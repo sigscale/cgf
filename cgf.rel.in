@@ -2,4 +2,5 @@
 	[{kernel, "@ERLANG_LIB_VER_kernel@"},
 	{stdlib, "@ERLANG_LIB_VER_stdlib@"},
 	{sasl, "@ERLANG_LIB_VER_sasl@", load},
+	{asn1, "@ERLANG_LIB_VER_asn1@"},
 	{@PACKAGE@, "@VERSION@"}]}.

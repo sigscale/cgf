@@ -4,4 +4,4 @@
 		{modules,
 			[cgf_app]},
 		{registered, []},
-		{applications, [kernel, stdlib]}]}.
+		{applications, [kernel, stdlib, asn1]}]}.
