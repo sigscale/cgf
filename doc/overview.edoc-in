@@ -1,0 +1,15 @@
+@copyright 2024 SigScale Global Inc.
+@version %VERSION%
+@title %DESCRIPTION%
+@reference <a href="https://webapp.etsi.org/key/key.asp?GSMSpecPart1=32&amp;GSMSpecPart2=240">
+3GPP TS 32.240</a> Charging architecture and principles.
+@doc This application implements the 3GPP Charging Gateway Function (CGF).
+
+==Introduction==
+
+==Installation==
+
+==Operation==
+
+==Configuration==
+

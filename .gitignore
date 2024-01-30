@@ -1,0 +1,14 @@
+# http://www.gnu.org/software/automake
+INSTALL
+Makefile.in
+ebin/Makefile.in
+doc/Makefile.in
+
+# http://www.gnu.org/software/autoconf
+aclocal.m4
+config.h.in
+configure
+autom4te.cache/
+install-sh
+missing
+
