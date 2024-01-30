@@ -1,0 +1,25 @@
+Attribute-ASN1Module {joint-iso-itu-t ms(9) smi(3) part2(2) asn1Module(2) 1}
+
+DEFINITIONS IMPLICIT TAGS ::= BEGIN
+
+	EXPORTS ManagementExtension;
+
+	DMI-TYPE-IDENTIFIER ::= CLASS {
+		&id     OBJECT IDENTIFIER UNIQUE,
+		&Value  
+	} WITH SYNTAX {
+		TYPE    &Value
+		ID      &id
+	}
+
+	DMI-EXTENSION ::= DMI-TYPE-IDENTIFIER
+	
+	ManagementExtension ::= SEQUENCE {
+	  identifier    DMI-EXTENSION.&id({ManagementExtensionSet}),
+	  significance  [1]  BOOLEAN DEFAULT FALSE,
+	  information   [2]  DMI-EXTENSION.&Value({ManagementExtensionSet}{@.identifier})
+	}
+	
+	ManagementExtensionSet DMI-EXTENSION ::= {...}
+
+END

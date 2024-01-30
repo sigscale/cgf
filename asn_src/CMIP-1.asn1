@@ -1,0 +1,23 @@
+CMIP-1 {joint-iso-itu-t ms(9) cmip(1) modules(0) protocol(3)}
+
+-- This module is taken from ITU-T X.711 Common Management Information Protocol
+-- and stripped to just the exports required by 3GPP TS 32.298
+
+DEFINITIONS ::= BEGIN
+
+	EXPORTS
+		ObjectInstance;
+
+	IMPORTS
+		DistinguishedName,
+		RDNSequence
+	FROM InformationFramework {joint-iso-ccitt ds(5) modules(1) informationFramework(1)};
+
+	ObjectInstance ::= CHOICE {
+		distinguishedName       [2] IMPLICIT DistinguishedName,
+		nonSpecificForm         [3] IMPLICIT OCTET STRING,
+		localDistinguishedName  [4] IMPLICIT RDNSequence
+	}
+
+END
+

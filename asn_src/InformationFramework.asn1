@@ -1,0 +1,32 @@
+InformationFramework {joint-iso-ccitt ds(5) modules(1) informationFramework(1)}
+
+-- Taken from ITU-T X.711 Common Management Information Protocol Annex D,
+-- originally published in CCITT Rec. X.501 (1988) | ISO/IEC 9594-2:1990.
+
+DEFINITIONS ::= BEGIN
+
+	EXPORTS
+		Name,
+      RDNSequence,
+		DistinguishedName;
+
+	AttributeType ::= OBJECT IDENTIFIER
+	
+	AttributeValue ::= ANY
+	
+	AttributeValueAssertion ::= SEQUENCE {
+		type AttributeType,
+		assertion AttributeValue
+	}
+	
+	Name ::= CHOICE {
+		rdnSequence RDNSequence
+	}
+	
+	RDNSequence ::= SEQUENCE OF RelativeDistinguishedName
+	
+	DistinguishedName ::= RDNSequence
+	
+	RelativeDistinguishedName ::= SET OF AttributeValueAssertion
+
+END

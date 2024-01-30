@@ -1,0 +1,26 @@
+ACSE-1 {joint-iso-itu-t association-control(2) modules(0) apdus(0) version1(1)}
+
+-- This module is taken from ITU-T X.227 Association Control Service Element
+-- and stripped to just the exports required by 3GPP TS 32.298
+
+DEFINITIONS ::= BEGIN
+
+	EXPORTS
+		AE-title;
+	
+	IMPORTS
+		Name,
+		RelativeDistinguishedName
+	FROM InformationFramework {joint-iso-itu-t ds(5) module(1) informationFramework(1) 3};
+	
+	AE-title ::= CHOICE {
+		ae-title-form1  AE-title-form1,
+		ae-title-form2  AE-title-form2,
+		...
+	}
+	
+	AE-title-form1 ::= Name
+	
+	AE-title-form2 ::= OBJECT IDENTIFIER
+
+END
