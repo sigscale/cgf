@@ -46,12 +46,14 @@ docdir=$ERLANG_INSTALL_LIB_DIR/$PACKAGE_NAME-$PACKAGE_VERSION/doc
 erldir=$ERLANG_INSTALL_LIB_DIR/$PACKAGE_NAME-$PACKAGE_VERSION/src
 beamdir=$ERLANG_INSTALL_LIB_DIR/$PACKAGE_NAME-$PACKAGE_VERSION/ebin
 asndir=$ERLANG_INSTALL_LIB_DIR/$PACKAGE_NAME-$PACKAGE_VERSION/asn_dir
+eincludedir=$ERLANG_INSTALL_LIB_DIR/$PACKAGE_NAME-$PACKAGE_VERSION/include
 reldir=$ERLANG_INSTALL_LIB_DIR/../releases
 AC_SUBST(otpdir)
 AC_SUBST(appdir)
 AC_SUBST(erldir)
 AC_SUBST(beamdir)
 AC_SUBST(asndir)
+AC_SUBST(eincludedir)
 AC_SUBST(reldir)
 
 
@@ -66,6 +68,7 @@ AC_ERLANG_CHECK_LIB([stdlib],
 		[AC_MSG_ERROR([stdlib was not found!])])
 AC_ERLANG_CHECK_LIB([sasl], [], [AC_MSG_ERROR([sasl was not found!])])
 AC_ERLANG_CHECK_LIB([asn1], [], [AC_MSG_ERROR([asn1 was not found!])])
+AC_ERLANG_CHECK_LIB([map], [], [AC_MSG_ERROR([map was not found!])])
 
 
 ##
