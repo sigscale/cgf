@@ -10,6 +10,15 @@
 @doc This application implements the 3GPP Charging Gateway Function (CGF).
 
 ==Introduction==
+The 3GPP reference architecture for the charging domain includes
+the functions:
+<ul>
+	<li>Charging Trigger Function (CTF)</li>
+	<li>Charging Data Function (CDF)</li>
+	<li>Charging Gateway Function (CGF)</li>
+</ul>
+<img class="diagram" alt="3GPP Charging Architecture"
+		src="3gpp-architecture.svg" />
 
 ==Installation==
 

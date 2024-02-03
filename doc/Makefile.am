@@ -8,7 +8,8 @@ modhtml = cgf_app.html
 doc_DATA = overview.edoc $(modhtml) \
 		modules-frame.html overview-summary.html \
 		index.html stylesheet.css edoc-info \
-		sigscale-logo.png
+		sigscale-logo.png \
+		3gpp-architecture.svg
 
 overview.edoc: overview.edoc-in
 	sed -e 's!%VERSION%!$(VERSION)!' \
@@ -25,5 +26,6 @@ overview.edoc: overview.edoc-in
 			mv $$i.tmp $$i; \
 	done
 	-cp -n $(top_srcdir)/doc/sigscale-logo.png .
+	-cp -n $(top_srcdir)/doc/3gpp-architecture.svg .
 
 CLEANFILES = $(doc_DATA) $(modhtml) erlang.png

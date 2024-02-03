@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xl="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="-210.5 -62.5 914 496" width="914" height="496">
+  <defs/>
+  <g id="architecture" stroke-opacity="1" fill="none" stroke-dasharray="none" stroke="none" fill-opacity="1">
+    <title>architecture</title>
+    <g id="architecture_Layer_1">
+      <title>Layer 1</title>
+      <g id="Graphic_28">
+        <path d="M 358 131.25 L 442 131.25 C 446.4183 131.25 450 134.83172 450 139.25 L 450 198.25 C 450 202.66828 446.4183 206.25 442 206.25 L 358 206.25 C 353.58172 206.25 350 202.66828 350 198.25 L 350 139.25 C 350 134.83172 353.58172 131.25 358 131.25 Z" fill="#ffa900"/>
+        <text transform="translate(355 154.25)" fill="white">
+          <tspan font-family="Montserrat" font-size="24" fill="white" x="19.68" y="23">CGF</tspan>
+        </text>
+      </g>
+      <g id="Line_18">
+        <line x1="251.5" y1="168.75" x2="350" y2="168.75" stroke="#aaa" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      </g>
+      <g id="Graphic_17">
+        <rect x="285.1801" y="156.75" width="26.534" height="24" fill="white"/>
+        <text transform="translate(286.1801 157.75)" fill="black">
+          <tspan font-family="Montserrat" font-size="18" fill="black" x="0" y="17">Ga</tspan>
+        </text>
+      </g>
+      <g id="Graphic_9">
+        <path d="M 159.5 131.25 L 243.5 131.25 C 247.91828 131.25 251.5 134.83172 251.5 139.25 L 251.5 198.25 C 251.5 202.66828 247.91828 206.25 243.5 206.25 L 159.5 206.25 C 155.08172 206.25 151.5 202.66828 151.5 198.25 L 151.5 139.25 C 151.5 134.83172 155.08172 131.25 159.5 131.25 Z" fill="#ffa900"/>
+        <text transform="translate(156.5 154.25)" fill="white">
+          <tspan font-family="Montserrat" font-size="24" fill="white" x="18.864" y="23">CDF</tspan>
+        </text>
+      </g>
+      <g id="Graphic_31">
+        <path d="M 546.9666 174.121 C 517.875 168.75 529.476 123.535 575.8836 131.25 C 580.1892 116.211 634.155 118.652 633.8022 131.25 C 667.6404 115.137 710.8836 147.266 681.8784 163.379 C 716.6832 171.191 681.4392 213.281 652.875 206.25 C 650.589 217.969 599.5248 222.07 595.0428 206.25 C 566.1276 223.145 505.8348 197.168 546.9666 174.121 Z" fill="#ccc"/>
+        <text transform="translate(555.5 139.75)" fill="white">
+          <tspan font-family="Montserrat" font-size="24" fill="white" x="19.66" y="23">Billing </tspan>
+          <tspan font-family="Montserrat" font-size="24" fill="white" x="9.4" y="52">Domain</tspan>
+        </text>
+      </g>
+      <g id="Line_33">
+        <line x1="450" y1="168.75" x2="535.9885" y2="168.75" stroke="#aaa" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      </g>
+      <g id="Graphic_32">
+        <rect x="478.148" y="156.75" width="25.184" height="24" fill="white"/>
+        <text transform="translate(479.148 157.75)" fill="black">
+          <tspan font-family="Montserrat" font-size="18" fill="black" x="55422333e-20" y="17">Bx</tspan>
+        </text>
+      </g>
+      <g id="Group_50">
+        <g id="Graphic_35">
+          <path d="M -169.2112 362.0936 C -208 353.5 -192.532 281.156 -130.6552 293.5 C -124.9144 269.4376 -52.96 273.3432 -53.4304 293.5 C -8.3128 267.7192 49.3448 319.1256 10.6712 344.9064 C 57.0776 357.4056 10.0856 424.7496 -28 413.5 C -31.048 432.2504 -99.1336 438.812 -105.1096 413.5 C -143.6632 440.532 -224.0536 398.9688 -169.2112 362.0936 Z" fill="#ccc"/>
+          <text transform="translate(-159.5 375.5)" fill="white">
+            <tspan font-family="Montserrat" font-size="24" fill="white" x="12.736" y="23">Subsystem</tspan>
+          </text>
+        </g>
+        <g id="Graphic_34">
+          <path d="M -90.5 312 L -31.5 312 C -27.081722 312 -23.5 315.58172 -23.5 320 L -23.5 364 C -23.5 368.41828 -27.081722 372 -31.5 372 L -90.5 372 C -94.91828 372 -98.5 368.41828 -98.5 364 L -98.5 320 C -98.5 315.58172 -94.91828 312 -90.5 312 Z" fill="white"/>
+          <text transform="translate(-93.5 327.5)" fill="#aaa">
+            <tspan font-family="Montserrat" font-size="24" fill="#aaa" x="9.496" y="23">CTF</tspan>
+          </text>
+        </g>
+      </g>
+      <g id="Line_22">
+        <line x1="-23.894893" y1="317.51063" x2="152.11916" y2="201.34135" stroke="#aaa" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      </g>
+      <g id="Graphic_21">
+        <rect x="99.04662" y="217.40095" width="21.116" height="24" fill="white"/>
+        <text transform="translate(100.04662 218.40095)" fill="black">
+          <tspan font-family="Montserrat" font-size="18" fill="black" x="9023893e-19" y="17">Rf</tspan>
+        </text>
+      </g>
+      <g id="Group_47">
+        <g id="Graphic_39">
+          <path d="M -176.6038 26.0936 C -218.625 17.5 -201.868 -54.844 -134.8348 -42.5 C -128.6156 -66.5624 -50.665 -62.6568 -51.1746 -42.5 C -2.2972 -68.2808 60.1652 -16.8744 18.2688 8.9064 C 68.5424 21.4056 17.6344 88.7496 -23.625 77.5 C -26.927 96.2504 -100.6864 102.812 -107.1604 77.5 C -148.9268 104.532 -236.0164 62.9688 -176.6038 26.0936 Z" fill="#ccc"/>
+          <text transform="translate(-166.5 -33.5)" fill="white">
+            <tspan font-family="Montserrat" font-size="24" fill="white" x="0" y="23">Core Network</tspan>
+          </text>
+        </g>
+        <g id="Graphic_38">
+          <path d="M -90 5.5 L -31 5.5 C -26.581722 5.5 -23 9.081722 -23 13.5 L -23 57.5 C -23 61.91828 -26.581722 65.5 -31 65.5 L -90 65.5 C -94.41828 65.5 -98 61.91828 -98 57.5 L -98 13.5 C -98 9.081722 -94.41828 5.5 -90 5.5 Z" fill="white"/>
+          <text transform="translate(-93 21)" fill="#aaa">
+            <tspan font-family="Montserrat" font-size="24" fill="#aaa" x="9.496" y="23">CTF</tspan>
+          </text>
+        </g>
+      </g>
+      <g id="Group_48">
+        <g id="Graphic_42">
+          <path d="M -171.389 196.5936 C -219.875 188 -200.54 115.656 -123.194 128 C -116.018 103.9376 -26.075 107.8432 -26.663 128 C 29.734 102.2192 101.806 153.6256 53.464 179.4064 C 111.472 191.9056 52.732 259.2496 5.125 248 C 1.315 266.7504 -83.792 273.312 -91.262 248 C -139.454 275.032 -239.942 233.4688 -171.389 196.5936 Z" fill="#ccc"/>
+          <text transform="translate(-160.5 210)" fill="white">
+            <tspan font-family="Montserrat" font-size="24" fill="white" x="0" y="23">Service Element</tspan>
+          </text>
+        </g>
+        <g id="Graphic_41">
+          <path d="M -90 138 L -28 138 C -23.581722 138 -20 141.58172 -20 146 L -20 190 C -20 194.41828 -23.581722 198 -28 198 L -90 198 C -94.41828 198 -98 194.41828 -98 190 L -98 146 C -98 141.58172 -94.41828 138 -90 138 Z" fill="white"/>
+          <text transform="translate(-93 153.5)" fill="#aaa">
+            <tspan font-family="Montserrat" font-size="24" fill="#aaa" x="10.996" y="23">CTF</tspan>
+          </text>
+        </g>
+      </g>
+      <g id="Line_20">
+        <line x1="-23" y1="54.57204" x2="151.5" y2="143.32061" stroke="#aaa" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      </g>
+      <g id="Graphic_19">
+        <rect x="98.31384" y="109.64045" width="21.116" height="24" fill="white"/>
+        <text transform="translate(99.31384 110.64045)" fill="black">
+          <tspan font-family="Montserrat" font-size="18" fill="black" x="9023893e-19" y="17">Rf</tspan>
+        </text>
+      </g>
+      <g id="Line_45">
+        <line x1="-20" y1="168.11228" x2="151.5" y2="168.60605" stroke="#aaa" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      </g>
+      <g id="Graphic_44">
+        <rect x="98.30254" y="156.48328" width="21.116" height="24" fill="white"/>
+        <text transform="translate(99.30254 157.48328)" fill="black">
+          <tspan font-family="Montserrat" font-size="18" fill="black" x="9023893e-19" y="17">Rf</tspan>
+        </text>
+      </g>
+    </g>
+  </g>
+</svg>
