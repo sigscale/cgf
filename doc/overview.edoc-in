@@ -3,6 +3,10 @@
 @title %DESCRIPTION%
 @reference <a href="https://webapp.etsi.org/key/key.asp?GSMSpecPart1=32&amp;GSMSpecPart2=240">
 3GPP TS 32.240</a> Charging architecture and principles.
+@reference <a href="https://webapp.etsi.org/key/key.asp?GSMSpecPart1=32&amp;GSMSpecPart2=297">
+3GPP TS 32.297</a> Charging Data Record (CDR) file format and transfer.
+@reference <a href="https://webapp.etsi.org/key/key.asp?GSMSpecPart1=32&amp;GSMSpecPart2=298">
+ 3GPP TS 32.298</a> Charging Data Record (CDR) parameter description.
 @doc This application implements the 3GPP Charging Gateway Function (CGF).
 
 ==Introduction==
