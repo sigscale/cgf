@@ -845,7 +845,7 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 
 	AOCParameters ::= SEQUENCE
 	--
-	-- See TSÊ22.024
+	-- See TS 22.024
 	--
 	{
 		e1  [1] EParameter OPTIONAL,
