@@ -7,7 +7,7 @@
 ## Configure new build directory
 mkdir -p shell/lib
 
-## Make edoc available
+## Make documentation and test reports available
 mkdir -p ~/public_html/cgf
 ln -st ~/public_html/cgf ../../cgf.build/doc
 
