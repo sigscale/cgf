@@ -9,36 +9,48 @@
 			"type": "object",
 			"allOf": [
 				{
-					"$ref": "http://sigscale.org/schema/cgf/ECS_base.json"
+					"$ref": "http://sigscale.org/schema/cgf/ECS_base.json#/$defs/ECS_base"
 				},
 				{
-					"$ref": "http://sigscale.org/schema/cgf/ECS_ecs.json"
+					"$ref": "http://sigscale.org/schema/cgf/ECS_ecs.json#/$defs/ECS_ecs"
 				},
 				{
-					"$ref": "http://sigscale.org/schema/cgf/ECS_service.json"
+					"$ref": "http://sigscale.org/schema/cgf/ECS_service.json#/$defs/ECS_service"
 				},
 				{
-					"$ref": "http://sigscale.org/schema/cgf/ECS_network.json"
+					"$ref": "http://sigscale.org/schema/cgf/ECS_network.json#/$defs/ECS_network"
 				},
 				{
-					"$ref": "http://sigscale.org/schema/cgf/ECS_user.json"
+					"$ref": "http://sigscale.org/schema/cgf/ECS_user.json#/$defs/ECS_user"
 				},
 				{
-					"$ref": "http://sigscale.org/schema/cgf/ECS_event.json"
+					"$ref": "http://sigscale.org/schema/cgf/ECS_event.json#/$defs/ECS_event"
 				},
 				{
 					"properties": {
 						"Bx_moCall": {
-							"$ref": "http://sigscale.org/schema/cgf/ECS_3GPP_Bx_MOCallRecord.json"
-						},
+							"$ref": "http://sigscale.org/schema/cgf/ECS_3GPP_Bx_MOCallRecord.json#/$defs/MOCallRecord"
+						}
+					}
+				},
+				{
+					"properties": {
 						"Bx_mtCall": {
-							"$ref": "http://sigscale.org/schema/cgf/ECS_3GPP_Bx_MTCallRecord.json"
-						},
+							"$ref": "http://sigscale.org/schema/cgf/ECS_3GPP_Bx_MTCallRecord.json#/$defs/MTCallRecord"
+						}
+					}
+				},
+				{
+					"properties": {
 						"Bx_moSMS": {
-							"$ref": "http://sigscale.org/schema/cgf/ECS_3GPP_Bx_MOSMSRecord.json"
-						},
+							"$ref": "http://sigscale.org/schema/cgf/ECS_3GPP_Bx_MOSMSRecord.json#/$defs/MOSMSRecord"
+						}
+					}
+				},
+				{
+					"properties": {
 						"Bx_mtSMS": {
-							"$ref": "http://sigscale.org/schema/cgf/ECS_3GPP_Bx_MTSMSRecord.json"
+							"$ref": "http://sigscale.org/schema/cgf/ECS_3GPP_Bx_MTSMSRecord.json#/$defs/MTSMSRecord"
 						}
 					}
 				}
