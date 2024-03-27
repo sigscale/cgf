@@ -1,0 +1,1227 @@
+SS-DataTypes {itu-t(0) identified-organization(4) etsi(0) mobileDomain(0) gsm-Access(2) modules(3) ss-DataTypes(2) version17(17)}
+
+DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		PrivateExtension
+	FROM MAP-ExtensionDataTypes {itu-t(0) identified-organization (4) etsi (0) mobileDomain (0) gsm-Network (1) modules (3) map-ExtensionDataTypes (21) version18 (18)};
+
+	SS-UserData ::= IA5String  ( SIZE( 1 .. 200 ) )
+
+	NotifySS-Arg ::= SEQUENCE {
+		ss-Code                   [1] IMPLICIT OCTET STRING ( SIZE( 1 ) ) OPTIONAL, 
+		ss-Status                 [4] IMPLICIT OCTET STRING ( SIZE( 1 ) ) OPTIONAL, 
+		ss-Notification           [5] IMPLICIT OCTET STRING ( SIZE( 1 ) ) OPTIONAL, 
+		callIsWaiting-Indicator   [14] IMPLICIT NULL OPTIONAL, 
+		callOnHold-Indicator      [15] IMPLICIT ENUMERATED {
+			callRetrieved    ( 0 ), 
+			callOnHold       ( 1 ) } OPTIONAL, 
+		mpty-Indicator            [16] IMPLICIT NULL OPTIONAL, 
+		cug-Index                 [17] IMPLICIT INTEGER ( 0 .. 32767 ) OPTIONAL, 
+		clirSuppressionRejected   [18] IMPLICIT NULL OPTIONAL, 
+		... , 
+		ect-Indicator             [19] IMPLICIT SEQUENCE {
+			ect-CallState   [0] IMPLICIT ENUMERATED {
+				alerting    ( 0 ), 
+				active      ( 1 ) }, 
+			rdn             [1] CHOICE {
+				presentationAllowedAddress              [0] IMPLICIT SEQUENCE {
+					partyNumber             [0] IMPLICIT OCTET STRING ( SIZE( 1 .. 20 ) ) ( SIZE( 1 .. 9 ) ), 
+					partyNumberSubaddress   [1] IMPLICIT OCTET STRING ( SIZE( 1 .. 21 ) ) OPTIONAL, 
+					... }, 
+				presentationRestricted                  [1] IMPLICIT NULL, 
+				numberNotAvailableDueToInterworking     [2] IMPLICIT NULL, 
+				presentationRestrictedAddress           [3] IMPLICIT SEQUENCE {
+					partyNumber             [0] IMPLICIT OCTET STRING ( SIZE( 1 .. 20 ) ) ( SIZE( 1 .. 9 ) ), 
+					partyNumberSubaddress   [1] IMPLICIT OCTET STRING ( SIZE( 1 .. 21 ) ) OPTIONAL, 
+					... }} OPTIONAL, 
+			... } OPTIONAL, 
+		nameIndicator             [20] IMPLICIT SEQUENCE {
+			callingName   [0] CHOICE {
+				namePresentationAllowed        [0] IMPLICIT SEQUENCE {
+					dataCodingScheme     [0] IMPLICIT OCTET STRING ( SIZE( 1 ) ), 
+					lengthInCharacters   [1] IMPLICIT INTEGER, 
+					nameString           [2] IMPLICIT OCTET STRING ( SIZE( 1 .. 160 ) ), 
+					... }, 
+				presentationRestricted         [1] IMPLICIT NULL, 
+				nameUnavailable                [2] IMPLICIT NULL, 
+				namePresentationRestricted     [3] IMPLICIT SEQUENCE {
+					dataCodingScheme     [0] IMPLICIT OCTET STRING ( SIZE( 1 ) ), 
+					lengthInCharacters   [1] IMPLICIT INTEGER, 
+					nameString           [2] IMPLICIT OCTET STRING ( SIZE( 1 .. 160 ) ), 
+					... }} OPTIONAL, 
+			... } OPTIONAL, 
+		ccbs-Feature              [21] IMPLICIT SEQUENCE {
+			ccbs-Index               [0] IMPLICIT INTEGER ( 1 .. 5 ) OPTIONAL, 
+			b-subscriberNumber       [1] IMPLICIT OCTET STRING ( SIZE( 1 .. 20 ) ) ( SIZE( 1 .. 9 ) ) OPTIONAL, 
+			b-subscriberSubaddress   [2] IMPLICIT OCTET STRING ( SIZE( 1 .. 21 ) ) OPTIONAL, 
+			basicServiceGroup        [3] CHOICE {
+				bearerService     [2] IMPLICIT OCTET STRING ( SIZE( 1 ) ), 
+				teleservice       [3] IMPLICIT OCTET STRING ( SIZE( 1 ) )} OPTIONAL, 
+			... } OPTIONAL, 
+		alertingPattern           [22] IMPLICIT OCTET STRING ( SIZE( 1 ) ) OPTIONAL, 
+		multicall-Indicator       [23] IMPLICIT ENUMERATED {
+			nbr-SNexceeded      ( 0 ), 
+			nbr-Userexceeded    ( 1 ) } OPTIONAL}
+
+	Multicall-Indicator ::= ENUMERATED {
+		nbr-SNexceeded      ( 0 ), 
+		nbr-Userexceeded    ( 1 ) }
+
+	ForwardChargeAdviceArg ::= SEQUENCE {
+		ss-Code               [0] IMPLICIT OCTET STRING ( SIZE( 1 ) ), 
+		chargingInformation   [1] IMPLICIT SEQUENCE {
+			e1         [1] IMPLICIT INTEGER ( 0 .. 8191 ) OPTIONAL, 
+			e2         [2] IMPLICIT INTEGER ( 0 .. 8191 ) OPTIONAL, 
+			e3         [3] IMPLICIT INTEGER ( 0 .. 8191 ) OPTIONAL, 
+			e4         [4] IMPLICIT INTEGER ( 0 .. 8191 ) OPTIONAL, 
+			e5         [5] IMPLICIT INTEGER ( 0 .. 8191 ) OPTIONAL, 
+			e6         [6] IMPLICIT INTEGER ( 0 .. 8191 ) OPTIONAL, 
+			e7         [7] IMPLICIT INTEGER ( 0 .. 8191 ) OPTIONAL, 
+			... }, 
+		... }
+
+	SS-Notification ::= OCTET STRING ( SIZE( 1 ) )
+
+	ChargingInformation ::= SEQUENCE {
+		e1         [1] IMPLICIT INTEGER ( 0 .. 8191 ) OPTIONAL, 
+		e2         [2] IMPLICIT INTEGER ( 0 .. 8191 ) OPTIONAL, 
+		e3         [3] IMPLICIT INTEGER ( 0 .. 8191 ) OPTIONAL, 
+		e4         [4] IMPLICIT INTEGER ( 0 .. 8191 ) OPTIONAL, 
+		e5         [5] IMPLICIT INTEGER ( 0 .. 8191 ) OPTIONAL, 
+		e6         [6] IMPLICIT INTEGER ( 0 .. 8191 ) OPTIONAL, 
+		e7         [7] IMPLICIT INTEGER ( 0 .. 8191 ) OPTIONAL, 
+		... }
+
+	E1         ::= INTEGER ( 0 .. 8191 )
+
+	max10TimesUnitsPerTime INTEGER ::= 8191
+
+	E2         ::= INTEGER ( 0 .. 8191 )
+
+	max10TimesTimeInterval INTEGER ::= 8191
+
+	E3         ::= INTEGER ( 0 .. 8191 )
+
+	max100TimesScalingFactor INTEGER ::= 8191
+
+	E4         ::= INTEGER ( 0 .. 8191 )
+
+	max10TimesIncrement INTEGER ::= 8191
+
+	E5         ::= INTEGER ( 0 .. 8191 )
+
+	max10TimesIncrementPerDataInterval INTEGER ::= 8191
+
+	E6         ::= INTEGER ( 0 .. 8191 )
+
+	maxNumberOfSegmentsPerDataInterval INTEGER ::= 8191
+
+	E7         ::= INTEGER ( 0 .. 8191 )
+
+	max10TimesInitialTime INTEGER ::= 8191
+
+	CallOnHold-Indicator ::= ENUMERATED {
+		callRetrieved    ( 0 ), 
+		callOnHold       ( 1 ) }
+
+	ForwardCUG-InfoArg ::= SEQUENCE {
+		cug-Index         [0] IMPLICIT INTEGER ( 0 .. 32767 ) OPTIONAL, 
+		suppressPrefCUG   [1] IMPLICIT NULL OPTIONAL, 
+		suppressOA        [2] IMPLICIT NULL OPTIONAL, 
+		... }
+
+	ECT-Indicator ::= SEQUENCE {
+		ect-CallState   [0] IMPLICIT ENUMERATED {
+			alerting    ( 0 ), 
+			active      ( 1 ) }, 
+		rdn             [1] CHOICE {
+			presentationAllowedAddress              [0] IMPLICIT SEQUENCE {
+				partyNumber             [0] IMPLICIT OCTET STRING ( SIZE( 1 .. 20 ) ) ( SIZE( 1 .. 9 ) ), 
+				partyNumberSubaddress   [1] IMPLICIT OCTET STRING ( SIZE( 1 .. 21 ) ) OPTIONAL, 
+				... }, 
+			presentationRestricted                  [1] IMPLICIT NULL, 
+			numberNotAvailableDueToInterworking     [2] IMPLICIT NULL, 
+			presentationRestrictedAddress           [3] IMPLICIT SEQUENCE {
+				partyNumber             [0] IMPLICIT OCTET STRING ( SIZE( 1 .. 20 ) ) ( SIZE( 1 .. 9 ) ), 
+				partyNumberSubaddress   [1] IMPLICIT OCTET STRING ( SIZE( 1 .. 21 ) ) OPTIONAL, 
+				... }} OPTIONAL, 
+		... }
+
+	ECT-CallState ::= ENUMERATED {
+		alerting    ( 0 ), 
+		active      ( 1 ) }
+
+	NameIndicator ::= SEQUENCE {
+		callingName   [0] CHOICE {
+			namePresentationAllowed        [0] IMPLICIT SEQUENCE {
+				dataCodingScheme     [0] IMPLICIT OCTET STRING ( SIZE( 1 ) ), 
+				lengthInCharacters   [1] IMPLICIT INTEGER, 
+				nameString           [2] IMPLICIT OCTET STRING ( SIZE( 1 .. 160 ) ), 
+				... }, 
+			presentationRestricted         [1] IMPLICIT NULL, 
+			nameUnavailable                [2] IMPLICIT NULL, 
+			namePresentationRestricted     [3] IMPLICIT SEQUENCE {
+				dataCodingScheme     [0] IMPLICIT OCTET STRING ( SIZE( 1 ) ), 
+				lengthInCharacters   [1] IMPLICIT INTEGER, 
+				nameString           [2] IMPLICIT OCTET STRING ( SIZE( 1 .. 160 ) ), 
+				... }} OPTIONAL, 
+		... }
+
+	Name       ::= CHOICE {
+		namePresentationAllowed        [0] IMPLICIT SEQUENCE {
+			dataCodingScheme     [0] IMPLICIT OCTET STRING ( SIZE( 1 ) ), 
+			lengthInCharacters   [1] IMPLICIT INTEGER, 
+			nameString           [2] IMPLICIT OCTET STRING ( SIZE( 1 .. 160 ) ), 
+			... }, 
+		presentationRestricted         [1] IMPLICIT NULL, 
+		nameUnavailable                [2] IMPLICIT NULL, 
+		namePresentationRestricted     [3] IMPLICIT SEQUENCE {
+			dataCodingScheme     [0] IMPLICIT OCTET STRING ( SIZE( 1 ) ), 
+			lengthInCharacters   [1] IMPLICIT INTEGER, 
+			nameString           [2] IMPLICIT OCTET STRING ( SIZE( 1 .. 160 ) ), 
+			... }}
+
+	NameSet    ::= SEQUENCE {
+		dataCodingScheme     [0] IMPLICIT OCTET STRING ( SIZE( 1 ) ), 
+		lengthInCharacters   [1] IMPLICIT INTEGER, 
+		nameString           [2] IMPLICIT OCTET STRING ( SIZE( 1 .. 160 ) ), 
+		... }
+
+	RDN        ::= CHOICE {
+		presentationAllowedAddress              [0] IMPLICIT SEQUENCE {
+			partyNumber             [0] IMPLICIT OCTET STRING ( SIZE( 1 .. 20 ) ) ( SIZE( 1 .. 9 ) ), 
+			partyNumberSubaddress   [1] IMPLICIT OCTET STRING ( SIZE( 1 .. 21 ) ) OPTIONAL, 
+			... }, 
+		presentationRestricted                  [1] IMPLICIT NULL, 
+		numberNotAvailableDueToInterworking     [2] IMPLICIT NULL, 
+		presentationRestrictedAddress           [3] IMPLICIT SEQUENCE {
+			partyNumber             [0] IMPLICIT OCTET STRING ( SIZE( 1 .. 20 ) ) ( SIZE( 1 .. 9 ) ), 
+			partyNumberSubaddress   [1] IMPLICIT OCTET STRING ( SIZE( 1 .. 21 ) ) OPTIONAL, 
+			... }}
+
+	RemotePartyNumber ::= SEQUENCE {
+		partyNumber             [0] IMPLICIT OCTET STRING ( SIZE( 1 .. 20 ) ) ( SIZE( 1 .. 9 ) ), 
+		partyNumberSubaddress   [1] IMPLICIT OCTET STRING ( SIZE( 1 .. 21 ) ) OPTIONAL, 
+		... }
+
+	AccessRegisterCCEntryArg ::= SEQUENCE {
+		... }
+
+	CallDeflectionArg ::= SEQUENCE {
+		deflectedToNumber       [0] IMPLICIT OCTET STRING ( SIZE( 1 .. 20 ) ), 
+		deflectedToSubaddress   [1] IMPLICIT OCTET STRING ( SIZE( 1 .. 21 ) ) OPTIONAL, 
+		... }
+
+	UserUserServiceArg ::= SEQUENCE {
+		uUS-Service    [0] IMPLICIT ENUMERATED {
+			uUS1        ( 1 ), 
+			uUS2        ( 2 ), 
+			uUS3        ( 3 ), 
+			...  }, 
+		uUS-Required   [1] IMPLICIT BOOLEAN, 
+		... }
+
+	UUS-Service ::= ENUMERATED {
+		uUS1        ( 1 ), 
+		uUS2        ( 2 ), 
+		uUS3        ( 3 ), 
+		...  }
+
+	LocationNotificationArg ::= SEQUENCE {
+		notificationType      [0] IMPLICIT ENUMERATED {
+			notifyLocationAllowed                             ( 0 ), 
+			notifyAndVerify-LocationAllowedIfNoResponse       ( 1 ), 
+			notifyAndVerify-LocationNotAllowedIfNoResponse    ( 2 ), 
+			... , 
+			locationNotAllowed                                ( 3 ) }, 
+		locationType          [1] IMPLICIT SEQUENCE {
+			locationEstimateType        [0] IMPLICIT ENUMERATED {
+				currentLocation                 ( 0 ), 
+				currentOrLastKnownLocation      ( 1 ), 
+				initialLocation                 ( 2 ), 
+				... , 
+				activateDeferredLocation        ( 3 ), 
+				cancelDeferredLocation          ( 4 ), 
+				notificationVerificationOnly    ( 5 ) }, 
+			... , 
+			deferredLocationEventType   [1] IMPLICIT BIT STRING {
+				msAvailable  (0 ), 
+				enteringIntoArea  (1 ), 
+				leavingFromArea  (2 ), 
+				beingInsideArea  (3 ), 
+				periodicLDR  (4 )} ( SIZE( 1 .. 16 ) ) OPTIONAL}, 
+		lcsClientExternalID   [2] IMPLICIT SEQUENCE {
+			externalAddress      [0] IMPLICIT OCTET STRING ( SIZE( 1 .. 20 ) ) ( SIZE( 1 .. 9 ) ) OPTIONAL, 
+			extensionContainer   [1] IMPLICIT SEQUENCE {
+				privateExtensionList   [0] IMPLICIT SEQUENCE ( SIZE( 1 .. 10 ) ) OF PrivateExtension OPTIONAL, 
+				pcs-Extensions         [1] IMPLICIT SEQUENCE {
+					... } OPTIONAL, 
+				... } OPTIONAL, 
+			... } OPTIONAL, 
+		lcsClientName         [3] IMPLICIT SEQUENCE {
+			dataCodingScheme      [0] IMPLICIT OCTET STRING ( SIZE( 1 ) ), 
+			nameString            [2] IMPLICIT OCTET STRING ( SIZE( 1 .. 160 ) ) ( SIZE( 1 .. 63 ) ), 
+			... , 
+			lcs-FormatIndicator   [3] IMPLICIT ENUMERATED {
+				logicalName      ( 0 ), 
+				e-mailAddress    ( 1 ), 
+				msisdn           ( 2 ), 
+				url              ( 3 ), 
+				sipUrl           ( 4 ), 
+				...  } OPTIONAL} OPTIONAL, 
+		... , 
+		lcsRequestorID        [4] IMPLICIT SEQUENCE {
+			dataCodingScheme      [0] IMPLICIT OCTET STRING ( SIZE( 1 ) ), 
+			requestorIDString     [1] IMPLICIT OCTET STRING ( SIZE( 1 .. 160 ) ) ( SIZE( 1 .. 63 ) ), 
+			... , 
+			lcs-FormatIndicator   [2] IMPLICIT ENUMERATED {
+				logicalName      ( 0 ), 
+				e-mailAddress    ( 1 ), 
+				msisdn           ( 2 ), 
+				url              ( 3 ), 
+				sipUrl           ( 4 ), 
+				...  } OPTIONAL} OPTIONAL, 
+		lcsCodeword           [5] IMPLICIT SEQUENCE {
+			dataCodingScheme    [0] IMPLICIT OCTET STRING ( SIZE( 1 ) ), 
+			lcsCodewordString   [1] IMPLICIT OCTET STRING ( SIZE( 1 .. 160 ) ) ( SIZE( 1 .. 20 ) ), 
+			... } OPTIONAL, 
+		lcsServiceTypeID      [6] IMPLICIT INTEGER ( 0 .. 127 ) OPTIONAL, 
+		deferredLocationExt   [7] IMPLICIT BIT STRING {
+			motionEvent  (0 )} ( SIZE( 1 .. 16 ) ) OPTIONAL}
+
+	DeferredLocationExt ::= BIT STRING {
+		motionEvent  (0 )} ( SIZE( 1 .. 16 ) )
+
+	LocationNotificationRes ::= SEQUENCE {
+		verificationResponse        [0] IMPLICIT ENUMERATED {
+			permissionDenied     ( 0 ), 
+			permissionGranted    ( 1 ), 
+			...  } OPTIONAL, 
+		locationPrivacyIndication   [1] IMPLICIT ENUMERATED {
+			locationDisallowed    ( 0 ), 
+			locationAllowed       ( 1 ), 
+			...  } OPTIONAL, 
+		validTimePeriod             [2] IMPLICIT SEQUENCE {
+			startTime   [0] IMPLICIT OCTET STRING ( SIZE( 30 ) ) OPTIONAL, 
+			endTime     [1] IMPLICIT OCTET STRING ( SIZE( 30 ) ) OPTIONAL, 
+			... } OPTIONAL, 
+		... }
+
+	VerificationResponse ::= ENUMERATED {
+		permissionDenied     ( 0 ), 
+		permissionGranted    ( 1 ), 
+		...  }
+
+	LCS-MOLRArg ::= SEQUENCE {
+		molr-Type                         [0] IMPLICIT ENUMERATED {
+			locationEstimate                            ( 0 ), 
+			assistanceData                              ( 1 ), 
+			deCipheringKeys                             ( 2 ), 
+			... , 
+			deferredMo-lrTTTPInitiation                 ( 3 ), 
+			deferredMo-lrSelfLocationInitiation         ( 4 ), 
+			deferredMt-lrOrmo-lrTTTPLocationEstimate    ( 5 ), 
+			deferredMt-lrOrmo-lrCancellation            ( 6 ), 
+			periodicEvent                               ( 7 ), 
+			enteringAreaEvent                           ( 8 ), 
+			leavingAreaEvent                            ( 9 ), 
+			beingInsideAreaEvent                        ( 10 ), 
+			motionEvent                                 ( 11 ), 
+			maximumIntervalExpirationEvent              ( 12 ) }, 
+		locationMethod                    [1] IMPLICIT ENUMERATED {
+			msBasedEOTD            ( 0 ), 
+			msAssistedEOTD         ( 1 ), 
+			assistedGPS            ( 2 ), 
+			... , 
+			msBasedOTDOA           ( 3 ), 
+			assistedGANSS          ( 4 ), 
+			assistedGPSandGANSS    ( 5 ) } OPTIONAL, 
+		lcs-QoS                           [2] IMPLICIT SEQUENCE {
+			horizontal-accuracy         [0] IMPLICIT OCTET STRING ( SIZE( 1 ) ) OPTIONAL, 
+			verticalCoordinateRequest   [1] IMPLICIT NULL OPTIONAL, 
+			vertical-accuracy           [2] IMPLICIT OCTET STRING ( SIZE( 1 ) ) OPTIONAL, 
+			responseTime                [3] IMPLICIT SEQUENCE {
+				responseTimeCategory   ENUMERATED {
+					lowdelay         ( 0 ), 
+					delaytolerant    ( 1 ), 
+					...  }, 
+				... } OPTIONAL, 
+			extensionContainer          [4] IMPLICIT SEQUENCE {
+				privateExtensionList   [0] IMPLICIT SEQUENCE ( SIZE( 1 .. 10 ) ) OF PrivateExtension OPTIONAL, 
+				pcs-Extensions         [1] IMPLICIT SEQUENCE {
+					... } OPTIONAL, 
+				... } OPTIONAL, 
+			... , 
+			velocityRequest             [5] IMPLICIT NULL OPTIONAL, 
+			lcs-qos-class               [6] IMPLICIT ENUMERATED {
+				bestEffort    ( 0 ), 
+				assured       ( 1 ), 
+				...  } OPTIONAL} OPTIONAL, 
+		lcsClientExternalID               [3] IMPLICIT SEQUENCE {
+			externalAddress      [0] IMPLICIT OCTET STRING ( SIZE( 1 .. 20 ) ) ( SIZE( 1 .. 9 ) ) OPTIONAL, 
+			extensionContainer   [1] IMPLICIT SEQUENCE {
+				privateExtensionList   [0] IMPLICIT SEQUENCE ( SIZE( 1 .. 10 ) ) OF PrivateExtension OPTIONAL, 
+				pcs-Extensions         [1] IMPLICIT SEQUENCE {
+					... } OPTIONAL, 
+				... } OPTIONAL, 
+			... } OPTIONAL, 
+		mlc-Number                        [4] IMPLICIT OCTET STRING ( SIZE( 1 .. 20 ) ) ( SIZE( 1 .. 9 ) ) OPTIONAL, 
+		gpsAssistanceData                 [5] IMPLICIT OCTET STRING ( SIZE( 1 .. 38 ) ) OPTIONAL, 
+		... , 
+		supportedGADShapes                [6] IMPLICIT BIT STRING {
+			ellipsoidPoint  (0 ), 
+			ellipsoidPointWithUncertaintyCircle  (1 ), 
+			ellipsoidPointWithUncertaintyEllipse  (2 ), 
+			polygon  (3 ), 
+			ellipsoidPointWithAltitude  (4 ), 
+			ellipsoidPointWithAltitudeAndUncertaintyElipsoid  (5 ), 
+			ellipsoidArc  (6 )} ( SIZE( 7 .. 16 ) ) OPTIONAL, 
+		lcsServiceTypeID                  [7] IMPLICIT INTEGER ( 0 .. 127 ) OPTIONAL, 
+		ageOfLocationInfo                 [8] IMPLICIT INTEGER ( 0 .. 32767 ) OPTIONAL, 
+		locationType                      [9] IMPLICIT SEQUENCE {
+			locationEstimateType        [0] IMPLICIT ENUMERATED {
+				currentLocation                 ( 0 ), 
+				currentOrLastKnownLocation      ( 1 ), 
+				initialLocation                 ( 2 ), 
+				... , 
+				activateDeferredLocation        ( 3 ), 
+				cancelDeferredLocation          ( 4 ), 
+				notificationVerificationOnly    ( 5 ) }, 
+			... , 
+			deferredLocationEventType   [1] IMPLICIT BIT STRING {
+				msAvailable  (0 ), 
+				enteringIntoArea  (1 ), 
+				leavingFromArea  (2 ), 
+				beingInsideArea  (3 ), 
+				periodicLDR  (4 )} ( SIZE( 1 .. 16 ) ) OPTIONAL} OPTIONAL, 
+		pseudonymIndicator                [10] IMPLICIT NULL OPTIONAL, 
+		h-gmlc-address                    [11] IMPLICIT OCTET STRING ( SIZE( 5 .. 17 ) ) OPTIONAL, 
+		locationEstimate                  [12] IMPLICIT OCTET STRING ( SIZE( 1 .. 20 ) ) OPTIONAL, 
+		velocityEstimate                  [13] IMPLICIT OCTET STRING ( SIZE( 4 .. 7 ) ) OPTIONAL, 
+		referenceNumber                   [14] IMPLICIT OCTET STRING ( SIZE( 1 ) ) OPTIONAL, 
+		periodicLDRInfo                   [15] IMPLICIT SEQUENCE {
+			reportingAmount               INTEGER ( 1 .. 8639999 ), 
+			reportingInterval             INTEGER ( 1 .. 8639999 ), 
+			... , 
+			reportingOptionMilliseconds   [0] IMPLICIT SEQUENCE {
+				reportingAmountMilliseconds     INTEGER ( 1 .. 8639999 ), 
+				reportingIntervalMilliseconds   INTEGER ( 1 .. 999 ), 
+				... } OPTIONAL} OPTIONAL, 
+		locationUpdateRequest             [16] IMPLICIT NULL OPTIONAL, 
+		sequenceNumber                    [17] IMPLICIT INTEGER ( 1 .. 8639999 ) OPTIONAL, 
+		terminationCause                  [18] IMPLICIT ENUMERATED {
+			subscriberTermination    ( 0 ), 
+			uETermination            ( 1 ), 
+			... , 
+			normalTermination        ( 2 ), 
+			networkTermination       ( 3 ) } OPTIONAL, 
+		mo-lrShortCircuit                 [19] IMPLICIT NULL OPTIONAL, 
+		ganssAssistanceData               [20] IMPLICIT OCTET STRING ( SIZE( 1 .. 40 ) ) OPTIONAL, 
+		multiplePositioningProtocolPDUs   [21] IMPLICIT SEQUENCE  ( SIZE( 1 .. 3 ) ) OF
+			OCTET STRING OPTIONAL, 
+		locationInfo                      [22] IMPLICIT BIT STRING {
+			locationEstimate  (0 )} ( SIZE( 1 .. 32 ) ) OPTIONAL, 
+		scheduledLocTime                  [23] IMPLICIT OCTET STRING ( SIZE( 30 ) ) OPTIONAL}
+
+	MOLR-Type  ::= ENUMERATED {
+		locationEstimate                            ( 0 ), 
+		assistanceData                              ( 1 ), 
+		deCipheringKeys                             ( 2 ), 
+		... , 
+		deferredMo-lrTTTPInitiation                 ( 3 ), 
+		deferredMo-lrSelfLocationInitiation         ( 4 ), 
+		deferredMt-lrOrmo-lrTTTPLocationEstimate    ( 5 ), 
+		deferredMt-lrOrmo-lrCancellation            ( 6 ), 
+		periodicEvent                               ( 7 ), 
+		enteringAreaEvent                           ( 8 ), 
+		leavingAreaEvent                            ( 9 ), 
+		beingInsideAreaEvent                        ( 10 ), 
+		motionEvent                                 ( 11 ), 
+		maximumIntervalExpirationEvent              ( 12 ) }
+
+	LocationMethod ::= ENUMERATED {
+		msBasedEOTD            ( 0 ), 
+		msAssistedEOTD         ( 1 ), 
+		assistedGPS            ( 2 ), 
+		... , 
+		msBasedOTDOA           ( 3 ), 
+		assistedGANSS          ( 4 ), 
+		assistedGPSandGANSS    ( 5 ) }
+
+	GPSAssistanceData ::= OCTET STRING ( SIZE( 1 .. 38 ) )
+
+	GANSSAssistanceData ::= OCTET STRING ( SIZE( 1 .. 40 ) )
+
+	TerminationCause ::= ENUMERATED {
+		subscriberTermination    ( 0 ), 
+		uETermination            ( 1 ), 
+		... , 
+		normalTermination        ( 2 ), 
+		networkTermination       ( 3 ) }
+
+	MultiplePositioningProtocolPDUs ::= SEQUENCE  ( SIZE( 1 .. 3 ) ) OF
+		OCTET STRING
+
+	PositioningProtocolPDU ::= OCTET STRING
+
+	maxNumLPPMsg INTEGER ::= 3
+
+	LCS-MOLRRes ::= SEQUENCE {
+		locationEstimate              [0] IMPLICIT OCTET STRING ( SIZE( 1 .. 20 ) ) OPTIONAL, 
+		decipheringKeys               [1] IMPLICIT OCTET STRING ( SIZE( 15 ) ) OPTIONAL, 
+		... , 
+		add-LocationEstimate          [2] IMPLICIT OCTET STRING ( SIZE( 1 .. 91 ) ) OPTIONAL, 
+		velocityEstimate              [3] IMPLICIT OCTET STRING ( SIZE( 4 .. 7 ) ) OPTIONAL, 
+		referenceNumber               [4] IMPLICIT OCTET STRING ( SIZE( 1 ) ) OPTIONAL, 
+		h-gmlc-address                [5] IMPLICIT OCTET STRING ( SIZE( 5 .. 17 ) ) OPTIONAL, 
+		mo-lrShortCircuit             [6] IMPLICIT NULL OPTIONAL, 
+		reportingPLMNList             [7] IMPLICIT SEQUENCE {
+			plmn-ListPrioritized   [0] IMPLICIT NULL OPTIONAL, 
+			plmn-List              [1] IMPLICIT SEQUENCE  ( SIZE( 1 .. 20 ) ) OF
+				SEQUENCE {
+					plmn-Id                       [0] IMPLICIT OCTET STRING ( SIZE( 3 ) ), 
+					ran-Technology                [1] IMPLICIT ENUMERATED {
+						gsm         ( 0 ), 
+						umts        ( 1 ), 
+						...  } OPTIONAL, 
+					ran-PeriodicLocationSupport   [2] IMPLICIT NULL OPTIONAL, 
+					... }, 
+			... } OPTIONAL, 
+		timestampOfLocationEstimate   [8] IMPLICIT OCTET STRING ( SIZE( 30 ) ) OPTIONAL}
+
+	DecipheringKeys ::= OCTET STRING ( SIZE( 15 ) )
+
+	LCS-AreaEventRequestArg ::= SEQUENCE {
+		referenceNumber             [0] IMPLICIT OCTET STRING ( SIZE( 1 ) ), 
+		h-gmlc-address              [1] IMPLICIT OCTET STRING ( SIZE( 5 .. 17 ) ), 
+		deferredLocationEventType   [3] IMPLICIT BIT STRING {
+			msAvailable  (0 ), 
+			enteringIntoArea  (1 ), 
+			leavingFromArea  (2 ), 
+			beingInsideArea  (3 ), 
+			periodicLDR  (4 )} ( SIZE( 1 .. 16 ) ), 
+		areaEventInfo               [4] IMPLICIT SEQUENCE {
+			areaDefinition   [0] IMPLICIT SEQUENCE {
+				areaList   [0] IMPLICIT SEQUENCE  ( SIZE( 1 .. 10 ) ) OF
+					SEQUENCE {
+						areaType             [0] IMPLICIT ENUMERATED {
+							countryCode       ( 0 ), 
+							plmnId            ( 1 ), 
+							locationAreaId    ( 2 ), 
+							routingAreaId     ( 3 ), 
+							cellGlobalId      ( 4 ), 
+							... , 
+							utranCellId       ( 5 ) }, 
+						areaIdentification   [1] IMPLICIT OCTET STRING ( SIZE( 2 .. 7 ) ), 
+						... }, 
+				... }, 
+			occurrenceInfo   [1] IMPLICIT ENUMERATED {
+				oneTimeEvent         ( 0 ), 
+				multipleTimeEvent    ( 1 ), 
+				...  } OPTIONAL, 
+			intervalTime     [2] IMPLICIT INTEGER ( 1 .. 32767 ) OPTIONAL, 
+			... }, 
+		... }
+
+	SLMOLR-Type ::= ENUMERATED {
+		rangingSidelink    ( 0 ), 
+		...  }
+
+	LCS-SLMOLRArg ::= SEQUENCE {
+		slmolr-Type                  [0] IMPLICIT ENUMERATED {
+			rangingSidelink    ( 0 ), 
+			...  }, 
+		lcs-QoS                      [1] IMPLICIT SEQUENCE {
+			horizontal-accuracy         [0] IMPLICIT OCTET STRING ( SIZE( 1 ) ) OPTIONAL, 
+			verticalCoordinateRequest   [1] IMPLICIT NULL OPTIONAL, 
+			vertical-accuracy           [2] IMPLICIT OCTET STRING ( SIZE( 1 ) ) OPTIONAL, 
+			responseTime                [3] IMPLICIT SEQUENCE {
+				responseTimeCategory   ENUMERATED {
+					lowdelay         ( 0 ), 
+					delaytolerant    ( 1 ), 
+					...  }, 
+				... } OPTIONAL, 
+			extensionContainer          [4] IMPLICIT SEQUENCE {
+				privateExtensionList   [0] IMPLICIT SEQUENCE ( SIZE( 1 .. 10 ) ) OF PrivateExtension OPTIONAL, 
+				pcs-Extensions         [1] IMPLICIT SEQUENCE {
+					... } OPTIONAL, 
+				... } OPTIONAL, 
+			... , 
+			velocityRequest             [5] IMPLICIT NULL OPTIONAL, 
+			lcs-qos-class               [6] IMPLICIT ENUMERATED {
+				bestEffort    ( 0 ), 
+				assured       ( 1 ), 
+				...  } OPTIONAL} OPTIONAL, 
+		lcsClientExternalID          [2] IMPLICIT SEQUENCE {
+			externalAddress      [0] IMPLICIT OCTET STRING ( SIZE( 1 .. 20 ) ) ( SIZE( 1 .. 9 ) ) OPTIONAL, 
+			extensionContainer   [1] IMPLICIT SEQUENCE {
+				privateExtensionList   [0] IMPLICIT SEQUENCE ( SIZE( 1 .. 10 ) ) OF PrivateExtension OPTIONAL, 
+				pcs-Extensions         [1] IMPLICIT SEQUENCE {
+					... } OPTIONAL, 
+				... } OPTIONAL, 
+			... } OPTIONAL, 
+		mlc-Number                   [3] IMPLICIT OCTET STRING ( SIZE( 1 .. 20 ) ) ( SIZE( 1 .. 9 ) ) OPTIONAL, 
+		supportedGADShapes           [4] IMPLICIT BIT STRING {
+			ellipsoidPoint  (0 ), 
+			ellipsoidPointWithUncertaintyCircle  (1 ), 
+			ellipsoidPointWithUncertaintyEllipse  (2 ), 
+			polygon  (3 ), 
+			ellipsoidPointWithAltitude  (4 ), 
+			ellipsoidPointWithAltitudeAndUncertaintyElipsoid  (5 ), 
+			ellipsoidArc  (6 )} ( SIZE( 7 .. 16 ) ) OPTIONAL, 
+		lcsServiceTypeID             [5] IMPLICIT INTEGER ( 0 .. 127 ) OPTIONAL, 
+		pseudonymIndicator           [7] IMPLICIT NULL OPTIONAL, 
+		h-gmlc-address               [8] IMPLICIT OCTET STRING ( SIZE( 5 .. 17 ) ) OPTIONAL, 
+		calculationAssistIndicator   [9] IMPLICIT BOOLEAN OPTIONAL, 
+		preferredRangingResult       [10] IMPLICIT SEQUENCE {
+			absoluteLocationIndicator   [0] IMPLICIT BOOLEAN OPTIONAL, 
+			absoluteVelocityIndicator   [1] IMPLICIT BOOLEAN OPTIONAL, 
+			relativeLocationIndicator   [2] IMPLICIT BOOLEAN OPTIONAL, 
+			rangeDirection              [3] IMPLICIT BOOLEAN OPTIONAL, 
+			relativeVelocityIndicator   [4] IMPLICIT BOOLEAN OPTIONAL, 
+			... } OPTIONAL, 
+		relatedUEInfo                [11] IMPLICIT SEQUENCE  ( SIZE( 1 .. 16 ) ) OF
+			SEQUENCE {
+				applicationLayerID   [0] IMPLICIT NULL, 
+				rangingRole          [1] IMPLICIT ENUMERATED {
+					targetUE         ( 0 ), 
+					locatedUE        ( 1 ), 
+					slReferenceUE    ( 2 ), 
+					slServerUE       ( 3 ), 
+					slClientUE       ( 4 ), 
+					...  }, 
+				slppContainer        [2] IMPLICIT NULL OPTIONAL, 
+				... } OPTIONAL, 
+		... }
+
+	PreferredRangingResult ::= SEQUENCE {
+		absoluteLocationIndicator   [0] IMPLICIT BOOLEAN OPTIONAL, 
+		absoluteVelocityIndicator   [1] IMPLICIT BOOLEAN OPTIONAL, 
+		relativeLocationIndicator   [2] IMPLICIT BOOLEAN OPTIONAL, 
+		rangeDirection              [3] IMPLICIT BOOLEAN OPTIONAL, 
+		relativeVelocityIndicator   [4] IMPLICIT BOOLEAN OPTIONAL, 
+		... }
+
+	RelatedUEInfo ::= SEQUENCE  ( SIZE( 1 .. 16 ) ) OF
+		SEQUENCE {
+			applicationLayerID   [0] IMPLICIT NULL, 
+			rangingRole          [1] IMPLICIT ENUMERATED {
+				targetUE         ( 0 ), 
+				locatedUE        ( 1 ), 
+				slReferenceUE    ( 2 ), 
+				slServerUE       ( 3 ), 
+				slClientUE       ( 4 ), 
+				...  }, 
+			slppContainer        [2] IMPLICIT NULL OPTIONAL, 
+			... }
+
+	maxRelatedUE INTEGER ::= 16
+
+	RangingUEInfo ::= SEQUENCE {
+		applicationLayerID   [0] IMPLICIT NULL, 
+		rangingRole          [1] IMPLICIT ENUMERATED {
+			targetUE         ( 0 ), 
+			locatedUE        ( 1 ), 
+			slReferenceUE    ( 2 ), 
+			slServerUE       ( 3 ), 
+			slClientUE       ( 4 ), 
+			...  }, 
+		slppContainer        [2] IMPLICIT NULL OPTIONAL, 
+		... }
+
+	RangingRole ::= ENUMERATED {
+		targetUE         ( 0 ), 
+		locatedUE        ( 1 ), 
+		slReferenceUE    ( 2 ), 
+		slServerUE       ( 3 ), 
+		slClientUE       ( 4 ), 
+		...  }
+
+	LCS-SLMOLRRes ::= SEQUENCE {
+		absoluteLocation   [0] IMPLICIT OCTET STRING ( SIZE( 1 .. 20 ) ) OPTIONAL, 
+		absoluteVelocity   [1] IMPLICIT OCTET STRING ( SIZE( 4 .. 7 ) ) OPTIONAL, 
+		relativeLocation   [2] IMPLICIT OCTET STRING ( SIZE( 1 .. 20 ) ) OPTIONAL, 
+		rangeDirection     [3] IMPLICIT OCTET STRING ( SIZE( 1 .. 20 ) ) OPTIONAL, 
+		relativeVelocity   [4] IMPLICIT OCTET STRING ( SIZE( 4 .. 7 ) ) OPTIONAL, 
+		relatedUEInfo      [5] IMPLICIT SEQUENCE  ( SIZE( 1 .. 16 ) ) OF
+			SEQUENCE {
+				applicationLayerID   [0] IMPLICIT NULL, 
+				rangingRole          [1] IMPLICIT ENUMERATED {
+					targetUE         ( 0 ), 
+					locatedUE        ( 1 ), 
+					slReferenceUE    ( 2 ), 
+					slServerUE       ( 3 ), 
+					slClientUE       ( 4 ), 
+					...  }, 
+				slppContainer        [2] IMPLICIT NULL OPTIONAL, 
+				... } OPTIONAL, 
+		timestamp          [6] IMPLICIT OCTET STRING ( SIZE( 30 ) ) OPTIONAL, 
+		... }
+
+	LCS-AreaEventReportArg ::= SEQUENCE {
+		referenceNumber   [0] IMPLICIT OCTET STRING ( SIZE( 1 ) ), 
+		h-gmlc-address    [1] IMPLICIT OCTET STRING ( SIZE( 5 .. 17 ) ), 
+		... }
+
+	LCS-AreaEventCancellationArg ::= SEQUENCE {
+		referenceNumber   [0] IMPLICIT OCTET STRING ( SIZE( 1 ) ), 
+		h-gmlc-address    [1] IMPLICIT OCTET STRING ( SIZE( 5 .. 17 ) ), 
+		... }
+
+	LCS-PeriodicLocationRequestArg ::= SEQUENCE {
+		referenceNumber       [0] IMPLICIT OCTET STRING ( SIZE( 1 ) ), 
+		periodicLDRInfo       [1] IMPLICIT SEQUENCE {
+			reportingAmount               INTEGER ( 1 .. 8639999 ), 
+			reportingInterval             INTEGER ( 1 .. 8639999 ), 
+			... , 
+			reportingOptionMilliseconds   [0] IMPLICIT SEQUENCE {
+				reportingAmountMilliseconds     INTEGER ( 1 .. 8639999 ), 
+				reportingIntervalMilliseconds   INTEGER ( 1 .. 999 ), 
+				... } OPTIONAL}, 
+		lcsClientExternalID   [2] IMPLICIT SEQUENCE {
+			externalAddress      [0] IMPLICIT OCTET STRING ( SIZE( 1 .. 20 ) ) ( SIZE( 1 .. 9 ) ) OPTIONAL, 
+			extensionContainer   [1] IMPLICIT SEQUENCE {
+				privateExtensionList   [0] IMPLICIT SEQUENCE ( SIZE( 1 .. 10 ) ) OF PrivateExtension OPTIONAL, 
+				pcs-Extensions         [1] IMPLICIT SEQUENCE {
+					... } OPTIONAL, 
+				... } OPTIONAL, 
+			... }, 
+		qoS                   [3] IMPLICIT SEQUENCE {
+			horizontal-accuracy         [0] IMPLICIT OCTET STRING ( SIZE( 1 ) ) OPTIONAL, 
+			verticalCoordinateRequest   [1] IMPLICIT NULL OPTIONAL, 
+			vertical-accuracy           [2] IMPLICIT OCTET STRING ( SIZE( 1 ) ) OPTIONAL, 
+			responseTime                [3] IMPLICIT SEQUENCE {
+				responseTimeCategory   ENUMERATED {
+					lowdelay         ( 0 ), 
+					delaytolerant    ( 1 ), 
+					...  }, 
+				... } OPTIONAL, 
+			extensionContainer          [4] IMPLICIT SEQUENCE {
+				privateExtensionList   [0] IMPLICIT SEQUENCE ( SIZE( 1 .. 10 ) ) OF PrivateExtension OPTIONAL, 
+				pcs-Extensions         [1] IMPLICIT SEQUENCE {
+					... } OPTIONAL, 
+				... } OPTIONAL, 
+			... , 
+			velocityRequest             [5] IMPLICIT NULL OPTIONAL, 
+			lcs-qos-class               [6] IMPLICIT ENUMERATED {
+				bestEffort    ( 0 ), 
+				assured       ( 1 ), 
+				...  } OPTIONAL} OPTIONAL, 
+		h-gmlc-address        [4] IMPLICIT OCTET STRING ( SIZE( 5 .. 17 ) ) OPTIONAL, 
+		mo-lrShortCircuit     [5] IMPLICIT NULL OPTIONAL, 
+		reportingPLMNList     [6] IMPLICIT SEQUENCE {
+			plmn-ListPrioritized   [0] IMPLICIT NULL OPTIONAL, 
+			plmn-List              [1] IMPLICIT SEQUENCE  ( SIZE( 1 .. 20 ) ) OF
+				SEQUENCE {
+					plmn-Id                       [0] IMPLICIT OCTET STRING ( SIZE( 3 ) ), 
+					ran-Technology                [1] IMPLICIT ENUMERATED {
+						gsm         ( 0 ), 
+						umts        ( 1 ), 
+						...  } OPTIONAL, 
+					ran-PeriodicLocationSupport   [2] IMPLICIT NULL OPTIONAL, 
+					... }, 
+			... } OPTIONAL, 
+		... }
+
+	LCS-PeriodicLocationRequestRes ::= SEQUENCE {
+		mo-lrShortCircuit   [0] IMPLICIT NULL OPTIONAL, 
+		... }
+
+	LCS-LocationUpdateArg ::= SEQUENCE {
+		referenceNumber        [0] IMPLICIT OCTET STRING ( SIZE( 1 ) ) OPTIONAL, 
+		add-LocationEstimate   [1] IMPLICIT OCTET STRING ( SIZE( 1 .. 91 ) ) OPTIONAL, 
+		velocityEstimate       [2] IMPLICIT OCTET STRING ( SIZE( 4 .. 7 ) ) OPTIONAL, 
+		sequenceNumber         [3] IMPLICIT INTEGER ( 1 .. 8639999 ) OPTIONAL, 
+		... }
+
+	LCS-LocationUpdateRes ::= SEQUENCE {
+		terminationCause   [0] IMPLICIT ENUMERATED {
+			subscriberTermination    ( 0 ), 
+			uETermination            ( 1 ), 
+			... , 
+			normalTermination        ( 2 ), 
+			networkTermination       ( 3 ) } OPTIONAL, 
+		... }
+
+	LCS-PeriodicLocationCancellationArg ::= SEQUENCE {
+		referenceNumber   [0] IMPLICIT OCTET STRING ( SIZE( 1 ) ), 
+		h-gmlc-address    [1] IMPLICIT OCTET STRING ( SIZE( 5 .. 17 ) ) OPTIONAL, 
+		... }
+
+	LCS-PeriodicTriggeredInvokeArg ::= SEQUENCE {
+		referenceNumber                      [0] IMPLICIT OCTET STRING ( SIZE( 1 ) ), 
+		h-gmlc-address                       [1] IMPLICIT OCTET STRING ( SIZE( 5 .. 17 ) ), 
+		qoS                                  [2] IMPLICIT SEQUENCE {
+			horizontal-accuracy         [0] IMPLICIT OCTET STRING ( SIZE( 1 ) ) OPTIONAL, 
+			verticalCoordinateRequest   [1] IMPLICIT NULL OPTIONAL, 
+			vertical-accuracy           [2] IMPLICIT OCTET STRING ( SIZE( 1 ) ) OPTIONAL, 
+			responseTime                [3] IMPLICIT SEQUENCE {
+				responseTimeCategory   ENUMERATED {
+					lowdelay         ( 0 ), 
+					delaytolerant    ( 1 ), 
+					...  }, 
+				... } OPTIONAL, 
+			extensionContainer          [4] IMPLICIT SEQUENCE {
+				privateExtensionList   [0] IMPLICIT SEQUENCE ( SIZE( 1 .. 10 ) ) OF PrivateExtension OPTIONAL, 
+				pcs-Extensions         [1] IMPLICIT SEQUENCE {
+					... } OPTIONAL, 
+				... } OPTIONAL, 
+			... , 
+			velocityRequest             [5] IMPLICIT NULL OPTIONAL, 
+			lcs-qos-class               [6] IMPLICIT ENUMERATED {
+				bestEffort    ( 0 ), 
+				assured       ( 1 ), 
+				...  } OPTIONAL} OPTIONAL, 
+		reportingPLMNList                    [3] IMPLICIT SEQUENCE {
+			plmn-ListPrioritized   [0] IMPLICIT NULL OPTIONAL, 
+			plmn-List              [1] IMPLICIT SEQUENCE  ( SIZE( 1 .. 20 ) ) OF
+				SEQUENCE {
+					plmn-Id                       [0] IMPLICIT OCTET STRING ( SIZE( 3 ) ), 
+					ran-Technology                [1] IMPLICIT ENUMERATED {
+						gsm         ( 0 ), 
+						umts        ( 1 ), 
+						...  } OPTIONAL, 
+					ran-PeriodicLocationSupport   [2] IMPLICIT NULL OPTIONAL, 
+					... }, 
+			... } OPTIONAL, 
+		periodicLocation                     [4] IMPLICIT SEQUENCE {
+			periodicLDRInfo   [0] IMPLICIT SEQUENCE {
+				reportingAmount               INTEGER ( 1 .. 8639999 ), 
+				reportingInterval             INTEGER ( 1 .. 8639999 ), 
+				... , 
+				reportingOptionMilliseconds   [0] IMPLICIT SEQUENCE {
+					reportingAmountMilliseconds     INTEGER ( 1 .. 8639999 ), 
+					reportingIntervalMilliseconds   INTEGER ( 1 .. 999 ), 
+					... } OPTIONAL}, 
+			... } OPTIONAL, 
+		areaEventReporting                   [5] IMPLICIT SEQUENCE {
+			deferredLocationEventType   [0] IMPLICIT BIT STRING {
+				msAvailable  (0 ), 
+				enteringIntoArea  (1 ), 
+				leavingFromArea  (2 ), 
+				beingInsideArea  (3 ), 
+				periodicLDR  (4 )} ( SIZE( 1 .. 16 ) ), 
+			areaList                    [1] IMPLICIT SEQUENCE  ( SIZE( 1 .. 250 ) ) OF
+				SEQUENCE {
+					areaType                [0] IMPLICIT ENUMERATED {
+						trackingArea       ( 0 ), 
+						ecgi               ( 1 ), 
+						... , 
+						trackingArea5GS    ( 2 ), 
+						ncgi               ( 3 ) }, 
+					areaIdentification      [1] IMPLICIT OCTET STRING ( SIZE( 5 .. 7 ) ), 
+					... , 
+					areaIdentificationExt   [2] IMPLICIT OCTET STRING ( SIZE( 1 ) )}, 
+			occurrenceInfo              [2] IMPLICIT ENUMERATED {
+				oneTimeEvent         ( 0 ), 
+				multipleTimeEvent    ( 1 ), 
+				...  } OPTIONAL, 
+			intervalTime                [3] IMPLICIT INTEGER ( 1 .. 32767 ) OPTIONAL, 
+			maximumInterval             [4] IMPLICIT INTEGER ( 1 .. 86400 ) OPTIONAL, 
+			samplingInterval            [5] IMPLICIT INTEGER ( 1 .. 3600 ) OPTIONAL, 
+			duration                    [6] IMPLICIT INTEGER ( 1 .. 8640000 ) OPTIONAL, 
+			locationInfo                [7] IMPLICIT BIT STRING {
+				locationEstimate  (0 )} ( SIZE( 1 .. 32 ) ) OPTIONAL, 
+			... } OPTIONAL, 
+		motionEventReporting                 [6] IMPLICIT SEQUENCE {
+			linearDistance     [0] IMPLICIT INTEGER ( 1 .. 10000 ), 
+			occurrenceInfo     [1] IMPLICIT ENUMERATED {
+				oneTimeEvent         ( 0 ), 
+				multipleTimeEvent    ( 1 ), 
+				...  } OPTIONAL, 
+			intervalTime       [2] IMPLICIT INTEGER ( 1 .. 32767 ) OPTIONAL, 
+			maximumInterval    [3] IMPLICIT INTEGER ( 1 .. 86400 ) OPTIONAL, 
+			samplingInterval   [4] IMPLICIT INTEGER ( 1 .. 3600 ) OPTIONAL, 
+			duration           [5] IMPLICIT INTEGER ( 1 .. 8640000 ) OPTIONAL, 
+			locationInfo       [6] IMPLICIT BIT STRING {
+				locationEstimate  (0 )} ( SIZE( 1 .. 32 ) ) OPTIONAL, 
+			... } OPTIONAL, 
+		... , 
+		referenceNumberExt                   [7] IMPLICIT OCTET STRING ( SIZE( 1 .. 255 ) ) OPTIONAL, 
+		h-gmlc-callBackUri                   [8] IMPLICIT UTF8String OPTIONAL, 
+		supportedGADShapes                   [9] IMPLICIT BIT STRING {
+			ellipsoidPoint  (0 ), 
+			ellipsoidPointWithUncertaintyCircle  (1 ), 
+			ellipsoidPointWithUncertaintyEllipse  (2 ), 
+			polygon  (3 ), 
+			ellipsoidPointWithAltitude  (4 ), 
+			ellipsoidPointWithAltitudeAndUncertaintyElipsoid  (5 ), 
+			ellipsoidArc  (6 )} ( SIZE( 7 .. 16 ) ) OPTIONAL, 
+		deferredRoutingIdentifier            [10] IMPLICIT OCTET STRING OPTIONAL, 
+		reportingAccessTypes                 [11] IMPLICIT BIT STRING {
+			nR  (0 ), 
+			eUTRAConnectedTo5GC  (1 ), 
+			non3GPPConnectedTo5GC  (2 ), 
+			eUTRAConnectedToEPC  (3 ), 
+			nR-LEO  (4 ), 
+			nR-MEO  (5 ), 
+			nR-GEO  (6 ), 
+			nR-OTHER-SAT  (7 )} ( SIZE( 1 .. 16 ) ) OPTIONAL, 
+		multiplePositioningProtocolPDUs      [12] IMPLICIT SEQUENCE  ( SIZE( 1 .. 3 ) ) OF
+			OCTET STRING OPTIONAL, 
+		controlPlane-CIoT-5GS-Optimisation   [13] IMPLICIT SEQUENCE {
+			maximumDuration                  [0] IMPLICIT INTEGER ( 1 .. 10080 ) OPTIONAL, 
+			maximumConsecutiveEventReports   [1] IMPLICIT INTEGER ( 1 .. 1023 ) OPTIONAL, 
+			... } OPTIONAL, 
+		scheduledLocTime                     [14] IMPLICIT OCTET STRING ( SIZE( 30 ) ), 
+		eventReportAllowedArea               [15] IMPLICIT SEQUENCE  ( SIZE( 1 .. 250 ) ) OF
+			SEQUENCE {
+				areaType                [0] IMPLICIT ENUMERATED {
+					trackingArea       ( 0 ), 
+					ecgi               ( 1 ), 
+					... , 
+					trackingArea5GS    ( 2 ), 
+					ncgi               ( 3 ) }, 
+				areaIdentification      [1] IMPLICIT OCTET STRING ( SIZE( 5 .. 7 ) ), 
+				... , 
+				areaIdentificationExt   [2] IMPLICIT OCTET STRING ( SIZE( 1 ) )} OPTIONAL, 
+		reportingInd                         [16] IMPLICIT ENUMERATED {
+			insideReporting     ( 0 ), 
+			outsideReporting    ( 1 ), 
+			...  } OPTIONAL, 
+		mappedQoS                            [17] IMPLICIT SEQUENCE {
+			horizontal-accuracy         [0] IMPLICIT OCTET STRING ( SIZE( 1 ) ) OPTIONAL, 
+			verticalCoordinateRequest   [1] IMPLICIT NULL OPTIONAL, 
+			vertical-accuracy           [2] IMPLICIT OCTET STRING ( SIZE( 1 ) ) OPTIONAL, 
+			responseTime                [3] IMPLICIT SEQUENCE {
+				responseTimeCategory   ENUMERATED {
+					lowdelay         ( 0 ), 
+					delaytolerant    ( 1 ), 
+					...  }, 
+				... } OPTIONAL, 
+			extensionContainer          [4] IMPLICIT SEQUENCE {
+				privateExtensionList   [0] IMPLICIT SEQUENCE ( SIZE( 1 .. 10 ) ) OF PrivateExtension OPTIONAL, 
+				pcs-Extensions         [1] IMPLICIT SEQUENCE {
+					... } OPTIONAL, 
+				... } OPTIONAL, 
+			... , 
+			velocityRequest             [5] IMPLICIT NULL OPTIONAL, 
+			lcs-qos-class               [6] IMPLICIT ENUMERATED {
+				bestEffort    ( 0 ), 
+				assured       ( 1 ), 
+				...  } OPTIONAL} OPTIONAL, 
+		userPlaneReportAFAddr                [18] IMPLICIT SEQUENCE {
+			af-Ipv4-Addrs   [0] IMPLICIT SEQUENCE  ( SIZE( 1 .. 16 ) ) OF
+				OCTET STRING ( SIZE( 4 ) ) OPTIONAL, 
+			af-Ipv6-Addrs   [1] IMPLICIT SEQUENCE  ( SIZE( 1 .. 16 ) ) OF
+				OCTET STRING ( SIZE( 16 ) ) OPTIONAL, 
+			af-Fqdn         [2] IMPLICIT OCTET STRING ( SIZE( 4 .. 253 ) ) OPTIONAL} OPTIONAL, 
+		cumulativeReportCriteria             [19] IMPLICIT SEQUENCE {
+			timerCriteria     [0] IMPLICIT INTEGER ( 1 .. 8639999 ) OPTIONAL, 
+			counterCriteria   [1] IMPLICIT INTEGER ( 1 .. 8639999 ) OPTIONAL} OPTIONAL}
+
+	PeriodicLocation ::= SEQUENCE {
+		periodicLDRInfo   [0] IMPLICIT SEQUENCE {
+			reportingAmount               INTEGER ( 1 .. 8639999 ), 
+			reportingInterval             INTEGER ( 1 .. 8639999 ), 
+			... , 
+			reportingOptionMilliseconds   [0] IMPLICIT SEQUENCE {
+				reportingAmountMilliseconds     INTEGER ( 1 .. 8639999 ), 
+				reportingIntervalMilliseconds   INTEGER ( 1 .. 999 ), 
+				... } OPTIONAL}, 
+		... }
+
+	AreaEventReporting ::= SEQUENCE {
+		deferredLocationEventType   [0] IMPLICIT BIT STRING {
+			msAvailable  (0 ), 
+			enteringIntoArea  (1 ), 
+			leavingFromArea  (2 ), 
+			beingInsideArea  (3 ), 
+			periodicLDR  (4 )} ( SIZE( 1 .. 16 ) ), 
+		areaList                    [1] IMPLICIT SEQUENCE  ( SIZE( 1 .. 250 ) ) OF
+			SEQUENCE {
+				areaType                [0] IMPLICIT ENUMERATED {
+					trackingArea       ( 0 ), 
+					ecgi               ( 1 ), 
+					... , 
+					trackingArea5GS    ( 2 ), 
+					ncgi               ( 3 ) }, 
+				areaIdentification      [1] IMPLICIT OCTET STRING ( SIZE( 5 .. 7 ) ), 
+				... , 
+				areaIdentificationExt   [2] IMPLICIT OCTET STRING ( SIZE( 1 ) )}, 
+		occurrenceInfo              [2] IMPLICIT ENUMERATED {
+			oneTimeEvent         ( 0 ), 
+			multipleTimeEvent    ( 1 ), 
+			...  } OPTIONAL, 
+		intervalTime                [3] IMPLICIT INTEGER ( 1 .. 32767 ) OPTIONAL, 
+		maximumInterval             [4] IMPLICIT INTEGER ( 1 .. 86400 ) OPTIONAL, 
+		samplingInterval            [5] IMPLICIT INTEGER ( 1 .. 3600 ) OPTIONAL, 
+		duration                    [6] IMPLICIT INTEGER ( 1 .. 8640000 ) OPTIONAL, 
+		locationInfo                [7] IMPLICIT BIT STRING {
+			locationEstimate  (0 )} ( SIZE( 1 .. 32 ) ) OPTIONAL, 
+		... }
+
+	AreaList   ::= SEQUENCE  ( SIZE( 1 .. 250 ) ) OF
+		SEQUENCE {
+			areaType                [0] IMPLICIT ENUMERATED {
+				trackingArea       ( 0 ), 
+				ecgi               ( 1 ), 
+				... , 
+				trackingArea5GS    ( 2 ), 
+				ncgi               ( 3 ) }, 
+			areaIdentification      [1] IMPLICIT OCTET STRING ( SIZE( 5 .. 7 ) ), 
+			... , 
+			areaIdentificationExt   [2] IMPLICIT OCTET STRING ( SIZE( 1 ) )}
+
+	maxAreas   INTEGER ::= 250
+
+	Area       ::= SEQUENCE {
+		areaType                [0] IMPLICIT ENUMERATED {
+			trackingArea       ( 0 ), 
+			ecgi               ( 1 ), 
+			... , 
+			trackingArea5GS    ( 2 ), 
+			ncgi               ( 3 ) }, 
+		areaIdentification      [1] IMPLICIT OCTET STRING ( SIZE( 5 .. 7 ) ), 
+		... , 
+		areaIdentificationExt   [2] IMPLICIT OCTET STRING ( SIZE( 1 ) )}
+
+	AreaType   ::= ENUMERATED {
+		trackingArea       ( 0 ), 
+		ecgi               ( 1 ), 
+		... , 
+		trackingArea5GS    ( 2 ), 
+		ncgi               ( 3 ) }
+
+	AreaIdentification ::= OCTET STRING ( SIZE( 5 .. 7 ) )
+
+	AreaIdentificationExt ::= OCTET STRING ( SIZE( 1 ) )
+
+	OccurrenceInfo ::= ENUMERATED {
+		oneTimeEvent         ( 0 ), 
+		multipleTimeEvent    ( 1 ), 
+		...  }
+
+	MaximumInterval ::= INTEGER ( 1 .. 86400 )
+
+	SamplingInterval ::= INTEGER ( 1 .. 3600 )
+
+	Duration   ::= INTEGER ( 1 .. 8640000 )
+
+	LocationInfo ::= BIT STRING {
+		locationEstimate  (0 )} ( SIZE( 1 .. 32 ) )
+
+	MotionEventReporting ::= SEQUENCE {
+		linearDistance     [0] IMPLICIT INTEGER ( 1 .. 10000 ), 
+		occurrenceInfo     [1] IMPLICIT ENUMERATED {
+			oneTimeEvent         ( 0 ), 
+			multipleTimeEvent    ( 1 ), 
+			...  } OPTIONAL, 
+		intervalTime       [2] IMPLICIT INTEGER ( 1 .. 32767 ) OPTIONAL, 
+		maximumInterval    [3] IMPLICIT INTEGER ( 1 .. 86400 ) OPTIONAL, 
+		samplingInterval   [4] IMPLICIT INTEGER ( 1 .. 3600 ) OPTIONAL, 
+		duration           [5] IMPLICIT INTEGER ( 1 .. 8640000 ) OPTIONAL, 
+		locationInfo       [6] IMPLICIT BIT STRING {
+			locationEstimate  (0 )} ( SIZE( 1 .. 32 ) ) OPTIONAL, 
+		... }
+
+	LinearDistance ::= INTEGER ( 1 .. 10000 )
+
+	LCS-ReferenceNumberExt ::= OCTET STRING ( SIZE( 1 .. 255 ) )
+
+	ReportingAccessTypes ::= BIT STRING {
+		nR  (0 ), 
+		eUTRAConnectedTo5GC  (1 ), 
+		non3GPPConnectedTo5GC  (2 ), 
+		eUTRAConnectedToEPC  (3 ), 
+		nR-LEO  (4 ), 
+		nR-MEO  (5 ), 
+		nR-GEO  (6 ), 
+		nR-OTHER-SAT  (7 )} ( SIZE( 1 .. 16 ) )
+
+	ReportingInd ::= ENUMERATED {
+		insideReporting     ( 0 ), 
+		outsideReporting    ( 1 ), 
+		...  }
+
+	LCS-PeriodicTriggeredInvokeRes ::= SEQUENCE {
+		... }
+
+	LCS-EventReportArg ::= SEQUENCE {
+		eventType                         [0] IMPLICIT ENUMERATED {
+			periodicEvent                     ( 0 ), 
+			enteringAreaEvent                 ( 1 ), 
+			leavingAreaEvent                  ( 2 ), 
+			beingInsideAreaEvent              ( 3 ), 
+			motionEvent                       ( 4 ), 
+			maximumIntervalExpirationEvent    ( 5 ), 
+			locationCancellationEvent         ( 6 ), 
+			... , 
+			cumulativeEventReport             ( 7 ) }, 
+		referenceNumberExt                [1] IMPLICIT OCTET STRING ( SIZE( 1 .. 255 ) ), 
+		h-gmlc-callBackUri                [2] IMPLICIT UTF8String, 
+		locationInfo                      [3] IMPLICIT BIT STRING {
+			locationEstimate  (0 )} ( SIZE( 1 .. 32 ) ) OPTIONAL, 
+		supportedGADShapes                [4] IMPLICIT BIT STRING {
+			ellipsoidPoint  (0 ), 
+			ellipsoidPointWithUncertaintyCircle  (1 ), 
+			ellipsoidPointWithUncertaintyEllipse  (2 ), 
+			polygon  (3 ), 
+			ellipsoidPointWithAltitude  (4 ), 
+			ellipsoidPointWithAltitudeAndUncertaintyElipsoid  (5 ), 
+			ellipsoidArc  (6 )} ( SIZE( 7 .. 16 ) ) OPTIONAL, 
+		lcs-QoS                           [5] IMPLICIT SEQUENCE {
+			horizontal-accuracy         [0] IMPLICIT OCTET STRING ( SIZE( 1 ) ) OPTIONAL, 
+			verticalCoordinateRequest   [1] IMPLICIT NULL OPTIONAL, 
+			vertical-accuracy           [2] IMPLICIT OCTET STRING ( SIZE( 1 ) ) OPTIONAL, 
+			responseTime                [3] IMPLICIT SEQUENCE {
+				responseTimeCategory   ENUMERATED {
+					lowdelay         ( 0 ), 
+					delaytolerant    ( 1 ), 
+					...  }, 
+				... } OPTIONAL, 
+			extensionContainer          [4] IMPLICIT SEQUENCE {
+				privateExtensionList   [0] IMPLICIT SEQUENCE ( SIZE( 1 .. 10 ) ) OF PrivateExtension OPTIONAL, 
+				pcs-Extensions         [1] IMPLICIT SEQUENCE {
+					... } OPTIONAL, 
+				... } OPTIONAL, 
+			... , 
+			velocityRequest             [5] IMPLICIT NULL OPTIONAL, 
+			lcs-qos-class               [6] IMPLICIT ENUMERATED {
+				bestEffort    ( 0 ), 
+				assured       ( 1 ), 
+				...  } OPTIONAL} OPTIONAL, 
+		multiplePositioningProtocolPDUs   [6] IMPLICIT SEQUENCE  ( SIZE( 1 .. 3 ) ) OF
+			OCTET STRING OPTIONAL, 
+		terminationCause                  [7] IMPLICIT ENUMERATED {
+			subscriberTermination    ( 0 ), 
+			uETermination            ( 1 ), 
+			... , 
+			normalTermination        ( 2 ), 
+			networkTermination       ( 3 ) } OPTIONAL, 
+		... , 
+		userPlaneEventReportStat          [8] IMPLICIT INTEGER ( 1 .. 8639999 ) OPTIONAL}
+
+	EventType  ::= ENUMERATED {
+		periodicEvent                     ( 0 ), 
+		enteringAreaEvent                 ( 1 ), 
+		leavingAreaEvent                  ( 2 ), 
+		beingInsideAreaEvent              ( 3 ), 
+		motionEvent                       ( 4 ), 
+		maximumIntervalExpirationEvent    ( 5 ), 
+		locationCancellationEvent         ( 6 ), 
+		... , 
+		cumulativeEventReport             ( 7 ) }
+
+	ControlPlane-CIoT-5GS-Optimisation ::= SEQUENCE {
+		maximumDuration                  [0] IMPLICIT INTEGER ( 1 .. 10080 ) OPTIONAL, 
+		maximumConsecutiveEventReports   [1] IMPLICIT INTEGER ( 1 .. 1023 ) OPTIONAL, 
+		... }
+
+	MaximumDuration ::= INTEGER ( 1 .. 10080 )
+
+	MaximumConsecutiveEventReports ::= INTEGER ( 1 .. 1023 )
+
+	LCS-UserPlaneEventReportStat ::= INTEGER ( 1 .. 8639999 )
+
+	LCS-UserPlaneReportAFAddr ::= SEQUENCE {
+		af-Ipv4-Addrs   [0] IMPLICIT SEQUENCE  ( SIZE( 1 .. 16 ) ) OF
+			OCTET STRING ( SIZE( 4 ) ) OPTIONAL, 
+		af-Ipv6-Addrs   [1] IMPLICIT SEQUENCE  ( SIZE( 1 .. 16 ) ) OF
+			OCTET STRING ( SIZE( 16 ) ) OPTIONAL, 
+		af-Fqdn         [2] IMPLICIT OCTET STRING ( SIZE( 4 .. 253 ) ) OPTIONAL}
+
+	Ipv4Addrs  ::= SEQUENCE  ( SIZE( 1 .. 16 ) ) OF
+		OCTET STRING ( SIZE( 4 ) )
+
+	Ipv6Addrs  ::= SEQUENCE  ( SIZE( 1 .. 16 ) ) OF
+		OCTET STRING ( SIZE( 16 ) )
+
+	Ipv4Addr   ::= OCTET STRING ( SIZE( 4 ) )
+
+	Ipv6Addr   ::= OCTET STRING ( SIZE( 16 ) )
+
+	LCS-CumulativeReportCriteria ::= SEQUENCE {
+		timerCriteria     [0] IMPLICIT INTEGER ( 1 .. 8639999 ) OPTIONAL, 
+		counterCriteria   [1] IMPLICIT INTEGER ( 1 .. 8639999 ) OPTIONAL}
+
+	LCS-CumulativeReportTimerCriteria ::= INTEGER ( 1 .. 8639999 )
+
+	LCS-CumulativeReportCounterCriteria ::= INTEGER ( 1 .. 8639999 )
+
+	FQDN       ::= OCTET STRING ( SIZE( 4 .. 253 ) )
+
+	LCS-EventReportRes ::= SEQUENCE {
+		deferredRoutingIdentifier   [0] IMPLICIT OCTET STRING OPTIONAL, 
+		terminationCause            [1] IMPLICIT ENUMERATED {
+			subscriberTermination    ( 0 ), 
+			uETermination            ( 1 ), 
+			... , 
+			normalTermination        ( 2 ), 
+			networkTermination       ( 3 ) } OPTIONAL, 
+		... }
+
+	LCS-CancelDeferredLocationArg ::= SEQUENCE {
+		referenceNumberExt   [0] IMPLICIT OCTET STRING ( SIZE( 1 .. 255 ) ), 
+		h-gmlc-callBackUri   [2] IMPLICIT UTF8String, 
+		... }
+
+	LCS-LocationPrivacySettingArg ::= SEQUENCE {
+		locationPrivacyIndication   [0] IMPLICIT ENUMERATED {
+			locationDisallowed    ( 0 ), 
+			locationAllowed       ( 1 ), 
+			...  }, 
+		validTimePeriod             [1] IMPLICIT SEQUENCE {
+			startTime   [0] IMPLICIT OCTET STRING ( SIZE( 30 ) ) OPTIONAL, 
+			endTime     [1] IMPLICIT OCTET STRING ( SIZE( 30 ) ) OPTIONAL, 
+			... } OPTIONAL, 
+		... , 
+		eventReportExpectedArea     [2] IMPLICIT OCTET STRING ( SIZE( 1 .. 20 ) ) OPTIONAL}
+
+	LCS-LocationPrivacyIndication ::= ENUMERATED {
+		locationDisallowed    ( 0 ), 
+		locationAllowed       ( 1 ), 
+		...  }
+
+	LCS-ValidTimePeriod ::= SEQUENCE {
+		startTime   [0] IMPLICIT OCTET STRING ( SIZE( 30 ) ) OPTIONAL, 
+		endTime     [1] IMPLICIT OCTET STRING ( SIZE( 30 ) ) OPTIONAL, 
+		... }
+
+	DateTime   ::= OCTET STRING ( SIZE( 30 ) )
+
+	LCS-PruAssociationArg ::= SEQUENCE {
+		associationType           [0] IMPLICIT ENUMERATED {
+			initialAssociation    ( 0 ), 
+			associationUpdate     ( 1 ), 
+			...  }, 
+		positioningCapabilities   [1] IMPLICIT OCTET STRING, 
+		locationOfPru             [2] IMPLICIT OCTET STRING ( SIZE( 1 .. 20 ) ) OPTIONAL, 
+		stateOfPru                [3] IMPLICIT ENUMERATED {
+			on          ( 0 ), 
+			off         ( 1 ), 
+			...  } OPTIONAL, 
+		... }
+
+	LCS-AssociationType ::= ENUMERATED {
+		initialAssociation    ( 0 ), 
+		associationUpdate     ( 1 ), 
+		...  }
+
+	LCS-StateOfPru ::= ENUMERATED {
+		on          ( 0 ), 
+		off         ( 1 ), 
+		...  }
+
+	LCS-PruAssociationRes ::= SEQUENCE {
+		periodicUpdateTimer   [0] IMPLICIT INTEGER ( 1 .. 4294967295 ) OPTIONAL, 
+		updateTrigger         [1] IMPLICIT BIT STRING {
+			taiChange  (0 ), 
+			servingAmfChange  (1 ), 
+			pruStateChange  (2 )} ( SIZE( 1 .. 16 ) ) OPTIONAL, 
+		... }
+
+	LCS-PeriodicUpdateTimer ::= INTEGER ( 1 .. 4294967295 )
+
+	LCS-PruUpdateTrigger ::= BIT STRING {
+		taiChange  (0 ), 
+		servingAmfChange  (1 ), 
+		pruStateChange  (2 )} ( SIZE( 1 .. 16 ) )
+
+	LCS-PruDisassociationArg ::= SEQUENCE {
+		ackIndication     [0] IMPLICIT BOOLEAN OPTIONAL, 
+		newLmfRoutingId   [1] IMPLICIT OCTET STRING OPTIONAL, 
+		... }
+
+END

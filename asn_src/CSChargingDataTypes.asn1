@@ -78,7 +78,9 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		BasicService
 	FROM Basic-Service-Elements {itu-t(0) identified-organization(4) etsi(0) 196 basic-service-elements(8)}
 	-- from "Digital Subscriber Signalling System No. one (DSS1) protocol" ETS 300 196
-		DestinationRoutingAddress
+		PARAMETERS-BOUND
+	FROM CAP-classes {itu-t(0) identified-organization(4) etsi(0) mobileDomain(0) umts-network(1) modules(3) cap-classes(54) version8(7)}
+		DestinationRoutingAddress {}
 	FROM CAP-datatypes {itu-t(0) identified-organization(4) etsi(0) mobileDomain(0) gsm-Network(1) modules(3) cap-datatypes(52) version8(7)};
 	-- from TS 29.078
 
@@ -86,12 +88,12 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 	--  CS CALL AND EVENT RECORDS
 	--
 
-	CSRecord ::= CHOICE
+	CSRecord {PARAMETERS-BOUND: bound} ::= CHOICE
 	--
 	-- Record values 0..21 are circuit switch specific
 	--
 	{
-		moCallRecord         [0] MOCallRecord,
+		moCallRecord         [0] MOCallRecord {bound},
 		mtCallRecord         [1] MTCallRecord,
 		roamingRecord        [2] RoamingRecord,
 		incGatewayRecord     [3] IncGatewayRecord,
@@ -116,7 +118,7 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		iCSRegisterRecord   [22] ICSregisterRecord
 	}
 
-	MOCallRecord ::= SET
+	MOCallRecord {PARAMETERS-BOUND: bound} ::= SET
 	{
 		recordType                [0] RecordType,
 		servedIMSI                [1] IMSI OPTIONAL,
@@ -172,7 +174,7 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		numberOfDPEncountered    [51] INTEGER OPTIONAL,
 		levelOfCAMELService      [52] LevelOfCAMELService OPTIONAL,
 		freeFormatData           [53] FreeFormatData OPTIONAL,
-		cAMELCallLegInformation  [54] SEQUENCE OF CAMELInformation OPTIONAL,
+		cAMELCallLegInformation  [54] SEQUENCE OF CAMELInformation {bound} OPTIONAL,
 		freeFormatDataAppend     [55] BOOLEAN OPTIONAL,
 		defaultCallHandling-2    [56] DefaultCallHandling OPTIONAL,
 		gsm-SCFAddress-2         [57] Gsm-SCFAddress OPTIONAL,
@@ -299,14 +301,14 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		partialRecordType     [30] PartialRecordType OPTIONAL
 	}
 
-	TermCAMELRecord ::= SET
+	TermCAMELRecord {PARAMETERS-BOUND: bound} ::= SET
 	{
 		recordtype                 [0] RecordType,
 		servedIMSI                 [1] IMSI,
 		servedMSISDN               [2] MSISDN OPTIONAL,
 		recordingEntity            [3] RecordingEntity,
 		interrogationTime          [4] TimeStamp,
-		destinationRoutingAddress  [5] DestinationRoutingAddress,
+		destinationRoutingAddress  [5] DestinationRoutingAddress {bound},
 		gsm-SCFAddress             [6] Gsm-SCFAddress,
 		serviceKey                 [7] ServiceKey,
 		networkCallReference       [8] NetworkCallReference OPTIONAL,
@@ -329,7 +331,7 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		numberOfDPEncountered     [25] INTEGER OPTIONAL,
 		levelOfCAMELService       [26] LevelOfCAMELService OPTIONAL,
 		freeFormatData            [27] FreeFormatData OPTIONAL,
-		cAMELCallLegInformation   [28] SEQUENCE OF CAMELInformation OPTIONAL,
+		cAMELCallLegInformation   [28] SEQUENCE OF CAMELInformation {bound} OPTIONAL,
 		freeFormatDataAppend      [29] BOOLEAN OPTIONAL,
 		defaultCallHandling-2     [30] DefaultCallHandling OPTIONAL,
 		gsm-SCFAddress-2          [31] Gsm-SCFAddress OPTIONAL,
@@ -873,11 +875,11 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 
 	CallTypes ::= SET OF CallType
 
-	CAMELDestinationNumber ::= DestinationRoutingAddress
+	CAMELDestinationNumber {PARAMETERS-BOUND: bound} ::= DestinationRoutingAddress {bound}
 
-	CAMELInformation ::= SET
+	CAMELInformation {PARAMETERS-BOUND: bound} ::= SET
 	{
-		cAMELDestinationNumber   [1] CAMELDestinationNumber OPTIONAL,
+		cAMELDestinationNumber   [1] CAMELDestinationNumber {bound} OPTIONAL,
 		connectedNumber          [2] ConnectedNumber OPTIONAL,
 		roamingNumber            [3] RoamingNumber OPTIONAL,
 		mscOutgoingTKGP          [4] TrunkGroup OPTIONAL,

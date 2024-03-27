@@ -69,6 +69,7 @@ AC_ERLANG_CHECK_LIB([stdlib],
 AC_ERLANG_CHECK_LIB([sasl], [], [AC_MSG_ERROR([sasl was not found!])])
 AC_ERLANG_CHECK_LIB([asn1], [], [AC_MSG_ERROR([asn1 was not found!])])
 AC_ERLANG_CHECK_LIB([map], [], [AC_MSG_ERROR([map was not found!])])
+AC_ERLANG_CHECK_LIB([cap], [], [AC_MSG_ERROR([cap was not found!])])
 
 
 ##

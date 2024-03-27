@@ -66,7 +66,6 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		FEIdentifierList,
 		IMS-Charging-Identifier,
 		IMSCommunicationServiceIdentifier,
-		IMSNodeFunctionality,
 		InterOperatorIdentifiers,
 		ISUPCause,
 		ListOfInvolvedParties,
@@ -80,14 +79,13 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		ServedPartyIPAddress,
 		Service-Id,
 		SessionPriority,
-		SIPEventType,
+		SIP-Method,
 		TADIdentifier,
 		TransitIOILists,
 		TransmissionMedium,
 		TrunkGroupID
 	FROM IMSChargingDataTypes {itu-t (0) identified-organization (4) etsi(0) mobileDomain (0) charging (5) imsChargingDataTypes (4) asn1Module (0) version2 (1)}
 		AppSpecificData,
-		ProseFunctionality,
 		ProSeEventType,
 		ProSeUERole,
 		RangeClass,
@@ -96,7 +94,7 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		CoverageInfo,
 		RadioParameterSetInfo,
 		TransmitterInfo
-	FROM ProSeChargingDataTypes {itu-t (0) identified-organization (4) etsi (0) mobileDomain (0) charging (5) proseChargingDataType (14) asn1Module (0) version2 (1)};
+	FROM ProSeChargingDataTypes {itu-t (0) identified-organization (4) etsi (0) mobileDomain (0) charging (5) proseChargingDataType (11) asn1Module (0) version2 (1)};
 	
 	--
 	--  CHF RECORDS
@@ -854,7 +852,14 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 	--
 	-- I
 	--
-	
+
+	IMSNodeFunctionality ::= ENUMERATED
+	{
+		iMS-GWF  (0),
+		aS       (1),
+		mRFC     (2)
+	}
+
 	IncompleteCDRIndication ::= SEQUENCE
 	-- The values are TRUE if the corresponding message was lost, FALSE if it is not lost
 	-- and not included if the status is unknown
@@ -1501,6 +1506,13 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		sHARED      (0),
 		nON-SHARED  (1)
 	}
+
+	SIPEventType ::= SEQUENCE
+	{
+		sIPMethod      [0] SIP-Method OPTIONAL,
+		eventHeader    [1] INTEGER OPTIONAL,
+		expiresHeader  [2] UTF8String OPTIONAL
+	}
 	
 	SingleNSSAI ::= SEQUENCE
 	-- See S-NSSAI subclause 28.4.2 of TS 23.003 for encoding.
@@ -1549,7 +1561,7 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		additionOfAccess                          (116),
 		removalOfAccess                           (117),
 		redundantTransmissionChange               (118),
-		vSMFChange                                (119)
+		vSMFChange                                (119),
 	-- Limit per PDU session
 		pDUSessionExpiryDataTimeLimit             (200),
 		pDUSessionExpiryDataVolumeLimit           (201),
@@ -1810,7 +1822,10 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 	
 	--
 	-- W
-	-- WAgfId ::= UTF8String
+	--
+
+	WAgfId ::= UTF8String
+
 	--
 	-- See 3GPP TS 29.571 for details
 	--
