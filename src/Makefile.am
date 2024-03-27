@@ -26,8 +26,8 @@ noinst_DATA = GenericChargingDataTypes.erl \
 einclude_DATA = GenericChargingDataTypes.hrl \
 		IMSChargingDataTypes.hrl \
 		CSChargingDataTypes.hrl \
-		GPRSChargingDataTypes.hrl
-		MMTelChargingDataTypes.hrl
+		GPRSChargingDataTypes.hrl \
+		MMTelChargingDataTypes.hrl \
 		SMSChargingDataTypes.hrl \
 		MMSChargingDataTypes.hrl \
 		CPDTChargingDataTypes.hrl \
