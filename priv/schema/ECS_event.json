@@ -1,0 +1,124 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "http://sigscale.org/schema/cgf/ECS_event.json",
+	"title": "Elastic Common Schema (ECS) Event",
+	"$defs": {
+		"ECS_event": {
+			"$id": "#/$defs/ECS_event",
+			"description": "The event fields are used for context information about the log or metric event itself.",
+			"type": "object",
+			"properties": {
+				"start": {
+					"description": "The 'event.start' contains the date when the event started or when the activity was first observed.",
+					"type": "string",
+					"format": "date-time",
+					"examples": [
+						"2023-01-31T13:27:01.615Z"
+					]
+				},
+				"end": {
+					"description": "The 'event.end' contains the date when the event ended or when the activity was last observed.",
+					"type": "string",
+					"format": "date-time",
+					"examples": [
+						"2023-01-31T15:46:32.103Z"
+					]
+				},
+				"duration": {
+					"description": "Duration of the event in nanoseconds.",
+					"type": "string",
+					"examples": [
+						"8370488000000"
+					]
+				},
+				"kind": {
+					"description": "This is one of four ECS Categorization Fields, and indicates the highest level in the ECS category hierarchy.",
+					"type": "string",
+					"enum": [
+						"alert",
+						"enrichment",
+						"event",
+						"metric",
+						"state",
+						"pipeline_error",
+						"signal"
+					],
+					"examples": [
+						"event"
+					]
+				},
+				"category": {
+					"description": "This is one of four ECS Categorization Fields, and indicates the second level in the ECS category hierarchy.",
+					"type": "array",
+					"items": {
+						"type": "string",
+						"enum": [
+							"authentication",
+							"configuration",
+							"database",
+							"driver",
+							"email",
+							"file",
+							"host",
+							"iam",
+							"intrusion_detection",
+							"malware",
+							"network",
+							"package",
+							"process",
+							"registry",
+							"session",
+							"threat",
+							"vulnerability",
+							"web"
+						]
+					},
+					"examples": [
+						["network"]
+					]
+				},
+				"type": {
+					"description": "This is one of four ECS Categorization Fields, and indicates the third level in the ECS category hierarchy.",
+					"type": "array",
+					"items": {
+						"type": "string",
+						"enum": [
+							"access",
+							"admin",
+							"allowed",
+							"change",
+							"connection",
+							"creation",
+							"deletion",
+							"denied",
+							"end",
+							"error",
+							"group",
+							"indicator",
+							"info",
+							"installation",
+							"protocol",
+							"start",
+							"user"
+						]
+					},
+					"examples": [
+						["allowed", "protocol", "start"]
+					]
+				},
+				"outcome": {
+					"description": "This is one of four ECS Categorization Fields, and indicates the lowest level in the ECS category hierarchy.",
+					"type": "string",
+					"enum": [
+						"success",
+						"failure",
+						"unknown"
+					],
+					"examples": [
+						"success"
+					]
+				}
+			}
+		}
+	}
+}

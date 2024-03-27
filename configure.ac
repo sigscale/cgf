@@ -47,6 +47,8 @@ erldir=$ERLANG_INSTALL_LIB_DIR/$PACKAGE_NAME-$PACKAGE_VERSION/src
 beamdir=$ERLANG_INSTALL_LIB_DIR/$PACKAGE_NAME-$PACKAGE_VERSION/ebin
 asndir=$ERLANG_INSTALL_LIB_DIR/$PACKAGE_NAME-$PACKAGE_VERSION/asn_dir
 eincludedir=$ERLANG_INSTALL_LIB_DIR/$PACKAGE_NAME-$PACKAGE_VERSION/include
+privdir=$ERLANG_INSTALL_LIB_DIR/$PACKAGE_NAME-$PACKAGE_VERSION/priv
+schemadir=$ERLANG_INSTALL_LIB_DIR/$PACKAGE_NAME-$PACKAGE_VERSION/priv/schema
 reldir=$ERLANG_INSTALL_LIB_DIR/../releases
 AC_SUBST(otpdir)
 AC_SUBST(appdir)
@@ -54,6 +56,8 @@ AC_SUBST(erldir)
 AC_SUBST(beamdir)
 AC_SUBST(asndir)
 AC_SUBST(eincludedir)
+AC_SUBST(privdir)
+AC_SUBST(schemadir)
 AC_SUBST(reldir)
 
 
@@ -91,7 +95,7 @@ AC_ERLANG_CHECK_LIB([cap], [], [AC_MSG_ERROR([cap was not found!])])
 ##
 ## Output:  create output files
 ##
-AC_OUTPUT([Makefile ebin/Makefile doc/Makefile
-		src/Makefile asn_src/Makefile
+AC_OUTPUT([Makefile ebin/Makefile doc/Makefile src/Makefile
+		asn_src/Makefile priv/Makefile priv/schema/Makefile
 		sys.config cgf.rel $PACKAGE_NAME.rel])
 

@@ -1,0 +1,86 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "http://sigscale.org/schema/cgf/ECS_3GPP_Bx.json",
+	"title": "Elastic Log for the 3GPP Bx interface",
+	"$defs": {
+		"BxRecord": {
+			"$id": "#/$defs/BxRecord",
+			"description": "Elastic Stack log format for charging data records (CDR) on the 3GPP Bx interface .",
+			"type": "object",
+			"allOf": [
+				{
+					"$ref": "http://sigscale.org/schema/cgf/ECS_base.json"
+				},
+				{
+					"$ref": "http://sigscale.org/schema/cgf/ECS_ecs.json"
+				},
+				{
+					"$ref": "http://sigscale.org/schema/cgf/ECS_service.json"
+				},
+				{
+					"$ref": "http://sigscale.org/schema/cgf/ECS_network.json"
+				},
+				{
+					"$ref": "http://sigscale.org/schema/cgf/ECS_user.json"
+				},
+				{
+					"$ref": "http://sigscale.org/schema/cgf/ECS_event.json"
+				},
+				{
+					"properties": {
+						"Bx_moCall": {
+							"$ref": "http://sigscale.org/schema/cgf/ECS_3GPP_Bx_MOCallRecord.json"
+						},
+						"Bx_mtCall": {
+							"$ref": "http://sigscale.org/schema/cgf/ECS_3GPP_Bx_MTCallRecord.json"
+						},
+						"Bx_moSMS": {
+							"$ref": "http://sigscale.org/schema/cgf/ECS_3GPP_Bx_MOSMSRecord.json"
+						},
+						"Bx_mtSMS": {
+							"$ref": "http://sigscale.org/schema/cgf/ECS_3GPP_Bx_MTSMSRecord.json"
+						}
+					}
+				}
+			],
+			"examples": [
+				{
+					"@timestamp": "2024-03-27T11:45:03.692Z",
+					"labels": {
+						"application": "sigscale-cgf"
+					},
+					"tags": [],
+					"ecs": {
+						"version": "8.5"
+					},
+					"service": {
+						"type": "cgf",
+						"node": {
+							"name": "cgf@host.example.net"
+						}
+					},
+					"user": {
+						"name": "msisdn-21584107516",
+						"id": "imsi-0010010335668343"
+					},
+					"event": {
+						"start": "2024-03-26T00:01:01.102",
+						"end": "2024-03-26T00:06:18:45.761Z",
+						"duration": "316898000000",
+						"kind": "event",
+						"category": [
+							"session"
+						],
+						"type": [
+							"protocol",
+							"end"
+						],
+						"outcome": "success"
+					},
+					"Bx_moCall": {
+					}
+				}
+			]
+		}
+	}
+}

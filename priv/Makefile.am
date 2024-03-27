@@ -2,5 +2,5 @@
 ##
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = src asn_src ebin doc priv
+SUBDIRS = schema
 

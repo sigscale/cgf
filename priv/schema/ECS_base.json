@@ -1,0 +1,41 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "http://sigscale.org/schema/cgf/ECS_base.json",
+	"title": "Elastic Common Schema (ECS) Base",
+	"$defs": {
+		"ECS_base": {
+			"$id": "#/$defs/ECS_base",
+			"description": "The `base` field set contains all fields which are at the root of the events.  These fields are common across all types of events.",
+			"type": "object",
+			"properties": {
+				"@timestamp": {
+					"description": "Date/time when the event originated.",
+					"type": "string",
+					"format": "date-time",
+					"examples": [
+						"2023-01-31T09:55:23.891Z"
+					]
+				},
+				"tags": {
+					"description": "List of keywords used to tag each event.",
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"labels": {
+					"description": "Custom key/value pairs.",
+					"type": "object",
+					"examples": [
+						{
+							"application": "sigscale-cse"
+						}
+					]
+				}
+			},
+			"required": [
+				"@timestamp"
+			]
+		}
+	}
+}
