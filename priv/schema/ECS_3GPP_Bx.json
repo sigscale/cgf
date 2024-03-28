@@ -57,7 +57,7 @@
 			],
 			"examples": [
 				{
-					"@timestamp": "2024-03-27T11:45:03.692Z",
+					"@timestamp": "2024-03-28T12:45:03.692Z",
 					"labels": {
 						"application": "sigscale-cgf"
 					},
@@ -76,9 +76,9 @@
 						"id": "imsi-0010010335668343"
 					},
 					"event": {
-						"start": "2024-03-26T00:01:01.102",
-						"end": "2024-03-26T00:06:18:45.761Z",
-						"duration": "316898000000",
+						"start": "2024-03-28T09:13:10.456Z",
+						"end": "2024-03-28T09:13:48.789Z",
+						"duration": "38000000000",
 						"kind": "event",
 						"category": [
 							"session"
@@ -90,6 +90,34 @@
 						"outcome": "success"
 					},
 					"Bx_moCall": {
+						"servedIMSI": "001001012345678",
+						"calledNumber": {
+							"natureOfAddress": "international",
+							"numberingPlan": "e164",
+							"address": "14165551234"
+						},
+						"recordingEntity": {
+							"natureOfAddress": "international",
+							"numberingPlan": "e164",
+							"address": "14165550000"
+						},
+						"location": {
+							"locationAreaCode": 42,
+							"cellId": 1532,
+							"mcc": "001",
+							"ncc": "001"
+						},
+						"basicService": {
+							"bearerService": 20
+						},
+						"msClassmark": [125, 87],
+						"seizureTime": "2024-03-28T09:13:00.123Z",
+						"answerTime": "2024-03-28T09:13:10.456Z",
+						"releaseTime": "2024-03-28T09:13:48.789Z",
+						"callDuration": 38,
+						"causeForTerm": "normalRelease",
+						"callReference": 729081236,
+						"systemType": "gERAN"
 					}
 				}
 			]

@@ -222,17 +222,19 @@
 				},
 				"freeFormatDataAppend": {
 				},
-				"'defaultCallHandling-2'": {
+				"defaultCallHandling-2": {
 				},
-				"'gsm-SCFAddress-2'": {
+				"gsm-SCFAddress-2": {
 				},
-				"'serviceKey-2'": {
+				"serviceKey-2": {
 				},
-				"'freeFormatData-2'": {
+				"freeFormatData-2": {
 				},
-				"'freeFormatDataAppend-2'": {
+				"freeFormatDataAppend-2": {
 				},
 				"systemType": {
+					"description": "Indicates the radio access network type used (GERAN, UTRAN).",
+					"$ref": "#/$defs/SystemType"
 				},
 				"rateIndication": {
 				},
@@ -262,11 +264,55 @@
 				},
 				"iCSI2ActiveFlag": {
 				},
-				"'iMS-Charging-Identifier'": {
+				"iMS-Charging-Identifier": {
 				},
 				"privateUserID": {
 				}
-			}
+			},
+			"required": [
+				"servedIMSI",
+				"calledNumber",
+				"recordingEntity",
+				"location",
+				"basicService",
+				"msClassmark",
+				"callDuration",
+				"causeForTerm",
+				"callReference",
+				"systemType"
+			],
+			"examples": [
+				{
+					"servedIMSI": "001001012345678",
+					"calledNumber": {
+						"natureOfAddress": "international",
+						"numberingPlan": "e164",
+						"address": "14165551234"
+					},
+					"recordingEntity": {
+						"natureOfAddress": "international",
+						"numberingPlan": "e164",
+						"address": "14165550000"
+					},
+					"location": {
+						"locationAreaCode": 42,
+						"cellId": 1532,
+						"mcc": "001",
+						"ncc": "001"
+					},
+					"basicService": {
+						"bearerService": 20
+					},
+					"msClassmark": [125, 87],
+					"seizureTime": "2024-03-28T09:13:00.123Z",
+					"answerTime": "2024-03-28T09:13:10.456Z",
+					"releaseTime": "2024-03-28T09:13:48.789Z",
+					"callDuration": 38,
+					"causeForTerm": "normalRelease",
+					"callReference": 729081236,
+					"systemType": "gERAN"
+				}
+			]
 		},
 		"AdditionalChgInfo": {
 			"$id": "#/$defs/AdditionalChgInfo",
@@ -356,6 +402,14 @@
 							"$ref": "#/$defs/TeleserviceCode"
 						}
 					}
+				}
+			],
+			"examples": [
+				{
+					"bearerService": 20
+				},
+				{
+					"teleservice": 22
 				}
 			]
 		},
@@ -628,7 +682,19 @@
 					"type": "string",
 					"pattern": "^[0-9]{2,3}$"
 				}
-			}
+			},
+			"required": [
+				"mcc",
+				"mnc"
+			],
+			"examples": [
+				{
+					"locationAreaCode": 42,
+					"cellId": 1532,
+					"mcc": "001",
+					"ncc": "001"
+				}
+			]
 		},
 		"LocationChange": {
 			"$id": "#/$defs/LocationChange",
@@ -683,7 +749,17 @@
 					"type": "string",
 					"pattern": "^[0-9#*]{1,38}$"
 				}
-			}
+			},
+			"required": [
+				"address"
+			],
+			"examples": [
+				{
+					"natureOfAddress": "international",
+					"numberingPlan": "e164",
+					"address": "14165551234"
+				}
+			]
 		},
 		"RadioChanRequested": {
 			"$id": "#/$defs/RadioChanRequested",
@@ -738,6 +814,15 @@
 					"format": "date-time"
 				}
 			}
+		},
+		"SystemType": {
+			"description": "Describes the radio access network type used.",
+			"type": "string",
+			"enum": [
+				"unknown",
+				"iuUTRAN",
+				"gERAN"
+			]
 		},
 		"TeleserviceCode": {
 			"$id": "#/$defs/TeleserviceCode",
