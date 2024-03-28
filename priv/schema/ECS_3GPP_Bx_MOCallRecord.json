@@ -284,6 +284,7 @@
 			"examples": [
 				{
 					"servedIMSI": "001001012345678",
+					"servedMSISDN": "14165555678",
 					"calledNumber": {
 						"natureOfAddress": "international",
 						"numberingPlan": "e164",
@@ -298,7 +299,7 @@
 						"locationAreaCode": 42,
 						"cellId": 1532,
 						"mcc": "001",
-						"ncc": "001"
+						"mnc": "001"
 					},
 					"basicService": {
 						"bearerService": 20
@@ -692,7 +693,7 @@
 					"locationAreaCode": 42,
 					"cellId": 1532,
 					"mcc": "001",
-					"ncc": "001"
+					"mnc": "001"
 				}
 			]
 		},
