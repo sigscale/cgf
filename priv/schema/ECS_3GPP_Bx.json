@@ -29,7 +29,7 @@
 				{
 					"properties": {
 						"Bx_moCall": {
-							"$ref": "http://sigscale.org/schema/cgf/ECS_3GPP_Bx_MOCallRecord.json#/$defs/MOCallRecord"
+							"$ref": "http://sigscale.org/schema/cgf/ECS_3GPP_Bx_CS.json#/$defs/MOCallRecord"
 						}
 					}
 				},

@@ -8,7 +8,7 @@ schema_DATA = $(abs_builddir)/ECS_base.json \
 		$(abs_builddir)/ECS_network.json \
 		$(abs_builddir)/ECS_service.json \
 		$(abs_builddir)/ECS_3GPP_Bx.json \
-		$(abs_builddir)/ECS_3GPP_Bx_MOCallRecord.json
+		$(abs_builddir)/ECS_3GPP_Bx_CS.json
 
 check_DATA = .validation_ok
 
@@ -29,7 +29,7 @@ $(abs_builddir)/%.json:	$(srcdir)/%.json
          then exit 1; fi; \
 		if ! ajv compile -s ECS_3GPP_Bx.json; \
          then exit 1; fi; \
-		if ! ajv compile -s ECS_3GPP_Bx_MOCallRecord.json; \
+		if ! ajv compile -s ECS_3GPP_Bx_CS.json; \
          then exit 1; fi; \
 	else \
       echo "ajv-cli needed to validate JSON Schema"; \
