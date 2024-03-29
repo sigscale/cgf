@@ -1,0 +1,119 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "http://sigscale.org/schema/cgf/ECS_Bx",
+	"title": "SigScale CGF: ECS Bx interface",
+	"description": "Elastic Stack log for charging data records (CDR) on the Bx interface.",
+	"type": "object",
+	"allOf": [
+		{
+			"$ref": "/schema/cgf/ECS_base"
+		},
+		{
+			"$ref": "/schema/cgf/ECS_ecs"
+		},
+		{
+			"$ref": "/schema/cgf/ECS_service"
+		},
+		{
+			"$ref": "/schema/cgf/ECS_network"
+		},
+		{
+			"$ref": "/schema/cgf/ECS_user"
+		},
+		{
+			"$ref": "/schema/cgf/ECS_event"
+		},
+		{
+			"oneOf": [
+				{
+					"$ref": "/schema/cgf/ECS_Bx_CS"
+				},
+				{
+					"$ref": "/schema/cgf/ECS_Bx_PS"
+				},
+				{
+					"$ref": "/schema/cgf/ECS_Bx_IMS"
+				},
+				{
+					"$ref": "/schema/cgf/ECS_Bx_SMS"
+				},
+				{
+					"$ref": "/schema/cgf/ECS_Bx_MMS"
+				},
+				{
+					"$ref": "/schema/cgf/ECS_Bx_MMTEL"
+				},
+				{
+					"$ref": "/schema/cgf/ECS_Bx_CHF"
+				}
+			]
+		}
+	],
+	"examples": [
+		{
+			"@timestamp": "2024-03-28T12:45:03.692Z",
+			"labels": {
+				"application": "sigscale-cgf"
+			},
+			"tags": [],
+			"ecs": {
+				"version": "8.5"
+			},
+			"service": {
+				"type": "cgf",
+				"node": {
+					"name": "cgf@host.example.net"
+				}
+			},
+			"user": {
+				"name": "msisdn-21584107516",
+				"id": "imsi-0010010335668343"
+			},
+			"event": {
+				"start": "2024-03-28T09:13:10.456Z",
+				"end": "2024-03-28T09:13:48.789Z",
+				"duration": "38000000000",
+				"kind": "event",
+				"category": [
+					"session"
+				],
+				"type": [
+					"protocol",
+					"end"
+				],
+				"outcome": "success"
+			},
+			"Bx_moCall": {
+				"servedIMSI": "001001012345678",
+				"servedMSISDN": "14165555678",
+				"calledNumber": {
+					"natureOfAddress": "international",
+					"numberingPlan": "e164",
+					"address": "14165551234"
+				},
+				"recordingEntity": {
+					"natureOfAddress": "international",
+					"numberingPlan": "e164",
+					"address": "14165550000"
+				},
+				"location": {
+					"locationAreaCode": 42,
+					"cellId": 1532,
+					"mcc": "001",
+					"mnc": "001"
+				},
+				"basicService": {
+					"bearerService": 20
+				},
+				"msClassmark": [125, 87],
+				"seizureTime": "2024-03-28T09:13:00.123Z",
+				"answerTime": "2024-03-28T09:13:10.456Z",
+				"releaseTime": "2024-03-28T09:13:48.789Z",
+				"callDuration": 38,
+				"causeForTerm": "normalRelease",
+				"callReference": 729081236,
+				"systemType": "gERAN"
+			}
+		}
+	]
+}

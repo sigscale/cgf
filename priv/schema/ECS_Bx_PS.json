@@ -1,0 +1,297 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "http://sigscale.org/schema/cgf/ECS_Bx_PS",
+	"title": "SigScale CGF: Records on the Bx interface for packet switched (PS) domain",
+	"oneOf": [
+		{
+			"type": "object",
+			"properties": {
+				"Bx_sgsnPDP": {
+					"$ref": "#/$defs/SGSNPDPRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_sgsnMM": {
+					"$ref": "#/$defs/SGSNMMRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_sgsnSMO": {
+					"$ref": "#/$defs/SGSNSMORecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_sgsnSMT": {
+					"$ref": "#/$defs/SGSNSMTRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_sgsnMTLCS": {
+					"$ref": "#/$defs/SGSNMTLCSRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_sgsnMOLCS": {
+					"$ref": "#/$defs/SGSNMOLCSRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_sgsnNILCS": {
+					"$ref": "#/$defs/SGSNNILCSRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_sgsnMBMSR": {
+					"$ref": "#/$defs/SGSNMBMSRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_ggsnMBMSR": {
+					"$ref": "#/$defs/GGSNMBMSRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_sgw": {
+					"$ref": "#/$defs/SGWRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_pgw": {
+					"$ref": "#/$defs/PGWRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_gwMBMS": {
+					"$ref": "#/$defs/GWMBMSRecord"
+				}
+			} 
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_tdf": {
+					"$ref": "#/$defs/TDFRecord"
+				}
+			} 
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_ipe": {
+					"$ref": "#/$defs/IPERecord"
+				}
+			} 
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_epdg": {
+					"$ref": "#/$defs/EPDGRecord"
+				}
+			} 
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_twag": {
+					"$ref": "#/$defs/TWAGRecord"
+				}
+			} 
+		}
+	],
+	"$defs": {
+		"SGSNPDPRecord": {
+			"description": "Packet switched (PS) serving GPRS support node (SGSN) packet data protocol (PDP) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"SGSNMMRecord": {
+			"description": "Packet switched (PS) serving GPRS support node (SGSN) mobility management (MM) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"SGSNSMORecord": {
+			"description": "Packet switched (PS) serving GPRS support node (SGSN) short message origination (SMO) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"SGSNSMTRecord": {
+			"description": "Packet switched (PS) serving GPRS support node (SGSN) short message termination (SMT) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"SGSNMTLCSRecord": {
+			"description": "Packet switched (PS) serving GPRS support node (SGSN) mobile terminated (MT) location request (LCS) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"SGSNMOLCSRecord": {
+			"description": "Packet switched (PS) serving GPRS support node (SGSN) mobile originated (MO) location request (LCS) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"SGSNNILCSRecord": {
+			"description": "Packet switched (PS) serving GPRS support node (SGSN) network induced (NI) location request (LCS) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"SGSNMBMSRecord": {
+			"description": "Packet switched (PS) serving GPRS support node (SGSN) multimedia broadcast and multicast service (MBMS) bearer context charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"GGSNMBMSRecord": {
+			"description": "Packet switched (PS) gateway GPRS support node (SGSN) multimedia broadcast and multicast service (MBMS) bearer context charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"SGWRecord": {
+			"description": "Packet switched (PS) evolved packet core (EPC) serving gateway (SGW) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"PGWRecord": {
+			"description": "Packet switched (PS) evolved packet core (EPC) packet data network gateway (SGW) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"GWMBMSRecord": {
+			"description": "Packet switched (PS) evolved packet core (EPC) multimedia broadcast and multicast service (MBMS) bearer context charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"TDFRecord": {
+			"description": "Packet switched (PS) evolved packet core (EPC) application based charging (ABC) data in traffic detection function (TDF) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"IPERecord": {
+			"description": "Packet switched (PS) evolved packet core (EPC) IP-Edge (IPE) IP connectivity access network (IP-CAN) session charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"EPDGRecord": {
+			"description": "Packet switched (PS) evolved packet core (EPC) evolved packet data gateway (ePDG) IP connectivity access network (IP-CAN) bearer charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"TWAGRecord": {
+			"description": "Packet switched (PS) evolved packet core (EPC) trusted WLAN access gateway (TWAG) IP connectivity access network (IP-CAN) bearer charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		}
+	}
+}

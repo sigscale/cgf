@@ -1,0 +1,595 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "http://sigscale.org/schema/cgf/ECS_Bx_MMS",
+	"title": "SigScale CGF: Records on the Bx interface for MMS",
+	"oneOf": [
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mmO1S": {
+					"$ref": "#/$defs/MMO1SRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mmO4FRq": {
+					"$ref": "#/$defs/MMO4FRqRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mmO4FRs": {
+					"$ref": "#/$defs/MMO4FRsRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mmO4D": {
+					"$ref": "#/$defs/MMO4DRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mmO1D": {
+					"$ref": "#/$defs/MMO1DRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mmO4R": {
+					"$ref": "#/$defs/MMO4RRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mmO1R": {
+					"$ref": "#/$defs/MMO1RRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mmOMD": {
+					"$ref": "#/$defs/MMOMDRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mmR4F": {
+					"$ref": "#/$defs/MMR4FRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mmR1NRq": {
+					"$ref": "#/$defs/MMR1NRqRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mmR1NRs": {
+					"$ref": "#/$defs/MMR1NRsRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mmR1NRt": {
+					"$ref": "#/$defs/MMR1RtRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mmR1A": {
+					"$ref": "#/$defs/MMR1ARecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mmR4DRq": {
+					"$ref": "#/$defs/MMR4DRqRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mmR4DRs": {
+					"$ref": "#/$defs/MMR4DRsRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mmR1RR": {
+					"$ref": "#/$defs/MMR1RRRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mmR4RRq": {
+					"$ref": "#/$defs/MMR4RRqRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mmR4RRs": {
+					"$ref": "#/$defs/MMR4RRsRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mmRMD": {
+					"$ref": "#/$defs/MMRMDRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mmF": {
+					"$ref": "#/$defs/MMFRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mmBx1S": {
+					"$ref": "#/$defs/MMBx1SRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mmBx1V": {
+					"$ref": "#/$defs/MMBx1VRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mmBx1U": {
+					"$ref": "#/$defs/MMBx1URecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mmBx1D": {
+					"$ref": "#/$defs/MMBx1DRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mm7S": {
+					"$ref": "#/$defs/MM7SRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mm7DRq": {
+					"$ref": "#/$defs/MM7DRqRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mm7DRs": {
+					"$ref": "#/$defs/MM7DRsRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mm7C": {
+					"$ref": "#/$defs/MM7CRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mm7R": {
+					"$ref": "#/$defs/MM7RRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mm7DRRq": {
+					"$ref": "#/$defs/MM7DRRqRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mm7DRRs": {
+					"$ref": "#/$defs/MM7DRRsRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mm7RRq": {
+					"$ref": "#/$defs/MM7RRqRecord"
+				}
+			}
+		}
+	],
+	"$defs": {
+		"MMO1SRecord": {
+			"description": "Multimedia message service (MMS) originator MM1 submission charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MMO4FRqRecord": {
+			"description": "Multimedia message service (MMS) originator MM4 forward request charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MMO4FRsRecord": {
+			"description": "Multimedia message service (MMS) originator MM4 forward response charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MMO4DRecord": {
+			"description": "Multimedia message service (MMS) originator MM4 delivery charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MMO1DRecord": {
+			"description": "Multimedia message service (MMS) originator MM1 delivery charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MMO4RRecord": {
+			"description": "Multimedia message service (MMS) originator MM4 read reply report charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MMO1RRecord": {
+			"description": "Multimedia message service (MMS) originator MM1 read reply originator charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MMOMDRecord": {
+			"description": "Multimedia message service (MMS) originator MM deletion charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MMR4FRecord": {
+			"description": "Multimedia message service (MMS) recipient MM4 forward charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MMR1NRqRecord": {
+			"description": "Multimedia message service (MMS) recipient MM1 notification request charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MMR1NRsRecord": {
+			"description": "Multimedia message service (MMS) recipient MM1 notification response charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MMR1RtRecord": {
+			"description": "Multimedia message service (MMS) recipient MM1 retrieve charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MMR1ARecord": {
+			"description": "Multimedia message service (MMS) recipient MM1 acknowledgement charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MMR4DRqRecord": {
+			"description": "Multimedia message service (MMS) recipient MM4 delivery report request charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MMR4DRsRecord": {
+			"description": "Multimedia message service (MMS) recipient MM4 delivery report response charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MMR1RRRecord": {
+			"description": "Multimedia message service (MMS) recipient MM1 read reply recipient charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MMR4RRqRecord": {
+			"description": "Multimedia message service (MMS) recipient MM4 read reply report request charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MMR4RRsRecord": {
+			"description": "Multimedia message service (MMS) recipient MM4 read reply report response charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MMRMDRecord": {
+			"description": "Multimedia message service (MMS) recipient MM1 deletion charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MMFRecord": {
+			"description": "Multimedia message service (MMS) forwarding MM charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MMBx1SRecord": {
+			"description": "Multimedia message service (MMS) MMBox MM1 store charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MMBx1VRecord": {
+			"description": "Multimedia message service (MMS) MMBox MM1 view charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MMBx1URecord": {
+			"description": "Multimedia message service (MMS) MMBox MM1 upload charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MMBx1DRecord": {
+			"description": "Multimedia message service (MMS) MMBox MM1 delete charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MM7SRecord": {
+			"description": "Multimedia message service (MMS) VAS MM7 submission charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MM7DRqRecord": {
+			"description": "Multimedia message service (MMS) VAS MM7 deliver request charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MM7DRsRecord": {
+			"description": "Multimedia message service (MMS) VAS MM7 deliver response charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MM7CRecord": {
+			"description": "Multimedia message service (MMS) VAS MM7 cancel charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MM7RRecord": {
+			"description": "Multimedia message service (MMS) VAS MM7 replace charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MM7DRRqRecord": {
+			"description": "Multimedia message service (MMS) VAS MM7 delivery report request charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MM7DRRsRecord": {
+			"description": "Multimedia message service (MMS) VAS MM7 delivery report response charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MM7RRqRecord": {
+			"description": "Multimedia message service (MMS) VAS MM7 read reply report request charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MM7RRsRecord": {
+			"description": "Multimedia message service (MMS) VAS MM7 read reply report response charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		}
+	}
+}

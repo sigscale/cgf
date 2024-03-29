@@ -1,10 +1,43 @@
 {
 	"$schema": "http://json-schema.org/draft-07/schema#",
-	"$id": "http://sigscale.org/schema/cgf/ECS_3GPP_Bx_CS.json",
+	"$id": "http://sigscale.org/schema/cgf/ECS_Bx_CS",
 	"title": "SigScale CGF: Records on the Bx interface for circuit switched (CS) domain",
+	"oneOf": [
+		{
+			"type": "object",
+			"properties": {
+				"Bx_moCall": {
+					"$ref": "#/$defs/MOCallRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mtCall": {
+					"$ref": "#/$defs/MTCallRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_moSMS": {
+					"$ref": "#/$defs/MOSMSRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mtSMS": {
+					"$ref": "#/$defs/MTSMSRecord"
+				}
+			}
+		}
+	],
 	"$defs": {
 		"MOCallRecord": {
-			"$id": "#/$defs/MOCallRecord",
 			"description": "Circuit switched (CS) mobile originated (MO) call charging data record (CDR).",
 			"type": "object",
 			"properties": {
@@ -315,14 +348,43 @@
 				}
 			]
 		},
+		"MTCallRecord": {
+			"description": "Circuit switched (CS) mobile terminated (MT) call charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MOSMSRecord": {
+			"description": "Circuit switched (CS) mobile originated (MO) short message service (SMS) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MTSMSRecord": {
+			"description": "Circuit switched (CS) mobile terminated (MT) short message service (SMS) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
 		"AdditionalChgInfo": {
-			"$id": "#/$defs/AdditionalChgInfo",
 			"description": "Provides additional charging information.",
 			"type": "object",
 			"properties": {
 				"chargeIndicator": {
 					"description": "Derived from the ISUP backward call indicator.",
-					"type": "striing",
+					"type": "string",
 					"enum": [
 						"noCharge",
 						"charge"
@@ -338,9 +400,9 @@
 						"maximum": 255
 					}
 				}
+			}
 		},
 		"AOCParameters": {
-			"$id": "#/$defs/AOCParameters",
 			"description": "Describes a set of charge advice (AoC) parameters.",
 			"type": "object",
 			"properties": {
@@ -368,7 +430,6 @@
 			}
 		},
 		"AOCParmChange": {
-			"$id": "#/$defs/AOCParmChange",
 			"description": "Describes a change of Advice Of Charge (AOC) parameters.",
 			"type": "object",
 			"properties": {
@@ -383,7 +444,6 @@
 			}
 		},
 		"BasicServiceCode": {
-			"$id": "#/$defs/BasicServiceCode",
 			"description": "Identifies a basic service.",
 			"oneOf": [
 				{
@@ -415,21 +475,18 @@
 			]
 		},
 		"BearerServiceCode": {
-			"$id": "#/$defs/BearerServiceCode",
 			"description": "Provides a bearer service code.",
 			"type": "integer",
 			"minimum": 0,
 			"maximum": 255
 		},
 		"CallReferenceNumber": {
-			"$id": "#/$defs/CallReferenceNumber",
 			"description": "Uniquely identifies a call or transaction on one side of the interface (i.e. 'A' or 'B' side).",
 			"type": "integer",
 			"minimum": 0,
 			"maximum": 18446744073709551615
 		},
 		"CAMELInitCFIndicator": {
-			"$id": "#/$defs/CAMELInitCFIndicator",
 			"description": "Distinguish CAMEL call forwarding service scenarios from standard GSM call forwarding scenarios.",
 			"type": "string",
 			"enum": [
@@ -438,7 +495,6 @@
 			]
 		},
 		"CauseForTerm": {
-			"$id": "#/$defs/CauseForTerm",
 			"description": "Describes a generalised reason for the release of the connection.",
 			"type": "string",
 			"enum": [
@@ -455,32 +511,29 @@
 			]
 		},
 		"ChangeOfService": {
-			"$id": "#/$defs/ChangeOfService",
 			"description": "Describes an alteration to the basic service during the connection.",
-				"type": "object",
-				"properties": {
-					"basicService": {
-						"$ref": "#/$defs/BasicServiceCode"
-					},
-					"transparencyInd": {
-						"$ref": "#/$defs/TransparencyInd"
-					},
-					"changeTime": {
-						"description": "The time at which the change took place.",
-						"type": "string",
-						"format": "date-time"
-					},
-					"rateIndication": {
-						"$ref": "#/$defs/TransparencyInd"
-					},
-					"fnur": {
-						"$ref": "#/$defs/Fnur"
-					}
+			"type": "object",
+			"properties": {
+				"basicService": {
+					"$ref": "#/$defs/BasicServiceCode"
+				},
+				"transparencyInd": {
+					"$ref": "#/$defs/TransparencyInd"
+				},
+				"changeTime": {
+					"description": "The time at which the change took place.",
+					"type": "string",
+					"format": "date-time"
+				},
+				"rateIndication": {
+					"$ref": "#/$defs/TransparencyInd"
+				},
+				"fnur": {
+					"$ref": "#/$defs/Fnur"
 				}
 			}
 		},
 		"ChangeOfClassmark": {
-			"$id": "#/$defs/ChangeOfClassmark",
 			"description": "Describes a mobile station classmark change.",
 			"type": "object",
 			"properties": {
@@ -495,7 +548,6 @@
 			}
 		},
 		"ChangeOfRadioChannel": {
-			"$id": "#/$defs/ChangeOfRadioChannel",
 			"description": "Describes a change in the type of radio channel used.",
 			"type": "object",
 			"properties": {
@@ -508,12 +560,11 @@
 					"format": "date-time"
 				},
 				"speechVersionUsed": {
-					
+					"$ref": "#/$defs/SpeechVersionIdentifier"
 				}
 			}
 		},
 		"Classmark": {
-			"$id": "#/$defs/Classmark",
 			"description": "Octets of mobile station classmark 2/3",
 			"type": "array",
 			"items": {
@@ -524,7 +575,6 @@
 			}
 		},
 		"DefaultCallHandling": {
-			"$id": "#/$defs/DefaultCallHandling",
 			"description": "Indicates CAMEL default call hyandling handling applied.",
 			"type": "string",
 			"enum": [
@@ -533,7 +583,6 @@
 			]
 		},
 		"Diagnostics": {
-			"$id": "#/$defs/Diagnostics",
 			"description": "Provides a more detailed technical reason for the release of the connection.",
 			"type": "object",
 			"oneOf": [
@@ -612,7 +661,6 @@
 			]
 		},
 		"Fnur": {
-			"$id": "#/$defs/Fnur",
 			"description": "Fixed Network User Rate (FNUR).",
 			"type": "string",
 			"enum": [
@@ -631,7 +679,6 @@
 			]
 		},
 		"FreeFormatData": {
-			"$id": "#/$defs/FreeFormatData",
 			"description": "Charging information sent by gsmSCF in the Furnish Charging Information (FCI) message",
 			"type": "array",
 			"items": {
@@ -642,12 +689,10 @@
 			}
 		},
 		"Gsm-SCFAddres": {
-			"$id": "#/$defs/Gsm-SCFAddres",
 			"description": "The CAMEL server serving the subscriber is defined in HLR as part of CAMEL subscription information.",
 			"$ref": "#/$defs/PartyAddress"
 		},
 		"LevelOfCAMELService": {
-			"$id": "#/$defs/LevelOfCAMELService",
 			"description": "Describes briefly the complexity of CAMEL invocation",
 			"type": "string",
 			"enum": [
@@ -657,7 +702,6 @@
 			]
 		},
 		"LocationAreaAndCell": {
-			"$id": "#/$defs/LocationAreaAndCell",
 			"description": "The location of a mobile subscriber",
 			"type": "object",
 			"properties": {
@@ -698,7 +742,6 @@
 			]
 		},
 		"LocationChange": {
-			"$id": "#/$defs/LocationChange",
 			"description": "Describes a change of location (i.e. Routing Area change).",
 			"type": "array",
 			"items": {
@@ -716,7 +759,6 @@
 			}
 		},
 		"PartyAddress": {
-			"$id": "#/$defs/PartyAddress",
 			"description": "Circuit Switched (CS) calling/called/translated number",
 			"type": "object",
 			"properties": {
@@ -763,7 +805,6 @@
 			]
 		},
 		"RadioChanRequested": {
-			"$id": "#/$defs/RadioChanRequested",
 			"description": "Describes the type of channel requested by the user.",
 			"type": "string",
 			"enum": [
@@ -774,35 +815,30 @@
 			]
 		},
 		"RateIndication": {
-			"$id": "#/$defs/RateIndication",
 			"description": "Describes the rate adaptation that was used for the connection.",
 			"type": "integer",
 			"minimum": 0,
 			"maximum": 11
 		},
 		"ServiceKey": {
-			"$id": "#/$defs/ServiceKey",
 			"description": " Service key is defined in HLR as part of CAMEL subscription information.",
 			"type": "integer",
 			"minimum": 0,
 			"maximum": 2147483647
 		},
 		"SpeechVersionIdentifier": {
-			"$id": "#/$defs/SpeechVersionIdentifier",
 			"description": "Identifies a speech codec version.",
 			"type": "integer",
 			"minimum": 0,
 			"maximum": 37
 		},
 		"SS-Code": {
-			"$id": "#/$defs/SS-Code",
 			"description": "Identifies one or more supplementary services.",
 			"type": "integer",
 			"minimum": 0,
 			"maximum": 255
 		},
 		"SuppServiceUsed": {
-			"$id": "#/$defs/SuppServiceUsed",
 			"description": "Describes a supplementary service use.",
 			"type": "object",
 			"properties": {
@@ -826,14 +862,12 @@
 			]
 		},
 		"TeleserviceCode": {
-			"$id": "#/$defs/TeleserviceCode",
 			"description": "Provides a teleservice code.",
 			"type": "integer",
 			"minimum": 0,
 			"maximum": 255
 		},
 		"TrafficChannel": {
-			"$id": "#/$defs/TrafficChannel",
 			"description": "Describes the type of traffic channel actually employed for the connection.",
 			"type": "string",
 			"enum": [
@@ -842,7 +876,6 @@
 			]
 		},
 		"TransparencyInd": {
-			"$id": "#/$defs/TransparencyInd",
 			"description": "Indicates whether the basic service was employed in transparent or non-transparent mode.",
 			"type": "string",
 			"enum": [
@@ -851,7 +884,6 @@
 			]
 		},
 		"TrunkGroup": {
-			"$id": "#/$defs/TrunkGroup",
 			"description": "Identifies a trunk group on an MSC.",
 			"type": "object",
 			"properties": {

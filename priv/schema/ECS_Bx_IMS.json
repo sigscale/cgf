@@ -1,0 +1,225 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "http://sigscale.org/schema/cgf/ECS_Bx_IMS",
+	"title": "SigScale CGF: Records on the Bx interface for IP multimedia subsystem (IMS) domain",
+	"oneOf": [
+		{
+			"type": "object",
+			"properties": {
+				"Bx_sSCF": {
+					"$ref": "#/$defs/SCSCFRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_pCSCF": {
+					"$ref": "#/$defs/PCSCFRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_iCSCF": {
+					"$ref": "#/$defs/ICSCFRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mrfc": {
+					"$ref": "#/$defs/MRFCRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mgcf": {
+					"$ref": "#/$defs/MGCFRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_bgcf": {
+					"$ref": "#/$defs/BGCFRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_as": {
+					"$ref": "#/$defs/ASRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_eCSCF": {
+					"$ref": "#/$defs/ECSCFRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_ibcf": {
+					"$ref": "#/$defs/IBCFRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_trf": {
+					"$ref": "#/$defs/TRFRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_tf": {
+					"$ref": "#/$defs/TFRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_atcf": {
+					"$ref": "#/$defs/ATCFRecord"
+				}
+			}
+		}
+	],
+	"$defs": {
+		"SCSCFRecord": {
+			"description": "IP multimedia subsystem (IMS) serving call session control function (S-CSSF) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"PCSCFRecord": {
+			"description": "IP multimedia subsystem (IMS) proxy call session control function (P-CSSF) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"ICSCFRecord": {
+			"description": "IP multimedia subsystem (IMS) interogating call session control function (I-CSSF) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MRFCRecord": {
+			"description": "IP multimedia subsystem (IMS) multimedia resource function controller (MRFC) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"MGCFRecord": {
+			"description": "IP multimedia subsystem (IMS) media gateway control function (MGCF) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"BGCFRecord": {
+			"description": "IP multimedia subsystem (IMS) breakout gateway control function (BGCF) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"ASRecord": {
+			"description": "IP multimedia subsystem (IMS) application server (AS) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"ECSCFRecord": {
+			"description": "IP multimedia subsystem (IMS) emergency call session control function (E-CSCF) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"IBCFRecord": {
+			"description": "IP multimedia subsystem (IMS) interconnection border control function (IBCF) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"TRFRecord": {
+			"description": "IP multimedia subsystem (IMS) transit and roaming function (TRF) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"TFRecord": {
+			"description": "IP multimedia subsystem (IMS) transit function (TF) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"ATCFRecord": {
+			"description": "IP multimedia subsystem (IMS) access transfer control function (ATCF) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		}
+	}
+}

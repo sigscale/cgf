@@ -1,0 +1,107 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "http://sigscale.org/schema/cgf/ECS_Bx_SMS",
+	"title": "SigScale CGF: Records on the Bx interface for SMS",
+	"oneOf": [
+		{
+			"type": "object",
+			"properties": {
+				"Bx_scSMO": {
+					"$ref": "#/$defs/SCSMORecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_scSMT": {
+					"$ref": "#/$defs/SCSMTRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_scDVTT4": {
+					"$ref": "#/$defs/SCDVTT4Record"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_scSMOT4": {
+					"$ref": "#/$defs/SCSMTRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_ismSMO": {
+					"$ref": "#/$defs/ISMSMORecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_ismSMT": {
+					"$ref": "#/$defs/ISMSMTRecord"
+				}
+			}
+		}
+	],
+	"$defs": {
+		"SCSMORecord": {
+			"description": "Short message service center (SCS) mobile originated charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"SCSMTRecord": {
+			"description": "Short message service center (SCS) mobile terminated charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"SCDVTT4Record": {
+			"description": "Short message service center (SCS) device triggering on T4 interface (DVT-T4) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"ISMSMORecord": {
+			"description": "IP short message gateway (IP-SM-GW) mobile originating charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		},
+		"ISMSMTRecord": {
+			"description": "IP short message gateway (IP-SM-GW) mobile terminating charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		}
+	}
+}

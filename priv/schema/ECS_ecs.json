@@ -1,33 +1,28 @@
 {
 	"$schema": "http://json-schema.org/draft-07/schema#",
-	"$id": "http://sigscale.org/schema/cgf/ECS_ecs.json",
-	"title": "Elastic Common Schema (ECS) ECS",
-	"$defs": {
-		"ECS_ecs": {
-			"$id": "#/$defs/ECS_ecs",
-			"description": "Meta-information specific to ECS.",
+	"$id": "http://sigscale.org/schema/cgf/ECS_ecs",
+	"title": "Elastic Common Schema (ECS)",
+	"description": "ECS specific Meta-information.",
+	"type": "object",
+	"properties": {
+		"ecs": {
 			"type": "object",
 			"properties": {
-				"ecs": {
-					"type": "object",
-					"properties": {
-						"version": {
-							"description": "ECS version this event conforms to.",
-							"type": "string",
-							"enum": [
-								"8.5",
-								"8.6"
-							]
-						}
-					},
-					"required": [
-						"version"
+				"version": {
+					"description": "ECS version this event conforms to.",
+					"type": "string",
+					"enum": [
+						"8.5",
+						"8.6"
 					]
 				}
 			},
 			"required": [
-				"ecs"
+				"version"
 			]
 		}
-	}
+	},
+	"required": [
+		"ecs"
+	]
 }

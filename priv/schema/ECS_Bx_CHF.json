@@ -1,0 +1,27 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "http://sigscale.org/schema/cgf/ECS_Bx_CHF",
+	"title": "SigScale CGF: Records on the Bx interface for 5GC",
+	"oneOf": [
+		{
+			"type": "object",
+			"properties": {
+				"Bx_chf": {
+					"$ref": "#/$defs/ChargingRecord"
+				}
+			}
+		}
+	],
+	"$defs": {
+		"ChargingRecord": {
+			"description": "5G Core (5GC) charging function (CHF) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		}
+	}
+}

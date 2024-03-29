@@ -1,0 +1,27 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "http://sigscale.org/schema/cgf/ECS_Bx_MMTEL",
+	"title": "SigScale CGF: Records on the Bx interface for MMTEL",
+	"oneOf": [
+		{
+			"type": "object",
+			"properties": {
+				"Bx_mmtel": {
+					"$ref": "#/$defs/MMTelRecord"
+				}
+			}
+		}
+	],
+	"$defs": {
+		"MMTelRecord": {
+			"description": "MultiMedia Telephony (MMTEL) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+			},
+			"required": [
+			],
+			"examples": [
+			]
+		}
+	}
+}

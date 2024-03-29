@@ -1,30 +1,25 @@
 {
 	"$schema": "http://json-schema.org/draft-07/schema#",
-	"$id": "http://sigscale.org/schema/cgf/ECS_network.json",
+	"$id": "http://sigscale.org/schema/cgf/ECS_network",
 	"title": "Elastic Common Schema (ECS) Network",
-	"$defs": {
-		"ECS_network": {
-			"$id": "#/$defs/ECS_network",
-			"description": "The network is defined as the communication path over which a host or network event happens.",
-			"type": "object",
-			"properties": {
-				"application": {
-					"description": "Application level protocol name.",
-					"type": "string",
-					"examples": [
-						"ro",
-						"nrf"
-					]
-				},
-				"protocol": {
-					"description": "Application protocol name.",
-					"type": "string",
-					"examples": [
-						"diameter",
-						"http"
-					]
-				}
-			}
+	"description": "The network is defined as the communication path over which a host or network event happens.",
+	"type": "object",
+	"properties": {
+		"application": {
+			"description": "Application level name.",
+			"type": "string",
+			"examples": [
+				"rf",
+				"ga"
+			]
+		},
+		"protocol": {
+			"description": "Application protocol name.",
+			"type": "string",
+			"examples": [
+				"diameter",
+				"gtp'"
+			]
 		}
 	}
 }
