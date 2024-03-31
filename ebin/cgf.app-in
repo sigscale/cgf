@@ -26,5 +26,11 @@
 			'ExposureFunctionAPIChargingDataTypes']},
 		{registered, []},
 		{applications, [kernel, stdlib, asn1]},
+		{env,
+			[{bx_log_dir, "log/bx"},
+			{logs, [
+				% {LogName :: atom() | {global, term()},
+				%       Options :: [cgf_log:log_option()]}
+			]},
 		{mod, {cgf_app,[]}}]}.
 

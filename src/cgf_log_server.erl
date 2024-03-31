@@ -58,7 +58,7 @@
 %% @see //stdlib/gen_server:init/1
 %% @private
 init([Sup | Options]) ->
-	{ok, LogDir} = application:get_env(log_dir),
+	{ok, LogDir} = application:get_env(bx_log_dir),
 	State = #state{sup = Sup},
 	{State1, Options1} = case lists:keytake(codec, 1, Options) of
 		{value, {codec, {M, F}}, O1} when is_atom(M), is_atom(F) ->
