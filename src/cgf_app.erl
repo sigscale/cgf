@@ -54,7 +54,7 @@ start(normal = _StartType, _Args) ->
 	end.
 %% @hidden
 start1(TopSup, [{LogName, Options} | T]) ->
-	case cse_log:open(LogName, Options) of
+	case cgf_log:open(LogName, Options) of
 		ok ->
 			start1(TopSup, T);
 		{error, Reason} ->
