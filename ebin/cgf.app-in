@@ -25,7 +25,7 @@
 			'MONTEChargingDataTypes',
 			'CHFChargingDataTypes',
 			'ExposureFunctionAPIChargingDataTypes']},
-		{registered, []},
+		{registered, [{cgf, cgf_sup, cgf_log_sup]},
 		{applications, [kernel, stdlib, asn1]},
 		{env,
 			[{bx_log_dir, "log/bx"},
