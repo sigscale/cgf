@@ -1,5 +1,5 @@
 {application, %APP_NAME%,
-	[{description, "Charging Gateway Function (CGF)"},
+		[{description, "Charging Gateway Function (CGF)"},
 		{vsn, "%APP_VERSION%"},
 		{modules,
 			[cgf_app,
@@ -31,6 +31,6 @@
 			{logs, [
 				% {LogName :: atom() | {global, term()},
 				%       Options :: [cgf_log:log_option()]}
-			]},
+			]}]},
 		{mod, {cgf_app,[]}}]}.
 
