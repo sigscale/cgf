@@ -3,6 +3,12 @@
 		{vsn, "%APP_VERSION%"},
 		{modules,
 			[cgf_app,
+			cgf_sup,
+			cgf_server,
+			cgf_log_sup,
+			cgf_log_server_sup,
+			cgf_log_server,
+			cgf_log_job_sup,
 			'GenericChargingDataTypes',
 			'IMSChargingDataTypes',
 			'CSChargingDataTypes',
@@ -17,7 +23,8 @@
 			'ProSeChargingDataTypes',
 			'MONTEChargingDataTypes',
 			'CHFChargingDataTypes',
-			'ExposureFunctionAPIChargingDataTypes'],
+			'ExposureFunctionAPIChargingDataTypes']},
 		{registered, []},
-		{applications, [kernel, stdlib, asn1]}]}.
+		{applications, [kernel, stdlib, asn1]},
+		{mod, {cgf_app,[]}}]}.
 

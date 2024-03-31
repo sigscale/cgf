@@ -9,6 +9,12 @@ app_DATA = cgf.app
 EXTRA_DIST = cgf.app
 
 beam_DATA = cgf_app.beam \
+		cgf_sup.beam \
+		cgf_server.beam \
+		cgf_log_sup.beam \
+		cgf_log_server_sup.beam \
+		cgf_log_server.beam \
+		cgf_log_job_sup.beam \
 		GenericChargingDataTypes.beam \
 		IMSChargingDataTypes.beam \
 		CSChargingDataTypes.beam \

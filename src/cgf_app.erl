@@ -45,7 +45,23 @@
 		Reason :: term().
 %% @doc Starts the application processes.
 start(normal = _StartType, _Args) ->
-	{error, unimplemented}.
+	case supervisor:start_link({local, cgf_sup}, cgf_sup, []) of
+		{ok, TopSup} ->
+			{ok, Logs} = application:get_env(logs),
+			start1(TopSup, Logs);
+		{error, Reason} ->
+			{error, Reason}
+	end.
+%% @hidden
+start1(TopSup, [{LogName, Options} | T]) ->
+	case cse_log:open(LogName, Options) of
+		ok ->
+			start1(TopSup, T);
+		{error, Reason} ->
+			{error, Reason}
+	end;
+start1(TopSup, []) ->
+	{ok, TopSup}.
 
 -spec start_phase(Phase, StartType, PhaseArgs) -> Result
 	when
