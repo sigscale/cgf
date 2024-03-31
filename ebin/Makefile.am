@@ -15,6 +15,7 @@ beam_DATA = cgf_app.beam \
 		cgf_log_server_sup.beam \
 		cgf_log_server.beam \
 		cgf_log_job_sup.beam \
+		cgf_log.beam \
 		GenericChargingDataTypes.beam \
 		IMSChargingDataTypes.beam \
 		CSChargingDataTypes.beam \

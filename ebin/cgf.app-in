@@ -9,6 +9,7 @@
 			cgf_log_server_sup,
 			cgf_log_server,
 			cgf_log_job_sup,
+			cgf_log,
 			'GenericChargingDataTypes',
 			'IMSChargingDataTypes',
 			'CSChargingDataTypes',
