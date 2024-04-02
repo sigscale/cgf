@@ -15,6 +15,7 @@ schema_DATA = $(abs_builddir)/ECS_base.json \
 		$(abs_builddir)/ECS_Bx_MMS.json \
 		$(abs_builddir)/ECS_Bx_MMTEL.json \
 		$(abs_builddir)/ECS_Bx_CHF.json \
+		$(abs_builddir)/ECS_Bx_RF.json \
 		$(abs_builddir)/ECS_Bx.json
 
 check_DATA = .validation_ok
@@ -50,6 +51,8 @@ $(abs_builddir)/%.json:	$(srcdir)/%.json
          then exit 1; fi; \
 		if ! ajv compile -s ECS_Bx_CHF.json; \
          then exit 1; fi; \
+		if ! ajv compile -s ECS_Bx_RF.json; \
+         then exit 1; fi; \
 		if ! ajv -c ajv-formats compile \
 			-r ECS_base.json \
 			-r ECS_ecs.json \
@@ -64,6 +67,7 @@ $(abs_builddir)/%.json:	$(srcdir)/%.json
 			-r ECS_Bx_MMS.json \
 			-r ECS_Bx_MMTEL.json \
 			-r ECS_Bx_CHF.json \
+			-r ECS_Bx_RF.json \
 			-s ECS_Bx.json; \
          then exit 1; fi; \
 	else \

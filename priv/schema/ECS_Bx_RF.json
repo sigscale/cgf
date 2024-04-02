@@ -1,0 +1,245 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "http://sigscale.org/schema/cgf/ECS_Bx_RF",
+	"title": "SigScale CGF: Records on the Bx interface for Rating Function (RF)",
+	"oneOf": [
+		{
+			"type": "object",
+			"properties": {
+				"Bx_rated": {
+					"$ref": "#/$defs/Rated"
+				}
+			}
+		}
+	],
+	"$defs": {
+		"Rated": {
+			"description": "Rating Function (RF) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+				"product": {
+					"$ref": "#/$defs/Product"
+				},
+				"appliedCharge": {
+					"description": "Applied product usage charges.",
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/AppliedCharge"
+					}
+				}
+			},
+			"examples": [
+				{
+					"product": {
+						"productId": "14c743d2216b"
+					},
+					"appliedCharge": [
+						{
+							"name": "allowance",
+							"included": true,
+							"chargeUnits": "seconds",
+							"chargeAmount": {
+								"valueDigits": 120
+							}
+						},
+						{
+							"chargeUnit": "cents",
+							"chargeAmount": {
+								"valueDigits": 6,
+								"exponent": -2
+							}
+						}
+					]
+				}
+			]
+		},
+		"AppliedCharge": {
+			"description": "Describes an applied charge.",
+			"type": "object",
+			"properties": {
+				"name": {
+					"description": "Name of an applied charge.",
+					"type": "string"
+				},
+				"included": {
+					"description": "Indicates if the applied amount was included in an allowance",
+					"type": "boolean"
+				},
+				"chargeUnits": {
+					"description": "Indicates the charged unit type.",
+					"type": "string",
+					"examples": [
+						"bytes",
+						"seconds",
+						"messages",
+						"cents"
+					]
+				},
+				"chargeAmount": {
+					"$ref": "#/$defs/UnitValue"
+				},
+				"currencyCode": {
+					"$ref": "#/$defs/CurrencyCode"
+				}
+			},
+			"examples": [
+				{
+					"chargeUnits": "bytes",
+					"chargeAmount": {
+						"valueDigits": 11486124
+					},
+					"included": true
+				},
+				{
+					"chargeUnits": "cents",
+					"currencyCode": "CAD",
+					"chargeAmount": {
+						"valueDigits": 2,
+						"exponent": -2
+					}
+				}
+			]
+		},
+		"Product": {
+			"description": "Describes a subscribed product offering.",
+			"type": "object",
+			"properties": {
+				"productId": {
+					"description": "Identifies a subscription to a product offering.",
+					"type": "string"
+				},
+				"productOffering": {
+					"$ref": "#/$defs/ProductOffering"
+				}
+			}
+		},
+		"ProductOffering": {
+			"description": "Describes a product offering.",
+			"type": "object",
+			"properties": {
+				"id": {
+					"description": "Identifier of the product offering.",
+					"type": "string"
+				},
+				"name": {
+					"description": "Name of the product offering.",
+					"type": "string"
+				},
+				"bundledProductOffering": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/ProductOffering"
+					}
+				}
+			},
+			"examples": [
+				{
+					"id": "13a106b830fc",
+					"name": "Value Pack 200"
+				}
+			]
+		},
+		"ProductOfferingPrice": {
+			"description": "Describes an applied  product offering price.",
+			"type": "object",
+			"properties": {
+				"id": {
+					"description": "Identifier of an applied product offering price.",
+					"type": "string"
+				},
+				"name": {
+					"description": "Name of an applied product offering price.",
+					"type": "string"
+				},
+				"currencyCode": {
+					"$ref": "#/$defs/CurrencyCode"
+				},
+				"tariffRate": {
+					"$ref": "#/$defs/TariffRate"
+				}
+			},
+			"examples": [
+				{
+					"id": "f663e896ae06",
+					"name": "On Net"
+				}
+			]
+		},
+		"TariffRate": {
+			"description": "Describes an applied tarrif rate.",
+			"type": "object",
+			"properties": {
+				"name": {
+					"description": "Name of an applied tarrif rate.",
+					"type": "string"
+				},
+				"id": {
+					"description": "Identifier for an applied tarrif rate.",
+					"type": "string"
+				},
+				"unitType": {
+					"description": "Indicates the unit type of an applied tarrif rate.",
+					"type": "string"
+				},
+				"unitSize": {
+					"$ref": "#/$defs/UnitValue"
+				},
+				"unitCost": {
+					"$ref": "#/$defs/UnitValue"
+				}
+			}
+		},
+		"CurrencyCode": {
+			"description": "A currency code that specifies in which currency the values of monetary units were given.  It is specified by using the values defined in the ISO [4217](https://www.iso.org/iso-4217-currency-codes.html) standard.",
+			"oneOf": [
+				{
+					"description": "Alphabetic Code",
+					"type": "string",
+					"pattern": "^[A-Z]{3}$",
+					"examples": [
+						"CAD"
+					]
+				},
+				{
+					"description": "Numeric Code",
+					"type": "integer",
+					"minimum": 0,
+					"maximum": 999,
+					"examples": [
+						124
+					]
+				}
+			]
+		},
+		"UnitValue": {
+			"description": "Specifies a floating-point value. The UnitValue is a significand with an exponent; i.e., UnitValue = valueDigits * 10^exponent. This representation avoids unwanted rounding off. For example, the value of 2.3 is represented as ValueDigits = 23 and Exponent = -1. The absence of the exponent part MUST be interpreted as an exponent equal to zero.",
+			"type": "object",
+			"properties": {
+				"valueDigits": {
+					"description": "The significand of the floating point value.",
+					"type": "integer",
+					"minimum": -9223372036854775808,
+					"maximum": 9223372036854775807
+				},
+				"exponent": {
+					"description": "The exponent of the floating point value.",
+					"type": "integer",
+					"minimum": -2147483648,
+					"maximum":  2147483647
+				}
+			},
+			"required": [
+				"valueDigits"
+			],
+			"examples": [
+				{
+					"valueDigits": 1
+				},
+				{
+					"valueDigits": 142,
+					"exponent": -2
+				}
+			]
+		}
+	}
+}

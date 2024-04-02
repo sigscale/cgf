@@ -47,6 +47,9 @@
 					"$ref": "/schema/cgf/ECS_Bx_CHF"
 				}
 			]
+		},
+		{
+			"$ref": "/schema/cgf/ECS_Bx_RF"
 		}
 	],
 	"examples": [
@@ -113,6 +116,20 @@
 				"causeForTerm": "normalRelease",
 				"callReference": 729081236,
 				"systemType": "gERAN"
+			},
+			"Bx_Rated": {
+				"product": {
+					"productId": "14c743d2216b"
+				},
+				"appliedCharge": [
+					{
+						"chargeUnits": "cents",
+						"chargeAmount": {
+							"valueDigits": 1,
+							"exponent": -2
+						}
+					}
+				]
 			}
 		}
 	]
