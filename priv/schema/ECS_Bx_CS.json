@@ -298,6 +298,8 @@
 				"iCSI2ActiveFlag": {
 				},
 				"iMS-Charging-Identifier": {
+					"description": "Provides an IMS charging identifier (ICID)",
+					"type": "string"
 				},
 				"privateUserID": {
 				}
