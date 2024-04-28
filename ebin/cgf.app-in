@@ -11,6 +11,7 @@
 				cgf_log_job_sup,
 				cgf_log,
 				cgf_log_codec_ecs,
+				cgf_tools,
 				'GenericChargingDataTypes',
 				'IMSChargingDataTypes',
 				'CSChargingDataTypes',

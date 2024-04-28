@@ -11,7 +11,8 @@ modhtml = cgf_app.html \
 		cgf_log_server.html \
 		cgf_log_job_sup.html \
 		cgf_log.html \
-		cgf_log_codec_ecs.html
+		cgf_log_codec_ecs.html \
+		cgf_tools.html
 
 doc_DATA = overview.edoc $(modhtml) \
 		modules-frame.html overview-summary.html \
