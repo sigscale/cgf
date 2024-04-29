@@ -97,6 +97,15 @@ get_typedefs([#typedef{name = Name, typespec = TypeSpec} = H | T],
 		undefined ->
 			get_typedefs(T, Refs, [H | Pending], Acc)
 	end;
+get_typedefs([#ptypedef{name = Name, typespec = TypeSpec} = H | T],
+		Refs, Pending, Acc) ->
+	case get_type(TypeSpec, Refs) of
+		Type when is_map(Type) ->
+			Ref = lists:flatten(["#/$defs/", atom_to_list(Name)]),
+			get_typedefs(T, Refs#{Name => Ref}, Pending, Acc#{Name => Type});
+		undefined ->
+			get_typedefs(T, Refs, [H | Pending], Acc)
+	end;
 get_typedefs([], _Refs, [], Acc) ->
 	Acc;
 get_typedefs([], Refs, Pending, Acc) ->
@@ -140,6 +149,18 @@ get_type(#type{def = 'TeletexString', constraint = Constraints}, _Refs) ->
 	#{"type" => "string"};
 get_type(#type{def = 'VideotexString', constraint = Constraints}, _Refs) ->
 	#{"type" => "string"};
+get_type(#type{def = 'NULL', constraint = Constraints}, _Refs) ->
+	#{"type" => "null"};
+get_type(#type{def = 'GeneralizedTime', constraint = Constraints}, _Refs) ->
+	#{"type" => "string", "pattern" => "^[0-9]{14}([,.][0-9]{1,3})?Z?$"};
+get_type(#type{def = 'UTCTime', constraint = Constraints}, _Refs) ->
+	#{"type" => "string", "pattern" => "^([0-9]{10}|[0-9]{12})(Z|[+-]{1}[0-9]{4})$"};
+get_type(#type{def = 'ObjectDescriptor', constraint = Constraints}, _Refs) ->
+	#{"type" => "string"};
+get_type(#type{def = 'OBJECT IDENTIFIER', constraint = Constraints}, _Refs) ->
+	#{"type" => "string"};
+get_type(#type{def = 'REAL', constraint = Constraints}, _Refs) ->
+	#{"type" => "number"};
 get_type(#type{def =  {'CHOICE', Components}, constraint = []}, Refs) ->
 	case get_component(Components, Refs, []) of
 		Types when is_list(Types) ->
@@ -181,7 +202,14 @@ get_type(#type{def = #'Externaltypereference'{type = Type},
 		constraint = []}, Refs) when is_map_key(Type, Refs) ->
 	#{"type" => #{"$ref" => maps:get(Type, Refs)}};
 get_type(#type{def = #'Externaltypereference'{}}, _Refs) ->
-	undefined.
+	undefined;
+get_type(#type{def = {pt, #'Externaltypereference'{type = Type}, _},
+		constraint = []}, Refs) when is_map_key(Type, Refs) ->
+	#{"type" => #{"$ref" => maps:get(Type, Refs)}};
+get_type(#type{def = {pt, #'Externaltypereference'{}, _}}, _Refs) ->
+	undefined;
+get_type(#type{def = {'ANY_DEFINED_BY', _}}, _Refs) ->
+	#{}.
 
 get_component([#'ComponentType'{name = Name, typespec = TypeSpec} | T],
 		Refs, Acc) ->
