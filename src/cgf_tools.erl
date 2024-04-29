@@ -27,7 +27,8 @@
 -include_lib("asn1/src/asn1_records.hrl").
 
 -define(METASCHEMA, "http://json-schema.org/draft-07/schema#").
--define(BASE_ID, "http://sigscale.org/schema/cgf/").
+-define(BASE_AUTHORITY, "http://sigscale.org").
+-define(BASE_PATH, "/schema/cgf/").
 
 %%----------------------------------------------------------------------
 %%  The cgf_tools public API
@@ -61,9 +62,10 @@ transpile(Asn1Filename, JsonSchemaFilename) ->
 				typeorval = TypeOrVal}} ->
 			Refs = get_refs(Imports, #{}),
 			Defs = get_typedefs(TypeOrVal, Refs, [], #{}),
+			ID = lists:flatten([?BASE_AUTHORITY,
+					?BASE_PATH, atom_to_list(Name)]),
 			Schema = #{"$schema" => "http://json-schema.org/draft-07/schema#",
-					"$id" => ?BASE_ID ++ atom_to_list(Name),
-   				"$defs" => Defs},
+					"$id" => ID, "$defs" => Defs},
 			file:write_file(JsonSchemaFilename, zj:encode(Schema));
 		{error, Reason} ->
 			{error, Reason}
@@ -81,7 +83,7 @@ get_refs([], Acc) ->
 %% @hidden
 get_symbols([#'Externaltypereference'{module = Module,
 		type = Type} | T], Acc) ->
-	Ref = lists:flatten([$/, atom_to_list(Module),
+	Ref = lists:flatten([?BASE_PATH, atom_to_list(Module),
 			"#/$defs/", atom_to_list(Type)]),
 	get_symbols(T, Acc#{Type => Ref});
 get_symbols([], Acc) ->
@@ -115,52 +117,69 @@ get_typedefs([], Refs, Pending, Acc) ->
 get_type(#type{def = 'BOOLEAN'}, _Refs) ->
 	#{"type" => "boolean"};
 get_type(#type{def = 'INTEGER', constraint = Constraints}, _Refs) ->
-	#{"type" => "integer"};
-get_type(#type{def = {'INTEGER', _NamedNumbers}, constraint = []}, _Refs) ->
-	#{"type" => "integer"};
-get_type(#type{def = {'ENUMERATED', _NamedNumbers}, constraint = []}, _Refs) ->
-	#{"type" => "integer"};
+	get_constraint(Constraints, #{"type" => "integer"});
+get_type(#type{def = {'INTEGER', NamedNumbers}, constraint = []}, _Refs) ->
+	Enum = [atom_to_list(Name) || {'NamedNumber', Name, _N} <- NamedNumbers],
+	#{"type" => "string", "enum" => Enum};
+get_type(#type{def = {'ENUMERATED', NamedNumbers}, constraint = []}, _Refs) ->
+	Enum = [atom_to_list(Name) || {'NamedNumber', Name, _N} <- NamedNumbers],
+	#{"type" => "string", "enum" => Enum};
 get_type(#type{def = 'OCTET STRING', constraint = Constraints}, _Refs) ->
+	get_constraint(Constraints,
+			#{"type" => "string", "pattern" => "^([0-9a-fA-F]{2})*$"});
+get_type(#type{def = 'BIT STRING', constraint = []}, _Refs) ->
 	#{"type" => "string", "pattern" => "^[0-9a-fA-F]*$"};
-get_type(#type{def = 'BIT STRING', constraint = Constraints}, _Refs) ->
-	#{"type" => "string", "pattern" => "^[0-9a-fA-F]*$"};
-get_type(#type{def = {'BIT STRING', _NamedNumbers},
-		constraint = Constraints}, _Refs) ->
-	#{"type" => "string", "pattern" => "^[0-9a-fA-F]*$"};
+get_type(#type{def = {'BIT STRING', []}, constraint = [{element_set,
+		{'SizeConstraint', {element_set, {'SingleValue', Size}, none}},
+		none}]}, _Refs) when is_integer(Size), (Size rem 4) == 0 ->
+	Length = Size div 4,
+	Pattern = lists:flatten(["^[0-9a-fA-F]",
+			${, integer_to_list(Length), $}, $$]),
+	#{"type" => "string", "minLength" => Length,
+			"maxLength" => Length, "pattern" => Pattern};
+get_type(#type{def = {'BIT STRING', NamedNumbers}, constraint = []}, _Refs) ->
+	Enum = [atom_to_list(Name) || {'NamedNumber', Name, _N} <- NamedNumbers],
+	#{"type" => "string", "enum" => Enum};
 get_type(#type{def = 'UTF8String', constraint = Constraints}, _Refs) ->
-	#{"type" => "string"};
+	get_constraint(Constraints, #{"type" => "string"});
 get_type(#type{def = 'IA5String', constraint = Constraints}, _Refs) ->
-	#{"type" => "string", "pattern" => "^[\x00-\x7F]*$"};
+	get_constraint(Constraints,
+			#{"type" => "string", "pattern" => "^[\\x00-\\x7F]*$"});
 get_type(#type{def = 'VisibleString', constraint = Constraints}, _Refs) ->
-	#{"type" => "string", "pattern" => "^[\x20-\x7E]*$"};
+	get_constraint(Constraints,
+			#{"type" => "string", "pattern" => "^[\\x20-\\x7E]*$"});
 get_type(#type{def = 'PrintableString', constraint = Constraints}, _Refs) ->
-	#{"type" => "string", "pattern" => "^[a-zA-Z0-9 '()+,-./:=?]*$"};
+	get_constraint(Constraints,
+			#{"type" => "string", "pattern" => "^[a-zA-Z0-9 '()+,-./:=?]*$"});
 get_type(#type{def = 'NumericString', constraint = Constraints}, _Refs) ->
-	#{"type" => "string", "pattern" => "^[0-9 ]*$"};
+	get_constraint(Constraints,
+			#{"type" => "string", "pattern" => "^[0-9 ]*$"});
 get_type(#type{def = 'GraphicString', constraint = Constraints}, _Refs) ->
-	#{"type" => "string"};
+	get_constraint(Constraints, #{"type" => "string"});
 get_type(#type{def = 'GeneralString', constraint = Constraints}, _Refs) ->
-	#{"type" => "string"};
+	get_constraint(Constraints, #{"type" => "string"});
 get_type(#type{def = 'BMPString', constraint = Constraints}, _Refs) ->
-	#{"type" => "string"};
+	get_constraint(Constraints, #{"type" => "string"});
 get_type(#type{def = 'UniversalString', constraint = Constraints}, _Refs) ->
-	#{"type" => "string"};
+	get_constraint(Constraints, #{"type" => "string"});
 get_type(#type{def = 'TeletexString', constraint = Constraints}, _Refs) ->
-	#{"type" => "string"};
+	get_constraint(Constraints, #{"type" => "string"});
 get_type(#type{def = 'VideotexString', constraint = Constraints}, _Refs) ->
-	#{"type" => "string"};
+	get_constraint(Constraints, #{"type" => "string"});
 get_type(#type{def = 'NULL', constraint = Constraints}, _Refs) ->
-	#{"type" => "null"};
+	get_constraint(Constraints, #{"type" => "null"});
 get_type(#type{def = 'GeneralizedTime', constraint = Constraints}, _Refs) ->
-	#{"type" => "string", "pattern" => "^[0-9]{14}([,.][0-9]{1,3})?Z?$"};
+	get_constraint(Constraints, #{"type" => "string",
+			"pattern" => "^[0-9]{14}([,.][0-9]{1,3})?Z?$"});
 get_type(#type{def = 'UTCTime', constraint = Constraints}, _Refs) ->
-	#{"type" => "string", "pattern" => "^([0-9]{10}|[0-9]{12})(Z|[+-]{1}[0-9]{4})$"};
-get_type(#type{def = 'ObjectDescriptor', constraint = Constraints}, _Refs) ->
+	get_constraint(Constraints, #{"type" => "string",
+			"pattern" => "^([0-9]{10}|[0-9]{12})(Z|[+-]{1}[0-9]{4})$"});
+get_type(#type{def = 'ObjectDescriptor', constraint = []}, _Refs) ->
 	#{"type" => "string"};
-get_type(#type{def = 'OBJECT IDENTIFIER', constraint = Constraints}, _Refs) ->
+get_type(#type{def = 'OBJECT IDENTIFIER', constraint = []}, _Refs) ->
 	#{"type" => "string"};
 get_type(#type{def = 'REAL', constraint = Constraints}, _Refs) ->
-	#{"type" => "number"};
+	get_constraint(Constraints, #{"type" => "number"});
 get_type(#type{def =  {'CHOICE', Components}, constraint = []}, Refs) ->
 	case get_component(Components, Refs, []) of
 		Types when is_list(Types) ->
@@ -184,17 +203,21 @@ get_type(#type{def = #'SET'{components = Components},
 		undefined ->
 			undefined
 	end;
-get_type(#type{def = {'SEQUENCE OF', TypeSpec}, constraint = []}, Refs) ->
+get_type(#type{def = {'SEQUENCE OF', TypeSpec},
+		constraint = Constraints}, Refs) ->
 	case get_type(TypeSpec, Refs) of
 		Type when is_map(Type) ->
-			#{"type" => "array", "items" => Type};
+			get_constraint(Constraints,
+					#{"type" => "array", "items" => Type});
 		undefined ->
 			undefined
 	end;
-get_type(#type{def = {'SET OF', TypeSpec}, constraint = []}, Refs) ->
+get_type(#type{def = {'SET OF', TypeSpec},
+		constraint = Constraints}, Refs) ->
 	case get_type(TypeSpec, Refs) of
 		Type when is_map(Type) ->
-			#{"type" => "array", "items" => Type};
+			get_constraint(Constraints,
+					#{"type" => "array", "items" => Type});
 		undefined ->
 			undefined
 	end;
@@ -211,6 +234,7 @@ get_type(#type{def = {pt, #'Externaltypereference'{}, _}}, _Refs) ->
 get_type(#type{def = {'ANY_DEFINED_BY', _}}, _Refs) ->
 	#{}.
 
+%% @hidden
 get_component([#'ComponentType'{name = Name, typespec = TypeSpec} | T],
 		Refs, Acc) ->
 	case get_type(TypeSpec, Refs) of
@@ -221,7 +245,23 @@ get_component([#'ComponentType'{name = Name, typespec = TypeSpec} | T],
 		undefined ->
 			undefined
 	end;	
-get_component([], Refs, Acc) when is_list(Acc) ->
+get_component([], _Refs, Acc) when is_list(Acc) ->
 	lists:reverse(Acc);
-get_component([], Refs, Acc) when is_map(Acc) ->
+get_component([], _Refs, Acc) when is_map(Acc) ->
 	Acc.
+
+%% @hidden
+get_constraint([{element_set, {'ValueRange', {Min, Max}}, none} | T],
+		Acc) when is_integer(Min), is_integer(Max) ->
+	get_constraint(T, Acc#{"minimum" => Min, "maximum" => Max});
+get_constraint([{element_set, {'SizeConstraint',
+		{element_set, {'SingleValue', Size}, none}}, none} | T],
+		Acc) when is_integer(Size) ->
+	get_constraint(T, Acc#{"minLength" => Size, "maxLength" => Size});
+get_constraint([{element_set, {'SizeConstraint',
+		{element_set, {'ValueRange', {Min, Max}}, none}}, none} | T],
+		Acc) when is_integer(Min), is_integer(Max) ->
+	get_constraint(T, Acc#{"minLength" => Min, "maxLength" => Max});
+get_constraint([], Acc) ->
+	Acc.
+
