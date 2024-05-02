@@ -227,10 +227,254 @@
 			"description": "Packet switched (PS) evolved packet core (EPC) serving gateway (SGW) charging data record (CDR).",
 			"type": "object",
 			"properties": {
+				"servedIMSI": {
+					"description": "The international mobile subscriber identity (IMSI) of the served party.",
+					"type": "string",
+					"pattern": "^[0-9]{5,15}$"
+				},
+				"servedIMEI": {
+					"description": "The international mobile equipment identity (IMEI) of the equipment served.",
+					"type": "string",
+					"pattern": "^[0-9]{14,15}$"
+				},
+				"servedMSISDN": {
+					"description": "The mobile station ISDN number (MSISDN) of the served party.",
+					"type": "string",
+					"pattern": "^[0-9]{5,15}$"
+				},
+				"s-GWAddress": {
+					"description": "The serving SGW IP addresses for the control plane.",
+					"oneOf": [
+						{
+							"$ref": "#/$defs/IPv4Address"
+						},
+						{
+							"$ref": "#/$defs/IPv6Address"
+						}
+					]
+				},
+				"chargingID": {
+					"$ref": "#/$defs/ChargingID"
+				},
+				"servingNodeAddress": {
+					"description": "IP addresses of SGSN, MME, ePDG, HSGW, TWAG or S-GW, which have been connected during the record.",
+					"type": "array",
+					"items": {
+						"oneOf": [
+							{
+								"$ref": "#/$defs/IPv4Address"
+							},
+							{
+								"$ref": "#/$defs/IPv6Address"
+							}
+						]
+					}
+				},
+				"accessPointNameNI": {
+					"$ref": "#/$defs/AccessPointNameNI"
+				},
+				"pdpPDNType": {
+					"$ref": "#/$defs/PDPType"
+				},
+				"servedPDPPDNAddress": {
+					"$ref": "#/$defs/PDPAddress"
+				},
+				"dynamicAddressFlag": {
+					"$ref": "#/$defs/DynamicAddressFlag"
+				},
+				"listOfTrafficVolumes": {
+					"description": "Per QCI/ARP pair containers describing data volumes.",
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/ChangeOfCharCondition"
+					}
+				},
+				"recordOpeningTime": {
+					"$ref": "#/$defs/RecordOpeningTime"
+				},
+				"duration": {
+					"description": "Provides the duration in seconds for IP-CAN bearer.",
+					"type": "integer"
+				},
+				"causeForRecClosing": {
+					"$ref": "#/$defs/CauseForRecClosing"
+				},
+				"diagnostics": {
+				},
+				"recordSequenceNumber": {
+					"$ref": "#/$defs/RecordSequenceNumber"
+				},
+				"nodeID": {
+					"$ref": "#/$defs/NodeID"
+				},
+				"recordExtensions": {
+				},
+				"localSequenceNumber": {
+					"$ref": "#/$defs/LocalSequenceNumber"
+				},
+				"apnSelectionMode": {
+					"$ref": "#/$defs/APNSelectionMode"
+				},
+				"chargingCharacteristics": {
+					"$ref": "#/$defs/ChargingCharacteristics"
+				},
+				"chChSelectionMode": {
+					"$ref": "#/$defs/ChChSelectionMode"
+				},
+				"iMSsignalingContext": {
+				},
+				"servingNodePLMNIdentifier": {
+					"description": "The PLMN Identifier (Mobile Country Code and Mobile Network Code) serving the UE.",
+					"type": "string",
+					"pattern": "^[0-9]{5,6}$"
+				},
+				"rATType": {
+					"$ref": "#/$defs/RATType"
+				},
+				"mSTimeZone": {
+				},
+				"userLocationInformation": {
+					"description": "Contains the User Location Information (TS 29.060).",
+					"pattern": "^([0-9a-f]{2})*$",
+					"type": "string"
+				},
+				"sGWChange": {
+				},
+				"servingNodeType": {
+					"description": "Provides the types of nodes in servingNodeAddress in matching order.",
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/ServingNodeType"
+					}
+				},
+				"p-GWAddressUsed": {
+					"description": "The serving PGW IP Address for the Control Plane.",
+					"oneOf": [
+						{
+							"$ref": "#/$defs/IPv4Address"
+						},
+						{
+							"$ref": "#/$defs/IPv6Address"
+						}
+					]
+				},
+				"p-GWPLMNIdentifier": {
+					"description": "The PGW PMLN Identifier (Mobile Country Code and Mobile Network Code).",
+					"type": "string",
+					"pattern": "^[0-9]{5,6}$"
+				},
+				"startTime": {
+					"description": "The time when the IP-CAN session starts at the SGW/PGW/IP-Edge.",
+					"type": "string",
+					"format": "date-time"
+				},
+				"stopTime": {
+					"description": "The time when the IP-CAN session is terminated at the SGW/PGW/IP-Edge.",
+					"type": "string",
+					"format": "date-time"
+				},
+				"pDNConnectionChargingID": {
+					"$ref": "#/$defs/ChargingID"
+				},
+				"iMSIunauthenticatedFlag": {
+				},
+				"userCSGInformation": {
+				},
+				"servedPDPPDNAddressExt": {
+				},
+				"lowPriorityIndicator": {
+				},
+				"dynamicAddressFlagExt": {
+				},
+				"s-GWiPv6Address": {
+				},
+				"servingNodeiPv6Address": {
+				},
+				"p-GWiPv6AddressUsed": {
+				},
+				"retransmission": {
+				},
+				"userLocationInfoTime": {
+				},
+				"cNOperatorSelectionEnt": {
+				},
+				"presenceReportingAreaInfo": {
+				},
+				"lastUserLocationInformation": {
+				},
+				"lastMSTimeZone": {
+				},
+				"enhancedDiagnostics": {
+				},
+				"cPCIoTEPSOptimisationIndicator": {
+				},
+				"uNIPDUCPOnlyFlag": {
+				},
+				"servingPLMNRateControl": {
+				},
+				"pDPPDNTypeExtension": {
+				},
+				"mOExceptionDataCounter": {
+				},
+				"listOfRANSecondaryRATUsageReports": {
+				},
+				"pSCellInformation": {
+				}
 			},
 			"required": [
+				"s-GWAddress",
+				"chargingID",
+				"servingNodeType",
+				"servingNodeAddress",
+				"recordOpeningTime",
+				"duration",
+				"chargingCharacteristics",
+				"causeForRecClosing"
 			],
 			"examples": [
+				{
+					"servedIMSI": "001001555123456",
+					"servedIMSI": "14165551234",
+					"servedIMEI": "490154203237518",
+					"chargingID": 110690084,
+					"chargingCharacteristics": "0800",
+					"servingNodePLMNIdentifie": "001001",
+					"servingNodeAddress": ["10.2.0.31"],
+					"servingNodeType": ["mME"],
+					"s-GWAddress": "10.1.0.12",
+					"p-GWAddressUsed": "10.4.0.65",
+					"p-GWPLMNIdentifier": "999999",
+					"pDNConnectionChargingID": 110690084,
+					"rATType": 6,
+					"accessPointName": "internet",
+					"pdpPDNType": "f101",
+					"servedPDPPDNAddress": "192.0.2.54",
+					"apnSelectionMode": "mSorNetworkProvidedSubscriptionVerified",
+					"dynamicAddressFlag": true,
+					"chChSelectionMode": "roamingDefault",
+					"listOfTrafficVolumes": [
+						{
+							"dataVolumeGPRSUplink": 0,
+							"dataVolumeGPRSDownlink": 0,
+							"changeCondition": "recordClosure",
+							"changeTime": "2024-05-02T18:10:31+5:30",
+							"ePCQoSInformation": {
+								"qCI": 9,
+								"maxRequestedBandwithUL": 0,
+								"maxRequestedBandwithDL": 0,
+								"guaranteedBitrateUL": 0,
+								"guaranteedBitrateDL": 0,
+								"aRP": 80
+							}
+						}
+					],
+					"recordOpeningTime": "2024-05-02T18:09:18+5:30",
+					"startTime": "2024-05-02T18:09:18+5:30",
+					"startTime": "2024-05-02T18:10:31+5:30",
+					"duration": 73,
+					"causeForRecClosing": "normalRelease",
+					"recordSequenceNumber": 2
+				}
 			]
 		},
 		"PGWRecord": {
@@ -292,6 +536,521 @@
 			],
 			"examples": [
 			]
+		},
+		"AccessPointNameNI": {
+			"description": "Network Identifier part of access point name (APN) in dot representation.",
+			"type": "string",
+			"pattern": "^[\\x00-\\x7F]{1,63}$"
+		},
+		"AdditionalExceptionReports": {
+			"type": "string",
+			"enum": [
+				"notAllowed",
+				"allowed"
+			]
+		},
+		"APNRateControl": {
+			"description": "The APN Rate Control used during the record for the PDN connection to the PGW (TS 23.401).",
+			"type": "object",
+			"properties": {
+				"aPNRateControlDownlink": {
+					"$ref": "#/$defs/APNRateControlParameters"
+				},
+				"aPNRateControlUplink": {
+					"$ref": "#/$defs/APNRateControlParameters"
+				}
+			}
+		},
+		"APNRateControlParameters": {
+			"description": "APN Rate Control parameters (TS 23.401).",
+			"type": "object",
+			"properties": {
+				"additionalExceptionReports": {
+					"$ref": "#/$defs/AdditionalExceptionReports"
+				},
+				"rateControlMaxMessageSize": {
+					"type": "integer"
+				},
+				"rateControlMaxRate": {
+					"type": "integer"
+				},
+				"rateControlTimeUnit": {
+					"$ref": "#/$defs/RateControlTimeUnit"
+				}
+			}
+		},
+		"APNSelectionMode": {
+			"description": "Indicates how the SGSN/MME selected the APN to be used (TS 29.060).",
+			"type": "string",
+			"enum": [
+				"mSorNetworkProvidedSubscriptionVerified",
+				"mSProvidedSubscriptionNotVerified",
+				"networkProvidedSubscriptionNotVerified"
+			]
+		},
+		"CauseForRecClosing": {
+			"description": "Indicates a reason for the release of the charging data record.",
+			"type": "string",
+			"enum": [
+				"normalRelease",
+				"partialRecord",
+				"abnormalRelease",
+				"cAMELInitCallRelease",
+				"volumeLimit",
+				"timeLimit",
+				"servingNodeChange",
+				"maxChangeCond",
+				"managementIntervention",
+				"intraSGSNIntersystemChange",
+				"rATChange",
+				"mSTimeZoneChange",
+				"sGSNPLMNIDChange",
+				"sGWChange",
+				"aPNAMBRChange",
+				"mOExceptionDataCounterReceipt",
+				"unauthorizedRequestingNetwork",
+				"unauthorizedLCSClient",
+				"positionMethodFailure",
+				"unknownOrUnreachableLCSClient",
+				"listofDownstreamNodeChange"
+			]
+		},
+		"ChangeCondition": {
+			"type": "string",
+			"enum": [
+				"qoSChange",
+				"tariffTime",
+				"recordClosure",
+				"cGI-SAICHange",
+				"rAIChange",
+				"dT-Establishment",
+				"dT-Removal",
+				"eCGIChange",
+				"tAIChange",
+				"userLocationChange",
+				"userCSGInformationChange",
+				"presenceInPRAChange",
+				"removalOfAccess",
+				"unusabilityOfAccess",
+				"indirectChangeCondition",
+				"userPlaneToUEChange",
+				"servingPLMNRateControlChange",
+				"threeGPPPSDataOffStatusChange",
+				"aPNRateControlChange"
+			]
+		},
+		"ChangeOfCharCondition": {
+			"description": "Container describing data volumes.",
+			"type": "object",
+			"properties": {
+				"aPNRateControl": {
+					"$ref": "#/$defs/APNRateControl"
+				},
+				"accessAvailabilityChangeReason": {
+					"type": "integer",
+					"minimum": 0,
+					"maximum": 4294967295
+				},
+				"cPCIoTEPSOptimisationIndicator": {
+					"type": "boolean"
+				},
+				"changeCondition": {
+					"type": "string",
+					"enum": [
+						"qoSChange",
+						"tariffTime",
+						"recordClosure",
+						"cGI-SAICHange",
+						"rAIChange",
+						"dT-Establishment",
+						"dT-Removal",
+						"eCGIChange",
+						"tAIChange",
+						"userLocationChange",
+						"userCSGInformationChange",
+						"presenceInPRAChange",
+						"removalOfAccess",
+						"unusabilityOfAccess",
+						"indirectChangeCondition",
+						"userPlaneToUEChange",
+						"servingPLMNRateControlChange",
+						"threeGPPPSDataOffStatusChange",
+						"aPNRateControlChange"
+					]
+				},
+				"changeTime": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"chargingID": {
+					"$ref": "#/$defs/ChargingID"
+				},
+				"dataVolumeGPRSDownlink": {
+					"type": "string"
+				},
+				"dataVolumeGPRSUplink": {
+					"type": "string"
+				},
+				"diagnostics": {
+				},
+				"ePCQoSInformation": {
+					"$ref": "#/$defs/EPCQoSInformation"
+				},
+				"enhancedDiagnostics": {
+				},
+				"listOfPresenceReportingAreaInformation": {
+					"description": "Contains the list of Presence Reporting Area Information.",
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/PresenceReportingAreaInfo"
+					}
+				},
+				"presenceReportingAreaStatus": {
+					"$ref": "#/$defs/PresenceReportingAreaStatus"
+				},
+				"qosNegotiated": {
+					"$ref": "#/$defs/QoSInformation"
+				},
+				"qosRequested": {
+					"$ref": "#/$defs/QoSInformation"
+				},
+				"rATType": {
+					"$ref": "#/$defs/RATType"
+				},
+				"relatedChangeOfCharCondition": {
+					"$ref": "#/$defs/RelatedChangeOfCharCondition"
+				},
+				"servingPLMNRateControl": {
+					"$ref": "#/$defs/ServingPLMNRateControl"
+				},
+				"threeGPPPSDataOffStatus": {
+					"$ref": "#/$defs/ThreeGPPPSDataOffStatus"
+				},
+				"uWANUserLocationInformation": {
+					"$ref": "#/$defs/UWANUserLocationInfo"
+				},
+				"userCSGInformation": {
+					"$ref": "#/$defs/UserCSGInformation"
+				},
+				"userLocationInformation": {
+					"type": "string",
+					"pattern": "^([0-9a-f]{2})*$"
+				}
+			}
+		},
+		"ChargingCharacteristics": {
+			"description": "Allows the operator to apply different charging methods.",
+			"type": "string",
+			"pattern": "^[0-9a-f]{4}$"
+		},
+		"ChargingID": {
+			"description": "Identity used in all CDR for SGSN, SGW and PGW involved in a single IP-CAN bearer.",
+			"type": "integer",
+			"minimum": 0,
+			"maximum": 4294967295
+		},
+		"ChChSelectionMode": {
+			"description": "Indicates the charging characteristic type that the PCNs applied to the CDR.",
+			"type": "string",
+			"enum": [
+				"servingNodeSupplied",
+				"subscriptionSpecific",
+				"aPNSpecific",
+				"homeDefault",
+				"roamingDefault",
+				"visitingDefault",
+				"fixedDefault"
+			]
+		},
+		"DynamicAddressFlag": {
+			"description": "Indicates that PDN address has been dynamically allocated for a particular IP-CAN bearer.",
+			"type": "boolean"
+		},
+		"EPCQoSInformation": {
+			"description": "Indicates the APN-AMBR for the IP-CAN session.",
+			"type": "object",
+			"properties": {
+				"aPNAggregateMaxBitrateDL": {
+					"type": "integer"
+				},
+				"aPNAggregateMaxBitrateUL": {
+					"type": "integer"
+				},
+				"aRP": {
+					"type": "integer"
+				},
+				"extendedAPNAMBRDL": {
+					"type": "integer"
+				},
+				"extendedAPNAMBRUL": {
+					"type": "integer"
+				},
+				"extendedGBRDL": {
+					"type": "integer"
+				},
+				"extendedGBRUL": {
+					"type": "integer"
+				},
+				"extendedMaxRequestedBWDL": {
+					"type": "integer"
+				},
+				"extendedMaxRequestedBWUL": {
+					"type": "integer"
+				},
+				"guaranteedBitrateDL": {
+					"type": "integer"
+				},
+				"guaranteedBitrateUL": {
+					"type": "integer"
+				},
+				"maxRequestedBandwithDL": {
+					"type": "integer"
+				},
+				"maxRequestedBandwithUL": {
+					"type": "integer"
+				},
+				"qCI": {
+					"type": "integer"
+				}
+			}
+		},
+		"RecordOpeningTime": {
+			"description": "Time stamp at the start of the charging data record (CDR).",
+			"type": "string",
+			"format": "date-time"
+		},
+		"IPv4Address": {
+			"description": "IPv4 address.",
+			"type": "string",
+			"format": "ipv4"
+		},
+		"IPv6Address": {
+			"description": "IPv6 address.",
+			"type": "string",
+			"format": "ipv6"
+		},
+		"LocalSequenceNumber": {
+			"description": "A nodally unique record number allocated sequentially for each partial/whole CDR.",
+			"type": "integer",
+			"minimum": 0,
+			"maximum": 4294967295
+		},
+		"NodeID": {
+			"description": "Provides an optional, operator configurable, identifier string for the node that had generated the CDR.",
+			"type": "string",
+			"pattern": "^[\\x00-\\x7F]{1,20}$"
+		},
+		"PDPAddress": {
+			"description": "The PDP address of the served IMSI.",
+			"oneOf": [
+				{
+					"$ref": "#/$defs/IPv4Address"
+				},
+				{
+					"$ref": "#/$defs/IPv6Address"
+				}
+			]
+		},
+		"PDPType": {
+			"description": "Defines the PDP type (e.g. IP, PPP) as per TS 29.060.",
+			"type": "string",
+			"pattern": "^[0-9a-f]{4}$"
+		},
+		"PresenceReportingAreaInfo": {
+			"description": "Presence Reporting Area Information includes area identifier(s) and indication on inside/outside the area (TS 29.274).", 
+			"type": "object",
+			"properties": {
+				"presenceReportingAreaElementsList": {
+					"type": "string",
+					"pattern": "^([0-9a-f]{2})*$"
+				},
+				"presenceReportingAreaIdentifier": {
+					"type": "string",
+					"pattern": "^([0-9a-f]{2})*$"
+				},
+				"presenceReportingAreaNode": {
+					"type": "string",
+					"enum": [
+						"oCS",
+						"pCRF"
+					]
+				},
+				"presenceReportingAreaStatus": {
+					"$ref": "#/$defs/PresenceReportingAreaStatus"
+				}
+			}
+		},
+		"PresenceReportingAreaStatus": {
+			"type": "string",
+			"enum": [
+				"insideArea",
+				"outsideArea",
+				"inactive",
+				"unknown"
+			]
+		},
+		"QoSInformation": {
+			"description": "Bearer quality of service (TS 29.274).",
+			"type": "string",
+			"minLength": 4,
+			"maxLength": 255,
+			"pattern": "^([0-9a-f]{2})*$"
+		},
+		"RateControlTimeUnit": {
+			"type": "string",
+			"enum": [
+				"unrestricted",
+				"minute",
+				"hour",
+				"day",
+				"week"
+			]
+		},
+		"RATType": {
+			"description": "Holds the value of RAT Type, as provided to SGW and PGW (TS 29.061).",
+			"type": "integer",
+			"minimum": 0,
+			"maximum": 255
+		},
+		"RecordSequenceNumber": {
+			"description": "A running sequence number linking the partial records generated in the SGSN/SGW/PGW.",
+			"type": "integer"
+		},
+		"RelatedChangeOfCharCondition": {
+			"description": "Iindicates the reason a related container was closed.",
+			"type": "object",
+			"properties": {
+				"changeCondition": {
+					"$ref": "#/$defs/ChangeCondition"
+				},
+				"changeTime": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"presenceReportingAreaStatus": {
+					"$ref": "#/$defs/PresenceReportingAreaStatus"
+				},
+				"rATType": {
+					"$ref": "#/$defs/RATType"
+				},
+				"uWANUserLocationInformation": {
+					"$ref": "#/$defs/UWANUserLocationInfo"
+				},
+				"userCSGInformation": {
+					"$ref": "#/$defs/UserCSGInformation"
+				},
+				"userLocationInformation": {
+					"pattern": "^([0-9a-f]{2})*$",
+					"type": "string"
+				}
+			}
+		},
+		"ServingNodeType": {
+			"description": "Serving node types in control plane of S-GW or P-GW, which have been connected during the record.",
+			"type": "string",
+			"enum": [
+				"sGSN",
+				"pMIPSGW",
+				"gTPSGW",
+				"ePDG",
+				"hSGW",
+				"mME",
+				"tWAN"
+			]
+		},
+		"ServingPLMNRateControl": {
+			"description": "The Serving PLMN Rate Control used during the record for the PDN connection to the PGW (TS 23.401).",
+			"type": "object",
+			"properties": {
+				"sPLMNDLRateControlValue": {
+					"type": "integer"
+				},
+				"sPLMNULRateControlValue": {
+					"type": "integer"
+				}
+			}
+		},
+		"ThreeGPPPSDataOffStatus": {
+			"description": "Indicates the Status of UE's 3GPP PS Data Off.",
+			"type": "string",
+			"enum": [
+				"active",
+				"inactive"
+			]
+		},
+		"UserCSGInformation": {
+			"type": "object",
+			"properties": {
+				"cSGAccessMode": {
+					"type": "string",
+					"enum": [
+						"closedMode",
+						"hybridMode"
+					]
+				},
+				"cSGId": {
+					"type": "string",
+					"pattern" : "^([0-9a-fA-F]{2}){4}$"
+				},
+				"cSGMembershipIndication": {
+					"type": "null"
+				}
+			}
+		},
+		"UWANUserLocationInfo": {
+			"type": "object",
+			"properties": {
+				"bSSID": {
+					"type": "string",
+					"pattern": "^([0-9a-f]{2})*$"
+				},
+				"civicAddressInformation": {
+					"type": "string",
+					"pattern": "^([0-9a-f]{2})*$"
+				},
+				"logicalAccessID": {
+					"type": "string",
+					"pattern": "^([0-9a-f]{2})*$"
+				},
+				"sSID": {
+					"type": "string",
+					"pattern": "^([0-9a-f]{2})*$"
+				},
+				"tCPSourcePort": {
+					"type": "string",
+					"pattern": "^([0-9a-f]{2})*$"
+				},
+				"uDPSourcePort": {
+					"type": "string",
+					"pattern": "^([0-9a-f]{2})*$"
+				},
+				"uELocalIPAddress": {
+					"oneOf": [
+						{
+							"$ref": "#/$defs/IPv4Address"
+						},
+						{
+							"$ref": "#/$defs/IPv6Address"
+						}
+					]
+				},
+				"wLANOperatorId": {
+					"$ref": "#/$defs/WLANOperatorId"
+				}
+			}
+		},
+		"WLANOperatorId": {
+			"type": "object",
+			"properties": {
+				"wLANOperatorName": {
+						"type": "string",
+						"pattern": "^([0-9a-f]{2})*$"
+					},
+				"wLANPLMNId": {
+					"type": "string",
+					"pattern": "^[0-9]{5,6}$"
+				}
+			}
 		}
 	}
 }
