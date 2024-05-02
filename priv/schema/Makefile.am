@@ -39,19 +39,19 @@ $(abs_builddir)/%.json:	$(srcdir)/%.json
          then exit 1; fi; \
 		if ! ajv -c ajv-formats compile -s ECS_Bx_CS.json; \
          then exit 1; fi; \
-		if ! ajv compile -s ECS_Bx_PS.json; \
+		if ! ajv -c ajv-formats compile -s ECS_Bx_PS.json; \
          then exit 1; fi; \
-		if ! ajv compile -s ECS_Bx_IMS.json; \
+		if ! ajv -c ajv-formats compile -s ECS_Bx_IMS.json; \
          then exit 1; fi; \
-		if ! ajv compile -s ECS_Bx_SMS.json; \
+		if ! ajv -c ajv-formats compile -s ECS_Bx_SMS.json; \
          then exit 1; fi; \
-		if ! ajv compile -s ECS_Bx_MMS.json; \
+		if ! ajv -c ajv-formats compile -s ECS_Bx_MMS.json; \
          then exit 1; fi; \
-		if ! ajv compile -s ECS_Bx_MMTEL.json; \
+		if ! ajv -c ajv-formats compile -s ECS_Bx_MMTEL.json; \
          then exit 1; fi; \
-		if ! ajv compile -s ECS_Bx_CHF.json; \
+		if ! ajv -c ajv-formats compile -s ECS_Bx_CHF.json; \
          then exit 1; fi; \
-		if ! ajv compile -s ECS_Bx_RF.json; \
+		if ! ajv -c ajv-formats compile -s ECS_Bx_RF.json; \
          then exit 1; fi; \
 		if ! ajv -c ajv-formats compile \
 			-r ECS_base.json \
