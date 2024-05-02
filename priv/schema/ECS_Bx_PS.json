@@ -438,7 +438,7 @@
 					"servedIMEI": "490154203237518",
 					"chargingID": 110690084,
 					"chargingCharacteristics": "0800",
-					"servingNodePLMNIdentifie": "001001",
+					"servingNodePLMNIdentifier": "001001",
 					"servingNodeAddress": ["10.2.0.31"],
 					"servingNodeType": ["mME"],
 					"s-GWAddress": "10.1.0.12",
