@@ -26,6 +26,10 @@
 					"items": {
 						"$ref": "#/$defs/AppliedCharge"
 					}
+				},
+				"cdrId": {
+					"description": "Unique identifier for a rated CDR.",
+					"type": "string"
 				}
 			},
 			"examples": [
@@ -49,7 +53,8 @@
 								"exponent": -2
 							}
 						}
-					]
+					],
+					"cdrId": "650182365"
 				}
 			]
 		},
