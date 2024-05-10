@@ -419,6 +419,7 @@
 				"listOfRANSecondaryRATUsageReports": {
 				},
 				"pSCellInformation": {
+					"$ref": "#/$defs/PSCellInformation"
 				}
 			},
 			"required": [
@@ -772,6 +773,27 @@
 			"description": "Indicates that PDN address has been dynamically allocated for a particular IP-CAN bearer.",
 			"type": "boolean"
 		},
+		"Ecgi": {
+			"description": "EUTRAN Cell Global Identification (CGI).",
+			"type": "object",
+			"properties": {
+				"eutraCellId": {
+					"description": "E-UTRA cell identifier (3GPP TS 38.413).",
+					"type": "string",
+					"pattern": "^[a-f0-9]{7}$"
+				},
+				"nid": {
+					"description": "Network identifier.",
+					"type": "string",
+					"pattern": "^[a-f0-9]{11}$"
+				},
+				"plmnId": {
+					"description": "PLMN identifier as MCCMNC.",
+					"type": "string",
+					"pattern": "^[0-9]{5,6}$"
+				}
+			}
+		},
 		"EPCQoSInformation": {
 			"description": "Indicates the APN-AMBR for the IP-CAN session.",
 			"type": "object",
@@ -841,6 +863,27 @@
 			"minimum": 0,
 			"maximum": 4294967295
 		},
+		"Ncgi": {
+			"description": "NR Cell Global Identification (CGI).",
+			"type": "object",
+			"properties": {
+				"nrCellId": {
+					"description": "NR cell identifier (3GPP TS 38.413).",
+					"type": "string",
+					"pattern": "^[a-f0-9]{9}$"
+				},
+				"nid": {
+					"description": "Network identifier.",
+					"type": "string",
+					"pattern": "^[a-f0-9]{11}$"
+				},
+				"plmnId": {
+					"description": "PLMN identifier as MCCMNC.",
+					"type": "string",
+					"pattern": "^[0-9]{5,6}$"
+				}
+			}
+		},
 		"NodeID": {
 			"description": "Provides an optional, operator configurable, identifier string for the node that had generated the CDR.",
 			"type": "string",
@@ -894,6 +937,18 @@
 				"inactive",
 				"unknown"
 			]
+		},
+		"PSCellInformation": {
+			"description": "The primary of Secondary Cell Group (SCG)) cell information associated to the Secondary RAT.",
+			"type": "object",
+			"properties": {
+				"ecgi": {
+					"$ref": "#/$defs/Ecgi"
+				},
+				"nRcgi": {
+					"$ref": "#/$defs/Ncgi"
+				}
+			}
 		},
 		"QoSInformation": {
 			"description": "Bearer quality of service (TS 29.274).",
@@ -996,7 +1051,7 @@
 				},
 				"cSGId": {
 					"type": "string",
-					"pattern" : "^([0-9a-fA-F]{2}){4}$"
+					"pattern": "^([0-9a-fA-F]{2}){4}$"
 				},
 				"cSGMembershipIndication": {
 					"type": "null"
