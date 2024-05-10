@@ -3,7 +3,8 @@
 ##
 ## Process this file with automake to produce Makefile.in
 
-modhtml = cgf_app.html \
+modhtml = cgf.html \
+		cgf_app.html \
 		cgf_sup.html \
 		cgf_server.html \
 		cgf_log_sup.html \

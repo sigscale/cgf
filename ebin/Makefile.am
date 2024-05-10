@@ -8,7 +8,8 @@ appdir = $(beamdir)
 app_DATA = cgf.app
 EXTRA_DIST = cgf.app
 
-beam_DATA = cgf_app.beam \
+beam_DATA = cgf.beam \
+		cgf_app.beam \
 		cgf_sup.beam \
 		cgf_server.beam \
 		cgf_log_sup.beam \
