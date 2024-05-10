@@ -453,6 +453,12 @@
 					"apnSelectionMode": "mSorNetworkProvidedSubscriptionVerified",
 					"dynamicAddressFlag": true,
 					"chChSelectionMode": "roamingDefault",
+					"pSCellInformation": {
+						"ecgi": {
+							"eutraCellId": "5Bd6007",
+							"plmnId": "001001"
+						}
+					},
 					"listOfTrafficVolumes": [
 						{
 							"dataVolumeGPRSUplink": 0,
