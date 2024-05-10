@@ -434,7 +434,7 @@
 			"examples": [
 				{
 					"servedIMSI": "001001555123456",
-					"servedIMSI": "14165551234",
+					"servedMSISDN": "14165551234",
 					"servedIMEI": "490154203237518",
 					"chargingID": 110690084,
 					"chargingCharacteristics": "0800",
@@ -446,7 +446,7 @@
 					"p-GWPLMNIdentifier": "999999",
 					"pDNConnectionChargingID": 110690084,
 					"rATType": 6,
-					"accessPointName": "internet",
+					"accessPointNameNI": "internet",
 					"pdpPDNType": "f101",
 					"servedPDPPDNAddress": "192.0.2.54",
 					"apnSelectionMode": "mSorNetworkProvidedSubscriptionVerified",
@@ -470,7 +470,7 @@
 					],
 					"recordOpeningTime": "2024-05-02T18:09:18+5:30",
 					"startTime": "2024-05-02T18:09:18+5:30",
-					"startTime": "2024-05-02T18:10:31+5:30",
+					"stopTime": "2024-05-02T18:10:31+5:30",
 					"duration": 73,
 					"causeForRecClosing": "normalRelease",
 					"recordSequenceNumber": 2
