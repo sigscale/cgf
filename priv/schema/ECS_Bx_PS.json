@@ -686,10 +686,12 @@
 					"$ref": "#/$defs/ChargingID"
 				},
 				"dataVolumeGPRSDownlink": {
-					"type": "string"
+					"description": "The volume of downlink data transferred in octets.",
+					"type": "integer"
 				},
 				"dataVolumeGPRSUplink": {
-					"type": "string"
+					"description": "The volume of uplink data transferred in octets.",
+					"type": "integer"
 				},
 				"diagnostics": {
 				},
