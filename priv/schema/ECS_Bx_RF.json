@@ -30,6 +30,17 @@
 				"cdrId": {
 					"description": "Unique identifier for a rated CDR.",
 					"type": "string"
+				},
+				"terminationReason": {
+					"description": "Identifies a reason for terminating service usage.",
+					"type": "string",
+					"enum": [
+						"unknown",
+						"normal",
+						"insufficient-balance",
+						"maximum-duration",
+						"other"
+					]
 				}
 			},
 			"examples": [
@@ -44,14 +55,16 @@
 							"chargeUnits": "seconds",
 							"chargeAmount": {
 								"valueDigits": 120
-							}
+							},
+							"chargeReason": "usage"
 						},
 						{
 							"chargeUnit": "cents",
 							"chargeAmount": {
 								"valueDigits": 6,
 								"exponent": -2
-							}
+							},
+							"chargeReason": "usage"
 						}
 					],
 					"cdrId": "650182365"
@@ -85,6 +98,17 @@
 				},
 				"currencyCode": {
 					"$ref": "#/$defs/CurrencyCode"
+				},
+				"chargeReason": {
+					"description": "Identifies if the applied charge corresponds to a specific charge type.",
+					"type": "string",
+					"enum": [
+						"unknown",
+						"usage",
+						"communication-attempt",
+						"setup",
+						"add-on"
+					]
 				}
 			},
 			"examples": [
@@ -101,7 +125,8 @@
 					"chargeAmount": {
 						"valueDigits": 2,
 						"exponent": -2
-					}
+					},
+					"chargeReason": "usage"
 				}
 			]
 		},
