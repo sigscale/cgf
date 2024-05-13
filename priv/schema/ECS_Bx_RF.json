@@ -38,8 +38,13 @@
 						"none",
 						"insufficient-balance",
 						"maximum-duration",
+						"maximum-volume",
 						"other"
 					]
+				},
+				"resultCode": {
+					"description": "Indicates a specific reason for the result.",
+					"type": "integer"
 				}
 			},
 			"examples": [
