@@ -31,6 +31,15 @@
 					"description": "Unique identifier for a rated CDR.",
 					"type": "string"
 				},
+				"ratingType": {
+					"description": "Indicates the type of subscriber payment.",
+					"type": "string",
+					"enum": [
+						"prepaid",
+						"postpaid",
+						"hybrid"
+					]
+				},
 				"terminationReason": {
 					"description": "Identifies a reason for rating function terminating service usage.",
 					"type": "string",
