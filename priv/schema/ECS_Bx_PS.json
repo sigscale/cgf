@@ -455,7 +455,7 @@
 					"chChSelectionMode": "roamingDefault",
 					"pSCellInformation": {
 						"ecgi": {
-							"eutraCellId": "5Bd6007",
+							"eutraCellId": 8987908,
 							"plmnId": "001001"
 						}
 					},
@@ -785,20 +785,31 @@
 			"properties": {
 				"eutraCellId": {
 					"description": "E-UTRA cell identifier (3GPP TS 38.413).",
-					"type": "string",
-					"pattern": "^[a-f0-9]{7}$"
+					"type": "integer",
+					"minimum": 0,
+					"maximum": 268435455
 				},
 				"nid": {
-					"description": "Network identifier.",
+					"description": "A non-3GPP access Network identifier (NID).",
 					"type": "string",
-					"pattern": "^[a-f0-9]{11}$"
+					"maxLength": 253
 				},
 				"plmnId": {
 					"description": "PLMN identifier as MCCMNC.",
 					"type": "string",
 					"pattern": "^[0-9]{5,6}$"
 				}
-			}
+			},
+			"required": [
+				"plmnId",
+				"eutraCellId"
+			],
+			"examples": [
+				{
+					"eutraCellId": 8987908,
+					"plmnId": "001001"
+				}
+			]
 		},
 		"EPCQoSInformation": {
 			"description": "Indicates the APN-AMBR for the IP-CAN session.",
@@ -875,20 +886,31 @@
 			"properties": {
 				"nrCellId": {
 					"description": "NR cell identifier (3GPP TS 38.413).",
-					"type": "string",
-					"pattern": "^[a-f0-9]{9}$"
+					"type": "integer",
+					"minimum": 0,
+					"maximum": 68719476735
 				},
 				"nid": {
-					"description": "Network identifier.",
+					"description": "A non-3GPP access Network identifier (NID).",
 					"type": "string",
-					"pattern": "^[a-f0-9]{11}$"
+					"maxLength": 253
 				},
 				"plmnId": {
 					"description": "PLMN identifier as MCCMNC.",
 					"type": "string",
 					"pattern": "^[0-9]{5,6}$"
 				}
-			}
+			},
+			"required": [
+				"plmnId",
+				"nrCellId"
+			],
+			"examples": [
+				{
+					"nrCellId": 9223102471,
+					"plmnId": "001001"
+				}
+			]
 		},
 		"NodeID": {
 			"description": "Provides an optional, operator configurable, identifier string for the node that had generated the CDR.",

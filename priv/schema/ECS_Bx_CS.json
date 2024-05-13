@@ -331,10 +331,9 @@
 						"address": "14165550000"
 					},
 					"location": {
-						"locationAreaCode": 42,
-						"cellId": 1532,
-						"mcc": "001",
-						"mnc": "001"
+						"locationAreaCode": 10200,
+						"cellId": 4353,
+						"mCC-MNC": "001001"
 					},
 					"basicService": {
 						"bearerService": 20
@@ -710,36 +709,30 @@
 				"locationAreaCode": {
 					"description": "The Location Area Code (LAC) identifies a location area within a PLMN.",
 					"type": "integer",
-					"minimum": 1,
-					"maximum": 65533
+					"minimum": 0,
+					"maximum": 65535
 				},
 				"cellId": {
-					"description": "Identifies a cell within a location area.",
+					"description": "Identifies a cell within a location area (TS 24.008).",
 					"type": "integer",
 					"minimum": 0,
 					"maximum": 65535
 				},
-				"mcc": {
-					"description": "The Mobile Country Code (MCC)",
+				"mCC-MNC": {
+					"description": "PLMN identifier as MCCMNC.",
 					"type": "string",
-					"pattern": "^[0-9]{3}$"
-				},
-				"mnc": {
-					"description": "The Mobile  Network Code (MNC)",
-					"type": "string",
-					"pattern": "^[0-9]{2,3}$"
+					"pattern": "^[0-9]{5,6}$"
 				}
 			},
 			"required": [
-				"mcc",
-				"mnc"
+				"locationAreaCode",
+				"cellId"
 			],
 			"examples": [
 				{
-					"locationAreaCode": 42,
-					"cellId": 1532,
-					"mcc": "001",
-					"mnc": "001"
+					"locationAreaCode": 10200,
+					"cellId": 4353,
+					"mCC-MNC": "001001"
 				}
 			]
 		},
