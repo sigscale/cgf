@@ -32,11 +32,10 @@
 					"type": "string"
 				},
 				"terminationReason": {
-					"description": "Identifies a reason for terminating service usage.",
+					"description": "Identifies a reason for rating function terminating service usage.",
 					"type": "string",
 					"enum": [
-						"unknown",
-						"normal",
+						"none",
 						"insufficient-balance",
 						"maximum-duration",
 						"other"
@@ -103,11 +102,11 @@
 					"description": "Identifies if the applied charge corresponds to a specific charge type.",
 					"type": "string",
 					"enum": [
-						"unknown",
 						"usage",
 						"communication-attempt",
 						"setup",
-						"add-on"
+						"add-on",
+						"other"
 					]
 				}
 			},
