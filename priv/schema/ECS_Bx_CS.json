@@ -363,10 +363,103 @@
 			"description": "Circuit switched (CS) mobile originated (MO) short message service (SMS) charging data record (CDR).",
 			"type": "object",
 			"properties": {
+				"servedIMSI": {
+					"description": "The international mobile subscriber identity (IMSI) of the served party.",
+					"type": "string",
+					"pattern": "^[0-9]{5,15}$"
+				},
+				"servedIMEI": {
+					"description": "The international mobile equipment identity (IMEI) of the equipment served.",
+					"type": "string",
+					"pattern": "^[0-9]{14,15}$"
+				},
+				"servedMSISDN": {
+					"description": "The mobile station ISDN number (MSISDN) of the served party.",
+					"type": "string",
+					"pattern": "^[0-9]{5,15}$"
+				},
+				"msClassmark": {
+					"description": "The mobile station classmark employed by the served MS on call set-up.",
+					"$ref": "#/$defs/Classmark"
+				},
+				"serviceCentre": {
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"recordingEntity": {
+					"description": "The E.164 number assigned to the entity (MSC, VLR, HLR etc.) that produced the record.",
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"location": {
+					"description": "The location of the cell in which the served party is currently located.",
+					"$ref": "#/$defs/LocationAreaAndCell"
+				},
+				"messageReference": {
+					"description": "Unique number allocated by the Mobile Station (MS) when transmitting a short message to the SC.",
+					"type": "integer",
+					"minimum": 0,
+					"maximum": 255
+				},
+				"originationTime": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"smsResult": {
+				},
+				"recordExtensions": {
+				},
+				"destinationNumber": {
+					"description": "The short message destination number requested by the user (TS 32.250).",
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"cAMELSMSInformation": {
+					"$ref": "#/$defs/CAMELSMSInformation"
+				},
+				"systemType": {
+					"$ref": "#/$defs/SystemType"
+				},
+				"locationExtension": {
+				}
 			},
 			"required": [
+				"servedIMSI",
+				"msClassmark",
+				"serviceCentre",
+				"recordingEntity",
+				"messageReference",
+				"originationTime"
 			],
 			"examples": [
+				{
+					"servedIMSI": "001001012345678",
+					"servedMSISDN": "14165555678",
+					"destinationNumber": {
+						"natureOfAddress": "international",
+						"numberingPlan": "e164",
+						"address": "14165551234"
+					},
+					"serviceCentre": {
+						"natureOfAddress": "national",
+						"numberingPlan": "e164",
+						"address": "14165551234"
+					},
+					"recordingEntity": {
+						"natureOfAddress": "international",
+						"numberingPlan": "e164",
+						"address": "14165550000"
+					},
+					"cAMELSMSInformation": {
+						"serviceKey": 42
+					},
+					"location": {
+						"locationAreaCode": 10200,
+						"cellId": 4353,
+						"mCC-MNC": "001001"
+					},
+					"msClassmark": [125, 87],
+					"originationTime": "2024-03-28T09:13:00.123Z",
+					"messageReference": 810273349,
+					"systemType": "gERAN"
+				}
 			]
 		},
 		"MTSMSRecord": {
@@ -494,6 +587,39 @@
 				"noCAMELCallForwarding",
 				"cAMELCallForwarding"
 			]
+		},
+		"CAMELSMSInformation": {
+			"type": "object",
+			"properties": {
+				"gsm-SCFAddress": {
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"cAMELSMSCAddress": {
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"callingPartyNumber": {
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"defaultSMSHandling": {
+					"type": "string",
+					"enum": [
+						"continueTransaction",
+						"releaseTransaction"
+					]
+				},
+				"destinationSubscriberNumber": {
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"freeFormatData": {
+					"$ref": "#/$defs/FreeFormatData"
+				},
+				"serviceKey": {
+					"$ref": "#/$defs/ServiceKey"
+				},
+				"smsReferenceNumber": {
+					"$ref": "#/$defs/CallReferenceNumber"
+				}
+			}
 		},
 		"CauseForTerm": {
 			"description": "Describes a generalised reason for the release of the connection.",
@@ -761,7 +887,7 @@
 					"description": "Indicates the scope of the address value.",
 					"type": "string",
 					"enum": [
-		      		"unknown",
+						"unknown",
 						"subscriber",
 						"national",
 						"international",
@@ -773,7 +899,7 @@
 					"description": "Describes which numbering plan is used.",
 					"type": "string",
 					"enum": [
-		      		"unknown",
+						"unknown",
 						"e164",
 						"x121",
 						"e212",

@@ -75,7 +75,7 @@ bx([{moCall = _RecordType, Parameters}, {rated, OCS}] = _CDR) ->
 					"event", "session", ["connection"], Outcome), $,,
 			$", "Bx_moCall", $", $:, zj:encode(Parameters), $,,
 			$", "Bx_rated", $", $:, zj:encode(OCS), $}];
-bx([{scSMO = _RecordType, Parameters}, {rated, OCS}] = _CDR) ->
+bx([{moSMS = _RecordType, Parameters}, {rated, OCS}] = _CDR) ->
 	IMSI = imsi(Parameters),
 	MSISDN = msisdn(Parameters),
 	{StartTime, StopTime, Duration} = call_duration(Parameters),
@@ -86,7 +86,7 @@ bx([{scSMO = _RecordType, Parameters}, {rated, OCS}] = _CDR) ->
 			ecs_user(MSISDN, IMSI, []), $,,
 			ecs_event(StartTime, StopTime, Duration,
 					"event", "session", ["connection"], Outcome), $,,
-			$", "Bx_scSMO", $", $:, zj:encode(Parameters), $,,
+			$", "Bx_moSMS", $", $:, zj:encode(Parameters), $,,
 			$", "Bx_rated", $", $:, zj:encode(OCS), $}];
 bx([{sgw = _RecordType, Parameters}, {rated, OCS}] = _CDR) ->
 	IMSI = imsi(Parameters),
