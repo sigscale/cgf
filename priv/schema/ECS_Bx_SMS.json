@@ -57,8 +57,92 @@
 			"description": "Short message service center (SCS) mobile originated charging data record (CDR).",
 			"type": "object",
 			"properties": {
+				"sMSNodeAddress": {
+					"description": "E.164 number assigned to the SMSC that produced the record.",
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"originatorInfo": {
+					"$ref": "#/$defs/OriginatorInfo"
+				},
+				"recipientInfo": {
+					"description": "Indicates the recpients of a Short Message (SM).",
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/RecipientInfo"
+					}
+				},
+				"servedIMEI": {
+					"description": "The international mobile equipment identity (IMEI) of the equipment served.",
+					"type": "string",
+					"pattern": "^[0-9]{14,15}$"
+				},
+				"eventtimestamp": {
+					"description": "Indicates the time of the event that triggered the generation of charging information for the SMS transaction.",
+					"type": "string",
+					"format": "date-time"
+				},
+				"messageReference": {
+					"description": "Unique number allocated by the Mobile Station (MS) when transmitting a short message to the SC.",
+					"type": "integer",
+					"minimum": 0,
+					"maximum": 255
+				},
+				"sMTotalNumber": {
+					"description": "The total number of short messages when the SMS is part of concatenated short message.",
+					"type": "integer"
+				},
+				"sMSequenceNumber": {
+					"description": "The sequence number of the SMS within a concatenated short message.",
+					"type": "integer"
+				},
+				"messageSize": {
+					"description": "Length of the user data part of the Short Message.",
+					"type": "integer"
+				},
+				"messageClass": {
+					"$ref": "#/$defs/MessageClass"
+				},
+				"sMdeliveryReportRequested": {
+					"description": "Indicates whether a delivery report is requested by the Short Message originator.",
+					"type": "boolean"
+				},
+				"sMDataCodingScheme": {
+					"description": "Indicates the data coding scheme used within the Short Message",
+					"type": "integer"
+				},
+				"sMMessageType": {
+					"$ref": "#/$defs/SMMessageType"
+				},
+				"sMReplyPathRequested": {
+					"description": "Indicates whether a reply Short Message to an original Short Message shall follow the same path,",
+					"type": "boolean"
+				},
+				"sMUserDataHeader": {
+					"description": "The user data header extracted from the user data of the SM (TP-UDH) (TS 23.040).",
+					"type": "string",
+					"pattern": "^([0-9a-fA-F]{2})*$"
+				},
+				"userLocationInfo": {
+					"description": "Information about the location of the subscriber during the SMS transaction (TS 29.061).",
+					"type": "string",
+					"pattern": "^([0-9a-fA-F]{2})*$"
+				},
+				"rATType": {
+					"$ref": "#/$defs/RATType"
+				},
+				"sMSResult": {
+				},
+				"uETimeZone": {
+				},
+				"localSequenceNumber": {
+					"$ref": "#/$defs/LocalSequenceNumber"
+				},
+				"recordExtensions": {
+				}
 			},
 			"required": [
+				"sMSNodeAddress",
+				"eventtimestamp"
 			],
 			"examples": [
 			]
@@ -102,6 +186,226 @@
 			],
 			"examples": [
 			]
+		},
+		"PartyAddress": {
+			"description": "Circuit Switched (CS) calling/called/translated number",
+			"type": "object",
+			"properties": {
+				"natureOfAddress": {
+					"description": "Indicates the scope of the address value.",
+					"type": "string",
+					"enum": [
+						"unknown",
+						"subscriber",
+						"national",
+						"international",
+						"spare",
+						"reserved"
+					]
+				},
+				"numberingPlan": {
+					"description": "Describes which numbering plan is used.",
+					"type": "string",
+					"enum": [
+						"unknown",
+						"e164",
+						"x121",
+						"e212",
+						"national",
+						"private",
+						"reserved"
+					]
+				},
+				"address": {
+					"description": "The digits of the address.",
+					"type": "string",
+					"pattern": "^[0-9#*]{1,38}$"
+				}
+			},
+			"required": [
+				"address"
+			],
+			"examples": [
+				{
+					"natureOfAddress": "international",
+					"numberingPlan": "e164",
+					"address": "14165551234"
+				}
+			]
+		},
+		"OriginatorInfo": {
+			"description": "Provides information about the Originator of a Short Message.",
+			"type": "object",
+			"properties": {
+				"originatorIMSI": {
+					"description": "The international mobile subscriber identity (IMSI) of the originating party.",
+					"type": "string",
+					"pattern": "^[0-9]{5,15}$"
+				},
+				"originatorMSISDN": {
+					"description": "The mobile station ISDN number (MSISDN) of the originating party.",
+					"type": "string",
+					"pattern": "^[0-9]{5,15}$"
+				},
+				"originatorOtherAddress": {
+					"$ref": "#/$defs/SMAddressInfo"
+				},
+				"originatorOtherAddresses": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/SMAddressInfo"
+					}
+				},
+				"originatorReceivedAddress": {
+					"$ref": "#/$defs/SMAddressInfo"
+				},
+				"originatorSCCPAddress": {
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"sMOriginatorInterface": {
+					"$ref": "#/$defs/SMInterface"
+				},
+				"sMOriginatorProtocolID": {
+					"description": "Indicates the TP-PROTOCOL-ID (TP-PID) (TS 23.040).", 
+					"type": "string",
+					"pattern": "^([0-9a-fA-F]{2})*$"
+				}
+			}
+		},
+		"RecipientInfo": {
+			"description": "Provides information about the Recipient of a Short Message.",
+			"type": "object",
+			"properties": {
+				"recipientIMSI": {
+					"description": "The international mobile subscriber identity (IMSI) of the receiving party.",
+					"type": "string",
+					"pattern": "^[0-9]{5,15}$"
+				},
+				"recipientMSISDN": {
+					"description": "The mobile station ISDN number (MSISDN) of the receiving party.",
+					"type": "string",
+					"pattern": "^[0-9]{5,15}$"
+				},
+				"recipientOtherAddress": {
+					"$ref": "#/$defs/SMAddressInfo"
+				},
+				"recipientOtherAddresses": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/SMAddressInfo"
+					}
+				},
+				"recipientReceivedAddress": {
+					"$ref": "#/$defs/SMAddressInfo"
+				},
+				"recipientSCCPAddress": {
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"sMDestinationInterface": {
+					"$ref": "#/$defs/SMInterface"
+				},
+				"sMRecipientProtocolID": {
+					"pattern": "^([0-9a-fA-F]{2})*$",
+					"type": "string"
+				}
+			}
+		},
+		"SMAddressInfo": {
+			"description": "Addressee of an originator/recipient of a Short Message other than IMSI and MSISDN (e.g. short code, email).",
+			"type": "object",
+			"properties": {
+				"sMAddressType": {
+					"type": "string",
+					"enum": [
+						"emailAddress",
+						"mSISDN",
+						"iPv4Address",
+						"iPv6Address",
+						"numericShortCode",
+						"alphanumericShortCode",
+						"other",
+						"iMSI",
+						"nAI",
+						"externalId"
+					]
+				},
+				"sMAddressDomain": {
+					"type": "object",
+					"properties": {
+						"sMDomainName": {
+							"type": "string"
+						},
+						"threeGPPIMSI-MCC-MNC": {
+							"description": "PLMN identifier as MCCMNC.",
+							"type": "string",
+							"pattern": "^[0-9]{5,6}$"
+						}
+					}
+				},
+				"sMAddressData": {
+					"type": "string"
+				}
+			}
+		},
+		"SMInterface": {
+			"description": "Describes an interface on which a Short Message was originated/received by the SMS node",
+			"type": "object",
+			"properties": {
+				"interfaceId": {
+					"type": "string"
+				},
+				"interfacePort": {
+					"type": "string"
+				},
+				"interfaceText": {
+					"type": "string"
+				},
+				"interfaceType": {
+					"type": "string",
+					"enum": [
+						"unkown",
+						"mobileOriginating",
+						"mobileTerminating",
+						"applicationOriginating",
+						"applicationTerminating",
+						"deviceTrigger"
+					]
+				}
+			}
+		},
+		"LocalSequenceNumber": {
+			"description": "Sequence number of the charging record in the node.",
+			"type": "integer",
+			"minimum": 0,
+			"maximum": 4294967295
+		},
+		"MessageClass": {
+			"description": "Indicates class of message (TS 23.140).",
+			"type": "string",
+			"enum": [
+				"personal",
+				"advertisement",
+				"information-service",
+				"auto"
+			]
+		},
+		"SMMessageType": {
+			"description": "Indicates the message type that triggered the generation of charging information.",
+			"type": "string",
+			"enum": [
+				"submission",
+				"deliveryReport",
+				"sMServiceRequest",
+				"delivery",
+				"t4DeviceTrigger",
+				"sMDeviceTrigger"
+			]
+		},
+		"RATType": {
+			"description": "Holds the value of RAT Type, as provided to SGW and PGW (TS 29.061).",
+			"type": "integer",
+			"minimum": 0,
+			"maximum": 255
 		}
 	}
 }
