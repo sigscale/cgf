@@ -27,6 +27,30 @@
 						"$ref": "#/$defs/AppliedCharge"
 					}
 				},
+				"totalAllowanceDuration": {
+					"description": "Total duration debited from allowance.",
+					"type": "integer"
+				},
+				"totalAllowanceVolume": {
+					"description": "Total volume debited from allowance.",
+					"type": "integer"
+				},
+				"totalAllowanceEvent": {
+					"description": "Total events debited from allowance.",
+					"type": "integer"
+				},
+				"totalChargeMonetary": {
+					"description": "Total debited from monetary account.",
+					"type": "integer"
+				},
+				"totalChargePrepaid": {
+					"description": "Total debited from monetary prepaid account.",
+					"type": "integer"
+				},
+				"totalChargePostpaid": {
+					"description": "Total charged to monetary postpaid account.",
+					"type": "integer"
+				},
 				"cdrId": {
 					"description": "Unique identifier for a rated CDR.",
 					"type": "string"
