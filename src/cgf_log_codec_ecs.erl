@@ -36,7 +36,8 @@
 -spec bx(CDR) -> iodata()
 	when
 		CDR :: [{RecordType, Parameters}],
-		RecordType :: moCall | mtCall | moSMS | mtSMS | rated,
+		RecordType :: moCall | mtCall | moSMS | mtSMS
+				| scSMO | scSMT | sgw | rated,
 		Parameters :: #{_Name := binary(), _Value := term()}.
 %% @doc Bx interface CODEC for Elastic Stack logs.
 %%
@@ -73,6 +74,32 @@ bx([{moCall = _RecordType, Parameters}, {rated, OCS}] = _CDR) ->
 			ecs_event(StartTime, StopTime, Duration,
 					"event", "session", ["connection"], Outcome), $,,
 			$", "Bx_moCall", $", $:, zj:encode(Parameters), $,,
+			$", "Bx_rated", $", $:, zj:encode(OCS), $}];
+bx([{scSMO = _RecordType, Parameters}, {rated, OCS}] = _CDR) ->
+	IMSI = imsi(Parameters),
+	MSISDN = msisdn(Parameters),
+	{StartTime, StopTime, Duration} = call_duration(Parameters),
+	Outcome = call_outcome(Parameters),
+	[${,
+			ecs_base(cgf_log:iso8601(erlang:system_time(millisecond))), $,,
+			ecs_service("bx", "cgf"), $,,
+			ecs_user(MSISDN, IMSI, []), $,,
+			ecs_event(StartTime, StopTime, Duration,
+					"event", "session", ["connection"], Outcome), $,,
+			$", "Bx_scSMO", $", $:, zj:encode(Parameters), $,,
+			$", "Bx_rated", $", $:, zj:encode(OCS), $}];
+bx([{sgw = _RecordType, Parameters}, {rated, OCS}] = _CDR) ->
+	IMSI = imsi(Parameters),
+	MSISDN = msisdn(Parameters),
+	{StartTime, StopTime, Duration} = call_duration(Parameters),
+	Outcome = call_outcome(Parameters),
+	[${,
+			ecs_base(cgf_log:iso8601(erlang:system_time(millisecond))), $,,
+			ecs_service("bx", "cgf"), $,,
+			ecs_user(MSISDN, IMSI, []), $,,
+			ecs_event(StartTime, StopTime, Duration,
+					"event", "session", ["connection"], Outcome), $,,
+			$", "Bx_sgw", $", $:, zj:encode(Parameters), $,,
 			$", "Bx_rated", $", $:, zj:encode(OCS), $}].
 
 -spec ecs_base(Timestamp) -> iodata()
