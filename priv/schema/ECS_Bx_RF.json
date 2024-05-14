@@ -28,28 +28,40 @@
 					}
 				},
 				"totalAllowanceDuration": {
-					"description": "Total duration debited from allowance.",
+					"description": "Total duration, in seconds, debited from allowance.",
 					"type": "integer"
 				},
 				"totalAllowanceVolume": {
-					"description": "Total volume debited from allowance.",
+					"description": "Total octets debited from allowance.",
 					"type": "integer"
 				},
 				"totalAllowanceEvent": {
-					"description": "Total events debited from allowance.",
+					"description": "Total number of events debited from allowance.",
 					"type": "integer"
 				},
 				"totalChargeMonetary": {
 					"description": "Total debited from monetary account.",
-					"type": "integer"
+					"allOf": [
+						{
+							"$ref": "#/$defs/UnitValue"
+						}
+					]
 				},
 				"totalChargePrepaid": {
 					"description": "Total debited from monetary prepaid account.",
-					"type": "integer"
+					"allOf": [
+						{
+							"$ref": "#/$defs/UnitValue"
+						}
+					]
 				},
 				"totalChargePostpaid": {
 					"description": "Total charged to monetary postpaid account.",
-					"type": "integer"
+					"allOf": [
+						{
+							"$ref": "#/$defs/UnitValue"
+						}
+					]
 				},
 				"cdrId": {
 					"description": "Unique identifier for a rated CDR.",
