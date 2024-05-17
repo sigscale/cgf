@@ -9,6 +9,14 @@
  3GPP TS 32.298</a> Charging Data Record (CDR) parameter description.
 @doc This application implements the 3GPP Charging Gateway Function (CGF).
 
+==Table of Contents==
+<ul>
+	<li><a href="#Intoduction">Introduction</a><br /></li>
+	<li><a href="#Installation">Installation</a><br /></li>
+	<li><a href="#Operation">Operation</a><br /></li>
+	<li><a href="#Configuration">Configuration</a><br /></li>
+</ul>
+
 ==Introduction==
 The 3GPP reference architecture for the charging domain includes
 the functions:
@@ -25,4 +33,20 @@ the functions:
 ==Operation==
 
 ==Configuration==
+System wide settings in the {@link //cgf. cgf} application may be
+configured using the following application environment variables
+(`~/releases/cgf-<VERSION>/sys.config').
+
+===SFTP===
+Application environment variables configuring instances of the
+{@link //ssh. ssh} application subsystem for `sftp':
+<dl>
+	<dt>`sftpd'</dt>
+		<dd>Defines SFTP services as `[{Addr, Port, DaemonOptions, SftpdOptions}]'.
+				Each set of local bind address (`Addr :: inet:ip_address()'),
+				port (`Port :: 0..65535'), daemon options
+				(`DaemonOptions :: ssh:daemon_options()) and `sftp' options
+				(`SftpdOptions :: cgf_sftpd:options())
+				define an SFTP service. (default: `[]')</dd>
+</dl>
 
