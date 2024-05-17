@@ -223,12 +223,12 @@ get_type(#type{def = {'SET OF', TypeSpec},
 	end;
 get_type(#type{def = #'Externaltypereference'{type = Type},
 		constraint = []}, Refs) when is_map_key(Type, Refs) ->
-	#{"type" => #{"$ref" => maps:get(Type, Refs)}};
+	#{"$ref" => maps:get(Type, Refs)};
 get_type(#type{def = #'Externaltypereference'{}}, _Refs) ->
 	undefined;
 get_type(#type{def = {pt, #'Externaltypereference'{type = Type}, _},
 		constraint = []}, Refs) when is_map_key(Type, Refs) ->
-	#{"type" => #{"$ref" => maps:get(Type, Refs)}};
+	#{"$ref" => maps:get(Type, Refs)};
 get_type(#type{def = {pt, #'Externaltypereference'{}, _}}, _Refs) ->
 	undefined;
 get_type(#type{def = {'ANY_DEFINED_BY', _}}, _Refs) ->
