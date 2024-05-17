@@ -181,7 +181,7 @@ get_type(#type{def = 'OBJECT IDENTIFIER', constraint = []}, _Refs) ->
 get_type(#type{def = 'REAL', constraint = Constraints}, _Refs) ->
 	get_constraint(Constraints, #{"type" => "number"});
 get_type(#type{def =  {'CHOICE', Components}, constraint = []}, Refs) ->
-	case get_component(Components, Refs, []) of
+	case get_choice(Components, Refs, []) of
 		Types when is_list(Types) ->
 			#{"oneOf" => Types};
 		undefined ->
@@ -189,7 +189,7 @@ get_type(#type{def =  {'CHOICE', Components}, constraint = []}, Refs) ->
 	end;
 get_type(#type{def = #'SEQUENCE'{components = Components},
 		constraint = []}, Refs) ->
-	case get_component(Components, Refs, #{}) of
+	case get_sequence(Components, Refs, #{}) of
 		Types when is_map(Types) ->
 			#{"type" => "object", "properties" => Types};
 		undefined ->
@@ -197,7 +197,7 @@ get_type(#type{def = #'SEQUENCE'{components = Components},
 	end;
 get_type(#type{def = #'SET'{components = Components},
 		constraint = []}, Refs) ->
-	case get_component(Components, Refs, #{}) of
+	case get_sequence(Components, Refs, #{}) of
 		Types when is_map(Types) ->
 			#{"type" => "object", "properties" => Types};
 		undefined ->
@@ -235,19 +235,29 @@ get_type(#type{def = {'ANY_DEFINED_BY', _}}, _Refs) ->
 	#{}.
 
 %% @hidden
-get_component([#'ComponentType'{name = Name, typespec = TypeSpec} | T],
+get_choice([#'ComponentType'{name = Name, typespec = TypeSpec} | T],
 		Refs, Acc) ->
 	case get_type(TypeSpec, Refs) of
 		Type when is_map(Type), is_list(Acc) ->
-			get_component(T, Refs, [#{Name => Type} | Acc]);
-		Type when is_map(Type), is_map(Acc) ->
-			get_component(T, Refs, Acc#{Name => Type});
+			Choice = #{"type" => "object",
+					"properties" => #{Name => Type}},
+			get_choice(T, Refs, [Choice | Acc]);
 		undefined ->
 			undefined
-	end;	
-get_component([], _Refs, Acc) when is_list(Acc) ->
-	lists:reverse(Acc);
-get_component([], _Refs, Acc) when is_map(Acc) ->
+	end;
+get_choice([], _Refs, Acc) ->
+	lists:reverse(Acc).
+
+%% @hidden
+get_sequence([#'ComponentType'{name = Name, typespec = TypeSpec} | T],
+		Refs, Acc) ->
+	case get_type(TypeSpec, Refs) of
+		Type when is_map(Type) ->
+			get_sequence(T, Refs, Acc#{Name => Type});
+		undefined ->
+			undefined
+	end;
+get_sequence([], _Refs, Acc) ->
 	Acc.
 
 %% @hidden
