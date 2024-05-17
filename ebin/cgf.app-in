@@ -27,7 +27,8 @@
 				'ProSeChargingDataTypes',
 				'MONTEChargingDataTypes',
 				'CHFChargingDataTypes',
-				'ExposureFunctionAPIChargingDataTypes']},
+				'ExposureFunctionAPIChargingDataTypes',
+				cgf_sftpd]},
 		{registered,
 				[cgf,
 				cgf_sup,
@@ -41,6 +42,10 @@
 				{logs,
 						[
 						% {LogName :: atom() | {global, term()}, Options :: [cgf_log:log_option()]}
+						]},
+				{sftpd,
+						[
+						% {Address :: inet:ip_address(), Port :: 1024..65535, DaemonOptions :: ssh:daemon_options(), Options :: cgf_sftpd:options()}
 						]}]},
 		{mod, {cgf_app, []}}]}.
 

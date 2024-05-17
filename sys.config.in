@@ -1,2 +1,10 @@
-[{cgf,
+[{ssh,
+      [{system_dir, "ssl/system"},
+      {server_options,
+            [{shell, disabled},
+            {exec, disabled},
+            {subsystems, []}]},
+      {client_options,
+            []}]},
+{cgf,
       []}].

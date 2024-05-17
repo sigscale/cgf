@@ -33,7 +33,8 @@ beam_DATA = cgf.beam \
 		ProSeChargingDataTypes.beam \
 		MONTEChargingDataTypes.beam \
 		CHFChargingDataTypes.beam \
-		ExposureFunctionAPIChargingDataTypes.beam
+		ExposureFunctionAPIChargingDataTypes.beam \
+		cgf_sftpd.beam
 
 %.beam:$(top_builddir)/src/%.erl
 	$(ERLC) $(ERLCFLAGS) -I $(top_builddir)/src $<

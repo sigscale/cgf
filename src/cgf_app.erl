@@ -61,6 +61,49 @@ start1(TopSup, [{LogName, Options} | T]) ->
 			{error, Reason}
 	end;
 start1(TopSup, []) ->
+	SystemDir = case application:get_env(ssh, system_dir) of
+		{ok, Path1} ->
+			Path1;
+		undefined ->
+			"ssl/system"
+	end,
+	PathComponents = filename:split(SystemDir),
+	BaseDir = lists:droplast(PathComponents),
+	undefined = application:get_env(ssh, user_dir),
+	UserDir = filename:join([BaseDir, "user"]),
+	UserDirFun = case application:get_env(ssh, user_dir_fun) of
+		{ok, Fun} ->
+			Fun;
+		undefined ->
+			fun(Username) -> filename:join([UserDir, Username]) end
+	end,
+	{ok, SubSystems} = application:get_env(sftpd),
+	start2(TopSup, SystemDir, UserDirFun, SubSystems).
+%% @hidden
+start2(TopSup, SystemDir, UserDirFun,
+		[{Address, Port, DaemonOptions, SftpdOptions} | T]) ->
+	Options1 = case proplists:lookup(system_dir, DaemonOptions) of
+		{system_dir, _SystemDir1} ->
+			DaemonOptions;
+		none ->
+			[{system_dir, SystemDir} | DaemonOptions]
+	end,
+	none = proplists:lookup(user_dir, Options1),
+	Options2 = case proplists:lookup(user_dir_fun, Options1) of
+		{user_dir_fun, _UserDirFun1} ->
+			Options1;
+		none ->
+			[{user_dir_fun, UserDirFun} | Options1]
+	end,
+	Spec = cgf_sftpd:subsystem_spec(SftpdOptions),
+	Options3 = [{subsystems, [Spec]} | Options2], 
+	case ssh:daemon(Address, Port, Options3) of
+		{ok, _DaemonRef} ->
+			start2(TopSup, SystemDir, UserDirFun, T);
+		{error, Reason} ->
+			{error, Reason}
+	end;
+start2(TopSup, _SystemDir, _UserDirFun, []) ->
 	{ok, TopSup}.
 
 -spec start_phase(Phase, StartType, PhaseArgs) -> Result
