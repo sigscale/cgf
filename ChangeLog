@@ -1,5 +1,11 @@
 2024-05-18   Vance Shipley <vances@sigscale.org>
 
+	* document sftp operation
+	* macros for systemd support
+	* table initialization function stub
+	* shell script for ssh key management
+	* systemd service configuration
+	* rename ssh keys directory
 	* build a release package
 	* document sftpd configuration
 	* application environment configures sftpd servers
