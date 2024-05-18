@@ -9,6 +9,8 @@ systemdsystemunit_DATA = scripts/cgf.service
 env_DATA = scripts/cgf
 endif
 
+script_SCRIPTS = scripts/ssh_keys.sh
+
 RELEASE_NAME = $(PACKAGE_NAME)-$(PACKAGE_VERSION)
 
 .PHONY: release
