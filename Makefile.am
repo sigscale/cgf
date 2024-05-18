@@ -4,6 +4,11 @@
 
 SUBDIRS = src asn_src ebin doc priv
 
+if HAVE_SYSTEMD
+systemdsystemunit_DATA = scripts/cgf.service
+env_DATA = scripts/cgf
+endif
+
 RELEASE_NAME = $(PACKAGE_NAME)-$(PACKAGE_VERSION)
 
 .PHONY: release
