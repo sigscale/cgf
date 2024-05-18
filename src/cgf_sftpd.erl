@@ -19,6 +19,13 @@
 %%% 	module implements a `sftpd' subsystem in
 %%% 	the {@link //cgf. cgf} application.
 %%%
+%%% 	The SSH `sftpd' subsystem implemented in this module is a wrapper
+%%% 	around the {@link //ssh/ssh_sftpd. ssh_sftpd} callback module with
+%%% 	the additional procedure of changing the `root' directory to a
+%%% 	subdirectory with the name of the username for the session
+%%% 	(`root/username'). This	sandboxes a session so they cannot see files
+%%% 	belonging to other users.
+%%%
 -module(cgf_sftpd).
 -copyright('Copyright (c) 2024 SigScale Global Inc.').
 -author('Vance Shipley <vances@sigscale.org>').
