@@ -2,6 +2,8 @@
 	[{kernel, "@ERLANG_LIB_VER_kernel@"},
 	{stdlib, "@ERLANG_LIB_VER_stdlib@"},
 	{sasl, "@ERLANG_LIB_VER_sasl@", load},
-	{ssh, "@ERLANG_LIB_VER_ssh@"},
+	{crypto, "@ERLANG_LIB_VER_crypto@"},
 	{asn1, "@ERLANG_LIB_VER_asn1@"},
+	{public_key, "@ERLANG_LIB_VER_public_key@"},
+	{ssh, "@ERLANG_LIB_VER_ssh@"},
 	{@PACKAGE@, "@VERSION@"}]}.
