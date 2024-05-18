@@ -1,5 +1,5 @@
 [{ssh,
-      [{system_dir, "ssl/system"},
+      [{system_dir, "ssh/system"},
       {server_options,
             [{shell, disabled},
             {exec, disabled},

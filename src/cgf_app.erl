@@ -65,7 +65,7 @@ start1(TopSup, []) ->
 		{ok, Path1} ->
 			Path1;
 		undefined ->
-			"ssl/system"
+			"ssh/system"
 	end,
 	PathComponents = filename:split(SystemDir),
 	BaseDir = lists:droplast(PathComponents),
