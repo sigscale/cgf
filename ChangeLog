@@ -1,0 +1,52 @@
+2024-05-18   Vance Shipley <vances@sigscale.org>
+
+	* build a release package
+	* document sftpd configuration
+	* application environment configures sftpd servers
+	* remove redundant type wrapper around refs
+	* refactor for choice type in transpiler
+	* cs domain mobile originated short messages
+	* codecs for epc sgw and smsc short message origination
+	* service center short message origination cdr
+	* use unit value type for monetary amounts
+	* applied charge summary amounts in rated
+	* payment type in rated
+	* rating result code
+	* charge reason and termination reason in rated
+	* cell id and location area as integers
+	* public api module with plmn function
+	* ps cell information example
+	* ps cell information
+	* extend 3gpp ps schema with total data volume
+	* correct data transfer values to type integer
+	* cdr id in rated
+	* add sgw cdr in ps domain
+	* enable ajv-formats in all schema validations
+	* handle constraints in asn.1 to json schema mapping
+	* map additional types from asn.1 to json schema
+	* experimental tooling for generating json schema from asn.1
+	* handle rated record in bx ecs codec
+	* pop missing in po
+	* include rating function schema in bx ecs log
+	* schema for ims iccid in cs ma call
+	* codec library module for ecs logs
+	* registered process names in application specification
+	* api library module for logs
+	* application environment variable for bx log directory
+	* start application and supervision tree, with log servers
+	* refactor json schemas; add ps, ims, sms, mms, mmtel, 5gc
+	* consolidate all cs domain records in one json schema file
+	* add served msisdn; typo in mnc
+	* include required and examples in schema
+	* correct ecs bx schema for outer event
+	* json schema for elastic stack bx interface
+	* build and ship beam files for asn1 modules
+	* fixes to build all 3gpp asn1 modules
+	* clarify purpose of html links
+	* intro and charging architecture diagram
+	* add 3gpp specification references
+	* asn.1 modules from 3gpp ts 32.298
+	* dependency on map application to build
+	* include asn1 application in release package
+	* genesis
+
