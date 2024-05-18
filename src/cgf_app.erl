@@ -28,6 +28,8 @@
 -export([start/2, stop/1, config_change/3]).
 %% optional callbacks for application behaviour
 -export([prep_stop/1, start_phase/3]).
+%% export the cse private API for installation
+-export([install/0, install/1]).
 
 -type state() :: #{}.
 
@@ -150,6 +152,37 @@ stop(_State) ->
 %%
 config_change(_Changed, _New, _Removed) ->
 	ok.
+
+-spec install() -> Result
+	when
+		Result :: {ok, Tables} | {error, Reason},
+		Tables :: [atom()],
+		Reason :: term().
+%% @equiv install([node() | nodes()])
+install() ->
+	Nodes = [node() | nodes()],
+	install(Nodes).
+
+-spec install(Nodes) -> Result
+	when
+		Nodes :: [node()],
+		Result :: {ok, Tables} | {error, Reason},
+		Tables :: [atom()],
+		Reason :: term().
+%% @doc Initialize CGF tables.
+%% 	`Nodes' is a list of the nodes where
+%% 	{@link //cgf. cgf} tables will be replicated.
+%%
+%% 	If {@link //mnesia. mnesia} is not running an attempt
+%% 	will be made to create a schema on all available nodes.
+%% 	If a schema already exists on any node
+%% 	{@link //mnesia. mnesia} will be started on all nodes
+%% 	using the existing schema.
+%%
+%% @private
+%%
+install(Nodes) when is_list(Nodes) ->
+	{ok, []}.
 
 %%----------------------------------------------------------------------
 %%  Internal functions
