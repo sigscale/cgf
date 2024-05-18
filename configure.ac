@@ -17,6 +17,20 @@ AM_INIT_AUTOMAKE([-Wno-portability])
 ##
 AC_ARG_ENABLE([debug],
 		[AS_HELP_STRING([--enable-debug], [enable debugging (default is no)])])
+PKG_PROG_PKG_CONFIG
+AC_ARG_WITH([systemdsystemunitdir],
+		[AS_HELP_STRING([--with-systemdsystemunitdir=DIR], [Directory for systemd service files])],,
+		[with_systemdsystemunitdir=auto])
+AS_IF([test "x$with_systemdsystemunitdir" = "xyes" -o "x$with_systemdsystemunitdir" = "xauto"],
+		[def_systemdsystemunitdir=$($PKG_CONFIG --variable=systemdsystemunitdir systemd)
+		AS_IF([test "x$def_systemdsystemunitdir" = "x"],
+				[AS_IF([test "x$with_systemdsystemunitdir" = "xyes"],
+						[AC_MSG_ERROR([systemd support requested but pkg-config unable to query systemd package])],
+						[with_systemdsystemunitdir=no])],
+				[with_systemdsystemunitdir="$def_systemdsystemunitdir"])])
+AS_IF([test "x$with_systemdsystemunitdir" != "xno"],
+		[AC_SUBST([systemdsystemunitdir], [$with_systemdsystemunitdir])])
+AM_CONDITIONAL([HAVE_SYSTEMD], [test "x$with_systemdsystemunitdir" != "xno"])
 
 
 ##
@@ -49,7 +63,9 @@ asndir=$ERLANG_INSTALL_LIB_DIR/$PACKAGE_NAME-$PACKAGE_VERSION/asn_dir
 eincludedir=$ERLANG_INSTALL_LIB_DIR/$PACKAGE_NAME-$PACKAGE_VERSION/include
 privdir=$ERLANG_INSTALL_LIB_DIR/$PACKAGE_NAME-$PACKAGE_VERSION/priv
 schemadir=$ERLANG_INSTALL_LIB_DIR/$PACKAGE_NAME-$PACKAGE_VERSION/priv/schema
+scriptdir=$ERLANG_INSTALL_LIB_DIR/$PACKAGE_NAME-$PACKAGE_VERSION/priv/bin
 reldir=$ERLANG_INSTALL_LIB_DIR/../releases
+envdir=/etc/default
 AC_SUBST(otpdir)
 AC_SUBST(appdir)
 AC_SUBST(erldir)
@@ -59,6 +75,8 @@ AC_SUBST(eincludedir)
 AC_SUBST(privdir)
 AC_SUBST(schemadir)
 AC_SUBST(reldir)
+AC_SUBST(scriptdir)
+AC_SUBST(envdir)
 
 
 ##
