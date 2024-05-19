@@ -45,6 +45,8 @@
 		| {root, string()}
 		| {sftpd_vsn, integer()}.
 -type options() :: [option()].
+-type cgf_state() :: #{user => Username :: string()}.
+-type sftpd_state() :: tuple().
 
 %%----------------------------------------------------------------------
 %%  The cgf_sftpd public API
@@ -76,48 +78,80 @@ subsystem_spec1({Name, {ssh_sftpd, Options}}) ->
 	when
 		Options :: options(),
 		Result :: {ok, State} | {ok, State, timeout()} | {stop, Reason},
-		State :: term(),
+		State :: {CgfState, SftpdState},
+		CgfState :: cgf_state(),
+		SftpdState :: sftpd_state(),
 		Reason :: term().
 %% Initialize an `sftpd' server channel.
 %% @private
 init(Options) ->
-	ssh_sftpd:init(Options).
+	case ssh_sftpd:init(Options) of
+		{ok, SftpdState} ->
+			{ok, {#{}, SftpdState}};
+		{ok, SftpdState, Timeout} ->
+			{pk, {#{}, SftpdState}, Timeout};
+		{stop, Reason} ->
+			{stop, Reason}
+	end.
 
 -spec handle_msg(Msg, State) -> Result
 	when
 		Msg :: timeout | term(),
 		Result :: {ok, State} | {stop, ChannelId, State},
 		ChannelId :: ssh:channel_id(),
-		State :: term().
+		State :: {CgfState, SftpdState},
+		CgfState :: cgf_state(),
+		SftpdState :: sftpd_state().
 %% @doc Handle messages other than SSH Connection Protocol,
 %% 	call, or cast messages sent to the channel.
 %% @private
-handle_msg({ssh_channel_up, _ChannelId, ConnectionRef} = Msg, State) ->
+handle_msg({ssh_channel_up, _ChannelId, ConnectionRef} = Msg,
+		{CgfState, SftpdState} = _State) ->
 	{user, Username} = ssh:connection_info(ConnectionRef, user),
-	State1 = update_state(Username, State),
-	ssh_sftpd:handle_msg(Msg, State1);
-handle_msg(Msg, State) ->
-	ssh_sftpd:handle_msg(Msg, State).
+	CgfState1 = CgfState#{user => Username},
+	SftpdState1 = update_state(Username, SftpdState),
+	case ssh_sftpd:handle_msg(Msg, SftpdState1) of
+		{ok, SftpdState2} ->
+			{ok, {CgfState1, SftpdState2}};
+		{stop, ChannelId, SftpdState2} ->
+			{stop, ChannelId, {CgfState1, SftpdState2}}
+	end;
+handle_msg(Msg, {CgfState, SftpdState} = _State) ->
+	case ssh_sftpd:handle_msg(Msg, SftpdState) of
+		{ok, SftpdState1} ->
+			{ok, {CgfState, SftpdState1}};
+		{stop, ChannelId, SftpdState1} ->
+			{stop, ChannelId, {CgfState, SftpdState1}}
+	end.
 
 -spec handle_ssh_msg(Msg, State) -> Result
 	when
 		Msg :: timeout | term(),
 		Result :: {ok, State} | {stop, ChannelId, State},
 		ChannelId :: ssh:channel_id(),
-		State :: term().
+		State :: {CgfState, SftpdState},
+		CgfState :: cgf_state(),
+		SftpdState :: sftpd_state().
 %% @doc Handles SSH Connection Protocol messages
 %% 	that may need service-specific attention.
 %% @private
-handle_ssh_msg(Msg, State) ->
-	ssh_sftpd:handle_ssh_msg(Msg, State).
+handle_ssh_msg(Msg, {CgfState, SftpdState} = _State) ->
+	case ssh_sftpd:handle_ssh_msg(Msg, SftpdState) of
+		{ok, SftpdState1} ->
+			{ok, {CgfState, SftpdState1}};
+		{stop, ChannelId, SftpdState1} ->
+			{stop, ChannelId, {CgfState, SftpdState1}}
+	end.
 
 -spec terminate(Reason, State) -> any()
 	when
 		Reason :: term(),
-		State :: term().
+		State :: {CgfState, SftpdState},
+		CgfState :: cgf_state(),
+		SftpdState :: sftpd_state().
 %% @doc Called by a channel process when it is about to terminate.
-terminate(Reason, State) ->
-	ssh_sftpd:terminate(Reason, State).
+terminate(Reason, {CgfState, SftpdState} = _State) ->
+	ssh_sftpd:terminate(Reason, SftpdState).
 
 %%----------------------------------------------------------------------
 %%  internal functions
@@ -126,7 +160,7 @@ terminate(Reason, State) ->
 %% @doc Update the `ssh_sftpd' state record.
 %% 	Hopefully `(#state.root == 4)' is true forever!
 %% @hidden
-update_state(Username, State) ->
-	RootPath = filename:join(element(4, State), Username),
-	setelement(4, State, RootPath).
+update_state(Username, SftpdState) ->
+	RootPath = filename:join(element(4, SftpdState), Username),
+	setelement(4, SftpdState, RootPath).
 
