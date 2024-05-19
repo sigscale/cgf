@@ -49,7 +49,9 @@
 		| {root, string()}
 		| {sftpd_vsn, integer()}.
 -type options() :: [option()].
--type cgf_state() :: #{user => Username :: string()}.
+-type cgf_state() :: #{
+		user => Username :: string(),
+		write_handles := ordsets:set(Handle :: non_neg_integer())}.
 -type sftpd_state() :: #state{}.
 
 %%----------------------------------------------------------------------
@@ -89,11 +91,12 @@ subsystem_spec1({Name, {ssh_sftpd, Options}}) ->
 %% Initialize an `sftpd' server channel.
 %% @private
 init(Options) ->
+	CgfState = #{write_handles => ordsets:new()},
 	case ssh_sftpd:init(Options) of
 		{ok, SftpdState} ->
-			{ok, {#{}, SftpdState}};
+			{ok, {CgfState, SftpdState}};
 		{ok, SftpdState, Timeout} ->
-			{pk, {#{}, SftpdState}, Timeout};
+			{pk, {CgfState, SftpdState}, Timeout};
 		{stop, Reason} ->
 			{stop, Reason}
 	end.
@@ -141,18 +144,17 @@ handle_msg(Msg, {CgfState, SftpdState} = _State) ->
 %% 	that may need service-specific attention.
 %% @private
 handle_ssh_msg({ssh_cm, _ConnectionRef,
-		{data, _ChannelId, Type, Data}} = Event,
-		{CgfState, SftpdState} = State) ->
-	case handle_data(Type, Data, SftpdState) of
-		true ->
+		{data, _ChannelId, Type, Data}} = Event, State) ->
+	case handle_data(Type, Data, State) of
+		{ok, {CgfState, SftpdState} = _State1} ->
 			case ssh_sftpd:handle_ssh_msg(Event, SftpdState) of
 				{ok, SftpdState1} ->
 					{ok, {CgfState, SftpdState1}};
 				{stop, ChannelId, SftpdState1} ->
 					{stop, ChannelId, {CgfState, SftpdState1}}
 			end;
-		false ->
-			{ok, State}
+		{prohibit, State1} ->
+			{ok, State1}
 	end;
 handle_ssh_msg(Event,
 		{CgfState, SftpdState} = _State) ->
@@ -179,62 +181,106 @@ terminate(Reason, {_CgfState, SftpdState} = _State) ->
 
 %% @hidden
 handle_data(0, <<?UINT32(Len), Msg:Len/binary, _/binary>>,
-		#state{pending = <<>>} = SftpdState) ->
+		{_CgfState, #state{pending = <<>>} = _SftpdState} = State) ->
 	<<Op, ?UINT32(ReqId), Data/binary>> = Msg,
-	handle_op(Op, ReqId, Data, SftpdState);
-handle_data(Type, Data, #state{pending = Pending} = SftpdState) ->
-	handle_data(Type, <<Pending/binary, Data/binary>>, SftpdState);
-handle_data(_Type, _Data, _SftpdState) ->
-	true.
+	handle_op(Op, ReqId, Data, State);
+handle_data(Type, Data,
+		{CgfState, #state{pending = Pending} = SftpdState} = _State) ->
+	SftpdState1 = SftpdState#state{pending = <<>>},
+	State1 = {CgfState, SftpdState1},
+	handle_data(Type, <<Pending/binary, Data/binary>>, State1);
+handle_data(_Type, _Data, State) ->
+	{ok, State}.
 
 %% @hidden
-handle_op(?SSH_FXP_INIT, Version, _, _SftpdState) ->
-	true;
-handle_op(?SSH_FXP_REALPATH, ReqId, <<?UINT32(Rlen), RPath:Rlen/binary>>, _SftpdState) ->
-	true;
-handle_op(?SSH_FXP_OPENDIR, ReqId, _Data, _SftpdState) ->
-	true;
-handle_op(?SSH_FXP_READDIR, ReqId, _Data, #state{xf = XF} = _SftpdState) ->
+handle_op(?SSH_FXP_INIT, _Version, _Data, State) ->
+	{ok, State};
+handle_op(?SSH_FXP_REALPATH, _ReqId, _Data, State) ->
+	{ok, State};
+handle_op(?SSH_FXP_OPENDIR, _ReqId, _Data, State) ->
+	{ok, State};
+handle_op(?SSH_FXP_READDIR, ReqId, _Data,
+		{_CgfState, #state{xf = XF} = _SftpdState} = State) ->
 	ssh_xfer:xf_send_status(XF, ReqId, ?SSH_FX_PERMISSION_DENIED, "Prohibited."),
-	false;
-handle_op(?SSH_FXP_CLOSE, ReqId, <<?UINT32(HLen), BinHandle:HLen/binary>>, _SftpdState) ->
-	true;
-handle_op(?SSH_FXP_LSTAT, ReqId, _Data, #state{xf = XF} = _SftpdState) ->
+	{prohibit, State};
+handle_op(?SSH_FXP_CLOSE, _ReqId,
+		<<?UINT32(HLen), BinHandle:HLen/binary>> = _Data,
+		{#{write_handles := CgfHandles, user := Username} = CgfState,
+		#state{root = Root, handles = SftpdHandles} = SftpdState} = State) ->
+	Handle = binary_to_integer(BinHandle),
+	case lists:keysearch(Handle, 1, SftpdHandles) of
+		{value, {Handle, file, {Path, _IoDevice}}} ->
+			case ordsets:is_element(Handle, CgfHandles) of
+				true ->
+					RealPath = Root ++ Path,
+					EventPayload = #{user => Username, path => RealPath},
+					cgf_event:notify(file_close, EventPayload),
+					CgfHandles1 = ordsets:del_element(Handle, CgfHandles),
+					CgfState1 = CgfState#{write_handles => CgfHandles1},
+					State1 = {CgfState1, SftpdState},
+					{ok, State1};
+				false ->
+					{ok, State}
+			end;
+		_ ->
+			{ok, State}
+	end;
+handle_op(?SSH_FXP_LSTAT, ReqId, _Data,
+		{_CgfState, #state{xf = XF} = _SftpdState} = State) ->
 	ssh_xfer:xf_send_status(XF, ReqId, ?SSH_FX_PERMISSION_DENIED, "Prohibited."),
-	false;
-handle_op(?SSH_FXP_STAT, ReqId, _Data, #state{xf = XF} = _SftpdState) ->
+	{prohibit, State};
+handle_op(?SSH_FXP_STAT, ReqId, _Data,
+		{_CgfState, #state{xf = XF} = _SftpdState} = State) ->
 	ssh_xfer:xf_send_status(XF, ReqId, ?SSH_FX_PERMISSION_DENIED, "Prohibited."),
-	false;
-handle_op(?SSH_FXP_FSTAT, ReqId, _Data, _SftpdState) ->
-	true;
-handle_op(?SSH_FXP_OPEN, ReqId, _Data, _SftpdState) ->
-	true;
-handle_op(?SSH_FXP_READ, ReqId, _Data, #state{xf = XF} = _SftpdState) ->
+	{prohibit, State};
+handle_op(?SSH_FXP_FSTAT, ReqId, _Data,
+		{_CgfState, #state{xf = XF} = _SftpdState} = State) ->
 	ssh_xfer:xf_send_status(XF, ReqId, ?SSH_FX_PERMISSION_DENIED, "Prohibited."),
-	false;
-handle_op(?SSH_FXP_WRITE, ReqId, <<?UINT32(HLen), BinHandle:HLen/binary, _/binary>>, _SftpdState) ->
-	true;
-handle_op(?SSH_FXP_READLINK, ReqId, _Data, #state{xf = XF} = _SftpdState) ->
+	{prohibit, State};
+handle_op(?SSH_FXP_OPEN, _ReqId, _Data, State) ->
+	{ok, State};
+handle_op(?SSH_FXP_READ, ReqId, _Data,
+		{_CgfState, #state{xf = XF} = _SftpdState} = State) ->
 	ssh_xfer:xf_send_status(XF, ReqId, ?SSH_FX_PERMISSION_DENIED, "Prohibited."),
-	false;
-handle_op(?SSH_FXP_SETSTAT, ReqId, _Data, #state{xf = XF} = _SftpdState) ->
+	{prohibit, State};
+handle_op(?SSH_FXP_WRITE, _ReqId,
+		<<?UINT32(HLen), BinHandle:HLen/binary, _/binary>> = _Data,
+		{#{write_handles := Handles} = CgfState, SftpdState} = _State) ->
+	Handle = binary_to_integer(BinHandle),
+	Handles1 = ordsets:add_element(Handle, Handles),
+	CgfState1 = CgfState#{write_handles => Handles1},
+	State1 = {CgfState1, SftpdState},
+	{ok, State1};
+handle_op(?SSH_FXP_READLINK, ReqId, _Data,
+		{_CgfState, #state{xf = XF} = _SftpdState} = State) ->
 	ssh_xfer:xf_send_status(XF, ReqId, ?SSH_FX_PERMISSION_DENIED, "Prohibited."),
-	false;
-handle_op(?SSH_FXP_MKDIR, ReqId, _Data, #state{xf = XF} = _SftpdState) ->
+	{prohibit, State};
+handle_op(?SSH_FXP_SETSTAT, ReqId, _Data,
+		{_CgfState, #state{xf = XF} = _SftpdState} = State) ->
 	ssh_xfer:xf_send_status(XF, ReqId, ?SSH_FX_PERMISSION_DENIED, "Prohibited."),
-	false;
-handle_op(?SSH_FXP_FSETSTAT, ReqId, _Data, _SftpdState) ->
-	true;
-handle_op(?SSH_FXP_REMOVE, ReqId, _Data, #state{xf = XF} = _SftpdState) ->
+	{prohibit, State};
+handle_op(?SSH_FXP_MKDIR, ReqId, _Data,
+		{_CgfState, #state{xf = XF} = _SftpdState} = State) ->
 	ssh_xfer:xf_send_status(XF, ReqId, ?SSH_FX_PERMISSION_DENIED, "Prohibited."),
-	false;
-handle_op(?SSH_FXP_RMDIR, ReqId, _Data, #state{xf = XF} = _SftpdState) ->
+	{prohibit, State};
+handle_op(?SSH_FXP_FSETSTAT, ReqId, _Data,
+		{_CgfState, #state{xf = XF} = _SftpdState} = State) ->
 	ssh_xfer:xf_send_status(XF, ReqId, ?SSH_FX_PERMISSION_DENIED, "Prohibited."),
-	false;
-handle_op(?SSH_FXP_RENAME, ReqId, _Data, #state{xf = XF} = _SftpdState) ->
+	{prohibit, State};
+handle_op(?SSH_FXP_REMOVE, ReqId, _Data,
+		{_CgfState, #state{xf = XF} = _SftpdState} = State) ->
 	ssh_xfer:xf_send_status(XF, ReqId, ?SSH_FX_PERMISSION_DENIED, "Prohibited."),
-	false;
-handle_op(?SSH_FXP_SYMLINK, ReqId, _Data, #state{xf = XF} = _SftpdState) ->
+	{prohibit, State};
+handle_op(?SSH_FXP_RMDIR, ReqId, _Data,
+		{_CgfState, #state{xf = XF} = _SftpdState} = State) ->
 	ssh_xfer:xf_send_status(XF, ReqId, ?SSH_FX_PERMISSION_DENIED, "Prohibited."),
-	false.
+	{prohibit, State};
+handle_op(?SSH_FXP_RENAME, ReqId, _Data,
+		{_CgfState, #state{xf = XF} = _SftpdState} = State) ->
+	ssh_xfer:xf_send_status(XF, ReqId, ?SSH_FX_PERMISSION_DENIED, "Prohibited."),
+	{prohibit, State};
+handle_op(?SSH_FXP_SYMLINK, ReqId, _Data,
+		{_CgfState, #state{xf = XF} = _SftpdState} = State) ->
+	ssh_xfer:xf_send_status(XF, ReqId, ?SSH_FX_PERMISSION_DENIED, "Prohibited."),
+	{prohibit, State}.
 
