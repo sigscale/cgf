@@ -21,7 +21,8 @@ noinst_DATA = GenericChargingDataTypes.erl \
 		ProSeChargingDataTypes.erl \
 		MONTEChargingDataTypes.erl \
 		CHFChargingDataTypes.erl \
-		ExposureFunctionAPIChargingDataTypes.erl
+		ExposureFunctionAPIChargingDataTypes.erl \
+		ssh_sftpd.hrl
 
 einclude_DATA = GenericChargingDataTypes.hrl \
 		IMSChargingDataTypes.hrl \
@@ -41,6 +42,10 @@ einclude_DATA = GenericChargingDataTypes.hrl \
 
 %.erl %.hrl:$(top_srcdir)/asn_src/%.asn1
 	$(ERLC) $(ASNCFLAGS) $<
+
+ssh_sftpd.hrl:
+	sed -ne '/^-record(state,/,/})./p' \
+			${ERLANG_LIB_DIR_ssh}/src/ssh_sftpd.erl > $@
 
 CLEANFILES = $(noinst_DATA) \
 		$(einclude_DATA) \
