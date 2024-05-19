@@ -12,6 +12,7 @@ beam_DATA = cgf.beam \
 		cgf_app.beam \
 		cgf_sup.beam \
 		cgf_server.beam \
+		cgf_event.beam \
 		cgf_log_sup.beam \
 		cgf_log_server_sup.beam \
 		cgf_log_server.beam \

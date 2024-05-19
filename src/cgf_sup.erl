@@ -52,7 +52,8 @@
 %%
 init(_Args) ->
 	ChildSpecs = [server({local, cgf}, cgf_server, [self()], []),
-			supervisor({local, cgf_log_sup}, cgf_log_sup, [])],
+			supervisor({local, cgf_log_sup}, cgf_log_sup, []),
+			event(cgf_event)],
 	SupFlags = #{},
 	{ok, {SupFlags, ChildSpecs}}.
 
@@ -97,4 +98,17 @@ server(RegName, StartMod, Args, Opts) ->
 	StartArgs = [RegName, StartMod, Args, Opts],
 	StartFunc = {gen_server, start_link, StartArgs},
 	#{id => StartMod, start => StartFunc, modules => [StartMod]}.
+
+-spec event(StartMod) -> Result
+	when
+		StartMod :: atom(),
+		Result :: supervisor:child_spec().
+%% @doc Build a supervisor child specification for a
+%%		{@link //stdlib/gen_event. gen_event} behaviour.
+%% @private
+%%
+event(StartMod) ->
+	StartArgs = [{local, StartMod}],
+	StartFunc = {gen_event, start_link, StartArgs},
+	{StartMod, StartFunc, permanent, 4000, worker, [StartMod]}.
 

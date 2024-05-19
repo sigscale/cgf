@@ -6,6 +6,7 @@
 				cgf_app,
 				cgf_sup,
 				cgf_server,
+				cgf_event,
 				cgf_log_sup,
 				cgf_log_server_sup,
 				cgf_log_server,
