@@ -21,10 +21,16 @@
 %%%
 %%% 	The SSH `sftpd' subsystem implemented in this module is a wrapper
 %%% 	around the {@link //ssh/ssh_sftpd. ssh_sftpd} callback module with
-%%% 	the additional procedure of changing the `root' directory to a
-%%% 	subdirectory with the name of the username for the session
-%%% 	(`root/username'). This	sandboxes a session so they cannot see files
-%%% 	belonging to other users.
+%%% 	application specific enhancements.
+%%%
+%%% 	The SFTP service is hardened by prohibiting operations unecessary
+%%% 	for pushing CDF files (ls, get, delete, etc.) and changing the
+%%% 	`root' directory to a subdirectory with the name of the username
+%%% 	for the session (`root/username'). This sandboxes a session so they
+%%% 	cannot see files belonging to other users.
+%%%
+%%% 	When the client closes a file it has written to a notification is
+%%% 	sent with {@link //cgf/cgf_event:notify/2. cgf_event:notify/2}.
 %%%
 -module(cgf_sftpd).
 -copyright('Copyright (c) 2024 SigScale Global Inc.').
