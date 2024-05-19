@@ -102,8 +102,8 @@ handle_event(_Event, State) ->
 %% @see //stdlib/gen_event:handle_call/3
 %% @private
 %%
-handle_call(_Request, _State) ->
-	{ok, not_implemented. State}.
+handle_call(_Request, State) ->
+	{ok, not_implemented, State}.
 
 -spec handle_info(Info, State) -> Result
 	when
