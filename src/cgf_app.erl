@@ -49,20 +49,28 @@
 start(normal = _StartType, _Args) ->
 	case supervisor:start_link({local, cgf_sup}, cgf_sup, []) of
 		{ok, TopSup} ->
-			{ok, Logs} = application:get_env(logs),
-			start1(TopSup, Logs);
+			start1(TopSup);
 		{error, Reason} ->
 			{error, Reason}
 	end.
 %% @hidden
-start1(TopSup, [{LogName, Options} | T]) ->
+start1(TopSup) ->
+	case gen_event:add_handler(cgf_event, cgf_event, []) of
+		ok ->
+			{ok, Logs} = application:get_env(logs),
+			start2(TopSup, Logs);
+		{_Error, Reason} ->
+			{error, Reason}
+	end.
+%% @hidden
+start2(TopSup, [{LogName, Options} | T]) ->
 	case cgf_log:open(LogName, Options) of
 		ok ->
-			start1(TopSup, T);
+			start2(TopSup, T);
 		{error, Reason} ->
 			{error, Reason}
 	end;
-start1(TopSup, []) ->
+start2(TopSup, []) ->
 	SystemDir = case application:get_env(ssh, system_dir) of
 		{ok, Path1} ->
 			Path1;
@@ -80,9 +88,9 @@ start1(TopSup, []) ->
 			fun(Username) -> filename:join([UserDir, Username]) end
 	end,
 	{ok, SubSystems} = application:get_env(sftpd),
-	start2(TopSup, SystemDir, UserDirFun, SubSystems).
+	start3(TopSup, SystemDir, UserDirFun, SubSystems).
 %% @hidden
-start2(TopSup, SystemDir, UserDirFun,
+start3(TopSup, SystemDir, UserDirFun,
 		[{Address, Port, DaemonOptions, SftpdOptions} | T]) ->
 	Options1 = case proplists:lookup(system_dir, DaemonOptions) of
 		{system_dir, _SystemDir1} ->
@@ -101,11 +109,11 @@ start2(TopSup, SystemDir, UserDirFun,
 	Options3 = [{subsystems, [Spec]} | Options2], 
 	case ssh:daemon(Address, Port, Options3) of
 		{ok, _DaemonRef} ->
-			start2(TopSup, SystemDir, UserDirFun, T);
+			start3(TopSup, SystemDir, UserDirFun, T);
 		{error, Reason} ->
 			{error, Reason}
 	end;
-start2(TopSup, _SystemDir, _UserDirFun, []) ->
+start3(TopSup, _SystemDir, _UserDirFun, []) ->
 	{ok, TopSup}.
 
 -spec start_phase(Phase, StartType, PhaseArgs) -> Result

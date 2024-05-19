@@ -103,7 +103,7 @@ handle_event(_Event, State) ->
 %% @private
 %%
 handle_call(_Request, _State) ->
-	{remove_handler, not_implementedd}.
+	{ok, not_implemented. State}.
 
 -spec handle_info(Info, State) -> Result
 	when
@@ -120,8 +120,8 @@ handle_call(_Request, _State) ->
 %% @see //stdlib/gen_event:handle_info/2
 %% @private
 %%
-handle_info(_Info, _State) ->
-	remove_handler.
+handle_info(_Info, State) ->
+	{ok, State}.
 
 -spec terminate(Arg, State) -> term()
 	when
