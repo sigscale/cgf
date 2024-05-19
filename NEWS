@@ -1,3 +1,8 @@
+May 19, 2024
+------------
+	- Notification event when new file is closed
+	- Harden SFTP daemon by operations other than push file
+
 May 18, 2024
 ------------
 	- SSH key management script

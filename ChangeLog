@@ -1,3 +1,13 @@
+2024-05-19   Vance Shipley <vances@sigscale.org>
+
+	* notification on sftp close of written file
+	* add cgf_event module to event handler
+	* event handler for notifications
+	* deny permission for operations unecessary for file push
+	* get ssh_sftpd state record definition
+	* keep username in ssh_server_channel state
+	* clean scripts directory
+
 2024-05-18   Vance Shipley <vances@sigscale.org>
 
 	* document sftp operation
