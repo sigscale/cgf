@@ -4,7 +4,7 @@
 ##
 ## Boilerplate:  standard boilerplate code
 ##
-AC_INIT([cgf], [1.0.2], [issues@sigscale.org])
+AC_INIT([cgf], [1.0.3], [issues@sigscale.org])
 AC_COPYRIGHT([Copyright (c) 2024 SigScale Global Inc.])
 AC_PREREQ(2.64)
 AC_CONFIG_SRCDIR([src/cgf_app.erl])
@@ -89,6 +89,7 @@ AC_ERLANG_CHECK_LIB([stdlib],
 				[AC_MSG_ERROR([>= stdlib-3.5 required!])])],
 		[AC_MSG_ERROR([stdlib was not found!])])
 AC_ERLANG_CHECK_LIB([sasl], [], [AC_MSG_ERROR([sasl was not found!])])
+AC_ERLANG_CHECK_LIB([inets], [], [AC_MSG_ERROR([inets was not found!])])
 AC_ERLANG_CHECK_LIB([crypto], [], [AC_MSG_ERROR([crypto was not found!])])
 AC_ERLANG_CHECK_LIB([asn1], [], [AC_MSG_ERROR([asn1 was not found!])])
 AC_ERLANG_CHECK_LIB([public_key], [], [AC_MSG_ERROR([public_keywas not found!])])

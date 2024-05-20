@@ -2,6 +2,7 @@
 	[{kernel, "@ERLANG_LIB_VER_kernel@"},
 	{stdlib, "@ERLANG_LIB_VER_stdlib@"},
 	{sasl, "@ERLANG_LIB_VER_sasl@", load},
+	{inets, "@ERLANG_LIB_VER_inets@"},
 	{crypto, "@ERLANG_LIB_VER_crypto@"},
 	{asn1, "@ERLANG_LIB_VER_asn1@"},
 	{public_key, "@ERLANG_LIB_VER_public_key@"},
