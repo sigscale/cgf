@@ -1,3 +1,8 @@
+2024-05-20   Vance Shipley <vances@sigscale.org>
+
+	* inets httpd for documentation
+	* document sftp hardening and notification
+
 2024-05-19   Vance Shipley <vances@sigscale.org>
 
 	* notification on sftp close of written file
