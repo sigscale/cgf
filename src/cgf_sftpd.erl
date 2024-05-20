@@ -23,7 +23,7 @@
 %%% 	around the {@link //ssh/ssh_sftpd. ssh_sftpd} callback module with
 %%% 	application specific enhancements.
 %%%
-%%% 	The SFTP service is hardened by prohibiting operations unecessary
+%%% 	The SFTP service is hardened by prohibiting operations unnecessary
 %%% 	for pushing CDF files (ls, get, delete, etc.) and changing the
 %%% 	`root' directory to a subdirectory with the name of the username
 %%% 	for the session (`root/username'). This sandboxes a session so they
