@@ -30,7 +30,7 @@ user_keys() {
 			then
 				ssh-keygen -t ${algo} -N '' -f ${user_dir}/${username}/id_${algo}
 			fi
-			cat ${user_dir}/${username}/id_${algo}.pub >> ${user_dir}/${username}/authorized_hosts
+			cat ${user_dir}/${username}/id_${algo}.pub >> ${user_dir}/${username}/authorized_keys
 		done
 	done
 }
