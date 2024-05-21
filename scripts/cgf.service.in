@@ -1,5 +1,5 @@
 [Unit]
-Description=Charging Gateway Function (CSE)
+Description=Charging Gateway Function (CGF)
 Documentation="https://github.com/sigscale/cgf"
 After=epmd.service epmd.socket
 
