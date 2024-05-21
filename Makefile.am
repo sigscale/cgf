@@ -4,6 +4,8 @@
 
 SUBDIRS = src asn_src ebin doc priv
 
+beam_DATA = ebin/cse.appup
+
 if HAVE_SYSTEMD
 systemdsystemunit_DATA = scripts/cgf.service
 env_DATA = scripts/cgf

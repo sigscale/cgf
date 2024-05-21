@@ -1,0 +1,3 @@
+{"@VERSION@",
+	[{<<"1\\..*">>, [{restart_application, cgf}]}],
+	[{<<"1\\..*">>, [{restart_application, cgf}]}]}.

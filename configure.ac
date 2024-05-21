@@ -119,6 +119,6 @@ AC_ERLANG_CHECK_LIB([cap], [], [AC_MSG_ERROR([cap was not found!])])
 ##
 AC_OUTPUT([Makefile ebin/Makefile doc/Makefile src/Makefile
 		asn_src/Makefile priv/Makefile priv/schema/Makefile
-		sys.config $PACKAGE_NAME.rel
+		sys.config $PACKAGE_NAME.rel ebin/cgf.appup
 		scripts/cgf scripts/cgf.service])
 
