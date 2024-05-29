@@ -50,6 +50,9 @@
 		},
 		{
 			"$ref": "/schema/cgf/ECS_Bx_RF"
+		},
+		{
+			"$ref": "/schema/cgf/ECS_Bx_ABMF"
 		}
 	],
 	"examples": [

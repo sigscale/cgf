@@ -37,7 +37,7 @@
 	when
 		CDR :: [{RecordType, Parameters}],
 		RecordType :: moCall | mtCall | moSMS | mtSMS
-				| scSMO | scSMT | sgw | rated,
+				| scSMO | scSMT | sgw | rated | abmf,
 		Parameters :: #{_Name := binary(), _Value := term()}.
 %% @doc Bx interface CODEC for Elastic Stack logs.
 %%
@@ -100,7 +100,18 @@ bx([{sgw = _RecordType, Parameters}, {rated, OCS}] = _CDR) ->
 			ecs_event(StartTime, StopTime, Duration,
 					"event", "session", ["connection"], Outcome), $,,
 			$", "Bx_sgw", $", $:, zj:encode(Parameters), $,,
-			$", "Bx_rated", $", $:, zj:encode(OCS), $}].
+			$", "Bx_rated", $", $:, zj:encode(OCS), $}];
+bx([{abmf = _RecordType, Parameters}] = _CDR) ->
+	MSISDN = msisdn(Parameters),
+	{StartTime, StopTime, Duration} = call_duration(Parameters),
+	Outcome = call_outcome(Parameters),
+	[${,
+			ecs_base(cgf_log:iso8601(erlang:system_time(millisecond))), $,,
+			ecs_service("bx", "cgf"), $,,
+			ecs_user(MSISDN, [], []), $,,
+			ecs_event(StartTime, StopTime, Duration,
+					"event", "session", ["connection"], Outcome), $,,
+			$", "Bx_ABMF", $", $:, zj:encode(Parameters), $}].
 
 -spec ecs_base(Timestamp) -> iodata()
 	when
@@ -403,6 +414,9 @@ imsi(_Parameters) ->
 msisdn(#{<<"servedMSISDN">> := ServedMSISDN} = _Parameters)
 		when byte_size(ServedMSISDN) > 0 ->
 	"msisdn-" ++ binary_to_list(ServedMSISDN);
+msisdn(#{<<"chargingParty">> := ChargingParty} = _Parameters)
+		when byte_size(ChargingParty) > 0 ->
+	"msisdn-" ++ binary_to_list(ChargingParty);
 msisdn(_Parameters) ->
 	[].
 

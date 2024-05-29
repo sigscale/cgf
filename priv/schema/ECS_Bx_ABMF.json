@@ -1,0 +1,238 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "http://sigscale.org/schema/cgf/ECS_Bx_RF",
+	"title": "SigScale CGF: Records on the Bx interface for Account Balance Management Function (ABMF)",
+	"oneOf": [
+		{
+			"type": "object",
+			"properties": {
+				"Bx_balance": {
+					"$ref": "#/$defs/BalanceRecord"
+				}
+			}
+		}
+	],
+	"$defs": {
+		"BalanceRecord": {
+			"description": "Account Balance Management Function (ABMF) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+				"chargingParty": {
+					"description": "Indicates the charging party.",
+					"type": "string"
+				},
+				"subscribedProduct": {
+					"description": "Identifies the subscribed product.",
+					"allOf": [
+						{
+							"$ref": "#/$defs/Product"
+						}
+					]
+				},
+				"appliedProduct": {
+					"description": "Identifies the (sub) product offering applied to.",
+					"allOf": [
+						{
+							"$ref": "#/$defs/Product"
+						}
+					]
+				},
+				"appliedChange": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/UsageVolumeBalanceEntry"
+					}
+				},
+				"voucherId": {
+					"description": "Unique identifier for the voucher.",
+					"type": "string"
+				},
+				"voucherFaceValue": {
+					"description": "Indicates the face value of a voucher.",
+					"allOf": [
+						{
+							"$ref": "#/$defs/UsageVolumeBalanceEntry"
+						}
+					]
+				},
+				"transactionId": {
+					"description": "Unique identifier for the transaction.",
+					"type": "string"
+				},
+				"channelId": {
+					"description": "Unique identifier for the distribution channel.",
+					"type": "string"
+				},
+				"accountType": {
+					"description": "Indicates the type of subscriber payment.",
+					"type": "string",
+					"enum": [
+						"prepaid",
+						"postpaid",
+						"hybrid"
+					]
+				},
+				"channelMethod": {
+					"description": "Indicates a method used for a transaction.",
+					"type": "string",
+					"examples": [
+						"ivr",
+						"ussd",
+						"sms",
+						"api"
+					]
+				},
+				"otherParty": {
+					"description": "Indicates a third party in a transaction.",
+					"type": "string"
+				},
+				"cdrId": {
+					"description": "Unique identifier for a balance CDR.",
+					"type": "string"
+				},
+				"resultCode": {
+					"description": "Indicates a specific reason for the result.",
+					"type": "integer"
+				}
+			},
+			"examples": [
+			]
+		},
+		"UsageVolumeBalanceEntry": {
+			"description": "Describes an applied balance change (e.g. voucher redemption).",
+			"type": "object",
+			"properties": {
+				"name": {
+					"description": "Name of an applied balance change.",
+					"type": "string"
+				},
+				"units": {
+					"description": "Indicates the unit type.",
+					"type": "string",
+					"examples": [
+						"bytes",
+						"seconds",
+						"messages",
+						"cents"
+					]
+				},
+				"amount": {
+					"$ref": "#/$defs/UnitValue"
+				},
+				"currencyCode": {
+					"$ref": "#/$defs/CurrencyCode"
+				}
+			},
+			"examples": [
+				{
+					"units": "cents",
+					"amount": {
+						 "valueDigits": 2000
+					}
+				}
+			]
+		},
+		"UnitValue": {
+			"description": "Specifies a floating-point value. The UnitValue is a significand with an exponent; i.e., UnitValue = valueDigits * 10^exponent. This representation avoids unwanted rounding off. For example, the value of 2.3 is represented as ValueDigits = 23 and Exponent = -1. The absence of the exponent part MUST be interpreted as an exponent equal to zero.",
+			"type": "object",
+			"properties": {
+				"valueDigits": {
+					"description": "The significand of the floating point value.",
+					"type": "integer",
+					"minimum": -9223372036854775808,
+					"maximum": 9223372036854775807
+				},
+				"exponent": {
+					"description": "The exponent of the floating point value.",
+					"type": "integer",
+					"minimum": -2147483648,
+					"maximum":  2147483647
+				}
+			},
+			"required": [
+				"valueDigits"
+			],
+			"examples": [
+				{
+					"valueDigits": 1
+				},
+				{
+					"valueDigits": 142,
+					"exponent": -2
+				}
+			]
+		},
+		"CurrencyCode": {
+			"description": "A currency code that specifies in which currency the values of monetary units were given.  It is specified by using the values defined in the ISO [4217](https://www.iso.org/iso-4217-currency-codes.html) standard.",
+			"oneOf": [
+				{
+					"description": "Alphabetic Code",
+					"type": "string",
+					"pattern": "^[A-Z]{3}$",
+					"examples": [
+						"CAD"
+					]
+				},
+				{
+					"description": "Numeric Code",
+					"type": "integer",
+					"minimum": 0,
+					"maximum": 999,
+					"examples": [
+						124
+					]
+				}
+			]
+		},
+		"Product": {
+			"description": "Describes a subscribed product offering.",
+			"type": "object",
+			"properties": {
+				"productId": {
+					"description": "Identifies a subscription to a product offering.",
+					"type": "string"
+				},
+				"productOffering": {
+					"$ref": "#/$defs/ProductOffering"
+				}
+			},
+			"examples": [
+				{
+					"productId": "7f04e235fe08"
+				},
+				{
+					"productOffering": {
+						"id": "823004ab13f7",
+						"name": "Super Surfer"
+					}
+				}
+			]
+		},
+		"ProductOffering": {
+			"description": "Describes a product offering.",
+			"type": "object",
+			"properties": {
+				"id": {
+					"description": "Identifier of the product offering.",
+					"type": "string"
+				},
+				"name": {
+					"description": "Name of the product offering.",
+					"type": "string"
+				},
+				"bundledProductOffering": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/ProductOffering"
+					}
+				}
+			},
+			"examples": [
+				{
+					"id": "13a106b830fc",
+					"name": "Value Pack 200"
+				}
+			]
+		}
+	}
+}
