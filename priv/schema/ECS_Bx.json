@@ -118,7 +118,7 @@
 				"systemType": "gERAN"
 			},
 			"Bx_Rated": {
-				"product": {
+				"subscribedProduct": {
 					"productId": "14c743d2216b"
 				},
 				"appliedCharge": [

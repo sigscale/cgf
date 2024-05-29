@@ -17,8 +17,21 @@
 			"description": "Rating Function (RF) charging data record (CDR).",
 			"type": "object",
 			"properties": {
-				"product": {
-					"$ref": "#/$defs/Product"
+				"subscribedProduct": {
+					"description": "Identifies the subscribed product.",
+					"allOf": [
+						{
+							"$ref": "#/$defs/Product"
+						}
+					]
+				},
+				"ratedProduct": {
+					"description": "Identifies the (sub) product offering used in rating.",
+					"allOf": [
+						{
+							"$ref": "#/$defs/Product"
+						}
+					]
 				},
 				"appliedCharge": {
 					"description": "Applied product usage charges.",
@@ -94,7 +107,7 @@
 			},
 			"examples": [
 				{
-					"product": {
+					"subscrinedProduct": {
 						"productId": "14c743d2216b"
 					},
 					"appliedCharge": [
