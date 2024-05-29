@@ -203,7 +203,18 @@
 				"productOffering": {
 					"$ref": "#/$defs/ProductOffering"
 				}
-			}
+			},
+			"examples": [
+				{
+					"productId": "7f04e235fe08"
+				},
+				{
+					"productOffering": {
+						"id": "823004ab13f7",
+						"name": "Super Surfer"
+					}
+				}
+			]
 		},
 		"ProductOffering": {
 			"description": "Describes a product offering.",
