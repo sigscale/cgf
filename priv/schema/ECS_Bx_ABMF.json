@@ -90,6 +90,11 @@
 					"description": "Unique identifier for a balance CDR.",
 					"type": "string"
 				},
+				"timestamp": {
+					"description": "Indicates the time of the change.",
+					"type": "string",
+					"format": "date-time"
+				},
 				"resultCode": {
 					"description": "Indicates a specific reason for the result.",
 					"type": "integer"
