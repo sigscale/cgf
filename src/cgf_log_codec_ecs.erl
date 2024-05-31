@@ -54,9 +54,15 @@ bx([{moCall = _RecordType, Parameters}] = _CDR) ->
 	IMSI = imsi(Parameters),
 	MSISDN = msisdn(Parameters),
 	{StartTime, StopTime, Duration} = call_duration(Parameters),
+	Timestamp = case {StartTime, StopTime} of
+		{[], StopTime} ->
+			StopTime;
+		{StartTime, _} ->
+			StartTime
+	end,
 	Outcome = call_outcome(Parameters),
 	[${,
-			ecs_base(cgf_log:iso8601(erlang:system_time(millisecond))), $,,
+			ecs_base(Timestamp), $,,
 			ecs_service("bx", "cgf"), $,,
 			ecs_user(MSISDN, IMSI, []), $,,
 			ecs_event(StartTime, StopTime, Duration,
@@ -66,9 +72,15 @@ bx([{moCall = _RecordType, Parameters}, {rated, OCS}] = _CDR) ->
 	IMSI = imsi(Parameters),
 	MSISDN = msisdn(Parameters),
 	{StartTime, StopTime, Duration} = call_duration(Parameters),
+	Timestamp = case {StartTime, StopTime} of
+		{[], StopTime} ->
+			StopTime;
+		{StartTime, _} ->
+			StartTime
+	end,
 	Outcome = call_outcome(Parameters),
 	[${,
-			ecs_base(cgf_log:iso8601(erlang:system_time(millisecond))), $,,
+			ecs_base(Timestamp), $,,
 			ecs_service("bx", "cgf"), $,,
 			ecs_user(MSISDN, IMSI, []), $,,
 			ecs_event(StartTime, StopTime, Duration,
@@ -78,38 +90,54 @@ bx([{moCall = _RecordType, Parameters}, {rated, OCS}] = _CDR) ->
 bx([{moSMS = _RecordType, Parameters}, {rated, OCS}] = _CDR) ->
 	IMSI = imsi(Parameters),
 	MSISDN = msisdn(Parameters),
-	{StartTime, StopTime, Duration} = call_duration(Parameters),
+	Timestamp = case maps:find(<<"eventtimestamp">>, Parameters) of
+		{ok, Ts} ->
+			Ts;
+		error ->
+			cgf_log:iso8601(erlang:system_time(millisecond))
+	end,
 	Outcome = call_outcome(Parameters),
 	[${,
-			ecs_base(cgf_log:iso8601(erlang:system_time(millisecond))), $,,
+			ecs_base(Timestamp), $,,
 			ecs_service("bx", "cgf"), $,,
 			ecs_user(MSISDN, IMSI, []), $,,
-			ecs_event(StartTime, StopTime, Duration,
+			ecs_event(Timestamp, [], [],
 					"event", "session", ["connection"], Outcome), $,,
 			$", "Bx_moSMS", $", $:, zj:encode(Parameters), $,,
 			$", "Bx_rated", $", $:, zj:encode(OCS), $}];
 bx([{sgw = _RecordType, Parameters}, {rated, OCS}] = _CDR) ->
 	IMSI = imsi(Parameters),
 	MSISDN = msisdn(Parameters),
-	{StartTime, StopTime, Duration} = call_duration(Parameters),
+	{StartTime, StopTime, Duration} = session_duration(Parameters),
+	Timestamp = case {StartTime, StopTime} of
+		{[], StopTime} ->
+			StopTime;
+		{StartTime, _} ->
+			StartTime
+	end,
 	Outcome = call_outcome(Parameters),
 	[${,
-			ecs_base(cgf_log:iso8601(erlang:system_time(millisecond))), $,,
+			ecs_base(Timestamp), $,,
 			ecs_service("bx", "cgf"), $,,
 			ecs_user(MSISDN, IMSI, []), $,,
-			ecs_event(StartTime, StopTime, Duration,
+			ecs_event(Timestamp, StopTime, Duration,
 					"event", "session", ["connection"], Outcome), $,,
 			$", "Bx_sgw", $", $:, zj:encode(Parameters), $,,
 			$", "Bx_rated", $", $:, zj:encode(OCS), $}];
 bx([{abmf = _RecordType, Parameters}] = _CDR) ->
 	MSISDN = msisdn(Parameters),
-	{StartTime, StopTime, Duration} = call_duration(Parameters),
+	Timestamp = case maps:find(<<"timestamp">>, Parameters) of
+		{ok, Ts} ->
+			Ts;
+		error ->
+			cgf_log:iso8601(erlang:system_time(millisecond))
+	end,
 	Outcome = call_outcome(Parameters),
 	[${,
-			ecs_base(cgf_log:iso8601(erlang:system_time(millisecond))), $,,
+			ecs_base(Timestamp), $,,
 			ecs_service("bx", "cgf"), $,,
 			ecs_user(MSISDN, [], []), $,,
-			ecs_event(StartTime, StopTime, Duration,
+			ecs_event(Timestamp, [], [],
 					"event", "session", ["connection"], Outcome), $,,
 			$", "Bx_ABMF", $", $:, zj:encode(Parameters), $}].
 
@@ -125,7 +153,7 @@ ecs_base(Timestamp) ->
 	TS = [$", "@timestamp", $", $:, $", Timestamp, $"],
 	Labels = [$", "labels", $", $:, ${,
 			$", "application", $", $:, $", "sigscale-cgf", $", $}],
-	Tags = [$", "tags", $", $:, $[, $]],
+	% Tags = [$", "tags", $", $:, $[, $]],
 	Version = [$", "ecs", $", $:, ${,
 			$", "version", $", $:, $", "8.5", $", $}],
 	[TS, $,, Labels, $,, Tags, $,, Version].
@@ -237,8 +265,17 @@ ecs_client4(Acc) ->
 		Application :: string(),
 		Protocol :: string().
 %% @doc Elastic Common Schema (ECS): Network attributes.
+ecs_network([] = _Application, Protocol) ->
+	ecs_network1(Protocol, []);
 ecs_network(Application, Protocol) ->
 	Napplication = [$", "application", $", $:, $", Application, $"],
+	ecs_network1(Protocol, Napplication).
+%% @hidden
+ecs_network1([] = _Protocol, [] = _Napplication) ->
+	[];
+ecs_network1([], Napplication) ->
+	[$", "network", $", $:, ${, Napplication, $}];
+ecs_network1(Protocol, Napplication) ->
 	Nprotocol = [$", "protocol", $", $:, $", Protocol, $"],
 	[$", "network", $", $:, ${, Napplication, $,, Nprotocol, $}].
 
@@ -251,31 +288,57 @@ ecs_network(Application, Protocol) ->
 		UserName :: binary() | string(),
 		UserIds :: [string()].
 %% @doc Elastic Common Schema (ECS): Source attributes.
+ecs_source([] = _Address, Domain, SubDomain, UserName, UserIds) ->
+	ecs_source1(Domain, SubDomain, UserName, UserIds, []);
 ecs_source(Address, Domain, SubDomain, UserName, UserIds) ->
 	Saddress = [$", "address", $", $:, $", Address, $"],
+	ecs_source1(Domain, SubDomain, UserName, UserIds, [Saddress]).
+%% @hidden
+ecs_source1([], SubDomain, UserName, UserIds, Acc) ->
+	ecs_source2(SubDomain, UserName, UserIds, Acc);
+ecs_source1(Domain, SubDomain, UserName, UserIds, Acc) ->
 	Sdomain = [$", "domain", $", $:, $", Domain, $"],
+	ecs_source2(SubDomain, UserName, UserIds, [Sdomain | Acc]).
+%% @hidden
+ecs_source2([], UserName, UserIds, Acc) ->
+	ecs_source3(UserName, UserIds, Acc);
+ecs_source2(SubDomain, UserName, UserIds, Acc) ->
 	Ssubdomain = [$", "subdomain", $", $:, $", SubDomain, $"],
-	{UserId, OtherIds} = case UserIds of
-		[H]  ->
-			{H, []};
-		[H | T] ->
-			{H, T};
-		[] ->
-			{[], []}
-	end,
+	ecs_source3(UserName, UserIds, [Ssubdomain | Acc]).
+%% @hidden
+ecs_source3([], [], Acc) ->
+	ecs_source5(Acc);
+ecs_source3([], [H | _] = UserIds, Acc) ->
+	User = [$", "user", $", $:, ${,
+			$", "id", $", $:, $", H, $", $}],
+	ecs_source4(UserIds, [User | Acc]);
+ecs_source3(UserName, [H | _] = UserIds, Acc) ->
 	User = [$", "user", $", $:, ${,
 			$", "name", $", $:, $", UserName, $", $,,
-			$", "id", $", $:, $", UserId, $", $}],
+			$", "id", $", $:, $", H, $", $}],
+	ecs_source4(UserIds, [User | Acc]).
+%% @hidden
+ecs_source4([], Acc) ->
+	ecs_source5(Acc);
+ecs_source4([H | T] = _UserIds, Acc) ->
 	Related = [$", "related", $", $:, ${,
-			$", "user", $", $:, $[, $", UserId, $",
-			[[$,, $", R, $"] || R <- OtherIds], $], $}],
-	[$", "source", $", $:, ${, Saddress, $,, Sdomain, $,,
-			Ssubdomain, $,, User, $,, Related, $}].
+			$", "user", $", $:, $[, $", H, $",
+			[[$,, $", R, $"] || R <- T], $], $}],
+	ecs_source5([Related | Acc]).
+%% @hidden
+ecs_source5([]) ->
+	[];
+ecs_source5(Acc) ->
+	[H | T] = lists:reverse(Acc),
+	Rest = [[$,, Field] || Field <- T],
+	[$", "source", $", $:, ${, H, Rest, $}].
 
 -spec ecs_destination(SubDomain) -> iodata()
 	when
 		SubDomain :: binary() | string().
 %% @doc Elastic Common Schema (ECS): Destination attributes.
+ecs_destination([] = _SubDomain) ->
+	[];
 ecs_destination(SubDomain) ->
 	Dsubdomain = [$", "subdomain", $", $:, $", SubDomain, $"],
 	[$", "destination", $", $:, ${, Dsubdomain, $}].
@@ -286,11 +349,21 @@ ecs_destination(SubDomain) ->
 		Type :: string().
 %% @doc Elastic Common Schema (ECS): Service attributes.
 ecs_service(Name, Type) ->
-	Sname = [$", "name", $", $:, $", Name, $"],
-	Stype = [$", "type", $", $:, $", Type, $"],
+	Sname = case Name of
+		[] ->
+			[];
+		_ ->
+			[$,, $", "name", $", $:, $", Name, $"]
+	end,
+	Stype = case Type of
+		[] ->
+			[];
+		_ ->
+			[$,, $", "type", $", $:, $", Type, $"]
+	end,
 	Snode = [$", "node", $", $:, ${,
 			$", "name", $", $:, $", atom_to_list(node()), $", $}],
-	[$", "service", $", $:, ${, Sname, $,, Stype, $,, Snode, $}].
+	[$", "service", $", $:, ${, Snode, Sname, Stype, $}].
 
 -spec ecs_event(Start, End, Duration,
 		Kind, Category, Type, Outcome) -> iodata()
@@ -304,23 +377,60 @@ ecs_service(Name, Type) ->
 		Outcome :: string().
 %% @doc Elastic Common Schema (ECS): Event attributes.
 ecs_event(Start, End, Duration, Kind, Category, Type, Outcome) ->
-	Estart = [$", "start", $", $:, $", Start, $"],
-	Eend = [$", "end", $", $:, $", End, $"],
-	Eduration = [$", "duration", $", $:, $", Duration, $"],
-	Ekind = [$", "kind", $", $:, $", Kind, $"],
-	Ecategory = [$", "category", $", $:, $[, $", Category, $", $]],
+	Now = cgf_log:iso8601(erlang:system_time(millisecond)),
+	Ecreated = [$", "created", $", $:, $", Now, $"],
+	Estart = case Start of
+		[] ->
+			[];
+		_ ->
+			[$,, $", "start", $", $:, $", Start, $"]
+	end,
+	Eend = case End of
+		[] ->
+			[];
+		_ ->
+			[$,, $", "end", $", $:, $", End, $"]
+	end,
+	Eduration = case Duration of
+		[] ->
+			[];
+		_ ->
+			[$,, $", "duration", $", $:, $", Duration, $"]
+	end,
+	Ekind = case Kind of
+		[] ->
+			[];
+		_ ->
+			[$,, $", "kind", $", $:, $", Kind, $"]
+	end,
+	Ecategory = case Category of
+		[] ->
+			[];
+		_ ->
+			[$,, $", "category", $", $:, $[, $", Category, $", $]]
+	end,
 	Etypes = case Type of
+		[] ->
+			[];
 		[H] ->
 			[$", H, $"];
 		[H | T] ->
 			[$", H, $" | [[$,, $", E, $"] || E <- T]]
 	end,
-	Etype = [$", "type", $", $:, $[, Etypes, $]],
-	Eoutcome  = [$", "outcome", $", $:, $", Outcome, $"],
-	[$", "event", $", $:, ${,
-			Estart, $,, Eend, $,, Eduration, $,,
-			Ekind, $,, Ecategory, $,, Etype, $,,
-			Eoutcome, $}].
+	Etype = case Etypes of
+		[] ->
+			[];
+		_ ->
+			[$,, $", "type", $", $:, $[, Etypes, $]]
+	end,
+	Eoutcome = case Outcome of
+		[] ->
+			[];
+		_ ->
+			[$,, $", "outcome", $", $:, $", Outcome, $"]
+	end,
+	[$", "event", $", $:, ${, Ecreated, Estart, Eend,
+			Eduration, Ekind, Ecategory, Etype, Eoutcome, $}].
 
 -spec ecs_user(Name, Id, Domain) -> iodata()
 	when
@@ -328,17 +438,37 @@ ecs_event(Start, End, Duration, Kind, Category, Type, Outcome) ->
 		Id :: string(),
 		Domain :: string().
 %% @doc Elastic Common Schema (ECS): User attributes.
+ecs_user([] = _Name, Id, Domain) ->
+	ecs_user1(Id, Domain, []);
 ecs_user(Name, Id, Domain) ->
 	Uname = [$", "name", $", $:, $", Name, $"],
+	ecs_user1(Id, Domain, [Uname]).
+%% @hidden
+ecs_user1([] = _Id, Domain, Acc) ->
+	ecs_user2(Domain, Acc);
+ecs_user1(Id, Domain, Acc) ->
 	Uid = [$", "id", $", $:, $", Id, $"],
+	ecs_user2(Domain, [Uid | Acc]).
+%% @hidden
+ecs_user2([] = _Domain, Acc) ->
+	ecs_user3(Acc);
+ecs_user2(Domain, Acc) ->
 	Udomain = [$", "domain", $", $:, $", Domain, $"],
-	[$", "user", $", $:, ${,
-			Uname, $,, Uid, $,, Udomain, $}].
+	ecs_user3([Udomain | Acc]).
+%% @hidden
+ecs_user3([]) ->
+	[];
+ecs_user3(Acc) ->
+	[H | T] = lists:reverse(Acc),
+	Rest = [[$,, Field] || Field <- T],
+	[$", "user", $", $:, ${, H, Rest, $}].
 
 -spec ecs_url(URL) -> iodata()
 	when
 		URL :: uri_string:uri_string() | uri_string:uri_map().
 %% @doc Elastic Common Schema (ECS): URL attributes.
+ecs_url([] = _URL) ->
+	[];
 ecs_url(URL) when is_list(URL) ->
 	ecs_url(uri_string:parse(URL));
 ecs_url(URL) when is_map(URL) ->
@@ -423,7 +553,7 @@ msisdn(_Parameters) ->
 -spec call_duration(Parameters) -> Result
 	when
 		Parameters :: #{_Name := binary(), _Value := term()},
-		Result :: {StartTime, StopTime, Duration}, 
+		Result :: {StartTime, StopTime, Duration},
 		StartTime :: iodata(),
 		StopTime :: iodata(),
 		Duration :: string().
@@ -464,6 +594,43 @@ call_duration(Parameters) ->
 			{[], Release, integer_to_list(Seconds * 1000000000)};
 		{_, _, {ok, Release}, error} when is_binary(Release) ->
 			{[], Release, []};
+		_ ->
+			{[], [], []}
+	end.
+
+-spec session_duration(Parameters) -> Result
+	when
+		Parameters :: #{_Name := binary(), _Value := term()},
+		Result :: {StartTime, StopTime, Duration},
+		StartTime :: iodata(),
+		StopTime :: iodata(),
+		Duration :: string().
+%% @hidden
+session_duration(Parameters) ->
+	case {maps:find(<<"startTime">>, Parameters),
+			maps:find(<<"stopTime">>, Parameters),
+			maps:find(<<"duration">>, Parameters)} of
+		{{ok, Start}, {ok, Stop}, {ok, Seconds}}
+				when is_binary(Start), is_binary(Stop),
+				is_integer(Seconds) ->
+			{Start, Stop, integer_to_list(Seconds * 1000000000)};
+		{{ok, Start}, {ok, Stop}, error}
+				when is_binary(Start), is_binary(Stop) ->
+			Ms = cgf_log:iso8601(Start) - cgf_log:iso8601(Stop),
+			{Start, Stop, integer_to_list(Ms * 1000000)};
+		{{ok, Start}, _, {ok, Seconds}}
+				when is_binary(Start), is_integer(Seconds) ->
+			{Start, [], integer_to_list(Seconds * 1000000000)};
+		{_, {ok, Stop}, {ok, Seconds}}
+				when is_binary(Stop), is_integer(Seconds) ->
+			{[], Stop, integer_to_list(Seconds * 1000000000)};
+		{{ok, Start}, {ok, Stop}, _}
+				when is_binary(Start), is_binary(Stop) ->
+			{Start, Stop, []};
+		{{ok, Start}, _, _} when is_binary(Start) ->
+			{Start, [], []};
+		{_, {ok, Stop}, _} when is_binary(Stop) ->
+			{[], Stop, []};
 		_ ->
 			{[], [], []}
 	end.
