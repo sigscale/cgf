@@ -45,14 +45,14 @@
 				},
 				{
 					"$ref": "/schema/cgf/ECS_Bx_CHF"
+				},
+				{
+					"$ref": "/schema/cgf/ECS_Bx_ABMF"
 				}
 			]
 		},
 		{
 			"$ref": "/schema/cgf/ECS_Bx_RF"
-		},
-		{
-			"$ref": "/schema/cgf/ECS_Bx_ABMF"
 		}
 	],
 	"examples": [

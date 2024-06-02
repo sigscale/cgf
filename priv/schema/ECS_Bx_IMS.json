@@ -165,8 +165,255 @@
 			"description": "IP multimedia subsystem (IMS) application server (AS) charging data record (CDR).",
 			"type": "object",
 			"properties": {
+				"accessNetworkInformation": {
+					"type": "string"
+				},
+				"additionalAccessNetworkInformation": {
+					"type": "string"
+				},
+				"alternateChargedPartyAddress": {
+					"type": "string"
+				},
+				"called-Party-Address": {
+					"$ref": "#/$defs/InvolvedParty"
+				},
+				"carrierSelectRouting": {
+					"type": "string"
+				},
+				"causeForRecordClosing": {
+					"$ref": "#/$defs/CauseForRecordClosing"
+				},
+				"cellularNetworkInformation": {
+					"type": "string"
+				},
+				"event": {
+					"type": "string"
+				},
+				"expiresInformation": {
+					"type": "integer"
+				},
+				"fEIdentifierList": {
+					"$ref": "#/$defs/FEIdentifierList"
+				},
+				"fromAddress": {
+					"type": "string"
+				},
+				"gGSNaddress": {
+					"$ref": "#/$defs/NodeAddress"
+				},
+				"iMS-Charging-Identifier": {
+					"$ref": "#/$defs/IMS-Charging-Identifier"
+				},
+				"iMSCommunicationServiceIdentifier": {
+					"$ref": "#/$defs/IMSCommunicationServiceIdentifier"
+				},
+				"iMSVisitedNetworkIdentifier": {
+					"type": "string"
+				},
+				"incomplete-CDR-Indication": {
+					"$ref": "#/$defs/Incomplete-CDR-Indication"
+				},
+				"initialIMS-Charging-Identifier": {
+					"$ref": "#/$defs/IMS-Charging-Identifier"
+				},
+				"instanceId": {
+					"type": "string",
+					"format": "uri"
+				},
+				"interOperatorIdentifiers": {
+					"$ref": "#/$defs/InterOperatorIdentifiers"
+				},
+				"list-Of-AccessNetworkInfoChange": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/AccessNetworkInfoChange"
+					}
+				},
+				"list-Of-AccessTransferInformation": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/AccessTransferInformation"
+					}
+				},
+				"list-Of-Called-Asserted-Identity": {
+					"$ref": "#/$defs/ListOfInvolvedParties"
+				},
+				"list-Of-Calling-Party-Address": {
+					"$ref": "#/$defs/ListOfInvolvedParties"
+				},
+				"list-Of-Early-SDP-Media-Components": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/Early-Media-Components-List"
+					}
+				},
+				"list-Of-Message-Bodies": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/MessageBody"
+					}
+				},
+				"list-Of-SDP-Media-Components": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/Media-Components-List"
+					}
+				},
+				"list-of-Requested-Party-Address": {
+					"$ref": "#/$defs/ListOfInvolvedParties"
+				},
+				"list-of-subscription-ID": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/SubscriptionID"
+					}
+				},
+				"listOfCalledIdentityChanges": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/CalledIdentityChange"
+					}
+				},
+				"listOfReasonHeader": {
+					"$ref": "#/$defs/ListOfReasonHeader"
+				},
+				"localRecordSequenceNumber": {
+					"type": "integer",
+					"minimum": 0,
+					"maximum": 4294967295
+				},
+				"mSTimeZone": {
+					"type": "string"
+				},
+				"msc-Address": {
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"nNI-Information": {
+					"$ref": "#/$defs/NNI-Information"
+				},
+				"nodeAddress": {
+					"$ref": "#/$defs/NodeAddress"
+				},
+				"numberPortabilityRouting": {
+					"type": "string"
+				},
+				"online-charging-flag": {
+					"type": "boolean",
+					"default": false
+				},
+				"outgoingSessionId": {
+					"type": "string"
+				},
+				"privateUserID": {
+					"type": "string"
+				},
+				"realTimeTariffInformation": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/RealTimeTariffInformation"
+					}
+				},
+				"recordClosureTime": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"recordExtensions": {
+				},
+				"recordOpeningTime": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"recordSequenceNumber": {
+					"type": "integer"
+				},
+				"requested-Party-Address": {
+					"$ref": "#/$defs/InvolvedParty"
+				},
+				"retransmission": {
+					"type": "boolean",
+					"default": false
+				},
+				"role-of-Node": {
+					"$ref": "#/$defs/Role-of-Node"
+				},
+				"sIP-Method": {
+					"type": "string"
+				},
+				"serviceContextID": {
+					"type": "string"
+				},
+				"serviceDeliveryEndTimeStamp": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"serviceDeliveryEndTimeStampFraction": {
+					"type": "integer",
+					"minimum": 0,
+					"maximum": 999
+				},
+				"serviceDeliveryStartTimeStamp": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"serviceDeliveryStartTimeStampFraction": {
+					"type": "integer",
+					"minimum": 0,
+					"maximum": 999
+				},
+				"serviceReasonReturnCode": {
+					"type": "string"
+				},
+				"serviceRequestTimeStamp": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"serviceRequestTimeStampFraction": {
+					"type": "integer",
+					"minimum": 0,
+					"maximum": 999
+				},
+				"serviceSpecificInfo": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/ServiceSpecificInfo"
+					}
+				},
+				"session-Id": {
+					"description": "The Session identification.",
+					"type": "string"
+				},
+				"sessionPriority": {
+					"$ref": "#/$defs/SessionPriority"
+				},
+				"subscriberEquipmentNumber": {
+					"$ref": "#/$defs/SubscriberEquipmentNumber"
+				},
+				"tADS-Identifier": {
+					"type": "string",
+					"enum": [
+						"cS",
+						"pS"
+					]
+				},
+				"threeGPPPSDataOffStatus": {
+					"type": "string",
+					"enum": [
+						"active",
+						"inactive"
+					]
+				},
+				"transit-IOI-Lists": {
+					"$ref": "#/$defs/TransitIOILists"
+				},
+				"userLocationInformation": {
+					"type": "string"
+				},
+				"vlr-Number": {
+					"$ref": "#/$defs/PartyAddress"
+				}
 			},
 			"required": [
+				"session-Id"
 			],
 			"examples": [
 			]
@@ -220,6 +467,569 @@
 			],
 			"examples": [
 			]
+		},
+		"AccessNetworkInfoChange": {
+			"type": "object",
+			"properties": {
+				"accessChangeTime": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"accessNetworkInformation": {
+					"type": "string"
+				},
+				"additionalAccessNetworkInformation": {
+					"type": "string"
+				},
+				"cellularNetworkInformation": {
+					"type": "string"
+				}
+			}
+		},
+		"AccessTransferInformation": {
+			"type": "object",
+			"properties": {
+				"accessNetworkInformation": {
+					"type": "string"
+				},
+				"accessTransferTime": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"accessTransferType": {
+					"type": "string",
+					"enum": [
+						"pSToCS",
+						"cSToPS",
+						"pSToPS",
+						"cSToCS"
+					]
+				},
+				"additionalAccessNetworkInformation": {
+					"type": "string"
+				},
+				"cellularNetworkInformation": {
+					"type": "string"
+				},
+				"instanceId": {
+					"type": "string"
+				},
+				"inter-UE-Transfer": {
+					"type": "boolean",
+					"default": false
+				},
+				"relatedICID": {
+					"$ref": "#/$defs/IMS-Charging-Identifier"
+				},
+				"relatedICIDGenerationNode": {
+					"$ref": "#/$defs/NodeAddress"
+				},
+				"subscriberEquipmentNumber": {
+					"$ref": "#/$defs/SubscriberEquipmentNumber"
+				}
+			}
+		},
+		"CalledIdentityChange": {
+			"type": "object",
+			"properties": {
+				"calledIdentity": {
+					"$ref": "#/$defs/InvolvedParty"
+				},
+				"changeTime": {
+					"type": "string",
+					"format": "date-time"
+				}
+			}
+		},
+		"CauseForRecordClosing": {
+			"type": "string",
+			"enum": [
+				"serviceDeliveryEndSuccessfully",
+				"unSuccessfulServiceDelivery",
+				"timeLimit",
+				"serviceChange",
+				"managementIntervention"
+			]
+		},
+		"Early-Media-Components-List": {
+			"type": "object",
+			"properties": {
+				"mediaInitiatorFlag": {
+					"type": "boolean",
+					"default": false
+				},
+				"sDP-Answer-Timestamp": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"sDP-Media-Components": {
+					"items": {
+						"$ref": "#/$defs/SDP-Media-Component"
+					},
+					"type": "array"
+				},
+				"sDP-Offer-Timestamp": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"sDP-Session-Description": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"sDP-Type": {
+					"$ref": "#/$defs/SDP-Type"
+				}
+			}
+		},
+		"FEIdentifierList": {
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		},
+		"IMS-Charging-Identifier": {
+			"description": "Globally unique charging identifier ('icid-value' parameter TS 24.229).", 
+			"type": "string"
+		},
+		"IMSCommunicationServiceIdentifier": {
+			"type": "string"
+		},
+		"Incomplete-CDR-Indication": {
+			"type": "object",
+			"properties": {
+				"aCRStartLost": {
+					"type": "boolean"
+				},
+				"aCRInterimLost": {
+					"type": "string",
+					"enum": [
+						"no",
+						"yes",
+						"unknown"
+					]
+				},
+				"aCRStopLost": {
+					"type": "boolean"
+				}
+			}
+		},
+		"InterOperatorIdentifiers": {
+			"type": "object",
+			"properties": {
+				"originatingIOI": {
+					"type": "string"
+				},
+				"terminatingIOI": {
+					"type": "string"
+				}
+			}
+		},
+		"InvolvedParty": {
+			"oneOf": [
+				{
+					"type": "object",
+					"properties": {
+						"iSDN-E164": {
+							"type": "string",
+							"pattern": "^[0-9]{5,15}$"
+						}
+					}
+				},
+				{
+					"type": "object",
+					"properties": {
+						"sIP-URI": {
+							"type": "string",
+							"format": "uri"
+						}
+					}
+				},
+				{
+					"type": "object",
+					"properties": {
+						"tEL-URI": {
+							"type": "string",
+							"format": "uri"
+						}
+					}
+				},
+				{
+					"type": "object",
+					"properties": {
+						"uRN": {
+							"type": "string",
+							"format": "uri"
+						}
+					}
+				},
+				{
+					"type": "object",
+					"properties": {
+						"externalId": {
+							"type": "string",
+							"format": "email"
+						}
+					}
+				}
+			]
+		},
+		"IPAddress": {
+			"oneOf": [
+				{
+					"$ref": "#/$defs/IPv4Address"
+				},
+				{
+					"$ref": "#/$defs/IPv6Address"
+				}
+			]
+		},
+		"IPv4Address": {
+			"description": "IPv4 address.",
+			"type": "string",
+			"format": "ipv4"
+		},
+		"IPv6Address": {
+			"description": "IPv6 address.",
+			"type": "string",
+			"format": "ipv6"
+		},
+		"ListOfInvolvedParties": {
+			"type": "array",
+			"items": {
+				"$ref": "#/$defs/InvolvedParty"
+			}
+		},
+		"ListOfReasonHeader": {
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		},
+		"Media-Components-List": {
+			"type": "object",
+			"properties": {
+				"mediaInitiatorFlag": {
+					"type": "boolean",
+					"default": false
+				},
+				"mediaInitiatorParty": {
+					"$ref": "#/$defs/InvolvedParty"
+				},
+				"sDP-Media-Components": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/SDP-Media-Component"
+					}
+				},
+				"sDP-Session-Description": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"sDP-Type": {
+					"$ref": "#/$defs/SDP-Type"
+				},
+				"sIP-Request-Timestamp": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"sIP-Request-Timestamp-Fraction": {
+					"type": "integer",
+					"minimum": 0,
+					"maximum": 999
+				},
+				"sIP-Response-Timestamp": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"sIP-Response-Timestamp-Fraction": {
+					"type": "integer",
+					"minimum": 0,
+					"maximum": 999
+				}
+			}
+		},
+		"MessageBody": {
+			"type": "object",
+			"properties": {
+				"content-Disposition": {
+					"type": "string"
+				},
+				"content-Length": {
+					"type": "integer"
+				},
+				"content-Type": {
+					"type": "string"
+				},
+				"originator": {
+					"$ref": "#/$defs/InvolvedParty"
+				}
+			}
+		},
+		"NodeAddress": {
+			"oneOf": [
+				{
+					"$ref": "#/$defs/IPAddress"
+				},
+				{
+					"type": "string",
+					"format": "hostname"
+				}
+			]
+		},
+		"NNI-Information": {
+			"type": "object",
+			"properties": {
+				"nNIType": {
+					"type": "string",
+					"enum": [
+						"non-roaming",
+						"roaming-without-loopback",
+						"roaming-with-loopback"
+					]
+				},
+				"neighbourNodeAddress": {
+					"$ref": "#/$defs/IPAddress"
+				},
+				"relationshipMode": {
+					"type": "string",
+					"enum": [
+						"trusted",
+						"non-trusted"
+					]
+				},
+				"sessionDirection": {
+					"type": "string",
+					"enum": [
+						"inbound",
+						"outbound"
+					]
+				}
+			}
+		},
+		"PartyAddress": {
+			"description": "Circuit Switched (CS) calling/called/translated number",
+			"type": "object",
+			"properties": {
+				"natureOfAddress": {
+					"description": "Indicates the scope of the address value.",
+					"type": "string",
+					"enum": [
+						"unknown",
+						"subscriber",
+						"national",
+						"international",
+						"spare",
+						"reserved"
+					]
+				},
+				"numberingPlan": {
+					"description": "Describes which numbering plan is used.",
+					"type": "string",
+					"enum": [
+						"unknown",
+						"e164",
+						"x121",
+						"e212",
+						"national",
+						"private",
+						"reserved"
+					]
+				},
+				"address": {
+					"description": "The digits of the address.",
+					"type": "string",
+					"pattern": "^[0-9#*]{1,38}$"
+				}
+			},
+			"required": [
+				"address"
+			],
+			"examples": [
+				{
+					"natureOfAddress": "international",
+					"numberingPlan": "e164",
+					"address": "14165551234"
+				}
+			]
+		},
+		"RateElement": {
+			"type": "object",
+			"properties": {
+				"unitCost": {
+					"type": "number"
+				},
+				"unitQuotaThreshold": {
+					"type": "number"
+				},
+				"unitType": {
+					"type": "integer"
+				},
+				"unitValue": {
+					"type": "number"
+				}
+			}
+		},
+		"RealTimeTariffInformation": {
+			"oneOf": [
+				{
+					"type": "object",
+					"properties": {
+						"tariffInformation": {
+							"$ref": "#/$defs/TariffInformation"
+						}
+					}
+				},
+				{
+					"type": "object",
+					"properties": {
+						"tariffXml": {
+							"type": "string"
+						}
+					}
+				}
+			]
+		},
+		"Role-of-Node": {
+			"type": "string",
+			"enum": [
+				"originating",
+				"terminating"
+			]
+		},
+		"SDP-Media-Component": {
+			"type": "object",
+			"properties": {
+				"accessCorrelationID": {
+					"oneOf": [
+						{
+							"type": "object",
+							"properties": {
+								"gPRS-Charging-Id": {
+									"type": "integer",
+									"minimum": 0,
+									"maximum": 4294967295
+								}
+							}
+						},
+						{
+							"type": "object",
+							"properties": {
+								"accessNetworkChargingIdentifier": {
+									"type": "string"
+								}
+							}
+						}
+					]
+				},
+				"iPRealmDefaultIndication": {
+					"type": "boolean"
+				},
+				"localGWInsertedIndication": {
+					"type": "boolean"
+				},
+				"sDP-Media-Descriptions": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"sDP-Media-Name": {
+					"type": "string"
+				},
+				"transcoderInsertedIndication": {
+					"type": "boolean"
+				}
+			}
+		},
+		"SDP-Type": {
+			"type": "string",
+			"enum": [
+				"sDP-offer",
+				"sDP-answer"
+			]
+		},
+		"ServiceSpecificInfo": {
+			"type": "object",
+			"properties": {
+				"serviceSpecificType": {
+					"type": "integer"
+				},
+				"serviceSpecificData": {
+					"type": "string"
+				}
+			}
+		},
+		"SessionPriority": {
+			"type": "string",
+			"enum": [
+				"pRIORITY-0",
+				"pRIORITY-1",
+				"pRIORITY-2",
+				"pRIORITY-3",
+				"pRIORITY-4"
+			]
+		},
+		"SubscriberEquipmentNumber": {
+			"type": "object",
+			"properties": {
+				"subscriberEquipmentNumberData": {
+					"type": "string"
+				},
+				"subscriberEquipmentNumberType": {
+					"type": "string",
+					"enum": [
+						"iMEISV",
+						"mAC",
+						"eUI64",
+						"modifiedEUI64"
+					]
+				}
+			}
+		},
+		"SubscriptionID": {
+			"type": "object",
+			"properties": {
+				"subscriptionIDData": {
+					"type": "string"
+				},
+				"subscriptionIDType": {
+					"type": "string",
+					"enum": [
+						"eND-USER-E164",
+						"eND-USER-IMSI",
+						"eND-USER-SIP-URI",
+						"eND-USER-NAI",
+						"eND-USER-PRIVATE"
+					]
+				}
+			}
+		},
+		"TariffInformation": {
+			"type": "object",
+			"properties": {
+				"currencyCode": {
+					"type": "integer"
+				},
+				"rateElements": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/RateElement"
+					}
+				},
+				"scaleFactor": {
+					"type": "number"
+				}
+			}
+		},
+		"TransitIOILists": {
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
 		}
 	}
 }
