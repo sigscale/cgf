@@ -155,7 +155,7 @@ ecs_base(Timestamp) ->
 			$", "application", $", $:, $", "sigscale-cgf", $", $}],
 	Version = [$", "ecs", $", $:, ${,
 			$", "version", $", $:, $", "8.5", $", $}],
-	[TS, $,, Labels, $,, $,, Version].
+	[TS, $,, Labels, $,, Version].
 
 -spec ecs_server(Address, Domain, IP, Port) -> iodata()
 	when
