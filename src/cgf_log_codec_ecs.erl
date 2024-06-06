@@ -37,7 +37,8 @@
 	when
 		CDR :: [{RecordType, Parameters}],
 		RecordType :: moCall | mtCall | moSMS | mtSMS
-				| scSMO | scSMT | sgw | rated | abmf,
+				| scSMO | scSMT | sgw | rated | abmf
+				| string(),
 		Parameters :: #{_Name := binary(), _Value := term()}.
 %% @doc Bx interface CODEC for Elastic Stack logs.
 %%
@@ -120,9 +121,13 @@ bx([{abmf = _RecordType, Parameters} | T] = _CDR) ->
 					"event", "session", ["connection"], Outcome), $,,
 			$", "Bx_ABMF", $", $:, zj:encode(Parameters)]).
 %% @hidden
-bx1([{rated, OCS} | T], Acc) ->
-	Rated = [$,, $", "Bx_rated", $", $:, zj:encode(OCS)],
-	bx1(T, [Acc | Rated]);
+bx1([{rated, Rated} | T], Acc) ->
+	Acc1 = [$,, $", "Bx_rated", $", $:, zj:encode(Rated)],
+	bx1(T, [Acc | Acc1]);
+bx1([{AttributeName, AttributeValue} | T], Acc)
+		when is_list(AttributeName) ->
+	Acc1 = [$,, $", AttributeName, $", $:, zj:encode(AttributeValue)],
+	bx1(T, [Acc | Acc1]);
 bx1([], Acc) ->
 	[Acc | [$}]].
 
