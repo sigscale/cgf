@@ -24,6 +24,9 @@
 			"$ref": "/schema/cgf/ECS_event"
 		},
 		{
+			"$ref": "/schema/cgf/ECS_data_stream"
+		},
+		{
 			"oneOf": [
 				{
 					"$ref": "/schema/cgf/ECS_Bx_CS"
@@ -88,6 +91,10 @@
 					"end"
 				],
 				"outcome": "success"
+			},
+			"data_stream": {
+				"type": "logs",
+				"dataset": "cdr"
 			},
 			"Bx_moCall": {
 				"servedIMSI": "001001012345678",

@@ -5,6 +5,7 @@
 schema_DATA = $(abs_builddir)/ECS_base.json \
 		$(abs_builddir)/ECS_ecs.json \
 		$(abs_builddir)/ECS_event.json \
+		$(abs_builddir)/ECS_data_stream.json \
 		$(abs_builddir)/ECS_network.json \
 		$(abs_builddir)/ECS_service.json \
 		$(abs_builddir)/ECS_user.json \
@@ -31,6 +32,8 @@ $(abs_builddir)/%.json:	$(srcdir)/%.json
 		if ! ajv -c ajv-formats compile -s ECS_base.json; \
 			then exit 1; fi; \
 		if ! ajv -c ajv-formats compile -s ECS_event.json; \
+			then exit 1; fi; \
+		if ! ajv -c ajv-formats compile -s ECS_data_stream.json; \
 			then exit 1; fi; \
 		if ! ajv compile -s ECS_network.json; \
 			then exit 1; fi; \
@@ -60,6 +63,7 @@ $(abs_builddir)/%.json:	$(srcdir)/%.json
 			-r ECS_base.json \
 			-r ECS_ecs.json \
 			-r ECS_event.json \
+			-r ECS_data_stream.json \
 			-r ECS_network.json \
 			-r ECS_service.json \
 			-r ECS_user.json \
