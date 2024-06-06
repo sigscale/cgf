@@ -1,0 +1,166 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "http://sigscale.org/schema/cgf/ECS_file",
+	"title": "Elastic Common Schema (ECS) File",
+	"description": ".",
+	"type": "object",
+	"properties": {
+		"file": {
+			"type": "object",
+			"properties": {
+				"accessed": {
+					"description": "Last time the file was accessed.",
+					"type": "string",
+					"format": "date-time"
+				},
+				"attributes": {
+					"description": "File attributes.",
+					"type": "array",
+					"items": {
+						"oneOf": [
+							{
+								"type": "string",
+								"enum": [
+									"archive",
+									"compressed",
+									"directory",
+									"encrypted",
+									"execute",
+									"hidden",
+									"read",
+									"readonly",
+									"system",
+									"write"
+								]
+							},
+							{
+								"type": "string"
+							}
+						]
+					}
+				},
+				"created": {
+					"description": "File creation time.",
+					"type": "string",
+					"format": "date-time"
+				},
+				"ctime": {
+					"description": "Last time the file attributes or metadata changed.",
+					"type": "string",
+					"format": "date-time"
+				},
+				"device": {
+					"description": "Device that is the source of the file.",
+					"type": "string"
+				},
+				"directory": {
+					"description": "Directory where the file is located.",
+					"type": "string"
+				},
+				"extension": {
+					"description": "File extension, excluding the leading dot.",
+					"type": "string"
+				},
+				"fork_name": {
+					"description": "A fork is additional data associated with a filesystem object.",
+					"type": "string"
+				},
+				"gid": {
+					"description": "Primary group ID (GID) of the file.",
+					"type": "string",
+					"examples": [
+						"1001"
+					]
+				},
+				"group": {
+					"description": "Primary group name of the file.",
+					"type": "string"
+				},
+				"inode": {
+					"description": "Inode representing the file in the filesystem.",
+					"type": "string"
+				},
+				"mime_type": {
+					"description": "MIME type should identify the format of the file or stream of bytes using IANA official types, where possible.",
+					"type": "string",
+					"examples": [
+						"application/octet-stream",
+						"application/json",
+						"text/csv"
+					]
+				},
+				"mode": {
+					"description": "Mode of the file in octal representation.",
+					"type": "string",
+					"examples": [
+						"755",
+						"0640"
+					]
+				},
+				"mtime": {
+					"description": "Last time the file content was modified.",
+					"type": "string",
+					"format": "date-time"
+				},
+				"name": {
+					"description": "Name of the file including the extension, without the directory.",
+					"type": "string"
+				},
+				"owner": {
+					"description": "File owners username.",
+					"type": "string"
+				},
+				"path": {
+					"description": "Full path to the file, including the file name.",
+					"type": "string"
+				},
+				"size": {
+					"description": "File size in bytes.",
+					"type": "integer",
+					"minimum": 0,
+					"maximum": 4294967295
+				},
+				"target_path": {
+					"description": "Target path for symlinks.",
+					"type": "string"
+				},
+				"type": {
+					"description": "File type.",
+					"type": "string",
+					"enum": [
+						"file",
+						"dir",
+						"symlink"
+					]
+				},
+				"uid": {
+					"description": "The user ID (UID) or security identifier (SID) of the file owner.",
+					"type": "string",
+					"examples": [
+						"1001"
+					]
+				}
+			},
+			"examples": [
+				{
+					"name": "CGFNodeId_-_1234.20050401_-_2315+0200",
+					"directory": "/var/spool/cgf/user1",
+					"path": "/var/spool/cgf/user1/CGFNodeId_-_1234.20050401_-_2315+0200",
+					"owner": "otp",
+					"group": "otp",
+					"mime_type": "application/octet-stream",
+					"size": 5248821
+				},
+				{
+					"name": "orec20201123_104_275539.unl",
+					"directory": "/var/spool/cgf/user5",
+					"mime_type": "text/csv",
+					"size": 1216083
+				}
+			]
+		}
+	},
+	"required": [
+		"file"
+	]
+}

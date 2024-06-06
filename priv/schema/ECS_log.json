@@ -1,0 +1,49 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "http://sigscale.org/schema/cgf/ECS_log",
+	"title": "Elastic Common Schema (ECS) Log",
+	"description": ".",
+	"type": "object",
+	"properties": {
+		"log": {
+			"type": "object",
+			"properties": {
+				"file": {
+					"$ref": "/schema/cgf/ECS_file"
+				},
+				"level": {
+					"description": "Original log level of the log event.",
+					"type": "string",
+					"examples": [
+						"warn",
+						"error"
+					]
+				},
+				"logger": {
+					"description": "The name of the logger inside an application.",
+					"type": "string"
+				},
+				"user": {
+					"$ref": "/schema/cgf/ECS_user"
+				}
+			},
+			"examples": [
+				{
+					"file": {
+						"name": "CGFNodeId_-_1234.20050401_-_2315+0200",
+						"directory": "/var/spool/cgf/user1",
+						"mime_type": "application/octet-stream",
+						"size": 5248821
+					},
+					"user": {
+						"name": "acme-sftp",
+						"domain": "mnc001.mcc001.3gppnetwork.org"
+					}
+				}
+			]
+		}
+	},
+	"required": [
+		"log"
+	]
+}
