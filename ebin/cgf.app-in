@@ -30,6 +30,7 @@
 				'CHFChargingDataTypes',
 				'ExposureFunctionAPIChargingDataTypes',
 				'TAP-0312',
+				cgf_tap,
 				cgf_sftpd]},
 		{registered,
 				[cgf,
