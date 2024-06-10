@@ -111,7 +111,7 @@ get_typedefs([#ptypedef{name = Name, typespec = TypeSpec} = H | T],
 get_typedefs([], _Refs, [], Acc) ->
 	Acc;
 get_typedefs([], Refs, Pending, Acc) ->
-	get_typedefs(Pending, Refs, [], Acc).
+	get_typedefs(lists:reverse(Pending), Refs, [], Acc).
 
 %% @hidden
 get_type(#type{def = 'BOOLEAN'}, _Refs) ->
@@ -224,11 +224,17 @@ get_type(#type{def = {'SET OF', TypeSpec},
 get_type(#type{def = #'Externaltypereference'{type = Type},
 		constraint = []}, Refs) when is_map_key(Type, Refs) ->
 	#{"$ref" => maps:get(Type, Refs)};
+get_type(#type{def = #'Externaltypereference'{type = Type},
+		constraint = Constraints}, Refs) when is_map_key(Type, Refs) ->
+	get_constraint(Constraints, #{"$ref" => maps:get(Type, Refs)});
 get_type(#type{def = #'Externaltypereference'{}}, _Refs) ->
 	undefined;
 get_type(#type{def = {pt, #'Externaltypereference'{type = Type}, _},
 		constraint = []}, Refs) when is_map_key(Type, Refs) ->
 	#{"$ref" => maps:get(Type, Refs)};
+get_type(#type{def = {pt, #'Externaltypereference'{type = Type}, _},
+		constraint = Constraints}, Refs) when is_map_key(Type, Refs) ->
+	get_constraint(Constraints, #{"$ref" => maps:get(Type, Refs)});
 get_type(#type{def = {pt, #'Externaltypereference'{}, _}}, _Refs) ->
 	undefined;
 get_type(#type{def = {'ANY_DEFINED_BY', _}}, _Refs) ->
@@ -245,6 +251,8 @@ get_choice([#'ComponentType'{name = Name, typespec = TypeSpec} | T],
 		undefined ->
 			undefined
 	end;
+get_choice([#'EXTENSIONMARK'{} | T], Refs, Acc) ->
+	get_choice(T, Refs, Acc);
 get_choice([], _Refs, Acc) ->
 	lists:reverse(Acc).
 
@@ -257,6 +265,8 @@ get_sequence([#'ComponentType'{name = Name, typespec = TypeSpec} | T],
 		undefined ->
 			undefined
 	end;
+get_sequence([#'EXTENSIONMARK'{} | T], Refs, Acc) ->
+	get_sequence(T, Refs, Acc);
 get_sequence([], _Refs, Acc) ->
 	Acc.
 
