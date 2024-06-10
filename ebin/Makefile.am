@@ -35,6 +35,7 @@ beam_DATA = cgf.beam \
 		MONTEChargingDataTypes.beam \
 		CHFChargingDataTypes.beam \
 		ExposureFunctionAPIChargingDataTypes.beam \
+		TAP-0312.beam \
 		cgf_sftpd.beam
 
 %.beam:$(top_builddir)/src/%.erl

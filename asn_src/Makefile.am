@@ -22,5 +22,5 @@ asn_DATA = ACSE-1.asn1 \
 		ProSeChargingDataTypes.asn1 \
 		MONTEChargingDataTypes.asn1 \
 		CHFChargingDataTypes.asn1 \
-		ExposureFunctionAPIChargingDataTypes.asn1
-
+		ExposureFunctionAPIChargingDataTypes.asn1 \
+		TAP-0312.asn1

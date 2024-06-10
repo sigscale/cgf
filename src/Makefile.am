@@ -22,6 +22,7 @@ noinst_DATA = GenericChargingDataTypes.erl \
 		MONTEChargingDataTypes.erl \
 		CHFChargingDataTypes.erl \
 		ExposureFunctionAPIChargingDataTypes.erl \
+		TAP-0312.erl \
 		ssh_sftpd.hrl
 
 einclude_DATA = GenericChargingDataTypes.hrl \
@@ -38,7 +39,8 @@ einclude_DATA = GenericChargingDataTypes.hrl \
 		ProSeChargingDataTypes.hrl \
 		MONTEChargingDataTypes.hrl \
 		CHFChargingDataTypes.hrl \
-		ExposureFunctionAPIChargingDataTypes.hrl
+		ExposureFunctionAPIChargingDataTypes.hrl \
+		TAP-0312.hrl
 
 %.erl %.hrl:$(top_srcdir)/asn_src/%.asn1
 	$(ERLC) $(ASNCFLAGS) $<
