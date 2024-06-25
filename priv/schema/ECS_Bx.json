@@ -51,6 +51,9 @@
 				},
 				{
 					"$ref": "/schema/cgf/ECS_Bx_ABMF"
+				},
+				{
+					"$ref": "/schema/cgf/ECS_Bx_TAP"
 				}
 			]
 		},

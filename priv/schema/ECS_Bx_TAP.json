@@ -1,0 +1,952 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "http://sigscale.org/schema/cgf/ECS_Bx_TAP",
+	"title": "SigScale CGF: Records on the Bx interface for GSMA TAP3",
+	"oneOf": [
+		{
+			"type": "object",
+			"properties": {
+				"Bx_roam_moCall": {
+					"$ref": "#/$defs/MobileOriginatedCall"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_roam_mtCall": {
+					"$ref": "#/$defs/MobileTerminatedCall"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_roam_supplService": {
+					"$ref": "#/$defs/SupplServiceEvent"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_roam_serviceCenter": {
+					"$ref": "#/$defs/ServiceCentreUsage"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_roam_gprsCall": {
+					"$ref": "#/$defs/GprsCall"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_roam_contentTransaction": {
+					"$ref": "#/$defs/ContentTransaction"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_roam_locationService": {
+					"$ref": "#/$defs/LocationService"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_roam_messagingEvent": {
+					"$ref": "#/$defs/MessagingEvent"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_roam_mobileSession": {
+					"$ref": "#/$defs/MobileSession"
+				}
+			}
+		}
+	],
+	"$defs": {
+		"MobileOriginatedCall": {
+			"description": "Mobile originated (MO) call roaming TAP CDR.",
+			"type": "object",
+			"properties": {
+				"basicCallInformation": {
+					"$ref": "#/$defs/MoBasicCallInformation"
+				},
+				"basicServiceUsedList": {
+					"$ref": "#/$defs/BasicServiceUsedList"
+				},
+				"camelServiceUsed": {
+					"$ref": "#/$defs/CamelServiceUsed"
+				},
+				"equipmentIdentifier": {
+					"$ref": "#/$defs/ImeiOrEsn"
+				},
+				"locationInformation": {
+					"$ref": "#/$defs/LocationInformation"
+				},
+				"operatorSpecInformation": {
+					"$ref": "#/$defs/OperatorSpecInfoList"
+				},
+				"supplServiceCode": {
+					"$ref": "#/$defs/SupplServiceCode"
+				},
+				"thirdPartyInformation": {
+					"$ref": "#/$defs/ThirdPartyInformation"
+				}
+			}
+		},
+		"MobileTerminatedCall": {
+			"description": "Mobile terminated (MT) call roaming TAP CDR.",
+			"type": "object",
+			"properties": {
+				"basicCallInformation": {
+					"$ref": "#/$defs/MtBasicCallInformation"
+				},
+				"basicServiceUsedList": {
+					"$ref": "#/$defs/BasicServiceUsedList"
+				},
+				"camelServiceUsed": {
+					"$ref": "#/$defs/CamelServiceUsed"
+				},
+				"equipmentIdentifier": {
+					"$ref": "#/$defs/ImeiOrEsn"
+				},
+				"locationInformation": {
+					"$ref": "#/$defs/LocationInformation"
+				},
+				"operatorSpecInformation": {
+					"$ref": "#/$defs/OperatorSpecInfoList"
+				}
+			}
+		},
+		"SupplServiceEvent": {
+			"description": "Supplementary services roaming TAP CDR.",
+			"type": "object",
+			"properties": {
+			}
+		},
+		"ServiceCentreUsage": {
+			"description": "Service center usage roaming TAP CDR.",
+			"type": "object",
+			"properties": {
+			}
+		},
+		"GprsCall": {
+			"description": "GPRS call roaming TAP CDR.",
+			"type": "object",
+			"properties": {
+			}
+		},
+		"ContentTransaction": {
+			"description": "Content transaction roaming TAP CDR.",
+			"type": "object",
+			"properties": {
+			}
+		},
+		"LocationService": {
+			"description": "Location service roaming TAP CDR.",
+			"type": "object",
+			"properties": {
+			}
+		},
+		"MessagingEvent": {
+			"description": "Messaging event roaming TAP CDR.",
+			"type": "object",
+			"properties": {
+			}
+		},
+		"MobileSession": {
+			"description": "Mobile session roaming TAP CDR.",
+			"type": "object",
+			"properties": {
+			}
+		},
+		"AbsoluteAmount": {
+			"type": "integer"
+		},
+		"AccessPointNameNI": {
+			"type": "string"
+		},
+		"AccessPointNameOI": {
+			"type": "string"
+		},
+		"BasicService": {
+			"type": "object",
+			"properties": {
+				"fnur": {
+					"$ref": "#/$defs/Fnur"
+				},
+				"guaranteedBitRate": {
+					"$ref": "#/$defs/GuaranteedBitRate"
+				},
+				"maximumBitRate": {
+					"$ref": "#/$defs/MaximumBitRate"
+				},
+				"serviceCode": {
+					"$ref": "#/$defs/BasicServiceCode"
+				},
+				"transparencyIndicator": {
+					"$ref": "#/$defs/TransparencyIndicator"
+				},
+				"userProtocolIndicator": {
+					"$ref": "#/$defs/UserProtocolIndicator"
+				}
+			}
+		},
+		"BasicServiceCode": {
+			"oneOf": [
+				{
+					"type": "object",
+					"properties": {
+						"teleServiceCode": {
+							"$ref": "#/$defs/TeleServiceCode"
+						}
+					}
+				},
+				{
+					"type": "object",
+					"properties": {
+						"bearerServiceCode": {
+							"$ref": "#/$defs/BearerServiceCode"
+						}
+					}
+				}
+			]
+		},
+		"BasicServiceUsed": {
+			"type": "object",
+			"properties": {
+				"basicService": {
+					"$ref": "#/$defs/BasicService"
+				},
+				"chargeInformationList": {
+					"$ref": "#/$defs/ChargeInformationList"
+				},
+				"chargingTimeStamp": {
+					"$ref": "#/$defs/ChargingTimeStamp"
+				},
+				"hSCSDIndicator": {
+					"$ref": "#/$defs/HSCSDIndicator"
+				}
+			}
+		},
+		"BasicServiceUsedList": {
+			"type": "array",
+			"items": {
+				"$ref": "#/$defs/BasicServiceUsed"
+			}
+		},
+		"BearerServiceCode": {
+			"type": "string",
+			"pattern": "^([0-9a-fA-F]{2})*$"
+		},
+		"Bid": {
+			"type": "string"
+		},
+		"CallEventStartTimeStamp": {
+			"type": "string",
+			"format": "date-time"
+		},
+		"CallOriginator": {
+			"type": "object",
+			"properties": {
+				"callingNumber": {
+					"description": "Calling directory number (E.164).",
+					"type": "string",
+					"pattern": "^[0-9]*$"
+				},
+				"clirIndicator": {
+					"$ref": "#/$defs/ClirIndicator"
+				},
+				"sMSOriginator": {
+					"description": "SMS originator directory number (E.164).",
+					"type": "string",
+					"pattern": "^[0-9]*$"
+				}
+			}
+		},
+		"CallReference": {
+			"type": "string",
+			"pattern": "^([0-9a-fA-F]{2}){1,8}$"
+		},
+		"CallTypeGroup": {
+			"type": "object",
+			"properties": {
+				"callTypeLevel1": {
+					"$ref": "#/$defs/CallTypeLevel1"
+				},
+				"callTypeLevel2": {
+					"$ref": "#/$defs/CallTypeLevel2"
+				},
+				"callTypeLevel3": {
+					"$ref": "#/$defs/CallTypeLevel3"
+				}
+			}
+		},
+		"CallTypeLevel1": {
+			"type": "integer"
+		},
+		"CallTypeLevel2": {
+			"type": "integer"
+		},
+		"CallTypeLevel3": {
+			"type": "integer"
+		},
+		"CamelDestinationNumber": {
+			"type": "string",
+			"pattern": "^[0-9a-e]*$"
+		},
+		"CamelInvocationFee": {
+			"$ref": "#/$defs/AbsoluteAmount"
+		},
+		"CamelServiceKey": {
+			"type": "integer"
+		},
+		"CamelServiceLevel": {
+			"type": "integer"
+		},
+		"CamelServiceUsed": {
+			"type": "object",
+			"properties": {
+				"camelInvocationFee": {
+					"$ref": "#/$defs/CamelInvocationFee"
+				},
+				"camelServiceKey": {
+					"$ref": "#/$defs/CamelServiceKey"
+				},
+				"camelServiceLevel": {
+					"$ref": "#/$defs/CamelServiceLevel"
+				},
+				"cseInformation": {
+					"$ref": "#/$defs/CseInformation"
+				},
+				"defaultCallHandling": {
+					"$ref": "#/$defs/DefaultCallHandlingIndicator"
+				},
+				"discountInformation": {
+					"$ref": "#/$defs/DiscountInformation"
+				},
+				"exchangeRateCode": {
+					"$ref": "#/$defs/ExchangeRateCode"
+				},
+				"taxInformation": {
+					"$ref": "#/$defs/TaxInformationList"
+				},
+				"threeGcamelDestination": {
+					"$ref": "#/$defs/ThreeGcamelDestination"
+				}
+			}
+		},
+		"CauseForTerm": {
+			"type": "integer",
+			"minimum": 0,
+			"maximum": 255
+		},
+		"CellId": {
+			"type": "integer"
+		},
+		"Charge": {
+			"$ref": "#/$defs/AbsoluteAmount"
+		},
+		"ChargeableSubscriber": {
+			"oneOf": [
+				{
+					"type": "object",
+					"properties": {
+						"simChargeableSubscriber": {
+							"$ref": "#/$defs/SimChargeableSubscriber"
+						}
+					}
+				},
+				{
+					"type": "object",
+					"properties": {
+						"minChargeableSubscriber": {
+							"$ref": "#/$defs/MinChargeableSubscriber"
+						}
+					}
+				}
+			]
+		},
+		"ChargeableUnits": {
+			"type": "integer"
+		},
+		"ChargeDetail": {
+			"type": "object",
+			"properties": {
+				"charge": {
+					"$ref": "#/$defs/Charge"
+				},
+				"chargeDetailTimeStamp": {
+					"$ref": "#/$defs/ChargeDetailTimeStamp"
+				},
+				"chargeType": {
+					"$ref": "#/$defs/ChargeType"
+				},
+				"chargeableUnits": {
+					"$ref": "#/$defs/ChargeableUnits"
+				},
+				"chargedUnits": {
+					"$ref": "#/$defs/ChargedUnits"
+				}
+			}
+		},
+		"ChargeDetailList": {
+			"type": "array",
+			"items": {
+				"$ref": "#/$defs/ChargeDetail"
+			}
+		},
+		"ChargeDetailTimeStamp": {
+			"$ref": "#/$defs/ChargingTimeStamp"
+		},
+		"ChargedItem": {
+			"type": "string"
+		},
+		"ChargedUnits": {
+			"type": "integer"
+		},
+		"ChargeInformation": {
+			"type": "object",
+			"properties": {
+				"callTypeGroup": {
+					"$ref": "#/$defs/CallTypeGroup"
+				},
+				"chargeDetailList": {
+					"$ref": "#/$defs/ChargeDetailList"
+				},
+				"chargedItem": {
+					"$ref": "#/$defs/ChargedItem"
+				},
+				"discountInformation": {
+					"$ref": "#/$defs/DiscountInformation"
+				},
+				"exchangeRateCode": {
+					"$ref": "#/$defs/ExchangeRateCode"
+				},
+				"taxInformation": {
+					"$ref": "#/$defs/TaxInformationList"
+				}
+			}
+		},
+		"ChargeInformationList": {
+			"items": {
+				"$ref": "#/$defs/ChargeInformation"
+			},
+			"type": "array"
+		},
+		"ChargingTimeStamp": {
+			"type": "string",
+			"format": "date-time"
+		},
+		"ChargeType": {
+			"type": "string"
+		},
+		"ClirIndicator": {
+			"type": "integer"
+		},
+		"CseInformation": {
+			"type": "string",
+			"pattern": "^([0-9a-fA-F]{2})*$"
+		},
+		"DefaultCallHandlingIndicator": {
+			"type": "integer"
+		},
+		"Destination": {
+			"type": "object",
+			"properties": {
+				"calledNumber": {
+					"description": "Called destination directory number (E.164).",
+					"type": "string",
+					"pattern": "^[0-9]*$"
+				},
+				"calledPlace": {
+					"type": "string"
+				},
+				"calledRegion": {
+					"type": "string"
+				},
+				"dialledDigits": {
+					"description": "Digits actually dialed by subscriber.",
+					"type": "string",
+					"pattern": "^\\+?[0-9*#]*$"
+				},
+				"sMSDestinationNumber": {
+					"description": "SMS destination directory number (E.164).",
+					"type": "string",
+					"pattern": "^[0-9]*$"
+				}
+			}
+		},
+		"DestinationNetwork": {
+			"$ref": "#/$defs/NetworkId"
+		},
+		"Discount": {
+			"$ref": "#/$defs/DiscountValue"
+		},
+		"DiscountApplied": {
+			"oneOf": [
+				{
+					"type": "object",
+					"properties": {
+						"fixedDiscountValue": {
+							"$ref": "#/$defs/FixedDiscountValue"
+						}
+					}
+				},
+				{
+					"type": "object",
+					"properties": {
+						"discountRate": {
+							"$ref": "#/$defs/DiscountRate"
+						}
+					}
+				}
+			]
+		},
+		"DiscountCode": {
+			"type": "integer"
+		},
+		"DiscountInformation": {
+			"type": "object",
+			"properties": {
+				"discount": {
+					"$ref": "#/$defs/Discount"
+				},
+				"discountCode": {
+					"$ref": "#/$defs/DiscountCode"
+				},
+				"discountableAmount": {
+					"$ref": "#/$defs/DiscountableAmount"
+				}
+			}
+		},
+		"DiscountRate": {
+			"$ref": "#/$defs/PercentageRate"
+		},
+		"DiscountValue": {
+			"$ref": "#/$defs/AbsoluteAmount"
+		},
+		"DiscountableAmount": {
+			"$ref": "#/$defs/AbsoluteAmount"
+		},
+		"Discounting": {
+			"type": "object",
+			"properties": {
+				"discountApplied": {
+					"$ref": "#/$defs/DiscountApplied"
+				},
+				"discountCode": {
+					"$ref": "#/$defs/DiscountCode"
+				}
+			}
+		},
+		"DiscountingList": {
+			"type": "array",
+			"items": {
+				"$ref": "#/$defs/Discounting"
+			}
+		},
+		"DiscountInformation": {
+			"type": "object",
+			"properties": {
+				"discount": {
+					"$ref": "#/$defs/Discount"
+				},
+				"discountCode": {
+					"$ref": "#/$defs/DiscountCode"
+				},
+				"discountableAmount": {
+					"$ref": "#/$defs/DiscountableAmount"
+				}
+			}
+		},
+		"Esn": {
+			"type": "string"
+		},
+		"ExchangeRateCode": {
+			"type": "integer"
+		},
+		"FixedDiscountValue": {
+			"$ref": "#/$defs/DiscountValue"
+		},
+		"Fnur": {
+			"type": "integer"
+		},
+		"GeographicalLocation": {
+			"type": "object",
+			"properties": {
+				"servingBid": {
+					"$ref": "#/$defs/ServingBid"
+				},
+				"servingLocationDescription": {
+					"$ref": "#/$defs/ServingLocationDescription"
+				},
+				"servingNetwork": {
+					"$ref": "#/$defs/ServingNetwork"
+				}
+			}
+		},
+		"GprsDestination": {
+			"type": "object",
+			"properties": {
+				"accessPointNameNI": {
+					"$ref": "#/$defs/AccessPointNameNI"
+				},
+				"accessPointNameOI": {
+					"$ref": "#/$defs/AccessPointNameOI"
+				}
+			}
+		},
+		"GuaranteedBitRate": {
+			"type": "integer",
+			"minimum": 0,
+			"maximum": 255
+		},
+		"HSCSDIndicator": {
+			"type": "string"
+		},
+		"HomeBid": {
+			"$ref": "#/$defs/Bid"
+		},
+		"HomeLocationDescription": {
+			"$ref": "#/$defs/LocationDescription"
+		},
+		"HomeLocationInformation": {
+			"type": "object",
+			"properties": {
+				"homeBid": {
+					"$ref": "#/$defs/HomeBid"
+				},
+				"homeLocationDescription": {
+					"$ref": "#/$defs/HomeLocationDescription"
+				}
+			}
+		},
+		"Imei": {
+			"description": "International mobile equipment identity (IMEI).",
+			"type": "string",
+			"pattern": "^[0-9]{14,15}$"
+		},
+		"ImeiOrEsn": {
+			"oneOf": [
+				{
+					"type": "object",
+					"properties": {
+						"imei": {
+							"$ref": "#/$defs/Imei"
+						}
+					}
+				},
+				{
+					"type": "object",
+					"properties": {
+						"esn": {
+							"$ref": "#/$defs/Esn"
+						}
+					}
+				}
+			]
+		},
+		"Imsi": {
+			"description": "International mobile subscriber identity (IMSI).",
+			"type": "string",
+			"pattern": "^[0-9]{5,15}$"
+		},
+		"LocationArea": {
+			"type": "integer"
+		},
+		"LocationDescription": {
+			"type": "string"
+		},
+		"LocationInformation": {
+			"type": "object",
+			"properties": {
+				"geographicalLocation": {
+					"$ref": "#/$defs/GeographicalLocation"
+				},
+				"homeLocationInformation": {
+					"$ref": "#/$defs/HomeLocationInformation"
+				},
+				"networkLocation": {
+					"$ref": "#/$defs/NetworkLocation"
+				}
+			}
+		},
+		"MaximumBitRate": {
+			"type": "integer",
+			"minimum": 0,
+			"maximum": 255
+		},
+		"Mdn": {
+			"description": "Mobile Directory Number (MDN)",
+			"type": "string",
+			"pattern": "^[0-9]{2,15}$"
+		},
+		"Min": {
+			"description": "Mobile Identification Number (MIN)",
+			"type": "string",
+			"pattern": "^[0-9]{2,15}$"
+		},
+		"MinChargeableSubscriber": {
+			"type": "object",
+			"properties": {
+				"mdn": {
+					"$ref": "#/$defs/Mdn"
+				},
+				"min": {
+					"$ref": "#/$defs/Min"
+				}
+			}
+		},
+		"MoBasicCallInformation": {
+			"type": "object",
+			"properties": {
+				"callEventStartTimeStamp": {
+					"$ref": "#/$defs/CallEventStartTimeStamp"
+				},
+				"causeForTerm": {
+					"$ref": "#/$defs/CauseForTerm"
+				},
+				"chargeableSubscriber": {
+					"$ref": "#/$defs/ChargeableSubscriber"
+				},
+				"destination": {
+					"$ref": "#/$defs/Destination"
+				},
+				"destinationNetwork": {
+					"$ref": "#/$defs/DestinationNetwork"
+				},
+				"rapFileSequenceNumber": {
+				},
+				"simToolkitIndicator": {
+				},
+				"totalCallEventDuration": {
+					"$ref": "#/$defs/TotalCallEventDuration"
+				}
+			}
+		},
+		"Msisdn": {
+			"description": "Mobile station ISDN number (MSISDN).",
+			"type": "string",
+			"pattern": "^[0-9]{5,15}$"
+		},
+		"MtBasicCallInformation": {
+			"type": "object",
+			"properties": {
+				"callEventStartTimeStamp": {
+					"$ref": "#/$defs/CallEventStartTimeStamp"
+				},
+				"callOriginator": {
+					"$ref": "#/$defs/CallOriginator"
+				},
+				"causeForTerm": {
+					"$ref": "#/$defs/CauseForTerm"
+				},
+				"chargeableSubscriber": {
+					"$ref": "#/$defs/ChargeableSubscriber"
+				},
+				"originatingNetwork": {
+					"$ref": "#/$defs/OriginatingNetwork"
+				},
+				"rapFileSequenceNumber": {
+				},
+				"simToolkitIndicator": {
+				},
+				"totalCallEventDuration": {
+					"$ref": "#/$defs/TotalCallEventDuration"
+				}
+			}
+		},
+		"NetworkId": {
+			"description": "Network identifier.",
+			"type": "string",
+			"pattern": "^[0-9]{1,6}$"
+		},
+		"NetworkLocation": {
+			"type": "object",
+			"properties": {
+				"callReference": {
+					"$ref": "#/$defs/CallReference"
+				},
+				"cellId": {
+					"$ref": "#/$defs/CellId"
+				},
+				"locationArea": {
+					"$ref": "#/$defs/LocationArea"
+				},
+				"recEntityCode": {
+					"$ref": "#/$defs/RecEntityCode"
+				}
+			}
+		},
+		"OperatorSpecInfoList": {
+			"type": "array",
+			"items": {
+				"$ref": "#/$defs/OperatorSpecInformation"
+			}
+		},
+		"OperatorSpecInformation": {
+			"type": "string"
+		},
+		"OriginatingNetwork": {
+			"$ref": "#/$defs/NetworkId"
+		},
+		"PercentageRate": {
+			"type": "integer"
+		},
+		"RecEntityCode": {
+			"type": "integer"
+		},
+		"ServingBid": {
+			"$ref": "#/$defs/Bid"
+		},
+		"ServingLocationDescription": {
+			"$ref": "#/$defs/LocationDescription"
+		},
+		"ServingNetwork": {
+			"type": "string"
+		},
+		"SimChargeableSubscriber": {
+			"type": "object",
+			"properties": {
+				"imsi": {
+					"$ref": "#/$defs/Imsi"
+				},
+				"msisdn": {
+					"$ref": "#/$defs/Msisdn"
+				}
+			}
+		},
+		"SupplServiceCode": {
+			"type": "string",
+			"pattern": "^([0-9a-fA-F]{2})*$"
+		},
+		"TaxCode": {
+			"type": "integer"
+		},
+		"TaxIndicator": {
+			"type": "string"
+		},
+		"TaxInformation": {
+			"type": "object",
+			"properties": {
+				"taxCode": {
+					"$ref": "#/$defs/TaxCode"
+				},
+				"taxValue": {
+					"$ref": "#/$defs/TaxValue"
+				},
+				"taxableAmount": {
+					"$ref": "#/$defs/TaxableAmount"
+				}
+			}
+		},
+		"TaxInformationList": {
+			"type": "array",
+			"items": {
+				"$ref": "#/$defs/TaxInformation"
+			}
+		},
+		"TaxRate": {
+			"type": "string",
+			"pattern": "^[0-9]{7}$"
+		},
+		"TaxType": {
+			"type": "string",
+			"pattern": "^[\\x20-\\x7E]{2}$"
+		},
+		"TaxValue": {
+			"$ref": "#/$defs/AbsoluteAmount"
+		},
+		"TaxableAmount": {
+			"$ref": "#/$defs/AbsoluteAmount"
+		},
+		"Taxation": {
+			"type": "object",
+			"properties": {
+				"chargeType": {
+					"$ref": "#/$defs/ChargeType"
+				},
+				"taxCode": {
+					"$ref": "#/$defs/TaxCode"
+				},
+				"taxIndicator": {
+					"$ref": "#/$defs/TaxIndicator"
+				},
+				"taxRate": {
+					"$ref": "#/$defs/TaxRate"
+				},
+				"taxType": {
+					"$ref": "#/$defs/TaxType"
+				}
+			}
+		},
+		"TaxationList": {
+			"type": "array",
+			"items": {
+				"$ref": "#/$defs/Taxation"
+			}
+		},
+		"TeleServiceCode": {
+			"type": "string",
+			"pattern": "^([0-9a-fA-F]{2})*$"
+		},
+		"ThirdPartyInformation": {
+			"type": "object",
+			"properties": {
+				"clirIndicator": {
+					"$ref": "#/$defs/ClirIndicator"
+				},
+				"thirdPartyNumber": {
+					"$ref": "#/$defs/ThirdPartyNumber"
+				}
+			}
+		},
+		"ThirdPartyNumber": {
+			"type": "string",
+			"pattern": "^[0-9a-e]*$"
+		},
+		"ThreeGcamelDestination": {
+			"oneOf": [
+				{
+					"type": "object",
+					"properties": {
+						"camelDestinationNumber": {
+							"$ref": "#/$defs/CamelDestinationNumber"
+						}
+					}
+				},
+				{
+					"type": "object",
+					"properties": {
+						"gprsDestination": {
+							"$ref": "#/$defs/GprsDestination"
+						}
+					}
+				}
+			]
+		},
+		"TotalCallEventDuration": {
+			"type": "integer"
+		},
+		"TransparencyIndicator": {
+			"type": "integer"
+		},
+		"UserProtocolIndicator": {
+			"type": "integer"
+		}
+	}
+}
