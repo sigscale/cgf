@@ -38,6 +38,7 @@
 		CDR :: [{RecordType, Parameters}],
 		RecordType :: moCall | mtCall | moSMS | mtSMS
 				| scSMO | scSMT | sgw | rated | abmf
+				| roam_moCall | roam_mtCall | roam_gprs
 				| string(),
 		Parameters :: #{_Name := binary(), _Value := term()}.
 %% @doc Bx interface CODEC for Elastic Stack logs.
@@ -119,7 +120,43 @@ bx([{abmf = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_user(MSISDN, [], []), $,,
 			ecs_event(Timestamp, [], [],
 					"event", "session", ["connection"], Outcome), $,,
-			$", "Bx_ABMF", $", $:, zj:encode(Parameters)]).
+			$", "Bx_ABMF", $", $:, zj:encode(Parameters)]);
+bx([{roam_moCall = _RecordType, Parameters} | T] = _CDR) ->
+	IMSI = imsi(Parameters),
+	MSISDN = msisdn(Parameters),
+	{StartTime, Duration} = roam_duration(Parameters),
+	Outcome = call_outcome(Parameters),
+	bx1(T, [${,
+			ecs_base(StartTime), $,,
+			ecs_service("bx", "cgf"), $,,
+			ecs_user(MSISDN, IMSI, []), $,,
+			ecs_event(StartTime, [], Duration,
+					"event", "session", ["connection"], Outcome), $,,
+			$", "Bx_roam_moCall", $", $:, zj:encode(Parameters)]);
+bx([{roam_mtCall = _RecordType, Parameters} | T] = _CDR) ->
+	IMSI = imsi(Parameters),
+	MSISDN = msisdn(Parameters),
+	{StartTime, Duration} = roam_duration(Parameters),
+	Outcome = call_outcome(Parameters),
+	bx1(T, [${,
+			ecs_base(StartTime), $,,
+			ecs_service("bx", "cgf"), $,,
+			ecs_user(MSISDN, IMSI, []), $,,
+			ecs_event(StartTime, [], Duration,
+					"event", "session", ["connection"], Outcome), $,,
+			$", "Bx_roam_mtCall", $", $:, zj:encode(Parameters)]);
+bx([{roam_gprs = _RecordType, Parameters} | T] = _CDR) ->
+	IMSI = imsi(Parameters),
+	MSISDN = msisdn(Parameters),
+	{StartTime, Duration} = roam_duration(Parameters),
+	Outcome = call_outcome(Parameters),
+	bx1(T, [${,
+			ecs_base(StartTime), $,,
+			ecs_service("bx", "cgf"), $,,
+			ecs_user(MSISDN, IMSI, []), $,,
+			ecs_event(StartTime, [], Duration,
+					"event", "session", ["connection"], Outcome), $,,
+			$", "Bx_roam_gprsCall", $", $:, zj:encode(Parameters)]).
 %% @hidden
 bx1([{rated, Rated} | T], Acc) ->
 	Acc1 = [$,, $", "Bx_rated", $", $:, zj:encode(Rated)],
@@ -522,6 +559,15 @@ ecs_url(URL) when is_map(URL) ->
 imsi(#{<<"servedIMSI">> := ServedIMSI} = _Parameters)
 		when byte_size(ServedIMSI) > 0 ->
 	"imsi-" ++ binary_to_list(ServedIMSI);
+imsi(#{<<"basicCallInformation">> := #{<<"chargeableSubscriber">>
+		:= #{<<"simChargeableSubscriber">> := #{<<"imsi">> := IMSI}}}})
+		when length(IMSI) > 0 ->
+	"imsi-" ++ IMSI;
+imsi(#{<<"gprsBasicCallInformation">> := #{<<"gprsChargeableSubscriber">>
+		:= #{<<"chargeableSubscriber">> := #{<<"simChargeableSubscriber">>
+		:= #{<<"imsi">> := IMSI}}}}})
+		when length(IMSI) > 0 ->
+	"imsi-" ++ IMSI;
 imsi(_Parameters) ->
 	[].
 
@@ -536,6 +582,15 @@ msisdn(#{<<"servedMSISDN">> := ServedMSISDN} = _Parameters)
 msisdn(#{<<"chargingParty">> := ChargingParty} = _Parameters)
 		when byte_size(ChargingParty) > 0 ->
 	"msisdn-" ++ binary_to_list(ChargingParty);
+msisdn(#{<<"basicCallInformation">> := #{<<"chargeableSubscriber">>
+		:= #{<<"simChargeableSubscriber">> := #{<<"msisdn">> := MSISDN}}}})
+		when length(MSISDN) > 0 ->
+	"msisdn-" ++ MSISDN;
+msisdn(#{<<"gprsBasicCallInformation">> := #{<<"gprsChargeableSubscriber">>
+		:= #{<<"chargeableSubscriber">> := #{<<"simChargeableSubscriber">>
+		:= #{<<"msisdn">> := MSISDN}}}}})
+		when length(MSISDN) > 0 ->
+	"msisdn-" ++ MSISDN;
 msisdn(_Parameters) ->
 	[].
 
@@ -623,6 +678,38 @@ session_duration(Parameters) ->
 		_ ->
 			{[], [], []}
 	end.
+
+%% @hidden
+roam_duration(#{<<"basicCallInformation">> := I}) ->
+	StartTime = case maps:find(<<"callEventStartTimeStamp">>, I) of
+		{ok, Start} ->
+			Start;
+		error ->
+			[]
+	end,
+	Duration = case maps:find(<<"totalCallEventDuration">>, I) of
+		{ok, Seconds} ->
+			integer_to_list(Seconds * 1000000000);
+		error ->
+			[]
+	end,
+	{StartTime, Duration};
+roam_duration(#{<<"gprsBasicCallInformation">> := I}) ->
+	StartTime = case maps:find(<<"callEventStartTimeStamp">>, I) of
+		{ok, Start} ->
+			Start;
+		error ->
+			[]
+	end,
+	Duration = case maps:find(<<"totalCallEventDuration">>, I) of
+		{ok, Seconds} ->
+			integer_to_list(Seconds * 1000000000);
+		error ->
+			[]
+	end,
+	{StartTime, Duration};
+roam_duration(_) ->
+	{[], []}.
 
 -spec call_outcome(Parameters) -> Outcome
 	when

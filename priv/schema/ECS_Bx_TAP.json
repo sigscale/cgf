@@ -147,6 +147,24 @@
 			"description": "GPRS call roaming TAP CDR.",
 			"type": "object",
 			"properties": {
+				"gprsBasicCallInformation": {
+					"$ref": "#/$defs/GprsBasicCallInformation"
+				},
+				"gprsLocationInformation": {
+					"$ref": "#/$defs/GprsLocationInformation"
+				},
+				"equipmentIdentifier": {
+					"$ref": "#/$defs/ImeiOrEsn"
+				},
+				"gprsServiceUsed": {
+					"$ref": "#/$defs/GprsServiceUsed"
+				},
+				"camelServiceUsed": {
+					"$ref": "#/$defs/CamelServiceUsed"
+				},
+				"operatorSpecInformation": {
+					"$ref": "#/$defs/OperatorSpecInfoList"
+				}
 			}
 		},
 		"ContentTransaction": {
@@ -175,12 +193,6 @@
 		},
 		"AbsoluteAmount": {
 			"type": "integer"
-		},
-		"AccessPointNameNI": {
-			"type": "string"
-		},
-		"AccessPointNameOI": {
-			"type": "string"
 		},
 		"BasicService": {
 			"type": "object",
@@ -447,6 +459,9 @@
 			},
 			"type": "array"
 		},
+		"ChargingId": {
+			"type" : "integer"
+		},
 		"ChargingTimeStamp": {
 			"type": "string",
 			"format": "date-time"
@@ -599,15 +614,72 @@
 				}
 			}
 		},
+		"GprsBasicCallInformation": {
+			"type": "object",
+			"properties": {
+				"gprsChargeableSubscriber": {
+					"$ref": "#/$defs/GprsChargeableSubscriber"
+				},
+				"rapFileSequenceNumber": {
+				},
+				"gprsDestination": {
+					"$ref": "#/$defs/GprsDestination"
+				},
+				"callEventStartTimeStamp": {
+					"$ref": "#/$defs/CallEventStartTimeStamp"
+				},
+				"totalCallEventDuration": {
+					"$ref": "#/$defs/TotalCallEventDuration"
+				},
+				"causeForTerm": {
+					"$ref": "#/$defs/CauseForTerm"
+				},
+				"partialTypeIndicator": {
+				},
+				"pDPContextStartTimestamp": {
+					"$ref": "#/$defs/PDPContextStartTimestamp"
+				},
+				"networkInitPDPContext": {
+					"$ref" : "#/$defs/NetworkInitPDPContext"
+				},
+				"chargingId": {
+					"$ref": "#/$defs/ChargingId"
+				}
+			}
+		},
+		"GprsChargeableSubscriber": {
+			"type": "object",
+			"properties": {
+				"chargeableSubscriber": {
+					"$ref": "#/$defs/ChargeableSubscriber"
+				},
+				"pdpAddress": {
+					"$ref": "#/$defs/PdpAddress"
+				},
+				"networkAccessIdentifier": {
+					"type": "string"
+				}
+			}
+		},
 		"GprsDestination": {
 			"type": "object",
 			"properties": {
 				"accessPointNameNI": {
-					"$ref": "#/$defs/AccessPointNameNI"
+					"type": "string"
 				},
 				"accessPointNameOI": {
-					"$ref": "#/$defs/AccessPointNameOI"
+					"type": "string"
 				}
+			}
+		},
+		"GprsLocationInformation": {
+			"type": "object",
+			"properties": {
+			}
+		},
+		"GprsServiceUsed": {
+			"type": "object",
+			"properties": {
 			}
 		},
 		"GuaranteedBitRate": {
@@ -775,6 +847,9 @@
 			"type": "string",
 			"pattern": "^[0-9]{1,6}$"
 		},
+		"NetworkInitPDPContext": {
+			"type" : "integer"
+		},
 		"NetworkLocation": {
 			"type": "object",
 			"properties": {
@@ -803,6 +878,13 @@
 		},
 		"OriginatingNetwork": {
 			"$ref": "#/$defs/NetworkId"
+		},
+		"PdpAddress": {
+			"type": "string"
+		},
+		"PDPContextStartTimestamp": {
+			"type": "string",
+			"format": "date-time"
 		},
 		"PercentageRate": {
 			"type": "integer"
