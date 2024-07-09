@@ -15,8 +15,16 @@
 %%% See the License for the specific language governing permissions and
 %%% limitations under the License.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% @doc This library module implements GSMA TAP file handling in
+%%% @doc This library module implements GSMA TAP3 file handling in
 %%% 	the {@link //cgf. cgf} application.
+%%%
+%%% @reference The GSM Association (<a href="https://www.gsma.com/">GSMA</a>)
+%%% 	specifies Transferred Accounts Procedure version 3
+%%% 	(<a href="https://www.gsma.com/get-involved/working-groups/interoperability-data-specifications-and-settlement-group/standardised-b2b-interfaces-specified-by-ids/open-standards-specifications/tap3-open-standard-download-form">TAP3</a>):
+%%% 	<ul>
+%%% 		<li>GSMA TD.57 - TAP 3.12 Format Specification</li>
+%%% 		<li>GSMA TD.58 - TAP 3.12 Implementation Handbook</li>
+%%% 	</ul>.
 %%%
 -module(cgf_tap).
 -copyright('Copyright (c) 2024 SigScale Global Inc.').
