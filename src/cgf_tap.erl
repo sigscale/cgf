@@ -33,7 +33,6 @@
 -export([import/2, import/3]).
 
 -include_lib("kernel/include/logger.hrl").
--include("TAP-0312.hrl").
 
 %%----------------------------------------------------------------------
 %%  The cgf_tap public API
@@ -73,7 +72,7 @@ import(Filename, Log, Metadata)
 	end.
 %% @hidden
 import1(Filename, Log, Metadata, {ok, {transferBatch, TransferBatch}}) ->
-	#'TransferBatch'{callEventDetails = CDRs} =  TransferBatch,
+	#{callEventDetails := CDRs} = TransferBatch,
 	parse(Filename, Log, Metadata, CDRs);
 import1(_Filename, _Log, _Metadata, {ok, {notification, _Notification}}) ->
 	{error, not_implemented};
@@ -206,13 +205,13 @@ parse(_Filename, _Log, _Metadata, []) ->
 		Metadata :: [{AttributeName, AttributeValue}],
 		AttributeName :: string(),
 		AttributeValue :: term(),
-		MOC :: #'MobileOriginatedCall'{},
+		MOC :: map(),
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a TAP event detail for a mobile originated call.
 parse_mo_call(Log, Metadata, MOC) ->
-	Call1 = basic_call_info(MOC#'MobileOriginatedCall'.basicCallInformation, #{}),
-	CDR = [{roam_moCall, Call1} | Metadata],
+	Call = mobile_originated_call(MOC),
+	CDR = [{roam_moCall, Call} | Metadata],
 	cgf_log:blog(Log, CDR).
 
 -spec parse_mt_call(Log, Metadata, MTC) -> Result
@@ -221,13 +220,13 @@ parse_mo_call(Log, Metadata, MOC) ->
 		Metadata :: [{AttributeName, AttributeValue}],
 		AttributeName :: string(),
 		AttributeValue :: term(),
-		MTC :: #'MobileTerminatedCall'{},
+		MTC :: map(),
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a TAP event detail for a mobile terminated call.
 parse_mt_call(Log, Metadata, MTC) ->
-	Call1 = basic_call_info(MTC#'MobileTerminatedCall'.basicCallInformation, #{}),
-	CDR = [{roam_mtCall, Call1} | Metadata],
+	Call = mobile_terminated_call(MTC),
+	CDR = [{roam_mtCall, Call} | Metadata],
 	cgf_log:blog(Log, CDR).
 
 -spec parse_mmtel(Log, Metadata, SupplServiceEvent) -> Result
@@ -236,7 +235,7 @@ parse_mt_call(Log, Metadata, MTC) ->
 		Metadata :: [{AttributeName, AttributeValue}],
 		AttributeName :: string(),
 		AttributeValue :: term(),
-		SupplServiceEvent :: #'SupplServiceEvent'{},
+		SupplServiceEvent :: map(),
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a TAP event detail for a supplementary service.
@@ -249,7 +248,7 @@ parse_mmtel(_Log, _Metadata, _SupplServiceEvent) ->
 		Metadata :: [{AttributeName, AttributeValue}],
 		AttributeName :: string(),
 		AttributeValue :: term(),
-		ServiceCentreUsage :: #'ServiceCentreUsage'{},
+		ServiceCentreUsage :: map(),
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a TAP event detail for a service center usage.
@@ -262,13 +261,13 @@ parse_sc_sm(_Log, _Metadata, _ServiceCentreUsage) ->
 		Metadata :: [{AttributeName, AttributeValue}],
 		AttributeName :: string(),
 		AttributeValue :: term(),
-		GPRS :: #'GprsCall'{},
+		GPRS :: map(),
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a TAP event detail for a GPRS session.
 parse_gprs(Log, Metadata, GPRS) ->
-	Call1 = basic_call_info(GPRS#'GprsCall'.gprsBasicCallInformation, #{}),
-	CDR = [{roam_gprs, Call1} | Metadata],
+	Call = gprs_call(GPRS),
+	CDR = [{roam_gprs, Call} | Metadata],
 	cgf_log:blog(Log, CDR).
 
 -spec parse_content(Log, Metadata, ContentTransaction) -> Result
@@ -277,7 +276,7 @@ parse_gprs(Log, Metadata, GPRS) ->
 		Metadata :: [{AttributeName, AttributeValue}],
 		AttributeName :: string(),
 		AttributeValue :: term(),
-		ContentTransaction :: #'ContentTransaction'{},
+		ContentTransaction :: map(),
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a TAP event detail for a content transaction.
@@ -290,7 +289,7 @@ parse_content(_Log, _Metadata, _ContentTransaction) ->
 		Metadata :: [{AttributeName, AttributeValue}],
 		AttributeName :: string(),
 		AttributeValue :: term(),
-		LocationService :: #'LocationService'{},
+		LocationService :: map(),
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a TAP event detail for a location service.
@@ -303,7 +302,7 @@ parse_location(_Log, _Metadata, _LocationService) ->
 		Metadata :: [{AttributeName, AttributeValue}],
 		AttributeName :: string(),
 		AttributeValue :: term(),
-		MessagingEvent :: #'MessagingEvent'{},
+		MessagingEvent :: map(),
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a TAP event detail for a messaging event.
@@ -316,7 +315,7 @@ parse_message(_Log, _Metadata, _MessagingEvent) ->
 		Metadata :: [{AttributeName, AttributeValue}],
 		AttributeName :: string(),
 		AttributeValue :: term(),
-		MobileSession :: #'MobileSession'{},
+		MobileSession :: map(),
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a TAP event detail for a mobile session.
@@ -324,153 +323,223 @@ parse_session(_Log, _Metadata, _MobileSession) ->
 	{error, not_implemented}.
 
 %% @hidden
-basic_call_info(#'MoBasicCallInformation'{
-		chargeableSubscriber = Subscriber,
-		destination = Destination,
-		callEventStartTimeStamp = TimeStamp,
-      totalCallEventDuration = Duration,
-      causeForTerm = Cause},
-		Call) ->
-	I1 = subscriber(Subscriber, #{}),
-	I2 = destination(Destination, I1),
-	I3 = call_event_start(TimeStamp, I2),
-	I4 = call_event_duration(Duration, I3),
-	I5 = cause_for_term(Cause, I4),
-	Call#{<<"basicCallInformation">> => I5};
-basic_call_info(#'MtBasicCallInformation'{
-		chargeableSubscriber = Subscriber,
-		callOriginator = Origination,
-		callEventStartTimeStamp = TimeStamp,
-      totalCallEventDuration = Duration,
-      causeForTerm = Cause},
-		Call) ->
-	I1 = subscriber(Subscriber, #{}),
-	I2 = origination(Origination, I1),
-	I3 = call_event_start(TimeStamp, I2),
-	I4 = call_event_duration(Duration, I3),
-	I5 = cause_for_term(Cause, I4),
-	Call#{<<"basicCallInformation">> => I5};
-basic_call_info(#'GprsBasicCallInformation'{
-		gprsChargeableSubscriber = GprsSubscriber,
-		callEventStartTimeStamp = TimeStamp,
-      totalCallEventDuration = Duration,
-      causeForTerm = Cause},
-		Call) ->
-	I1 = gprs_subscriber(GprsSubscriber, #{}),
-	I2 = call_event_start(TimeStamp, I1),
-	I3 = call_event_duration(Duration, I2),
-	I4 = cause_for_term(Cause, I3),
-	Call#{<<"gprsBasicCallInformation">> => I4};
-basic_call_info(asn1_NOVALUE, Call) ->
-	Call.
-
+mobile_originated_call(#{basicCallInformation
+		:= MoBasicCallInformation} = MobileOriginatedCall) ->
+	BCI = mo_basic_call_information(MoBasicCallInformation),
+	Acc = #{<<"basicCallInformation">> => BCI},
+	mobile_originated_call1(MobileOriginatedCall, Acc);
+mobile_originated_call(MobileOriginatedCall) ->
+	mobile_originated_call1(MobileOriginatedCall, #{}).
 %% @hidden
-subscriber({simChargeableSubscriber,
-		#'SimChargeableSubscriber'{imsi = IMSI, msisdn = MSISDN}},
-		Acc) ->
-	S1 = case IMSI of
-		asn1_NOVALUE ->
-			#{};
-		_ ->
-			#{<<"imsi">> => bcd(IMSI)}
-	end,
-	S2 = case MSISDN of
-		asn1_NOVALUE ->
-			S1;
-		_ ->
-			S1#{<<"msisdn">> => bcd(MSISDN)}
-	end,
-	Acc#{<<"chargeableSubscriber">> =>
-			#{<<"simChargeableSubscriber">> => S2}};
-subscriber({minChargeableSubscriber,
-		#'MinChargeableSubscriber'{min = MIN, mdn = MDN}},
-		Acc) ->
-	S1 = case MIN of
-		asn1_NOVALUE ->
-			#{};
-		_ ->
-			#{<<"min">> => MIN}
-	end,
-	S2 = case MDN of
-		asn1_NOVALUE ->
-			S1;
-		_ ->
-			S1#{<<"mdn">> => MDN}
-	end,
-	Acc#{<<"chargeableSubscriber">> =>
-			#{<<"minChargeableSubscriber">> => S2}};
-subscriber(asn1_NOVALUE, Acc) ->
+mobile_originated_call1(#{basicServiceUsedList
+		:= BasicServiceUsedList} = _MobileOriginatedCall, Acc) ->
+	BSUL = [basic_service_used(BSU) || BSU <- BasicServiceUsedList],
+	Acc#{<<"basicServiceUsedList">> => BSUL};
+mobile_originated_call1(_MobileOriginatedCall, Acc) ->
 	Acc.
 
 %% @hidden
-gprs_subscriber(#'GprsChargeableSubscriber'{
-		chargeableSubscriber = Subscriber},
-		Acc) when is_tuple(Subscriber) ->
-	Acc#{<<"gprsChargeableSubscriber">> => subscriber(Subscriber, #{})};
-gprs_subscriber(asn1_NOVALUE, Acc) ->
+mobile_terminated_call(#{basicCallInformation
+		:= MtBasicCallInformation} = MobileTerminatedCall) ->
+	BCI = mt_basic_call_information(MtBasicCallInformation),
+	Acc = #{<<"basicCallInformation">> => BCI},
+	mobile_terminated_call1(MobileTerminatedCall, Acc);
+mobile_terminated_call(MobileTerminatedCall) ->
+	mobile_terminated_call1(MobileTerminatedCall, #{}).
+%% @hidden
+mobile_terminated_call1(#{basicServiceUsedList
+		:= BasicServiceUsedList} = _MobileTerminatedCall, Acc) ->
+	BSUL = [basic_service_used(BSU) || BSU <- BasicServiceUsedList],
+	Acc#{<<"basicServiceUsedList">> => BSUL};
+mobile_terminated_call1(_MobileTerminatedCall, Acc) ->
 	Acc.
 
 %% @hidden
-destination(#'Destination'{calledNumber = CalledNumber,
-		dialledDigits = DialledDigits,
-		sMSDestinationNumber = SMSDestination}, Acc) ->
-	D1 = case CalledNumber of
-		asn1_NOVALUE ->
-			#{};
-		_ ->
-			#{<<"calledNumber">> => bcd(CalledNumber)}
-	end,
-	D2 = case DialledDigits of
-		asn1_NOVALUE ->
-			D1;
-		_ ->
-			D1#{<<"dialledDigits">> => DialledDigits}
-	end,
-	D3 = case SMSDestination of
-		asn1_NOVALUE ->
-			D2;
-		_ ->
-			D2#{<<"sMSDestinationNumber">> => SMSDestination}
-	end,
-	Acc#{<<"destination">> => D3};
-destination(asn1_NOVALUE, Acc) ->
+gprs_call(#{gprsBasicCallInformation
+		:= GprsBasicCallInformation} = GprsCall) ->
+	BCI = gprs_basic_call_information(GprsBasicCallInformation),
+	Acc = #{<<"gprsBasicCallInformation">> => BCI},
+	gprs_call1(GprsCall, Acc);
+gprs_call(GprsCall) ->
+	gprs_call1(GprsCall, #{}).
+%% @hidden
+gprs_call1(#{gprsServiceUsed := GprsServiceUsed} = _GprsCall, Acc) ->
+	GSU = gprs_service_used(GprsServiceUsed),
+	Acc#{<<"gprsServiceUsed">> => GSU};
+gprs_call1(_GprsCall, Acc) ->
 	Acc.
 
 %% @hidden
-origination(#'CallOriginator'{callingNumber = CallingNumber,
-		sMSOriginator = SMSOrigination}, Acc) ->
-	D1 = case CallingNumber of
-		asn1_NOVALUE ->
-			#{};
-		_ ->
-			#{<<"callingNumber">> => bcd(CallingNumber)}
-	end,
-	D2 = case SMSOrigination of
-		asn1_NOVALUE ->
-			D1;
-		_ ->
-			D1#{<<"sMSOriginator">> => SMSOrigination}
-	end,
-	Acc#{<<"callOriginator">> => D2};
-origination(asn1_NOVALUE, Acc) ->
+mo_basic_call_information(#{chargeableSubscriber := ChargeableSubscriber}
+		= MoBasicCallInformation) ->
+	CS = chargeable_subscriber(ChargeableSubscriber),
+	Acc = #{<<"chargeableSubscriber">> => CS},
+	mo_basic_call_information1(MoBasicCallInformation, Acc);
+mo_basic_call_information(MoBasicCallInformation) ->
+	mo_basic_call_information1(MoBasicCallInformation, #{}).
+%% @hidden
+mo_basic_call_information1(#{destination := Destination}
+		= MoBasicCallInformation, Acc) ->
+	Dest = destination(Destination),
+	Acc1 = Acc#{<<"destination">> => Dest},
+	mo_basic_call_information2(MoBasicCallInformation, Acc1);
+mo_basic_call_information1(MoBasicCallInformation, Acc) ->
+	mo_basic_call_information2(MoBasicCallInformation, Acc).
+%% @hidden
+mo_basic_call_information2(#{callEventStartTimeStamp := CallEventStartTimeStamp}
+		= MoBasicCallInformation, Acc) ->
+	TS = timestamp(CallEventStartTimeStamp),
+	Acc1 = Acc#{<<"callEventStartTimeStamp">> => TS},
+	mo_basic_call_information3(MoBasicCallInformation, Acc1);
+mo_basic_call_information2(MoBasicCallInformation, Acc) ->
+	mo_basic_call_information3(MoBasicCallInformation, Acc).
+%% @hidden
+mo_basic_call_information3(#{totalCallEventDuration := TotalCallEventDuration}
+		= MoBasicCallInformation, Acc) ->
+	Acc1 = Acc#{<<"totalCallEventDuration">> => TotalCallEventDuration},
+	mo_basic_call_information4(MoBasicCallInformation, Acc1);
+mo_basic_call_information3(MoBasicCallInformation, Acc) ->
+	mo_basic_call_information4(MoBasicCallInformation, Acc).
+%% @hidden
+mo_basic_call_information4(#{causeForTerm := CauseForTerm}, Acc) ->
+	Acc#{<<"causeForTerm">> => CauseForTerm};
+mo_basic_call_information4(_MoBasicCallInformation, Acc) ->
 	Acc.
 
 %% @hidden
-call_event_start(#'DateTime'{} = DateTime, Acc) ->
-	Acc#{<<"callEventStartTimeStamp">> => timestamp(DateTime)};
-call_event_start(asn1_NOVALUE, Acc) ->
+mt_basic_call_information(#{chargeableSubscriber := ChargeableSubscriber}
+		= MtBasicCallInformation) ->
+	CS = chargeable_subscriber(ChargeableSubscriber),
+	Acc = #{<<"chargeableSubscriber">> => CS},
+	mt_basic_call_information1(MtBasicCallInformation, Acc);
+mt_basic_call_information(MtBasicCallInformation) ->
+	mt_basic_call_information1(MtBasicCallInformation, #{}).
+%% @hidden
+mt_basic_call_information1(#{callOriginator := CallOriginator}
+		= MtBasicCallInformation, Acc) ->
+	CO = call_originator(CallOriginator),
+	Acc1 = Acc#{<<"callOriginator">> => CO},
+	mt_basic_call_information2(MtBasicCallInformation, Acc1);
+mt_basic_call_information1(MtBasicCallInformation, Acc) ->
+	mt_basic_call_information2(MtBasicCallInformation, Acc).
+%% @hidden
+mt_basic_call_information2(#{callEventStartTimeStamp := CallEventStartTimeStamp}
+		= MtBasicCallInformation, Acc) ->
+	TS = timestamp(CallEventStartTimeStamp),
+	Acc1 = Acc#{<<"callEventStartTimeStamp">> => TS},
+	mt_basic_call_information3(MtBasicCallInformation, Acc1);
+mt_basic_call_information2(MtBasicCallInformation, Acc) ->
+	mt_basic_call_information3(MtBasicCallInformation, Acc).
+%% @hidden
+mt_basic_call_information3(#{totalCallEventDuration := TotalCallEventDuration}
+		= MtBasicCallInformation, Acc) ->
+	Acc1 = Acc#{<<"totalCallEventDuration">> => TotalCallEventDuration},
+	mt_basic_call_information4(MtBasicCallInformation, Acc1);
+mt_basic_call_information3(MtBasicCallInformation, Acc) ->
+	mt_basic_call_information4(MtBasicCallInformation, Acc).
+%% @hidden
+mt_basic_call_information4(#{causeForTerm := CauseForTerm}, Acc) ->
+	Acc#{<<"causeForTerm">> => CauseForTerm};
+mt_basic_call_information4(_MtBasicCallInformation, Acc) ->
 	Acc.
 
 %% @hidden
-call_event_duration(Duration, Acc) when is_integer(Duration) ->
-	Acc#{<<"totalCallEventDuration">> => Duration};
-call_event_duration(asn1_NOVALUE, Acc) ->
+gprs_basic_call_information(#{gprsChargeableSubscriber
+		:= GprsChargeableSubscriber} = GprsBasicCallInformation) ->
+	GCS = gprs_chargeable_subscriber(GprsChargeableSubscriber),
+	Acc = #{<<"gprsChargeableSubscriber">> => GCS},
+	gprs_basic_call_information1(GprsBasicCallInformation, Acc);
+gprs_basic_call_information(GprsBasicCallInformation) ->
+	gprs_basic_call_information1(GprsBasicCallInformation, #{}).
+%% @hidden
+gprs_basic_call_information1(#{callEventStartTimeStamp
+		:= CallEventStartTimeStamp} = GprsBasicCallInformation, Acc) ->
+	TS = timestamp(CallEventStartTimeStamp),
+	Acc1 = Acc#{<<"callEventStartTimeStamp">> => TS},
+	gprs_basic_call_information2(GprsBasicCallInformation, Acc1);
+gprs_basic_call_information1(GprsBasicCallInformation, Acc) ->
+	gprs_basic_call_information2(GprsBasicCallInformation, Acc).
+%% @hidden
+gprs_basic_call_information2(#{totalCallEventDuration
+		:= TotalCallEventDuration} = GprsBasicCallInformation, Acc) ->
+	Acc1 = Acc#{<<"totalCallEventDuration">> => TotalCallEventDuration},
+	gprs_basic_call_information3(GprsBasicCallInformation, Acc1);
+gprs_basic_call_information2(GprsBasicCallInformation, Acc) ->
+	gprs_basic_call_information3(GprsBasicCallInformation, Acc).
+%% @hidden
+gprs_basic_call_information3(#{causeForTerm := CauseForTerm}, Acc) ->
+	Acc#{<<"causeForTerm">> => CauseForTerm};
+gprs_basic_call_information3(_GprsBasicCallInformation, Acc) ->
 	Acc.
 
 %% @hidden
-cause_for_term(Cause, Acc) when is_integer(Cause) ->
-	Acc#{<<"causeForTerm">> => Cause};
-cause_for_term(asn1_NOVALUE, Acc) ->
+chargeable_subscriber({simChargeableSubscriber, SimChargeableSubscriber}) ->
+	CS = sim_chargeable_subscriber(SimChargeableSubscriber),
+	#{<<"simChargeableSubscriber">> => CS};
+chargeable_subscriber({minChargeableSubscriber, MinChargeableSubscriber}) ->
+	CS = min_chargeable_subscriber(MinChargeableSubscriber),
+	#{<<"minChargeableSubscriber">> => CS}.
+
+%% @hidden
+sim_chargeable_subscriber(#{imsi := IMSI} = SimChargeableSubscriber) ->
+	Acc = #{<<"imsi">> => bcd(IMSI)},
+	sim_chargeable_subscriber1(SimChargeableSubscriber, Acc);
+sim_chargeable_subscriber(SimChargeableSubscriber) ->
+	sim_chargeable_subscriber1(SimChargeableSubscriber, #{}).
+%% @hidden
+sim_chargeable_subscriber1(#{msisdn := MSISDN}, Acc) ->
+	Acc#{<<"msisdn">> => bcd(MSISDN)};
+sim_chargeable_subscriber1(_SimChargeableSubscriber, Acc) ->
+	Acc.
+
+%% @hidden
+min_chargeable_subscriber(#{min := MIN} = MinChargeableSubscriber) ->
+	Acc = #{<<"min">> => bcd(MIN)},
+	min_chargeable_subscriber1(MinChargeableSubscriber, Acc);
+min_chargeable_subscriber(MinChargeableSubscriber) ->
+	min_chargeable_subscriber1(MinChargeableSubscriber, #{}).
+%% @hidden
+min_chargeable_subscriber1(#{mdn := MDN}, Acc) ->
+	Acc#{<<"mdn">> => bcd(MDN)};
+min_chargeable_subscriber1(_MinChargeableSubscriber, Acc) ->
+	Acc.
+
+%% @hidden
+gprs_chargeable_subscriber(#{chargeableSubscriber
+		:= ChargeableSubscriber} = _GprsChargeableSubscriber) ->
+	CS = chargeable_subscriber(ChargeableSubscriber),
+	#{<<"chargeableSubscriber">> => CS};
+gprs_chargeable_subscriber(_GprsChargeableSubscriber) ->
+	#{}.
+
+%% @hidden
+destination(#{calledNumber := CalledNumber} = Destination) ->
+	Acc = #{<<"calledNumber">> => bcd(CalledNumber)},
+	destination1(Destination, Acc);
+destination(Destination) ->
+	destination1(Destination, #{}).
+%% @hidden
+destination1(#{dialledDigits := DialledDigits} = Destination, Acc) ->
+	Acc1 = Acc#{<<"dialledDigits">> => DialledDigits},
+	destination2(Destination, Acc1);
+destination1(Destination, Acc) ->
+	destination2(Destination, Acc).
+%% @hidden
+destination2(#{sMSDestinationNumber := SMSDestinationNumber}, Acc) ->
+	Acc#{<<"sMSDestinationNumber">> => SMSDestinationNumber};
+destination2(_Destination, Acc) ->
+	Acc.
+
+%% @hidden
+call_originator(#{callingNumber := CallingNumber} = CallOriginator) ->
+	Acc = #{<<"callingNumber">> => bcd(CallingNumber)},
+	call_originator1(CallOriginator, Acc);
+call_originator(CallOriginator) ->
+	call_originator1(CallOriginator, #{}).
+%% @hidden
+call_originator1(#{sMSOriginator := SMSOriginator}, Acc) ->
+	Acc#{<<"sMSOriginator">> => bcd(SMSOriginator)};
+call_originator1(_CallOriginator, Acc) ->
 	Acc.
 
 %% @hidden
@@ -518,9 +587,190 @@ bcd1([], Acc) ->
 	Acc.
 
 %% @hidden
-timestamp(#'DateTime'{localTimeStamp = <<Year:4/binary, Month:2/binary,
+timestamp(#{localTimeStamp := <<Year:4/binary, Month:2/binary,
 		Day:2/binary, Hour:2/binary, Minute:2/binary, Second:2/binary>>,
-		utcTimeOffsetCode = Z}) ->
+		utcTimeOffsetCode := Z}) ->
 	<<Year/binary, $-, Month/binary, $-, Day/binary, $T, Hour/binary,
 			$:, Minute/binary, $:, Second/binary>>.
+
+%% @hidden
+basic_service_used(#{basicService := BasicService} = BasicServiceUsed) ->
+	BS = basic_service(BasicService),
+	Acc = #{<<"BasicService">> => BS},
+	basic_service_used1(BasicServiceUsed, Acc);
+basic_service_used(BasicServiceUsed) ->
+	basic_service_used1(BasicServiceUsed, #{}).
+%% @hidden
+basic_service_used1(#{chargingTimeStamp
+		:= ChargingTimeStamp} = BasicServiceUsed, Acc) ->
+	TS = timestamp(ChargingTimeStamp),
+	Acc1 = Acc#{<<"chargingTimeStamp">> => TS},
+	basic_service_used2(BasicServiceUsed, Acc1);
+basic_service_used1(BasicServiceUsed, Acc) ->
+	basic_service_used2(BasicServiceUsed, Acc).
+%% @hidden
+basic_service_used2(#{chargeInformationList
+		:= ChargeInformationList} = BasicServiceUsed, Acc) ->
+	CIL = [charge_information(CI) || CI <- ChargeInformationList],
+	Acc1 = Acc#{<<"chargeInformationList">> => CIL},
+	basic_service_used3(BasicServiceUsed, Acc1);
+basic_service_used2(BasicServiceUsed, Acc) ->
+	basic_service_used3(BasicServiceUsed, Acc).
+%% @hidden
+basic_service_used3(#{hSCSDIndicator
+		:= HSCSDIndicator} = _BasicServiceUsed, Acc) ->
+	Acc#{<<"hSCSDIndicator">> => HSCSDIndicator};
+basic_service_used3(_BasicServiceUsed, Acc) ->
+	Acc.
+
+%% @hidden
+basic_service(#{serviceCode := BasicServiceCode} = BasicService) ->
+	BSC = basic_service_code(BasicServiceCode),
+	Acc = #{<<"serviceCode">> => BSC},
+	basic_service1(BasicService, Acc);
+basic_service(BasicService) ->
+	basic_service1(BasicService, #{}).
+%% @hidden
+basic_service1(#{transparencyIndicator
+		:= TransparencyIndicator} = BasicService, Acc) ->
+	Acc1 = Acc#{<<"transparencyIndicator">> => TransparencyIndicator},
+	basic_service2(BasicService, Acc1);
+basic_service1(BasicService, Acc) ->
+	basic_service2(BasicService, Acc).
+%% @hidden
+basic_service2(#{fnur := Fnur} = BasicService, Acc) ->
+	Acc1 = Acc#{<<"fnur">> => Fnur},
+	basic_service3(BasicService, Acc1);
+basic_service2(BasicService, Acc) ->
+	basic_service3(BasicService, Acc).
+%% @hidden
+basic_service3(#{userProtocolIndicator
+		:= UserProtocolIndicator} = BasicService, Acc) ->
+	Acc1 = Acc#{<<"userProtocolIndicator">> => UserProtocolIndicator},
+	basic_service4(BasicService, Acc1);
+basic_service3(BasicService, Acc) ->
+	basic_service4(BasicService, Acc).
+%% @hidden
+basic_service4(#{guaranteedBitRate := GuaranteedBitRate} = BasicService, Acc) ->
+	Acc1 = Acc#{<<"guaranteedBitRate">> => GuaranteedBitRate},
+	basic_service5(BasicService, Acc1);
+basic_service4(BasicService, Acc) ->
+	basic_service5(BasicService, Acc).
+%% @hidden
+basic_service5(#{maximumBitRate := MaximumBitRate} = _BasicService, Acc) ->
+	Acc#{<<"maximumBitRate">> => MaximumBitRate};
+basic_service5(_BasicService, Acc) ->
+	Acc.
+
+%% @hidden
+basic_service_code({teleServiceCode, TeleServiceCode}) ->
+	#{<<"teleServiceCode">> => TeleServiceCode};
+basic_service_code({bearerServiceCode, BearerServiceCode}) ->
+	#{<<"bearerServiceCode">> => BearerServiceCode}.
+
+%% @hidden
+charge_information(#{chargedItem
+		:= ChargedItem} = ChargeInformation) ->
+	Acc = #{<<"chargedItem">> => ChargedItem},
+	charge_information1(ChargeInformation, Acc);
+charge_information(ChargeInformation) ->
+	charge_information1(ChargeInformation, #{}).
+%% @hidden
+charge_information1(#{exchangeRateCode
+		:= ExchangeRateCode} = ChargeInformation, Acc) ->
+	Acc1 = Acc#{<<"exchangeRateCode">> => ExchangeRateCode},
+	charge_information2(ChargeInformation, Acc1);
+charge_information1(ChargeInformation, Acc) ->
+	charge_information2(ChargeInformation, Acc).
+%% @hidden
+charge_information2(#{callTypeGroup
+		:= CallTypeGroup} = ChargeInformation, Acc) ->
+	Acc1 = Acc#{<<"callTypeGroup">> => CallTypeGroup},
+	charge_information3(ChargeInformation, Acc1);
+charge_information2(ChargeInformation, Acc) ->
+	charge_information3(ChargeInformation, Acc).
+%% @hidden
+charge_information3(#{chargeDetailList
+		:= ChargeDetailList} = ChargeInformation, Acc) ->
+	CDL = [charge_detail(CD) || CD <- ChargeDetailList],
+	Acc1 = Acc#{<<"chargeDetailList">> => CDL},
+	charge_information4(ChargeInformation, Acc1);
+charge_information3(ChargeInformation, Acc) ->
+	charge_information4(ChargeInformation, Acc).
+%% @hidden
+charge_information4(#{taxInformation
+		:= TaxInformationList} = ChargeInformation, Acc) ->
+	Acc1 = Acc#{<<"taxInformation">> => TaxInformationList},
+	charge_information5(ChargeInformation, Acc1);
+charge_information4(ChargeInformation, Acc) ->
+	charge_information5(ChargeInformation, Acc).
+%% @hidden
+charge_information5(#{discountInformation
+		:= DiscountInformation} = _ChargeInformation, Acc) ->
+	Acc#{<<"discountInformation">> => DiscountInformation};
+charge_information5(_ChargeInformation, Acc) ->
+	Acc.
+
+%% @hidden
+charge_detail(#{chargeType := ChargeType} = ChargeDetail) ->
+	Acc = #{<<"chargeType">> => ChargeType},
+	charge_detail1(ChargeDetail, Acc);
+charge_detail(ChargeDetail) ->
+	charge_detail1(ChargeDetail, #{}).
+%% @hidden
+charge_detail1(#{charge := Charge} = ChargeDetail, Acc) ->
+	Acc1 = Acc#{<<"charge">> => Charge},
+	charge_detail2(ChargeDetail, Acc1);
+charge_detail1(ChargeDetail, Acc) ->
+	charge_detail2(ChargeDetail, Acc).
+%% @hidden
+charge_detail2(#{chargeableUnits
+		:= ChargeableUnits} = ChargeDetail, Acc) ->
+	Acc1 = Acc#{<<"chargeableUnits">> => ChargeableUnits},
+	charge_detail3(ChargeDetail, Acc1);
+charge_detail2(ChargeDetail, Acc) ->
+	charge_detail3(ChargeDetail, Acc).
+%% @hidden
+charge_detail3(#{chargedUnits
+		:= ChargedUnits} = ChargeDetail, Acc) ->
+	Acc1 = Acc#{<<"chargedUnits">> => ChargedUnits},
+	charge_detail4(ChargeDetail, Acc1);
+charge_detail3(ChargeDetail, Acc) ->
+	charge_detail4(ChargeDetail, Acc).
+%% @hidden
+charge_detail4(#{chargeDetailTimeStamp
+		:= ChargeDetailTimeStamp} = _ChargeDetail, Acc) ->
+	TS = timestamp(ChargeDetailTimeStamp),
+	Acc#{<<"chargeDetailTimeStamp">> => TS};
+charge_detail4(_ChargeDetail, Acc) ->
+	Acc.
+
+%% @hidden
+gprs_service_used(#{iMSSignallingContext
+		:= IMSSignallingContext} = GprsServiceUsed) ->
+	Acc = #{<<"iMSSignallingContext">> => IMSSignallingContext},
+	gprs_service_used1(GprsServiceUsed, Acc);
+gprs_service_used(GprsServiceUsed) ->
+	gprs_service_used1(GprsServiceUsed, #{}).
+%% @hidden
+gprs_service_used1(#{dataVolumeIncoming
+		:= DataVolumeIncoming} = GprsServiceUsed, Acc) ->
+	Acc1 = Acc#{<<"dataVolumeIncoming">> => DataVolumeIncoming},
+	gprs_service_used2(GprsServiceUsed, Acc1);
+gprs_service_used1(GprsServiceUsed, Acc) ->
+	gprs_service_used2(GprsServiceUsed, Acc).
+%% @hidden
+gprs_service_used2(#{dataVolumeOutgoing
+		:= DataVolumeOutgoing} = GprsServiceUsed, Acc) ->
+	Acc1 = Acc#{<<"dataVolumeOutgoing">> => DataVolumeOutgoing},
+	gprs_service_used3(GprsServiceUsed, Acc1);
+gprs_service_used2(GprsServiceUsed, Acc) ->
+	gprs_service_used3(GprsServiceUsed, Acc).
+%% @hidden
+gprs_service_used3(#{chargeInformationList
+		:= ChargeInformationList} = _GprsServiceUsed, Acc) ->
+	CIL = [charge_information(CI) || CI <- ChargeInformationList],
+	Acc#{<<"chargeInformationList">> => CIL};
+gprs_service_used3(_GprsServiceUsed, Acc) ->
+	Acc.
 
