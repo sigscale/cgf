@@ -39,7 +39,7 @@
 		RecordType :: moCall | mtCall | moSMS | mtSMS
 				| scSMO | scSMT | sgw | rated | abmf
 				| roam_moCall | roam_mtCall | roam_gprs
-				| string(),
+				| vas | string(),
 		Parameters :: #{_Name := binary(), _Value := term()}.
 %% @doc Bx interface CODEC for Elastic Stack logs.
 %%
@@ -105,6 +105,23 @@ bx([{sgw = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_event(Timestamp, StopTime, Duration,
 					"event", "session", ["connection"], Outcome), $,,
 			$", "Bx_sgw", $", $:, zj:encode(Parameters)]);
+bx([{vas = _RecordType, Parameters} | T] = _CDR) ->
+	IMSI = imsi(Parameters),
+	MSISDN = msisdn(Parameters),
+	Timestamp = case maps:find(<<"eventtimestamp">>, Parameters) of
+		{ok, Ts} ->
+			Ts;
+		error ->
+			cgf_log:iso8601(erlang:system_time(millisecond))
+	end,
+	Outcome = call_outcome(Parameters),
+	bx1(T, [${,
+			ecs_base(Timestamp), $,,
+			ecs_service("bx", "cgf"), $,,
+			ecs_user(MSISDN, IMSI, []), $,,
+			ecs_event(Timestamp, [], [],
+					"event", "session", ["connection"], Outcome), $,,
+			$", "Bx_vas", $", $:, zj:encode(Parameters)]);
 bx([{abmf = _RecordType, Parameters} | T] = _CDR) ->
 	MSISDN = msisdn(Parameters),
 	Timestamp = case maps:find(<<"timestamp">>, Parameters) of
