@@ -57,7 +57,7 @@ import(Filename, Log) ->
 		AttributeValue :: term(),
 		Result :: ok | {error, Reason},
 		Reason :: term().
-%% @doc Import CSV file and write to Bx interface log.
+%% @doc Import TAP3 file and write to Bx interface log.
 import(Filename, Log, Metadata)
 		when is_list(Filename), is_list(Metadata) ->
 	case file:read_file(Filename) of

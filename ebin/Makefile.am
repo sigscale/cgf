@@ -37,6 +37,7 @@ beam_DATA = cgf.beam \
 		ExposureFunctionAPIChargingDataTypes.beam \
 		TAP-0312.beam \
 		cgf_tap.beam \
+		cgf_gprs.beam \
 		cgf_sftpd.beam
 
 %.beam:$(top_builddir)/src/%.erl
