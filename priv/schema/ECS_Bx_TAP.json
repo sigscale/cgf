@@ -2,76 +2,88 @@
 	"$schema": "http://json-schema.org/draft-07/schema#",
 	"$id": "http://sigscale.org/schema/cgf/ECS_Bx_TAP",
 	"title": "SigScale CGF: Records on the Bx interface for GSMA TAP3",
-	"oneOf": [
+	"allOf": [
 		{
-			"type": "object",
-			"properties": {
-				"Bx_roam_moCall": {
-					"$ref": "#/$defs/MobileOriginatedCall"
+			"oneOf": [
+				{
+					"type": "object",
+					"properties": {
+						"Bx_roam_moCall": {
+							"$ref": "#/$defs/MobileOriginatedCall"
+						}
+					}
+				},
+				{
+					"type": "object",
+					"properties": {
+						"Bx_roam_mtCall": {
+							"$ref": "#/$defs/MobileTerminatedCall"
+						}
+					}
+				},
+				{
+					"type": "object",
+					"properties": {
+						"Bx_roam_supplService": {
+							"$ref": "#/$defs/SupplServiceEvent"
+						}
+					}
+				},
+				{
+					"type": "object",
+					"properties": {
+						"Bx_roam_serviceCenter": {
+							"$ref": "#/$defs/ServiceCentreUsage"
+						}
+					}
+				},
+				{
+					"type": "object",
+					"properties": {
+						"Bx_roam_gprsCall": {
+							"$ref": "#/$defs/GprsCall"
+						}
+					}
+				},
+				{
+					"type": "object",
+					"properties": {
+						"Bx_roam_contentTransaction": {
+							"$ref": "#/$defs/ContentTransaction"
+						}
+					}
+				},
+				{
+					"type": "object",
+					"properties": {
+						"Bx_roam_locationService": {
+							"$ref": "#/$defs/LocationService"
+						}
+					}
+				},
+				{
+					"type": "object",
+					"properties": {
+						"Bx_roam_messagingEvent": {
+							"$ref": "#/$defs/MessagingEvent"
+						}
+					}
+				},
+				{
+					"type": "object",
+					"properties": {
+						"Bx_roam_mobileSession": {
+							"$ref": "#/$defs/MobileSession"
+						}
+					}
 				}
-			}
+			]
 		},
 		{
 			"type": "object",
 			"properties": {
-				"Bx_roam_mtCall": {
-					"$ref": "#/$defs/MobileTerminatedCall"
-				}
-			}
-		},
-		{
-			"type": "object",
-			"properties": {
-				"Bx_roam_supplService": {
-					"$ref": "#/$defs/SupplServiceEvent"
-				}
-			}
-		},
-		{
-			"type": "object",
-			"properties": {
-				"Bx_roam_serviceCenter": {
-					"$ref": "#/$defs/ServiceCentreUsage"
-				}
-			}
-		},
-		{
-			"type": "object",
-			"properties": {
-				"Bx_roam_gprsCall": {
-					"$ref": "#/$defs/GprsCall"
-				}
-			}
-		},
-		{
-			"type": "object",
-			"properties": {
-				"Bx_roam_contentTransaction": {
-					"$ref": "#/$defs/ContentTransaction"
-				}
-			}
-		},
-		{
-			"type": "object",
-			"properties": {
-				"Bx_roam_locationService": {
-					"$ref": "#/$defs/LocationService"
-				}
-			}
-		},
-		{
-			"type": "object",
-			"properties": {
-				"Bx_roam_messagingEvent": {
-					"$ref": "#/$defs/MessagingEvent"
-				}
-			}
-		},
-		{
-			"type": "object",
-			"properties": {
-				"Bx_roam_mobileSession": {
-					"$ref": "#/$defs/MobileSession"
+				"Bx_roam_accountingInfo": {
+					"$ref": "#/$defs/AccountingInfo"
 				}
 			}
 		}
@@ -191,6 +203,29 @@
 			"properties": {
 			}
 		},
+		"AccountingInfo": {
+			"type": "object",
+         "properties" : {
+            "currencyConversionInfo" : {
+               "$ref" : "#/$defs/CurrencyConversionList"
+            },
+            "discounting" : {
+               "$ref" : "#/$defs/DiscountingList"
+            },
+            "localCurrency" : {
+               "$ref" : "#/$defs/LocalCurrency"
+            },
+            "tapCurrency" : {
+               "$ref" : "#/$defs/TapCurrency"
+            },
+            "tapDecimalPlaces" : {
+               "type" : "integer"
+            },
+            "taxation" : {
+               "$ref" : "#/$defs/TaxationList"
+            }
+         }
+      },
 		"AbsoluteAmount": {
 			"type": "integer"
 		},
@@ -454,10 +489,10 @@
 			}
 		},
 		"ChargeInformationList": {
+			"type": "array",
 			"items": {
 				"$ref": "#/$defs/ChargeInformation"
-			},
-			"type": "array"
+			}
 		},
 		"ChargingId": {
 			"type" : "integer"
@@ -476,6 +511,30 @@
 			"type": "string",
 			"pattern": "^([0-9a-fA-F]{2})*$"
 		},
+      "Currency" : {
+         "pattern" : "^([0-9a-fA-F]{2})*$",
+         "type" : "string"
+      },
+      "CurrencyConversion" : {
+         "type" : "object",
+         "properties" : {
+            "exchangeRate" : {
+               "$ref" : "#/$defs/ExchangeRate"
+            },
+            "exchangeRateCode" : {
+               "$ref" : "#/$defs/ExchangeRateCode"
+            },
+            "numberOfDecimalPlaces" : {
+               "type": "integer"
+            }
+         }
+      },
+      "CurrencyConversionList" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/$defs/CurrencyConversion"
+         }
+      },
 		"DefaultCallHandlingIndicator": {
 			"type": "integer"
 		},
@@ -591,6 +650,9 @@
 		"Esn": {
 			"type": "string"
 		},
+      "ExchangeRate" : {
+         "type" : "integer"
+      },
 		"ExchangeRateCode": {
 			"type": "integer"
 		},
@@ -737,6 +799,9 @@
 			"type": "string",
 			"pattern": "^[0-9]{5,15}$"
 		},
+      "LocalCurrency" : {
+         "$ref" : "#/$defs/Currency"
+      },
 		"LocationArea": {
 			"type": "integer"
 		},
@@ -916,6 +981,9 @@
 			"type": "string",
 			"pattern": "^([0-9a-fA-F]{2})*$"
 		},
+      "TapCurrency" : {
+         "$ref" : "#/$defs/Currency"
+      },
 		"TaxCode": {
 			"type": "integer"
 		},
