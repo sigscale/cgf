@@ -67,11 +67,27 @@ import(Filename, Log, Metadata)
 			{error, Reason}
 	end.
 %% @hidden
-import1(Filename, Log, Metadata, {ok, {transferBatch, TransferBatch}}) ->
-	#{callEventDetails := CDRs} = TransferBatch,
-	parse(Filename, Log, Metadata, CDRs);
-import1(_Filename, _Log, _Metadata, {ok, {notification, _Notification}}) ->
-	{error, not_implemented};
+import1(Filename, Log, Metadata, {ok, CDR, Rest}) ->
+	case parse(Log, Metadata, CDR) of
+		ok ->
+			import1(Filename, Log, Metadata,
+					'GPRSChargingDataTypes':decode('GPRSRecord', Rest));
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+					{filename, Filename},
+					{error, Reason}]),
+			{error, Reason}
+	end;
+import1(Filename, Log, Metadata, {ok, CDR}) ->
+	case parse(Log, Metadata, CDR) of
+		ok ->
+			ok;
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+					{filename, Filename},
+					{error, Reason}]),
+			{error, Reason}
+	end;
 import1(Filename, _Log, _Metadata, {error, Reason}) ->
 	?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
 			{filename, Filename},
@@ -81,194 +97,71 @@ import1(Filename, _Log, _Metadata, {error, Reason}) ->
 %%  Internal functions
 %%----------------------------------------------------------------------
 
--spec parse(Filename, Log, Metadata, CDRs) -> Result
+-spec parse(Log, Metadata, CDR) -> Result
 	when
-		Filename :: file:filename(),
 		Log :: disk_log:log(),
 		Metadata :: [{AttributeName, AttributeValue}],
 		AttributeName :: string(),
 		AttributeValue :: term(),
-		CDRs :: [tuple()],
+		CDR :: {RecordType, Record},
+		RecordType :: sgsnPDPRecord | sgsnMMRecord | sgsnSMORecord
+				| sgsnSMTRecord | sgsnMTLCSRecord | sgsnMOLCSRecord
+				| sgsnNILCSRecord | sgsnMBMSRecord | ggsnMBMSRecord
+				| sGWRecord | pGWRecord | gwMBMSRecord | tDFRecord
+				| iPERecord | ePDGRecord | tWAGRecord,
+		Record :: map(),
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse CDRs from the import file.
 %% @private
-parse(Filename, Log, Metadata,
-		[{sgsnPDPRecord, SGSNPDPRecord} | T]) ->
-	case parse_sgsn_pdp(Log, Metadata, SGSNPDPRecord) of
-		ok ->
-			parse(Filename, Log, Metadata, T);
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
-					{filename, Filename},
-					{error, Reason}]),
-			{error, Reason}
-	end;
-parse(Filename, Log, Metadata,
-		[{sgsnMMRecord, SGSNMMRecord} | T]) ->
-	case parse_sgsn_mmr(Log, Metadata, SGSNMMRecord) of
-		ok ->
-			parse(Filename, Log, Metadata, T);
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
-					{filename, Filename},
-					{error, Reason}]),
-			{error, Reason}
-	end;
-parse(Filename, Log, Metadata,
-		[{sgsnSMORecord, SGSNSMORecord} | T]) ->
-	case parse_sgsn_smo(Log, Metadata, SGSNSMORecord) of
-		ok ->
-			parse(Filename, Log, Metadata, T);
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
-					{filename, Filename},
-					{error, Reason}]),
-			{error, Reason}
-	end;
-parse(Filename, Log, Metadata,
-		[{sgsnSMTRecord, SGSNSMTRecord} | T]) ->
-	case parse_sgsn_smt(Log, Metadata, SGSNSMTRecord) of
-		ok ->
-			parse(Filename, Log, Metadata, T);
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
-					{filename, Filename},
-					{error, Reason}]),
-			{error, Reason}
-	end;
-parse(Filename, Log, Metadata,
-		[{sgsnMTLCSRecord, SGSNMTLCSRecord} | T]) ->
-	case parse_sgsn_mt_lcs(Log, Metadata, SGSNMTLCSRecord) of
-		ok ->
-			parse(Filename, Log, Metadata, T);
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
-					{filename, Filename},
-					{error, Reason}]),
-			{error, Reason}
-	end;
-parse(Filename, Log, Metadata,
-		[{sgsnMOLCSRecord, SGSNMOLCSRecord} | T]) ->
-	case parse_sgsn_mo_lcs(Log, Metadata, SGSNMOLCSRecord) of
-		ok ->
-			parse(Filename, Log, Metadata, T);
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
-					{filename, Filename},
-					{error, Reason}]),
-			{error, Reason}
-	end;
-parse(Filename, Log, Metadata,
-		[{sgsnNILCSRecord, SGSNNILCSRecord} | T]) ->
-	case parse_sgsn_ni_lcs(Log, Metadata, SGSNNILCSRecord) of
-		ok ->
-			parse(Filename, Log, Metadata, T);
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
-					{filename, Filename},
-					{error, Reason}]),
-			{error, Reason}
-	end;
-parse(Filename, Log, Metadata,
-		[{sgsnMBMSRecord, SGSNMBMSRecord} | T]) ->
-	case parse_sgsn_mbms(Log, Metadata, SGSNMBMSRecord) of
-		ok ->
-			parse(Filename, Log, Metadata, T);
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
-					{filename, Filename},
-					{error, Reason}]),
-			{error, Reason}
-	end;
-parse(Filename, Log, Metadata,
-		[{ggsnMBMSRecord, GGSNMBMSRecord} | T]) ->
-	case parse_ggsn_mbms(Log, Metadata, GGSNMBMSRecord) of
-		ok ->
-			parse(Filename, Log, Metadata, T);
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
-					{filename, Filename},
-					{error, Reason}]),
-			{error, Reason}
-	end;
-parse(Filename, Log, Metadata,
-		[{sGWRecord, SGWRecord} | T]) ->
-	case parse_sgw(Log, Metadata, SGWRecord) of
-		ok ->
-			parse(Filename, Log, Metadata, T);
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
-					{filename, Filename},
-					{error, Reason}]),
-			{error, Reason}
-	end;
-parse(Filename, Log, Metadata,
-		[{pGWRecord, PGWRecord} | T]) ->
-	case parse_pgw(Log, Metadata, PGWRecord) of
-		ok ->
-			parse(Filename, Log, Metadata, T);
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
-					{filename, Filename},
-					{error, Reason}]),
-			{error, Reason}
-	end;
-parse(Filename, Log, Metadata,
-		[{gwMBMSRecord, GWMBMSRecord} | T]) ->
-	case parse_gw_mbms(Log, Metadata, GWMBMSRecord) of
-		ok ->
-			parse(Filename, Log, Metadata, T);
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
-					{filename, Filename},
-					{error, Reason}]),
-			{error, Reason}
-	end;
-parse(Filename, Log, Metadata,
-		[{tDFRecord, TDFRecord} | T]) ->
-	case parse_tdf(Log, Metadata, TDFRecord) of
-		ok ->
-			parse(Filename, Log, Metadata, T);
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
-					{filename, Filename},
-					{error, Reason}]),
-			{error, Reason}
-	end;
-parse(Filename, Log, Metadata,
-		[{iPERecord, IPERecord} | T]) ->
-	case parse_ipe(Log, Metadata, IPERecord) of
-		ok ->
-			parse(Filename, Log, Metadata, T);
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
-					{filename, Filename},
-					{error, Reason}]),
-			{error, Reason}
-	end;
-parse(Filename, Log, Metadata,
-		[{ePDGRecord, EPDGRecord} | T]) ->
-	case parse_epdg(Log, Metadata, EPDGRecord) of
-		ok ->
-			parse(Filename, Log, Metadata, T);
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
-					{filename, Filename},
-					{error, Reason}]),
-			{error, Reason}
-	end;
-parse(Filename, Log, Metadata,
-		[{tWAGRecord, TWAGRecord} | T]) ->
-	case parse_twag(Log, Metadata, TWAGRecord) of
-		ok ->
-			parse(Filename, Log, Metadata, T);
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
-					{filename, Filename},
-					{error, Reason}]),
-			{error, Reason}
-	end.
+parse(Log, Metadata,
+		{sgsnPDPRecord, SGSNPDPRecord} = _CDR) ->
+	parse_sgsn_pdp(Log, Metadata, SGSNPDPRecord);
+parse(Log, Metadata,
+		{sgsnMMRecord, SGSNMMRecord}) ->
+	parse_sgsn_mmr(Log, Metadata, SGSNMMRecord);
+parse(Log, Metadata,
+		{sgsnSMORecord, SGSNSMORecord}) ->
+	parse_sgsn_smo(Log, Metadata, SGSNSMORecord);
+parse(Log, Metadata,
+		{sgsnSMTRecord, SGSNSMTRecord}) ->
+	parse_sgsn_smt(Log, Metadata, SGSNSMTRecord);
+parse(Log, Metadata,
+		{sgsnMTLCSRecord, SGSNMTLCSRecord}) ->
+	parse_sgsn_mt_lcs(Log, Metadata, SGSNMTLCSRecord);
+parse(Log, Metadata,
+		{sgsnMOLCSRecord, SGSNMOLCSRecord}) ->
+	parse_sgsn_mo_lcs(Log, Metadata, SGSNMOLCSRecord);
+parse(Log, Metadata,
+		{sgsnNILCSRecord, SGSNNILCSRecord}) ->
+	parse_sgsn_ni_lcs(Log, Metadata, SGSNNILCSRecord);
+parse(Log, Metadata,
+		{sgsnMBMSRecord, SGSNMBMSRecord}) ->
+	parse_sgsn_mbms(Log, Metadata, SGSNMBMSRecord);
+parse(Log, Metadata,
+		{ggsnMBMSRecord, GGSNMBMSRecord}) ->
+	parse_ggsn_mbms(Log, Metadata, GGSNMBMSRecord);
+parse(Log, Metadata,
+		{sGWRecord, SGWRecord}) ->
+	parse_sgw(Log, Metadata, SGWRecord);
+parse(Log, Metadata,
+		{pGWRecord, PGWRecord}) ->
+	parse_pgw(Log, Metadata, PGWRecord);
+parse(Log, Metadata,
+		{gwMBMSRecord, GWMBMSRecord}) ->
+	parse_gw_mbms(Log, Metadata, GWMBMSRecord);
+parse(Log, Metadata,
+		{tDFRecord, TDFRecord}) ->
+	parse_tdf(Log, Metadata, TDFRecord);
+parse(Log, Metadata,
+		{iPERecord, IPERecord}) ->
+	parse_ipe(Log, Metadata, IPERecord);
+parse(Log, Metadata,
+		{ePDGRecord, EPDGRecord}) ->
+	parse_epdg(Log, Metadata, EPDGRecord);
+parse(Log, Metadata,
+		{tWAGRecord, TWAGRecord}) ->
+	parse_twag(Log, Metadata, TWAGRecord).
 
 -spec parse_sgsn_pdp(Log, Metadata, SGSNPDPRecord) -> Result
 	when
@@ -280,7 +173,7 @@ parse(Filename, Log, Metadata,
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a CDR event detail for an SGSN PDP.
-parse_sgsn_pdp(Log, Metadata, SGSNPDPRecord) ->
+parse_sgsn_pdp(_Log, _Metadata, _SGSNPDPRecord) ->
 	{error, not_implemented}.
 
 -spec parse_sgsn_mmr(Log, Metadata, SGSNMMRecord) -> Result
@@ -293,7 +186,7 @@ parse_sgsn_pdp(Log, Metadata, SGSNPDPRecord) ->
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a CDR event detail for an SGSN MMR.
-parse_sgsn_mmr(Log, Metadata, SGSNMMRecord) ->
+parse_sgsn_mmr(_Log, _Metadata, _SGSNMMRecord) ->
 	{error, not_implemented}.
 
 -spec parse_sgsn_smo(Log, Metadata, SGSNSMORecord) -> Result
@@ -306,7 +199,7 @@ parse_sgsn_mmr(Log, Metadata, SGSNMMRecord) ->
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a CDR event detail for an SGSN SMO.
-parse_sgsn_smo(Log, Metadata, SGSNSMORecord) ->
+parse_sgsn_smo(_Log, _Metadata, _SGSNSMORecord) ->
 	{error, not_implemented}.
 
 -spec parse_sgsn_smt(Log, Metadata, SGSNSMTRecord) -> Result
@@ -319,7 +212,7 @@ parse_sgsn_smo(Log, Metadata, SGSNSMORecord) ->
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a CDR event detail for an SGSN SMT.
-parse_sgsn_smt(Log, Metadata, SGSNSMTRecord) ->
+parse_sgsn_smt(_Log, _Metadata, _SGSNSMTRecord) ->
 	{error, not_implemented}.
 
 -spec parse_sgsn_mt_lcs(Log, Metadata, SGSNMTLCSRecord) -> Result
@@ -332,7 +225,7 @@ parse_sgsn_smt(Log, Metadata, SGSNSMTRecord) ->
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a CDR event detail for an SGSN MT LCS.
-parse_sgsn_mt_lcs(Log, Metadata, SGSNMTLCSRecord) ->
+parse_sgsn_mt_lcs(_Log, _Metadata, _SGSNMTLCSRecord) ->
 	{error, not_implemented}.
 
 -spec parse_sgsn_mo_lcs(Log, Metadata, SGSNMOLCSRecord) -> Result
@@ -345,7 +238,7 @@ parse_sgsn_mt_lcs(Log, Metadata, SGSNMTLCSRecord) ->
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a CDR event detail for an SGSN MO LCS.
-parse_sgsn_mo_lcs(Log, Metadata, SGSNMOLCSRecord) ->
+parse_sgsn_mo_lcs(_Log, _Metadata, _SGSNMOLCSRecord) ->
 	{error, not_implemented}.
 
 -spec parse_sgsn_ni_lcs(Log, Metadata, SGSNNILCSRecord) -> Result
@@ -358,7 +251,7 @@ parse_sgsn_mo_lcs(Log, Metadata, SGSNMOLCSRecord) ->
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a CDR event detail for an SGSN NI LCS.
-parse_sgsn_ni_lcs(Log, Metadata, SGSNNILCSRecord) ->
+parse_sgsn_ni_lcs(_Log, _Metadata, _SGSNNILCSRecord) ->
 	{error, not_implemented}.
 
 -spec parse_sgsn_mbms(Log, Metadata, SGSNMBMSRecord) -> Result
@@ -371,7 +264,7 @@ parse_sgsn_ni_lcs(Log, Metadata, SGSNNILCSRecord) ->
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a CDR event detail for an SGSN MBMS.
-parse_sgsn_mbms(Log, Metadata, SGSNMBMSRecord) ->
+parse_sgsn_mbms(_Log, _Metadata, _SGSNMBMSRecord) ->
 	{error, not_implemented}.
 
 -spec parse_ggsn_mbms(Log, Metadata, GGSNMBMSRecord) -> Result
@@ -384,7 +277,7 @@ parse_sgsn_mbms(Log, Metadata, SGSNMBMSRecord) ->
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a CDR event detail for a GGSN MBMS.
-parse_ggsn_mbms(Log, Metadata, GGSNMBMSRecord) ->
+parse_ggsn_mbms(_Log, _Metadata, _GGSNMBMSRecord) ->
 	{error, not_implemented}.
 
 -spec parse_sgw(Log, Metadata, SGWRecord) -> Result
@@ -397,7 +290,7 @@ parse_ggsn_mbms(Log, Metadata, GGSNMBMSRecord) ->
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a CDR event detail for an SGW.
-parse_sgw(Log, Metadata, SGWRecord) ->
+parse_sgw(_Log, _Metadata, _SGWRecord) ->
 	{error, not_implemented}.
 
 -spec parse_pgw(Log, Metadata, PGWRecord) -> Result
@@ -410,7 +303,7 @@ parse_sgw(Log, Metadata, SGWRecord) ->
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a CDR event detail for a PGW.
-parse_pgw(Log, Metadata, PGWRecord) ->
+parse_pgw(_Log, _Metadata, _PGWRecord) ->
 	{error, not_implemented}.
 
 -spec parse_gw_mbms(Log, Metadata, GWMBMSRecord) -> Result
@@ -423,7 +316,7 @@ parse_pgw(Log, Metadata, PGWRecord) ->
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a CDR event detail for a GW MBMS.
-parse_gw_mbms(Log, Metadata, GWMBMSRecord) ->
+parse_gw_mbms(_Log, _Metadata, _GWMBMSRecord) ->
 	{error, not_implemented}.
 
 -spec parse_tdf(Log, Metadata, TDFRecord) -> Result
@@ -436,7 +329,7 @@ parse_gw_mbms(Log, Metadata, GWMBMSRecord) ->
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a CDR event detail for a TDF.
-parse_tdf(Log, Metadata, TDFRecord) ->
+parse_tdf(_Log, _Metadata, _TDFRecord) ->
 	{error, not_implemented}.
 
 -spec parse_ipe(Log, Metadata, IPERecord) -> Result
@@ -449,7 +342,7 @@ parse_tdf(Log, Metadata, TDFRecord) ->
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a CDR event detail for an IPE.
-parse_ipe(Log, Metadata, IPERecord) ->
+parse_ipe(_Log, _Metadata, _IPERecord) ->
 	{error, not_implemented}.
 
 -spec parse_epdg(Log, Metadata, EPDGRecord) -> Result
@@ -462,7 +355,7 @@ parse_ipe(Log, Metadata, IPERecord) ->
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a CDR event detail for an EPDG.
-parse_epdg(Log, Metadata, EPDGRecord) ->
+parse_epdg(_Log, _Metadata, _EPDGRecord) ->
 	{error, not_implemented}.
 
 -spec parse_twag(Log, Metadata, TWAGRecord) -> Result
@@ -475,6 +368,6 @@ parse_epdg(Log, Metadata, EPDGRecord) ->
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a CDR event detail for a TWAG.
-parse_twag(Log, Metadata, TWAGRecord) ->
+parse_twag(_Log, _Metadata, _TWAGRecord) ->
 	{error, not_implemented}.
 
