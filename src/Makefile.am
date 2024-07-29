@@ -5,7 +5,7 @@
 ASNCFLAGS = $(ERLCFLAGS) \
 		-I ${ERLANG_LIB_DIR_map}/asn_src \
 		-I ${ERLANG_LIB_DIR_cap}/asn_src \
-		+ber +maps +noobj
+		+ber +maps +noobj +undec_rest
 
 noinst_DATA = GenericChargingDataTypes.erl \
 		IMSChargingDataTypes.erl \
