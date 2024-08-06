@@ -347,7 +347,7 @@ parse_session(_Log, _Metadata, _MobileSession) ->
 			tapDecimalPlaces => integer(),
 			taxation => [map()]}| {error, Reason},
 		Reason :: term().
-%% @doc Parse CDRs from the import file.
+%% @doc Parse Accounting Info from the import file.
 %% @private
 parse_accounting(AccountingInfo) ->
 	parse_accounting(AccountingInfo, #{}).
