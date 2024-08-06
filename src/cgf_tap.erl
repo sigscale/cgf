@@ -73,10 +73,10 @@ import(Filename, Log, Metadata)
 %% @hidden
 import1(Filename, Log, Metadata, {ok, {transferBatch,
 		#{callEventDetails := CDRs, accountingInfo := AccountingInfo}}}) ->
-	parse(Filename, Log, Metadata, CDRs, AccountingInfo);
+	parse(Filename, Log, Metadata, AccountingInfo, CDRs);
 import1(Filename, Log, Metadata, {ok, {transferBatch,
 		#{callEventDetails := CDRs, accountingInfo := AccountingInfo}}, _}) ->
-	parse(Filename, Log, Metadata, CDRs, AccountingInfo);
+	parse(Filename, Log, Metadata, AccountingInfo, CDRs);
 import1(_Filename, _Log, _Metadata, {ok, {notification, _Notification}}) ->
 	{error, not_implemented};
 import1(Filename, _Log, _Metadata, {error, Reason}) ->
@@ -88,7 +88,7 @@ import1(Filename, _Log, _Metadata, {error, Reason}) ->
 %%  Internal functions
 %%----------------------------------------------------------------------
 
--spec parse(Filename, Log, Metadata, CDRs, AccountingInfo) -> Result
+-spec parse(Filename, Log, Metadata, AccountingInfo, CDRs) -> Result
 	when
 		Filename :: file:filename(),
 		Log :: disk_log:log(),
@@ -101,10 +101,10 @@ import1(Filename, _Log, _Metadata, {error, Reason}) ->
 		Reason :: term().
 %% @doc Parse CDRs from the import file.
 %% @private
-parse(Filename, Log, Metadata, CDRs, AccountingInfo) ->
+parse(Filename, Log, Metadata, AccountingInfo, CDRs) ->
 	case parse_accounting(AccountingInfo) of
 		#{} = AccountingMap ->
-			parse1(Filename, Log, Metadata, CDRs, AccountingMap);
+			parse1(Filename, Log, Metadata, AccountingMap, CDRs);
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
 					{filename, Filename},
@@ -112,106 +112,106 @@ parse(Filename, Log, Metadata, CDRs, AccountingInfo) ->
 			{error, Reason}
 	end.
 %% @hidden
-parse1(Filename, Log, Metadata,
-		[{mobileOriginatedCall, MobileOriginatedCall} | T], AccountingMap) ->
+parse1(Filename, Log, Metadata, AccountingMap,
+		[{mobileOriginatedCall, MobileOriginatedCall} | T]) ->
 	case parse_mo_call(Log, [{roam_accountingInfo, AccountingMap} | Metadata], MobileOriginatedCall) of
 		ok ->
-			parse1(Filename, Log, Metadata, T, AccountingMap);
+			parse1(Filename, Log, Metadata, AccountingMap,T );
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end;
-parse1(Filename, Log, Metadata,
-		[{mobileTerminatedCall, MobileTerminatedCall} | T], AccountingMap) ->
+parse1(Filename, Log, Metadata, AccountingMap,
+		[{mobileTerminatedCall, MobileTerminatedCall} | T]) ->
 	case parse_mt_call(Log, [{roam_accountingInfo, AccountingMap} | Metadata], MobileTerminatedCall) of
 		ok ->
-			parse1(Filename, Log, Metadata, T, AccountingMap);
+			parse1(Filename, Log, Metadata, AccountingMap, T);
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end;
-parse1(Filename, Log, Metadata,
-		[{supplServiceEvent, SupplServiceEvent} | T], AccountingMap) ->
+parse1(Filename, Log, Metadata, AccountingMap,
+		[{supplServiceEvent, SupplServiceEvent} | T]) ->
 	case parse_mmtel(Log, [{roam_accountingInfo, AccountingMap} | Metadata], SupplServiceEvent) of
 		ok ->
-			parse1(Filename, Log, Metadata, T, AccountingMap);
+			parse1(Filename, Log, Metadata, AccountingMap, T);
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end;
-parse1(Filename, Log, Metadata,
-		[{serviceCentreUsage, ServiceCentreUsage} | T], AccountingMap) ->
+parse1(Filename, Log, Metadata, AccountingMap,
+		[{serviceCentreUsage, ServiceCentreUsage} | T]) ->
 	case parse_sc_sm(Log, [{roam_accountingInfo, AccountingMap} | Metadata], ServiceCentreUsage) of
 		ok ->
-			parse1(Filename, Log, Metadata, T, AccountingMap);
+			parse1(Filename, Log, Metadata, AccountingMap, T);
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end;
-parse1(Filename, Log, Metadata,
-		[{gprsCall, GprsCall} | T], AccountingMap) ->
+parse1(Filename, Log, Metadata, AccountingMap,
+		[{gprsCall, GprsCall} | T]) ->
 	case parse_gprs(Log, [{roam_accountingInfo, AccountingMap} | Metadata], GprsCall) of
 		ok ->
-			parse1(Filename, Log, Metadata, T, AccountingMap);
+			parse1(Filename, Log, Metadata, AccountingMap, T);
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end;
-parse1(Filename, Log, Metadata,
-		[{contentTransaction, ContentTransaction} | T], AccountingMap) ->
+parse1(Filename, Log, Metadata, AccountingMap,
+		[{contentTransaction, ContentTransaction} | T]) ->
 	case parse_content(Log, [{roam_accountingInfo, AccountingMap} | Metadata], ContentTransaction) of
 		ok ->
-			parse1(Filename, Log, Metadata, T, AccountingMap);
+			parse1(Filename, Log, Metadata, AccountingMap, T);
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end;
-parse1(Filename, Log, Metadata,
-		[{locationService, LocationService} | T], AccountingMap) ->
+parse1(Filename, Log, Metadata, AccountingMap,
+		[{locationService, LocationService} | T]) ->
 	case parse_location(Log, [{roam_accountingInfo, AccountingMap} | Metadata], LocationService) of
 		ok ->
-			parse1(Filename, Log, Metadata, T, AccountingMap);
+			parse1(Filename, Log, Metadata, AccountingMap, T);
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end;
-parse1(Filename, Log, Metadata,
-		[{messagingEvent, MessagingEvent} | T], AccountingMap) ->
+parse1(Filename, Log, Metadata, AccountingMap,
+		[{messagingEvent, MessagingEvent} | T]) ->
 	case parse_message(Log, [{roam_accountingInfo, AccountingMap} | Metadata], MessagingEvent) of
 		ok ->
-			parse1(Filename, Log, Metadata, T, AccountingMap);
+			parse1(Filename, Log, Metadata, AccountingMap, T);
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end;
-parse1(Filename, Log, Metadata,
-		[{mobileSession, MobileSession} | T], AccountingMap) ->
+parse1(Filename, Log, Metadata, AccountingMap,
+		[{mobileSession, MobileSession} | T]) ->
 	case parse_session(Log, [{roam_accountingInfo, AccountingMap} | Metadata], MobileSession) of
 		ok ->
-			parse1(Filename, Log, Metadata, T, AccountingMap);
+			parse1(Filename, Log, Metadata, AccountingMap, T);
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end;
-parse1(_Filename, _Log, _Metadata, [], _AccountingMap) ->
+parse1(_Filename, _Log, _Metadata, _AccountingMap, []) ->
 	ok.
 
 -spec parse_mo_call(Log, Metadata, MOC) -> Result
