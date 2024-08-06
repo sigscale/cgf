@@ -71,11 +71,11 @@ import(Filename, Log, Metadata)
 			{error, Reason}
 	end.
 %% @hidden
-import1(Filename, Log, Metadata, {ok, {transferBatch, TransferBatch}}) ->
-	#{callEventDetails := CDRs, accountingInfo := AccountingInfo} = TransferBatch,
+import1(Filename, Log, Metadata, {ok, {transferBatch,
+		#{callEventDetails := CDRs, accountingInfo := AccountingInfo}}}) ->
 	parse(Filename, Log, Metadata, CDRs, AccountingInfo);
-import1(Filename, Log, Metadata, {ok, {transferBatch, TransferBatch}, _}) ->
-	#{callEventDetails := CDRs, accountingInfo := AccountingInfo} = TransferBatch,
+import1(Filename, Log, Metadata, {ok, {transferBatch,
+		#{callEventDetails := CDRs, accountingInfo := AccountingInfo}}, _}) ->
 	parse(Filename, Log, Metadata, CDRs, AccountingInfo);
 import1(_Filename, _Log, _Metadata, {ok, {notification, _Notification}}) ->
 	{error, not_implemented};
