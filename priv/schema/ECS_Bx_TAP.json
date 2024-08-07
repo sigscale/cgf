@@ -97,7 +97,10 @@
 					"$ref": "#/$defs/MoBasicCallInformation"
 				},
 				"basicServiceUsedList": {
-					"$ref": "#/$defs/BasicServiceUsedList"
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/BasicServiceUsed"
+					}
 				},
 				"camelServiceUsed": {
 					"$ref": "#/$defs/CamelServiceUsed"
@@ -109,7 +112,10 @@
 					"$ref": "#/$defs/LocationInformation"
 				},
 				"operatorSpecInformation": {
-					"$ref": "#/$defs/OperatorSpecInfoList"
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
 				},
 				"supplServiceCode": {
 					"$ref": "#/$defs/SupplServiceCode"
@@ -127,7 +133,10 @@
 					"$ref": "#/$defs/MtBasicCallInformation"
 				},
 				"basicServiceUsedList": {
-					"$ref": "#/$defs/BasicServiceUsedList"
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/BasicServiceUsed"
+					}
 				},
 				"camelServiceUsed": {
 					"$ref": "#/$defs/CamelServiceUsed"
@@ -139,7 +148,10 @@
 					"$ref": "#/$defs/LocationInformation"
 				},
 				"operatorSpecInformation": {
-					"$ref": "#/$defs/OperatorSpecInfoList"
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
 				}
 			}
 		},
@@ -175,7 +187,10 @@
 					"$ref": "#/$defs/CamelServiceUsed"
 				},
 				"operatorSpecInformation": {
-					"$ref": "#/$defs/OperatorSpecInfoList"
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
 				}
 			}
 		},
@@ -207,48 +222,58 @@
 			"type": "object",
 			"properties" : {
 				"currencyConversionInfo" : {
-					"$ref" : "#/$defs/CurrencyConversionList"
+					"type" : "array",
+					"items" : {
+						"$ref" : "#/$defs/CurrencyConversion"
+					}
 				},
 				"discounting" : {
-					"$ref" : "#/$defs/DiscountingList"
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/Discounting"
+					}
 				},
 				"localCurrency" : {
-					"$ref" : "#/$defs/LocalCurrency"
+					"$ref" : "#/$defs/Currency"
 				},
 				"tapCurrency" : {
-					"$ref" : "#/$defs/TapCurrency"
+					"$ref" : "#/$defs/Currency"
 				},
 				"tapDecimalPlaces" : {
 					"type" : "integer"
 				},
 				"taxation" : {
-					"$ref" : "#/$defs/TaxationList"
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/Taxation"
+					}
 				}
 			}
-		},
-		"AbsoluteAmount": {
-			"type": "integer"
 		},
 		"BasicService": {
 			"type": "object",
 			"properties": {
 				"fnur": {
-					"$ref": "#/$defs/Fnur"
+					"type": "integer"
 				},
 				"guaranteedBitRate": {
-					"$ref": "#/$defs/GuaranteedBitRate"
+					"type": "integer",
+					"minimum": 0,
+					"maximum": 255
 				},
 				"maximumBitRate": {
-					"$ref": "#/$defs/MaximumBitRate"
+					"type": "integer",
+					"minimum": 0,
+					"maximum": 255
 				},
 				"serviceCode": {
 					"$ref": "#/$defs/BasicServiceCode"
 				},
 				"transparencyIndicator": {
-					"$ref": "#/$defs/TransparencyIndicator"
+					"type": "integer"
 				},
 				"userProtocolIndicator": {
-					"$ref": "#/$defs/UserProtocolIndicator"
+					"type": "integer"
 				}
 			}
 		},
@@ -258,7 +283,8 @@
 					"type": "object",
 					"properties": {
 						"teleServiceCode": {
-							"$ref": "#/$defs/TeleServiceCode"
+							"type": "string",
+							"pattern": "^([0-9a-fA-F]{2})*$"
 						}
 					}
 				},
@@ -279,28 +305,22 @@
 					"$ref": "#/$defs/BasicService"
 				},
 				"chargeInformationList": {
-					"$ref": "#/$defs/ChargeInformationList"
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/ChargeInformation"
+					}
 				},
 				"chargingTimeStamp": {
 					"$ref": "#/$defs/ChargingTimeStamp"
 				},
 				"hSCSDIndicator": {
-					"$ref": "#/$defs/HSCSDIndicator"
+					"type": "string"
 				}
-			}
-		},
-		"BasicServiceUsedList": {
-			"type": "array",
-			"items": {
-				"$ref": "#/$defs/BasicServiceUsed"
 			}
 		},
 		"BearerServiceCode": {
 			"type": "string",
 			"pattern": "^([0-9a-fA-F]{2})*$"
-		},
-		"Bid": {
-			"type": "string"
 		},
 		"CallEventStartTimeStamp": {
 			"type": "string",
@@ -315,7 +335,7 @@
 					"pattern": "^[0-9]*$"
 				},
 				"clirIndicator": {
-					"$ref": "#/$defs/ClirIndicator"
+					"type": "integer"
 				},
 				"sMSOriginator": {
 					"description": "SMS originator directory number (E.164).",
@@ -332,64 +352,46 @@
 			"type": "object",
 			"properties": {
 				"callTypeLevel1": {
-					"$ref": "#/$defs/CallTypeLevel1"
+					"type": "integer"
 				},
 				"callTypeLevel2": {
-					"$ref": "#/$defs/CallTypeLevel2"
+					"type": "integer"
 				},
 				"callTypeLevel3": {
-					"$ref": "#/$defs/CallTypeLevel3"
+					"type": "integer"
 				}
 			}
-		},
-		"CallTypeLevel1": {
-			"type": "integer"
-		},
-		"CallTypeLevel2": {
-			"type": "integer"
-		},
-		"CallTypeLevel3": {
-			"type": "integer"
-		},
-		"CamelDestinationNumber": {
-			"type": "string",
-			"pattern": "^[0-9a-e]*$"
-		},
-		"CamelInvocationFee": {
-			"$ref": "#/$defs/AbsoluteAmount"
-		},
-		"CamelServiceKey": {
-			"type": "integer"
-		},
-		"CamelServiceLevel": {
-			"type": "integer"
 		},
 		"CamelServiceUsed": {
 			"type": "object",
 			"properties": {
 				"camelInvocationFee": {
-					"$ref": "#/$defs/CamelInvocationFee"
+					"type": "integer"
 				},
 				"camelServiceKey": {
-					"$ref": "#/$defs/CamelServiceKey"
+					"type": "integer"
 				},
 				"camelServiceLevel": {
-					"$ref": "#/$defs/CamelServiceLevel"
+					"type": "integer"
 				},
 				"cseInformation": {
-					"$ref": "#/$defs/CseInformation"
+					"type": "string",
+					"pattern": "^([0-9a-fA-F]{2})*$"
 				},
 				"defaultCallHandling": {
-					"$ref": "#/$defs/DefaultCallHandlingIndicator"
+					"type": "integer"
 				},
 				"discountInformation": {
 					"$ref": "#/$defs/DiscountInformation"
 				},
 				"exchangeRateCode": {
-					"$ref": "#/$defs/ExchangeRateCode"
+					"type": "integer"
 				},
 				"taxInformation": {
-					"$ref": "#/$defs/TaxInformationList"
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/TaxInformation"
+					}
 				},
 				"threeGcamelDestination": {
 					"$ref": "#/$defs/ThreeGcamelDestination"
@@ -400,12 +402,6 @@
 			"type": "integer",
 			"minimum": 0,
 			"maximum": 255
-		},
-		"CellId": {
-			"type": "integer"
-		},
-		"Charge": {
-			"$ref": "#/$defs/AbsoluteAmount"
 		},
 		"ChargeableSubscriber": {
 			"oneOf": [
@@ -427,43 +423,25 @@
 				}
 			]
 		},
-		"ChargeableUnits": {
-			"type": "integer"
-		},
 		"ChargeDetail": {
 			"type": "object",
 			"properties": {
 				"charge": {
-					"$ref": "#/$defs/Charge"
+					"type": "integer"
 				},
 				"chargeDetailTimeStamp": {
-					"$ref": "#/$defs/ChargeDetailTimeStamp"
+					"$ref": "#/$defs/ChargingTimeStamp"
 				},
 				"chargeType": {
-					"$ref": "#/$defs/ChargeType"
+					"type": "string"
 				},
 				"chargeableUnits": {
-					"$ref": "#/$defs/ChargeableUnits"
+					"type": "integer"
 				},
 				"chargedUnits": {
-					"$ref": "#/$defs/ChargedUnits"
+					"type": "integer"
 				}
 			}
-		},
-		"ChargeDetailList": {
-			"type": "array",
-			"items": {
-				"$ref": "#/$defs/ChargeDetail"
-			}
-		},
-		"ChargeDetailTimeStamp": {
-			"$ref": "#/$defs/ChargingTimeStamp"
-		},
-		"ChargedItem": {
-			"type": "string"
-		},
-		"ChargedUnits": {
-			"type": "integer"
 		},
 		"ChargeInformation": {
 			"type": "object",
@@ -472,44 +450,31 @@
 					"$ref": "#/$defs/CallTypeGroup"
 				},
 				"chargeDetailList": {
-					"$ref": "#/$defs/ChargeDetailList"
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/ChargeDetail"
+					}
 				},
 				"chargedItem": {
-					"$ref": "#/$defs/ChargedItem"
+					"type": "string"
 				},
 				"discountInformation": {
 					"$ref": "#/$defs/DiscountInformation"
 				},
 				"exchangeRateCode": {
-					"$ref": "#/$defs/ExchangeRateCode"
+					"type": "integer"
 				},
 				"taxInformation": {
-					"$ref": "#/$defs/TaxInformationList"
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/TaxInformation"
+					}
 				}
 			}
-		},
-		"ChargeInformationList": {
-			"type": "array",
-			"items": {
-				"$ref": "#/$defs/ChargeInformation"
-			}
-		},
-		"ChargingId": {
-			"type" : "integer"
 		},
 		"ChargingTimeStamp": {
 			"type": "string",
 			"format": "date-time"
-		},
-		"ChargeType": {
-			"type": "string"
-		},
-		"ClirIndicator": {
-			"type": "integer"
-		},
-		"CseInformation": {
-			"type": "string",
-			"pattern": "^([0-9a-fA-F]{2})*$"
 		},
 		"Currency" : {
 			"pattern" : "^([0-9a-fA-F]{2})*$",
@@ -519,24 +484,15 @@
 			"type" : "object",
 			"properties" : {
 				"exchangeRate" : {
-					"$ref" : "#/$defs/ExchangeRate"
+					"type" : "integer"
 				},
 				"exchangeRateCode" : {
-					"$ref" : "#/$defs/ExchangeRateCode"
+					"type": "integer"
 				},
 				"numberOfDecimalPlaces" : {
 					"type": "integer"
 				}
 			}
-		},
-		"CurrencyConversionList" : {
-			"type" : "array",
-			"items" : {
-				"$ref" : "#/$defs/CurrencyConversion"
-			}
-		},
-		"DefaultCallHandlingIndicator": {
-			"type": "integer"
 		},
 		"Destination": {
 			"type": "object",
@@ -564,19 +520,13 @@
 				}
 			}
 		},
-		"DestinationNetwork": {
-			"$ref": "#/$defs/NetworkId"
-		},
-		"Discount": {
-			"$ref": "#/$defs/DiscountValue"
-		},
 		"DiscountApplied": {
 			"oneOf": [
 				{
 					"type": "object",
 					"properties": {
 						"fixedDiscountValue": {
-							"$ref": "#/$defs/FixedDiscountValue"
+							"type": "integer"
 						}
 					}
 				},
@@ -584,37 +534,25 @@
 					"type": "object",
 					"properties": {
 						"discountRate": {
-							"$ref": "#/$defs/DiscountRate"
+							"type": "integer"
 						}
 					}
 				}
 			]
 		},
-		"DiscountCode": {
-			"type": "integer"
-		},
 		"DiscountInformation": {
 			"type": "object",
 			"properties": {
 				"discount": {
-					"$ref": "#/$defs/Discount"
+					"type": "integer"
 				},
 				"discountCode": {
-					"$ref": "#/$defs/DiscountCode"
+					"type": "integer"
 				},
 				"discountableAmount": {
-					"$ref": "#/$defs/DiscountableAmount"
+					"type": "integer"
 				}
 			}
-		},
-		"DiscountRate": {
-			"$ref": "#/$defs/PercentageRate"
-		},
-		"DiscountValue": {
-			"$ref": "#/$defs/AbsoluteAmount"
-		},
-		"DiscountableAmount": {
-			"$ref": "#/$defs/AbsoluteAmount"
 		},
 		"Discounting": {
 			"type": "object",
@@ -623,56 +561,35 @@
 					"$ref": "#/$defs/DiscountApplied"
 				},
 				"discountCode": {
-					"$ref": "#/$defs/DiscountCode"
+					"type": "integer"
 				}
-			}
-		},
-		"DiscountingList": {
-			"type": "array",
-			"items": {
-				"$ref": "#/$defs/Discounting"
 			}
 		},
 		"DiscountInformation": {
 			"type": "object",
 			"properties": {
 				"discount": {
-					"$ref": "#/$defs/Discount"
+					"type": "integer"
 				},
 				"discountCode": {
-					"$ref": "#/$defs/DiscountCode"
+					"type": "integer"
 				},
 				"discountableAmount": {
-					"$ref": "#/$defs/DiscountableAmount"
+					"type": "integer"
 				}
 			}
-		},
-		"Esn": {
-			"type": "string"
-		},
-		"ExchangeRate" : {
-			"type" : "integer"
-		},
-		"ExchangeRateCode": {
-			"type": "integer"
-		},
-		"FixedDiscountValue": {
-			"$ref": "#/$defs/DiscountValue"
-		},
-		"Fnur": {
-			"type": "integer"
 		},
 		"GeographicalLocation": {
 			"type": "object",
 			"properties": {
 				"servingBid": {
-					"$ref": "#/$defs/ServingBid"
+					"type": "string"
 				},
 				"servingLocationDescription": {
-					"$ref": "#/$defs/ServingLocationDescription"
+					"type": "string"
 				},
 				"servingNetwork": {
-					"$ref": "#/$defs/ServingNetwork"
+					"type": "string"
 				}
 			}
 		},
@@ -691,7 +608,7 @@
 					"$ref": "#/$defs/CallEventStartTimeStamp"
 				},
 				"totalCallEventDuration": {
-					"$ref": "#/$defs/TotalCallEventDuration"
+					"type": "integer"
 				},
 				"causeForTerm": {
 					"$ref": "#/$defs/CauseForTerm"
@@ -702,10 +619,10 @@
 					"$ref": "#/$defs/PDPContextStartTimestamp"
 				},
 				"networkInitPDPContext": {
-					"$ref" : "#/$defs/NetworkInitPDPContext"
+					"type" : "integer"
 				},
 				"chargingId": {
-					"$ref": "#/$defs/ChargingId"
+					"type" : "integer"
 				}
 			}
 		},
@@ -716,7 +633,7 @@
 					"$ref": "#/$defs/ChargeableSubscriber"
 				},
 				"pdpAddress": {
-					"$ref": "#/$defs/PdpAddress"
+					"type": "string"
 				},
 				"networkAccessIdentifier": {
 					"type": "string"
@@ -758,7 +675,10 @@
 					"type": "integer"
 				},
 				"recEntity": {
-					"$ref": "#/$defs/RecEntityCodeList"
+					"type": "array",
+					"items": {
+						"type": "integer"
+					}
 				}
 			}
 		},
@@ -767,28 +687,14 @@
 			"properties": {
 			}
 		},
-		"GuaranteedBitRate": {
-			"type": "integer",
-			"minimum": 0,
-			"maximum": 255
-		},
-		"HSCSDIndicator": {
-			"type": "string"
-		},
-		"HomeBid": {
-			"$ref": "#/$defs/Bid"
-		},
-		"HomeLocationDescription": {
-			"$ref": "#/$defs/LocationDescription"
-		},
 		"HomeLocationInformation": {
 			"type": "object",
 			"properties": {
 				"homeBid": {
-					"$ref": "#/$defs/HomeBid"
+					"type": "string"
 				},
 				"homeLocationDescription": {
-					"$ref": "#/$defs/HomeLocationDescription"
+					"type": "string"
 				}
 			}
 		},
@@ -811,7 +717,7 @@
 					"type": "object",
 					"properties": {
 						"esn": {
-							"$ref": "#/$defs/Esn"
+							"type": "string"
 						}
 					}
 				}
@@ -821,15 +727,6 @@
 			"description": "International mobile subscriber identity (IMSI).",
 			"type": "string",
 			"pattern": "^[0-9]{5,15}$"
-		},
-		"LocalCurrency" : {
-			"$ref" : "#/$defs/Currency"
-		},
-		"LocationArea": {
-			"type": "integer"
-		},
-		"LocationDescription": {
-			"type": "string"
 		},
 		"LocationInformation": {
 			"type": "object",
@@ -844,11 +741,6 @@
 					"$ref": "#/$defs/NetworkLocation"
 				}
 			}
-		},
-		"MaximumBitRate": {
-			"type": "integer",
-			"minimum": 0,
-			"maximum": 255
 		},
 		"Mdn": {
 			"description": "Mobile Directory Number (MDN)",
@@ -887,14 +779,14 @@
 					"$ref": "#/$defs/Destination"
 				},
 				"destinationNetwork": {
-					"$ref": "#/$defs/DestinationNetwork"
+					"$ref": "#/$defs/NetworkId"
 				},
 				"rapFileSequenceNumber": {
 				},
 				"simToolkitIndicator": {
 				},
 				"totalCallEventDuration": {
-					"$ref": "#/$defs/TotalCallEventDuration"
+					"type": "integer"
 				}
 			}
 		},
@@ -919,14 +811,14 @@
 					"$ref": "#/$defs/ChargeableSubscriber"
 				},
 				"originatingNetwork": {
-					"$ref": "#/$defs/OriginatingNetwork"
+					"$ref": "#/$defs/NetworkId"
 				},
 				"rapFileSequenceNumber": {
 				},
 				"simToolkitIndicator": {
 				},
 				"totalCallEventDuration": {
-					"$ref": "#/$defs/TotalCallEventDuration"
+					"type": "integer"
 				}
 			}
 		},
@@ -935,9 +827,6 @@
 			"type": "string",
 			"pattern": "^[0-9]{1,6}$"
 		},
-		"NetworkInitPDPContext": {
-			"type" : "integer"
-		},
 		"NetworkLocation": {
 			"type": "object",
 			"properties": {
@@ -945,55 +834,19 @@
 					"$ref": "#/$defs/CallReference"
 				},
 				"cellId": {
-					"$ref": "#/$defs/CellId"
+					"type": "integer"
 				},
 				"locationArea": {
-					"$ref": "#/$defs/LocationArea"
+					"type": "integer"
 				},
 				"recEntityCode": {
-					"$ref": "#/$defs/RecEntityCode"
+					"type": "integer"
 				}
 			}
-		},
-		"OperatorSpecInfoList": {
-			"type": "array",
-			"items": {
-				"$ref": "#/$defs/OperatorSpecInformation"
-			}
-		},
-		"OperatorSpecInformation": {
-			"type": "string"
-		},
-		"OriginatingNetwork": {
-			"$ref": "#/$defs/NetworkId"
-		},
-		"PdpAddress": {
-			"type": "string"
 		},
 		"PDPContextStartTimestamp": {
 			"type": "string",
 			"format": "date-time"
-		},
-		"PercentageRate": {
-			"type": "integer"
-		},
-		"RecEntityCode": {
-			"type": "integer"
-		},
-		"RecEntityCodeList": {
-			"type": "array",
-			"items": {
-				"$ref": "#/$defs/RecEntityCode"
-			}
-		},
-		"ServingBid": {
-			"$ref": "#/$defs/Bid"
-		},
-		"ServingLocationDescription": {
-			"$ref": "#/$defs/LocationDescription"
-		},
-		"ServingNetwork": {
-			"type": "string"
 		},
 		"SimChargeableSubscriber": {
 			"type": "object",
@@ -1010,93 +863,53 @@
 			"type": "string",
 			"pattern": "^([0-9a-fA-F]{2})*$"
 		},
-		"TapCurrency" : {
-			"$ref" : "#/$defs/Currency"
-		},
-		"TaxCode": {
-			"type": "integer"
-		},
-		"TaxIndicator": {
-			"type": "string"
-		},
 		"TaxInformation": {
 			"type": "object",
 			"properties": {
 				"taxCode": {
-					"$ref": "#/$defs/TaxCode"
+					"type": "integer"
 				},
 				"taxValue": {
-					"$ref": "#/$defs/TaxValue"
+					"type": "integer"
 				},
 				"taxableAmount": {
-					"$ref": "#/$defs/TaxableAmount"
+					"type": "integer"
 				}
 			}
-		},
-		"TaxInformationList": {
-			"type": "array",
-			"items": {
-				"$ref": "#/$defs/TaxInformation"
-			}
-		},
-		"TaxRate": {
-			"type": "string",
-			"pattern": "^[0-9]{7}$"
-		},
-		"TaxType": {
-			"type": "string",
-			"pattern": "^[\\x20-\\x7E]{2}$"
-		},
-		"TaxValue": {
-			"$ref": "#/$defs/AbsoluteAmount"
-		},
-		"TaxableAmount": {
-			"$ref": "#/$defs/AbsoluteAmount"
 		},
 		"Taxation": {
 			"type": "object",
 			"properties": {
 				"chargeType": {
-					"$ref": "#/$defs/ChargeType"
+					"type": "string"
 				},
 				"taxCode": {
-					"$ref": "#/$defs/TaxCode"
+					"type": "integer"
 				},
 				"taxIndicator": {
-					"$ref": "#/$defs/TaxIndicator"
+					"type": "string"
 				},
 				"taxRate": {
-					"$ref": "#/$defs/TaxRate"
+					"type": "string",
+					"pattern": "^[0-9]{7}$"
 				},
 				"taxType": {
-					"$ref": "#/$defs/TaxType"
+					"type": "string",
+					"pattern": "^[\\x20-\\x7E]{2}$"
 				}
 			}
-		},
-		"TaxationList": {
-			"type": "array",
-			"items": {
-				"$ref": "#/$defs/Taxation"
-			}
-		},
-		"TeleServiceCode": {
-			"type": "string",
-			"pattern": "^([0-9a-fA-F]{2})*$"
 		},
 		"ThirdPartyInformation": {
 			"type": "object",
 			"properties": {
 				"clirIndicator": {
-					"$ref": "#/$defs/ClirIndicator"
+					"type": "integer"
 				},
 				"thirdPartyNumber": {
-					"$ref": "#/$defs/ThirdPartyNumber"
+					"type": "string",
+					"pattern": "^[0-9a-e]*$"
 				}
 			}
-		},
-		"ThirdPartyNumber": {
-			"type": "string",
-			"pattern": "^[0-9a-e]*$"
 		},
 		"ThreeGcamelDestination": {
 			"oneOf": [
@@ -1104,7 +917,8 @@
 					"type": "object",
 					"properties": {
 						"camelDestinationNumber": {
-							"$ref": "#/$defs/CamelDestinationNumber"
+							"type": "string",
+							"pattern": "^[0-9a-e]*$"
 						}
 					}
 				},
@@ -1117,15 +931,6 @@
 					}
 				}
 			]
-		},
-		"TotalCallEventDuration": {
-			"type": "integer"
-		},
-		"TransparencyIndicator": {
-			"type": "integer"
-		},
-		"UserProtocolIndicator": {
-			"type": "integer"
 		}
 	}
 }
