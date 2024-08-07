@@ -685,6 +685,21 @@
 		"GprsServiceUsed": {
 			"type": "object",
 			"properties": {
+				"iMSSignallingContext": {
+					"type": "integer"
+				},
+				"chargeInformationList": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/ChargeInformation"
+					}
+				},
+				"dataVolumeIncoming": {
+					"type": "integer"
+				},
+				"dataVolumeOutgoing": {
+					"type": "integer"
+				}
 			}
 		},
 		"HomeLocationInformation": {
