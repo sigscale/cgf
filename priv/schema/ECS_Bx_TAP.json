@@ -737,6 +737,29 @@
 		"GprsLocationInformation": {
 			"type": "object",
 			"properties": {
+				"geographicalLocation": {
+					"$ref": "#/$defs/GeographicalLocation"
+				},
+				"gprsNetworkLocation": {
+					"$ref": "#/$defs/GprsNetworkLocation"
+				},
+				"homeLocationInformation": {
+					"$ref": "#/$defs/HomeLocationInformation"
+				}
+			}
+		},
+		"GprsNetworkLocation": {
+			"type": "object",
+			"properties": {
+				"cellId": {
+					"type": "integer"
+				},
+				"locationArea": {
+					"type": "integer"
+				},
+				"recEntity": {
+					"$ref": "#/$defs/RecEntityCodeList"
+				}
 			}
 		},
 		"GprsServiceUsed": {
@@ -956,6 +979,12 @@
 		},
 		"RecEntityCode": {
 			"type": "integer"
+		},
+		"RecEntityCodeList": {
+			"type": "array",
+			"items": {
+				"$ref": "#/$defs/RecEntityCode"
+			}
 		},
 		"ServingBid": {
 			"$ref": "#/$defs/Bid"
