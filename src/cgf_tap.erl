@@ -514,11 +514,19 @@ mobile_originated_call(#{basicCallInformation
 mobile_originated_call(MobileOriginatedCall) ->
 	mobile_originated_call1(MobileOriginatedCall, #{}).
 %% @hidden
-mobile_originated_call1(#{basicServiceUsedList
+mobile_originated_call1(#{locationInformation
+		:= LocationInformation} = MobileOriginatedCall, Acc) ->
+	LI = location_information(LocationInformation),
+	Acc1 = Acc#{<<"locationInformation">> => LI},
+	mobile_originated_call2(MobileOriginatedCall, Acc1);
+mobile_originated_call1(MobileOriginatedCall, Acc) ->
+	mobile_originated_call2(MobileOriginatedCall, Acc).
+%% @hidden
+mobile_originated_call2(#{basicServiceUsedList
 		:= BasicServiceUsedList} = _MobileOriginatedCall, Acc) ->
 	BSUL = [basic_service_used(BSU) || BSU <- BasicServiceUsedList],
 	Acc#{<<"basicServiceUsedList">> => BSUL};
-mobile_originated_call1(_MobileOriginatedCall, Acc) ->
+mobile_originated_call2(_MobileOriginatedCall, Acc) ->
 	Acc.
 
 %% @hidden
@@ -530,11 +538,19 @@ mobile_terminated_call(#{basicCallInformation
 mobile_terminated_call(MobileTerminatedCall) ->
 	mobile_terminated_call1(MobileTerminatedCall, #{}).
 %% @hidden
-mobile_terminated_call1(#{basicServiceUsedList
+mobile_terminated_call1(#{locationInformation
+		:= LocationInformation} = MobileTerminatedCall, Acc) ->
+	LI = location_information(LocationInformation),
+	Acc1 = Acc#{<<"locationInformation">> => LI},
+	mobile_terminated_call2(MobileTerminatedCall, Acc1);
+mobile_terminated_call1(MobileTerminatedCall, Acc) ->
+	mobile_terminated_call2(MobileTerminatedCall, Acc).
+%% @hidden
+mobile_terminated_call2(#{basicServiceUsedList
 		:= BasicServiceUsedList} = _MobileTerminatedCall, Acc) ->
 	BSUL = [basic_service_used(BSU) || BSU <- BasicServiceUsedList],
 	Acc#{<<"basicServiceUsedList">> => BSUL};
-mobile_terminated_call1(_MobileTerminatedCall, Acc) ->
+mobile_terminated_call2(_MobileTerminatedCall, Acc) ->
 	Acc.
 
 %% @hidden
@@ -546,10 +562,17 @@ gprs_call(#{gprsBasicCallInformation
 gprs_call(GprsCall) ->
 	gprs_call1(GprsCall, #{}).
 %% @hidden
-gprs_call1(#{gprsServiceUsed := GprsServiceUsed} = _GprsCall, Acc) ->
+gprs_call1(#{gprsLocationInformation
+		:= GprsLocationInformation} = GprsCall, Acc) ->
+	Acc1 = Acc#{<<"gprsLocationInformation">> => GprsLocationInformation},
+	gprs_call2(GprsCall, Acc1);
+gprs_call1(GprsCall, Acc) ->
+	gprs_call2(GprsCall, Acc).
+%% @hidden
+gprs_call2(#{gprsServiceUsed := GprsServiceUsed} = _GprsCall, Acc) ->
 	GSU = gprs_service_used(GprsServiceUsed),
 	Acc#{<<"gprsServiceUsed">> => GSU};
-gprs_call1(_GprsCall, Acc) ->
+gprs_call2(_GprsCall, Acc) ->
 	Acc.
 
 %% @hidden
@@ -770,6 +793,14 @@ bcd1([], Acc) ->
 	Acc.
 
 %% @hidden
+octet_string(OctetString) when is_binary(OctetString) ->
+	ByteSize = byte_size(OctetString),
+	FieldWidth = 2 * ByteSize,
+	BitSize = ByteSize * 8,
+	<<N:BitSize>> = OctetString,
+	io_lib:fwrite("~*.16.0b", [FieldWidth, N]).
+
+%% @hidden
 timestamp(#{localTimeStamp := <<Year:4/binary, Month:2/binary,
 		Day:2/binary, Hour:2/binary, Minute:2/binary, Second:2/binary>>,
 		utcTimeOffsetCode := Z}) ->
@@ -850,6 +881,49 @@ basic_service_code({teleServiceCode, TeleServiceCode}) ->
 	#{<<"teleServiceCode">> => TeleServiceCode};
 basic_service_code({bearerServiceCode, BearerServiceCode}) ->
 	#{<<"bearerServiceCode">> => BearerServiceCode}.
+
+%% @hidden
+location_information(#{geographicalLocation
+		:= GeographicalLocation} = LocationInformation) ->
+	Acc = #{<<"geographicalLocation">> => GeographicalLocation},
+	location_information1(LocationInformation, Acc);
+location_information(LocationInformation) ->
+	location_information1(LocationInformation, #{}).
+%% @hidden
+location_information1(#{homeLocationInformation
+		:= HomeLocationInformation} = LocationInformation, Acc) ->
+	Acc1 = Acc#{<<"homeLocationInformation">> => HomeLocationInformation},
+	location_information2(LocationInformation, Acc1);
+location_information1(LocationInformation, Acc) ->
+	location_information2(LocationInformation, Acc).
+%% @hidden
+location_information2(#{networkLocation
+		:= NetworkLocation} = _LocationInformation, Acc) ->
+	NL = network_location(NetworkLocation),
+	Acc#{<<"networkLocation">> => NL};
+location_information2(_LocationInformation, Acc) ->
+	Acc.
+
+%% @hidden
+network_location(#{callReference
+		:= CallReference} = NetworkLocation)
+		when is_binary(CallReference) ->
+	Acc = #{<<"callReference">> => octet_string(CallReference)},
+	network_location1(NetworkLocation, Acc);
+network_location(NetworkLocation) ->
+	network_location1(NetworkLocation, #{}).
+%% @hidden
+network_location1(#{cellId := CellId} = NetworkLocation, Acc) ->
+	Acc1 = Acc#{<<"cellId">> => CellId},
+	network_location2(NetworkLocation, Acc1);
+network_location1(NetworkLocation, Acc) ->
+	network_location2(NetworkLocation, Acc).
+%% @hidden
+network_location2(#{locationArea
+		:= LocationArea} = _NetworkLocation, Acc) ->
+	Acc#{<<"locationArea">> => LocationArea};
+network_location2(_NetworkLocation, Acc) ->
+	Acc.
 
 %% @hidden
 charge_information(#{chargedItem
