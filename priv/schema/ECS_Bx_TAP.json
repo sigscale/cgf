@@ -205,27 +205,27 @@
 		},
 		"AccountingInfo": {
 			"type": "object",
-         "properties" : {
-            "currencyConversionInfo" : {
-               "$ref" : "#/$defs/CurrencyConversionList"
-            },
-            "discounting" : {
-               "$ref" : "#/$defs/DiscountingList"
-            },
-            "localCurrency" : {
-               "$ref" : "#/$defs/LocalCurrency"
-            },
-            "tapCurrency" : {
-               "$ref" : "#/$defs/TapCurrency"
-            },
-            "tapDecimalPlaces" : {
-               "type" : "integer"
-            },
-            "taxation" : {
-               "$ref" : "#/$defs/TaxationList"
-            }
-         }
-      },
+			"properties" : {
+				"currencyConversionInfo" : {
+					"$ref" : "#/$defs/CurrencyConversionList"
+				},
+				"discounting" : {
+					"$ref" : "#/$defs/DiscountingList"
+				},
+				"localCurrency" : {
+					"$ref" : "#/$defs/LocalCurrency"
+				},
+				"tapCurrency" : {
+					"$ref" : "#/$defs/TapCurrency"
+				},
+				"tapDecimalPlaces" : {
+					"type" : "integer"
+				},
+				"taxation" : {
+					"$ref" : "#/$defs/TaxationList"
+				}
+			}
+		},
 		"AbsoluteAmount": {
 			"type": "integer"
 		},
@@ -511,30 +511,30 @@
 			"type": "string",
 			"pattern": "^([0-9a-fA-F]{2})*$"
 		},
-      "Currency" : {
-         "pattern" : "^([0-9a-fA-F]{2})*$",
-         "type" : "string"
-      },
-      "CurrencyConversion" : {
-         "type" : "object",
-         "properties" : {
-            "exchangeRate" : {
-               "$ref" : "#/$defs/ExchangeRate"
-            },
-            "exchangeRateCode" : {
-               "$ref" : "#/$defs/ExchangeRateCode"
-            },
-            "numberOfDecimalPlaces" : {
-               "type": "integer"
-            }
-         }
-      },
-      "CurrencyConversionList" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/$defs/CurrencyConversion"
-         }
-      },
+		"Currency" : {
+			"pattern" : "^([0-9a-fA-F]{2})*$",
+			"type" : "string"
+		},
+		"CurrencyConversion" : {
+			"type" : "object",
+			"properties" : {
+				"exchangeRate" : {
+					"$ref" : "#/$defs/ExchangeRate"
+				},
+				"exchangeRateCode" : {
+					"$ref" : "#/$defs/ExchangeRateCode"
+				},
+				"numberOfDecimalPlaces" : {
+					"type": "integer"
+				}
+			}
+		},
+		"CurrencyConversionList" : {
+			"type" : "array",
+			"items" : {
+				"$ref" : "#/$defs/CurrencyConversion"
+			}
+		},
 		"DefaultCallHandlingIndicator": {
 			"type": "integer"
 		},
@@ -650,9 +650,9 @@
 		"Esn": {
 			"type": "string"
 		},
-      "ExchangeRate" : {
-         "type" : "integer"
-      },
+		"ExchangeRate" : {
+			"type" : "integer"
+		},
 		"ExchangeRateCode": {
 			"type": "integer"
 		},
@@ -799,9 +799,9 @@
 			"type": "string",
 			"pattern": "^[0-9]{5,15}$"
 		},
-      "LocalCurrency" : {
-         "$ref" : "#/$defs/Currency"
-      },
+		"LocalCurrency" : {
+			"$ref" : "#/$defs/Currency"
+		},
 		"LocationArea": {
 			"type": "integer"
 		},
@@ -981,9 +981,9 @@
 			"type": "string",
 			"pattern": "^([0-9a-fA-F]{2})*$"
 		},
-      "TapCurrency" : {
-         "$ref" : "#/$defs/Currency"
-      },
+		"TapCurrency" : {
+			"$ref" : "#/$defs/Currency"
+		},
 		"TaxCode": {
 			"type": "integer"
 		},
