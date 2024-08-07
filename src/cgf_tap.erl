@@ -71,9 +71,12 @@ import(Filename, Log, Metadata)
 			{error, Reason}
 	end.
 %% @hidden
-import1(Filename, Log, Metadata, {ok, {transferBatch, TransferBatch}}) ->
-	#{callEventDetails := CDRs} = TransferBatch,
-	parse(Filename, Log, Metadata, CDRs);
+import1(Filename, Log, Metadata, {ok, {transferBatch,
+		#{callEventDetails := CDRs, accountingInfo := AccountingInfo}}}) ->
+	parse(Filename, Log, Metadata, AccountingInfo, CDRs);
+import1(Filename, Log, Metadata, {ok, {transferBatch,
+		#{callEventDetails := CDRs, accountingInfo := AccountingInfo}}, _}) ->
+	parse(Filename, Log, Metadata, AccountingInfo, CDRs);
 import1(_Filename, _Log, _Metadata, {ok, {notification, _Notification}}) ->
 	{error, not_implemented};
 import1(Filename, _Log, _Metadata, {error, Reason}) ->
@@ -85,7 +88,7 @@ import1(Filename, _Log, _Metadata, {error, Reason}) ->
 %%  Internal functions
 %%----------------------------------------------------------------------
 
--spec parse(Filename, Log, Metadata, CDRs) -> Result
+-spec parse(Filename, Log, Metadata, AccountingInfo, CDRs) -> Result
 	when
 		Filename :: file:filename(),
 		Log :: disk_log:log(),
@@ -93,110 +96,122 @@ import1(Filename, _Log, _Metadata, {error, Reason}) ->
 		AttributeName :: string(),
 		AttributeValue :: term(),
 		CDRs :: [tuple()],
+		AccountingInfo :: map(),
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse CDRs from the import file.
 %% @private
-parse(Filename, Log, Metadata,
+parse(Filename, Log, Metadata, AccountingInfo, CDRs) ->
+	case parse_accounting(AccountingInfo) of
+		#{} = AccountingMap ->
+			parse1(Filename, Log, Metadata, AccountingMap, CDRs);
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+					{filename, Filename},
+					{error, Reason}]),
+			{error, Reason}
+	end.
+%% @hidden
+parse1(Filename, Log, Metadata, AccountingMap,
 		[{mobileOriginatedCall, MobileOriginatedCall} | T]) ->
-	case parse_mo_call(Log, Metadata, MobileOriginatedCall) of
+	case parse_mo_call(Log, [{roam_accountingInfo, AccountingMap} | Metadata], MobileOriginatedCall) of
 		ok ->
-			parse(Filename, Log, Metadata, T);
+			parse1(Filename, Log, Metadata, AccountingMap,T );
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end;
-parse(Filename, Log, Metadata,
+parse1(Filename, Log, Metadata, AccountingMap,
 		[{mobileTerminatedCall, MobileTerminatedCall} | T]) ->
-	case parse_mt_call(Log, Metadata, MobileTerminatedCall) of
+	case parse_mt_call(Log, [{roam_accountingInfo, AccountingMap} | Metadata], MobileTerminatedCall) of
 		ok ->
-			parse(Filename, Log, Metadata, T);
+			parse1(Filename, Log, Metadata, AccountingMap, T);
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end;
-parse(Filename, Log, Metadata,
+parse1(Filename, Log, Metadata, AccountingMap,
 		[{supplServiceEvent, SupplServiceEvent} | T]) ->
-	case parse_mmtel(Log, Metadata, SupplServiceEvent) of
+	case parse_mmtel(Log, [{roam_accountingInfo, AccountingMap} | Metadata], SupplServiceEvent) of
 		ok ->
-			parse(Filename, Log, Metadata, T);
+			parse1(Filename, Log, Metadata, AccountingMap, T);
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end;
-parse(Filename, Log, Metadata,
+parse1(Filename, Log, Metadata, AccountingMap,
 		[{serviceCentreUsage, ServiceCentreUsage} | T]) ->
-	case parse_sc_sm(Log, Metadata, ServiceCentreUsage) of
+	case parse_sc_sm(Log, [{roam_accountingInfo, AccountingMap} | Metadata], ServiceCentreUsage) of
 		ok ->
-			parse(Filename, Log, Metadata, T);
+			parse1(Filename, Log, Metadata, AccountingMap, T);
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end;
-parse(Filename, Log, Metadata,
+parse1(Filename, Log, Metadata, AccountingMap,
 		[{gprsCall, GprsCall} | T]) ->
-	case parse_gprs(Log, Metadata, GprsCall) of
+	case parse_gprs(Log, [{roam_accountingInfo, AccountingMap} | Metadata], GprsCall) of
 		ok ->
-			parse(Filename, Log, Metadata, T);
+			parse1(Filename, Log, Metadata, AccountingMap, T);
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end;
-parse(Filename, Log, Metadata,
+parse1(Filename, Log, Metadata, AccountingMap,
 		[{contentTransaction, ContentTransaction} | T]) ->
-	case parse_content(Log, Metadata, ContentTransaction) of
+	case parse_content(Log, [{roam_accountingInfo, AccountingMap} | Metadata], ContentTransaction) of
 		ok ->
-			parse(Filename, Log, Metadata, T);
+			parse1(Filename, Log, Metadata, AccountingMap, T);
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end;
-parse(Filename, Log, Metadata,
+parse1(Filename, Log, Metadata, AccountingMap,
 		[{locationService, LocationService} | T]) ->
-	case parse_location(Log, Metadata, LocationService) of
+	case parse_location(Log, [{roam_accountingInfo, AccountingMap} | Metadata], LocationService) of
 		ok ->
-			parse(Filename, Log, Metadata, T);
+			parse1(Filename, Log, Metadata, AccountingMap, T);
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end;
-parse(Filename, Log, Metadata,
+parse1(Filename, Log, Metadata, AccountingMap,
 		[{messagingEvent, MessagingEvent} | T]) ->
-	case parse_message(Log, Metadata, MessagingEvent) of
+	case parse_message(Log, [{roam_accountingInfo, AccountingMap} | Metadata], MessagingEvent) of
 		ok ->
-			parse(Filename, Log, Metadata, T);
+			parse1(Filename, Log, Metadata, AccountingMap, T);
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end;
-parse(Filename, Log, Metadata,
+parse1(Filename, Log, Metadata, AccountingMap,
 		[{mobileSession, MobileSession} | T]) ->
-	case parse_session(Log, Metadata, MobileSession) of
+	case parse_session(Log, [{roam_accountingInfo, AccountingMap} | Metadata], MobileSession) of
 		ok ->
-			parse(Filename, Log, Metadata, T);
+			parse1(Filename, Log, Metadata, AccountingMap, T);
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end;
-parse(_Filename, _Log, _Metadata, []) ->
+parse1(_Filename, _Log, _Metadata, _AccountingMap, []) ->
 	ok.
 
 -spec parse_mo_call(Log, Metadata, MOC) -> Result
@@ -321,6 +336,174 @@ parse_message(_Log, _Metadata, _MessagingEvent) ->
 %% @doc Parse a TAP event detail for a mobile session.
 parse_session(_Log, _Metadata, _MobileSession) ->
 	{error, not_implemented}.
+
+-spec parse_accounting(AccountingInfo) -> Result
+	when
+		AccountingInfo :: map(),
+		Result :: #{currencyConversionInfo => [map()],
+			discounting => map(),
+			localCurrency => list(),
+			tapCurrency => list(),
+			tapDecimalPlaces => integer(),
+			taxation => [map()]}| {error, Reason},
+		Reason :: term().
+%% @doc Parse Accounting Info from the import file.
+%% @private
+parse_accounting(AccountingInfo) ->
+	parse_accounting(AccountingInfo, #{}).
+%% @hidden
+parse_accounting(#{currencyConversionInfo := CurrencyConversionInfo} = AI, Acc) ->
+	case parse_cci(CurrencyConversionInfo) of
+		ConvertedCurrencyInfo when is_list(ConvertedCurrencyInfo) ->
+			parse_accounting1(AI,
+				Acc#{currencyConversionInfo => ConvertedCurrencyInfo});
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+					{error, Reason}]),
+			{error, Reason}
+	end;
+parse_accounting(AI, Acc) ->
+	parse_accounting1(AI, Acc).
+%% @hidden
+parse_accounting1(#{auditControlInfo := AuditControlInfo} = AI, Acc) ->
+	case parse_discounting(AuditControlInfo) of
+		#{} = Discounting ->
+			parse_accounting2(AI,
+				Acc#{discounting => Discounting});
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+					{error, Reason}]),
+			{error, Reason}
+	end;
+parse_accounting1(AI, Acc) ->
+	parse_accounting2(AI, Acc).
+%% @hidden
+parse_accounting2(#{localCurrency := LocalCurrency} = AI, Acc)
+		when is_binary(LocalCurrency) ->
+	parse_accounting3(AI,
+		Acc#{localCurrency => binary_to_list(LocalCurrency)});
+parse_accounting2(AI, Acc) ->
+	parse_accounting3(AI, Acc).
+%% @hidden
+parse_accounting3(#{tapCurrency := TapCurrency} = AI, Acc)
+		when is_binary(TapCurrency) ->
+	parse_accounting4(AI,
+		Acc#{tapCurrency => binary_to_list(TapCurrency)});
+parse_accounting3(AI, Acc) ->
+	parse_accounting4(AI, Acc).
+%% @hidden
+parse_accounting4(#{tapDecimalPlaces := TapDecimalPlaces} = AI, Acc)
+		when TapDecimalPlaces > 0 ->
+	parse_accounting5(AI,
+		Acc#{tapCurrency => TapDecimalPlaces});
+parse_accounting4(AI, Acc) ->
+	parse_accounting5(AI, Acc).
+%% @hidden
+parse_accounting5(#{taxation := Taxation} = _AI, Acc) ->
+	case parse_tax(Taxation) of
+		TaxValue when is_list(TaxValue) ->
+			Acc#{taxation => TaxValue};
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+					{error, Reason}]),
+			{error, Reason}
+	end;
+parse_accounting5(_AI, Acc) ->
+	Acc.
+
+-spec parse_cci(CCI) -> Result
+	when
+		CCI :: [map()],
+		Result :: map().
+%% @doc Parse Converted Currency Info from Import File
+%% @private
+parse_cci(CCI) when is_list(CCI) ->
+	parse_cci(CCI, []).
+parse_cci([H | T], Acc) ->
+	parse_cci(T, [parse_cci1(H, #{}) | Acc]);
+parse_cci([], Acc) ->
+	Acc.
+%% @hidden
+parse_cci1(#{exchangeRate := ExchangeRate} = CCI, Acc)
+		when ExchangeRate > 0 ->
+	parse_cci2(CCI, Acc#{exchangeRate => ExchangeRate});
+parse_cci1(CCI, Acc) ->
+	parse_cci2(CCI, Acc).
+%% @hidden
+parse_cci2(#{exchangeRateCode := ExchangeRateCode} = CCI, Acc)
+		when ExchangeRateCode > 0  ->
+	parse_cci3(CCI, Acc#{exchangeRateCode => ExchangeRateCode});
+parse_cci2(CCI, Acc) ->
+	parse_cci3(CCI, Acc).
+%% @hidden
+parse_cci3(#{numberOfDecimalPlaces := NoDecimalPlaces} = _CCI, Acc)
+		when NoDecimalPlaces > 0  ->
+	Acc#{numberOfDecimalPlaces => NoDecimalPlaces};
+parse_cci3(_CCI, Acc) ->
+	Acc.
+
+-spec parse_discounting(Discount) -> Result
+	when
+		Discount :: map(),
+		Result :: map().
+%% @doc Parse Discounting Info from Import File
+%% @private
+parse_discounting(Discount) when is_map(Discount) ->
+	parse_discounting(Discount, #{}).
+%% @hidden
+parse_discounting(#{totalDiscountValue := TotalValue} = Discount, Acc)
+		when TotalValue > 0 ->
+	parse_discounting1(Discount, Acc#{discountableAmount => TotalValue});
+parse_discounting(Discount, Acc) ->
+	parse_discounting1(Discount, Acc).
+%% @hidden
+parse_discounting1(#{discountCode := DisCode}, Acc)
+		when is_integer(DisCode) ->
+	Acc#{discountCode => DisCode};
+parse_discounting1(_Discount, Acc) ->
+	Acc.
+
+-spec parse_tax(TaxationList) -> Result
+	when
+		TaxationList :: [map()],
+		Result :: map().
+%% @doc Parse Taxation from Import File
+%% @private
+parse_tax(TL) when is_list(TL) ->
+	parse_tax(TL, []).
+%% @hidden
+parse_tax([H | T], Acc) ->
+	parse_tax(T, [parse_tax1(H, #{}) | Acc]);
+parse_tax([], Acc) ->
+	Acc.
+%% @hidden
+parse_tax1(#{chargeType := ChargeType} = TaxationList, Acc) ->
+	parse_tax2(TaxationList, Acc#{chargeType => ChargeType});
+parse_tax1(TaxationList, Acc) ->
+	parse_tax2(TaxationList, Acc).
+%% @hidden
+parse_tax2(#{taxCode := TaxCode} = TaxationList, Acc) ->
+	parse_tax3(TaxationList, Acc#{taxCode => TaxCode});
+parse_tax2(TaxationList, Acc) ->
+	parse_tax3(TaxationList, Acc).
+%% @hidden
+parse_tax3(#{taxRate := TaxRate} = TaxationList, Acc)
+		when TaxRate > 0 ->
+	parse_tax4(TaxationList, Acc#{taxRate => TaxRate});
+parse_tax3(TaxationList, Acc) ->
+	parse_tax4(TaxationList, Acc).
+%% @hidden
+parse_tax4(#{taxType := TaxType} = TaxationList, Acc)
+		when TaxType > 0 ->
+	parse_tax5(TaxationList, Acc#{taxType => TaxType});
+parse_tax4(TaxationList, Acc) ->
+	parse_tax5(TaxationList, Acc).
+%% @hidden
+parse_tax5(#{taxIndicator := TaxIndicator} = _TaxationList, Acc)
+		when is_list(TaxIndicator) ->
+	Acc#{taxIndicator => TaxIndicator};
+parse_tax5(_TaxationList, Acc) ->
+	Acc.
 
 %% @hidden
 mobile_originated_call(#{basicCallInformation
