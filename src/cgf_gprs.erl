@@ -173,8 +173,10 @@ parse(Log, Metadata,
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a CDR event detail for an SGSN PDP.
-parse_sgsn_pdp(_Log, _Metadata, _SGSNPDPRecord) ->
-	{error, not_implemented}.
+parse_sgsn_pdp(Log, Metadata, SGSNPDPRecord) ->
+	Call = sgsn_pdp_record(SGSNPDPRecord),
+	CDR = [{sgsn_pdp, Call} | Metadata],
+	cgf_log:blog(Log, CDR).
 
 -spec parse_sgsn_mmr(Log, Metadata, SGSNMMRecord) -> Result
 	when
@@ -371,3 +373,493 @@ parse_epdg(_Log, _Metadata, _EPDGRecord) ->
 parse_twag(_Log, _Metadata, _TWAGRecord) ->
 	{error, not_implemented}.
 
+%% @hidden
+sgsn_pdp_record(#{accessPointNameNI
+		:= APNNI} = SGSNPDPRecord) ->
+	Acc = #{<<"accessPointNameNI">> => APNNI},
+	sgsn_pdp_record1(SGSNPDPRecord, Acc);
+sgsn_pdp_record(SGSNPDPRecord) ->
+	sgsn_pdp_record1(SGSNPDPRecord, #{}).
+%% @hidden
+sgsn_pdp_record1(#{accessPointNameOI
+		:= APNOI} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"accessPointNameOI">> => APNOI},
+	sgsn_pdp_record2(SGSNPDPRecord, Acc1);
+sgsn_pdp_record1(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record2(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record2(#{apnSelectionMode
+		:= APNSM} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"apnSelectionMode">> => APNSM},
+	sgsn_pdp_record3(SGSNPDPRecord, Acc1);
+sgsn_pdp_record2(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record3(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record3(#{apnSelectionMode
+		:= APNSM} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"apnSelectionMode">> => APNSM},
+	sgsn_pdp_record4(SGSNPDPRecord, Acc1);
+sgsn_pdp_record3(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record4(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record4(#{causeForRecClosing
+		:= CFRC} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"causeForRecClosing">> => CFRC},
+	sgsn_pdp_record5(SGSNPDPRecord, Acc1);
+sgsn_pdp_record4(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record5(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record5(#{cellIdentifier
+		:= CI} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"cellIdentifier">> => bcd(CI)},
+	sgsn_pdp_record6(SGSNPDPRecord, Acc1);
+sgsn_pdp_record5(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record6(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record6(#{chChSelectionMode
+		:= CHCHSM} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"chChSelectionMode">> => CHCHSM},
+	sgsn_pdp_record7(SGSNPDPRecord, Acc1);
+sgsn_pdp_record6(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record7(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record7(#{chargingCharacteristics
+		:= CC} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"chargingCharacteristics">> => binary_to_list(CC)},
+	sgsn_pdp_record8(SGSNPDPRecord, Acc1);
+sgsn_pdp_record7(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record8(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record8(#{chargingID
+		:= CID} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"chargingID">> => CID},
+	sgsn_pdp_record9(SGSNPDPRecord, Acc1);
+sgsn_pdp_record8(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record9(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record9(#{diagnostics
+		:= Dia} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"diagnostics">> => Dia},
+	sgsn_pdp_record10(SGSNPDPRecord, Acc1);
+sgsn_pdp_record9(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record10(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record10(#{duration
+		:= Duration} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"duration">> => Duration},
+	sgsn_pdp_record11(SGSNPDPRecord, Acc1);
+sgsn_pdp_record10(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record11(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record11(#{dynamicAddressFlag
+		:= DAF} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"dynamicAddressFlag">> => DAF},
+	sgsn_pdp_record12(SGSNPDPRecord, Acc1);
+sgsn_pdp_record11(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record12(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record12(#{ggsnAddressUsed
+		:= {_, {_, Address}}} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"ggsnAddressUsed">> => Address},
+	sgsn_pdp_record13(SGSNPDPRecord, Acc1);
+sgsn_pdp_record12(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record13(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record13(#{listOfTrafficVolumes
+		:= ListOfTrafficVolumes} = SGSNPDPRecord, Acc) ->
+	LOTV = [traffic_volumes(TV) || TV <- ListOfTrafficVolumes],
+	Acc1 = Acc#{<<"listOfTrafficVolumes">> => LOTV},
+	sgsn_pdp_record14(SGSNPDPRecord, Acc1);
+sgsn_pdp_record13(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record14(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record14(#{localSequenceNumber
+		:= LocalSequenceNumber} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"localSequenceNumber">> => LocalSequenceNumber},
+	sgsn_pdp_record15(SGSNPDPRecord, Acc1);
+sgsn_pdp_record14(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record15(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record15(#{locationAreaCode
+		:= LocationAreaCode} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"locationAreaCode">> => bcd(LocationAreaCode)},
+	sgsn_pdp_record16(SGSNPDPRecord, Acc1);
+sgsn_pdp_record15(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record16(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record16(#{mSNetworkCapability
+		:= MSNetworkCapability} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"mSNetworkCapability">> => binary_to_list(MSNetworkCapability)},
+	sgsn_pdp_record17(SGSNPDPRecord, Acc1);
+sgsn_pdp_record16(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record17(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record17(#{lowPriorityIndicator
+		:= LowPriorityIndicator} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"lowPriorityIndicator">> => LowPriorityIndicator},
+	sgsn_pdp_record18(SGSNPDPRecord, Acc1);
+sgsn_pdp_record17(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record18(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record18(#{networkInitiation
+		:= NetworkInitiation} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"networkInitiation">> => NetworkInitiation},
+	sgsn_pdp_record19(SGSNPDPRecord, Acc1);
+sgsn_pdp_record18(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record19(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record19(#{pdpType
+		:= PDPType} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"pdpType">> => PDPType},
+	sgsn_pdp_record20(SGSNPDPRecord, Acc1);
+sgsn_pdp_record19(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record20(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record20(#{rATType
+		:= RATType} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"rATType">> => RATType},
+	sgsn_pdp_record21(SGSNPDPRecord, Acc1);
+sgsn_pdp_record20(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record21(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record21(#{rATType
+		:= RATType} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"rATType">> => RATType},
+	sgsn_pdp_record22(SGSNPDPRecord, Acc1);
+sgsn_pdp_record21(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record22(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record22(#{rNCUnsentDownlinkVolume
+		:= DownLinkVolume} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"rNCUnsentDownlinkVolume">> => DownLinkVolume},
+	sgsn_pdp_record23(SGSNPDPRecord, Acc1);
+sgsn_pdp_record22(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record23(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record23(#{recordExtensions
+		:= RecordExtensions} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"recordExtensions">> => RecordExtensions},
+	sgsn_pdp_record24(SGSNPDPRecord, Acc1);
+sgsn_pdp_record23(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record24(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record24(#{recordOpeningTime
+		:= RecordOpeningTime} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"recordOpeningTime">> => bcd(RecordOpeningTime)},
+	sgsn_pdp_record25(SGSNPDPRecord, Acc1);
+sgsn_pdp_record24(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record25(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record25(#{recordType
+		:= RecordType} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"recordType">> => RecordType},
+	sgsn_pdp_record26(SGSNPDPRecord, Acc1);
+sgsn_pdp_record25(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record26(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record26(#{routingArea
+		:= RoutingArea} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"routingArea">> => bcd(RoutingArea)},
+	sgsn_pdp_record27(SGSNPDPRecord, Acc1);
+sgsn_pdp_record26(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record27(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record27(#{servedIMEI
+		:= IMEI} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"servedIMEI">> => bcd(IMEI)},
+	sgsn_pdp_record28(SGSNPDPRecord, Acc1);
+sgsn_pdp_record27(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record28(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record28(#{servedIMSI
+		:= IMSI} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"servedIMSI">> => bcd(IMSI)},
+	sgsn_pdp_record29(SGSNPDPRecord, Acc1);
+sgsn_pdp_record28(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record29(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record29(#{servedMSISDN
+		:= MSISDN} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"servedMSISDN">> => bcd(MSISDN)},
+	sgsn_pdp_record30(SGSNPDPRecord, Acc1);
+sgsn_pdp_record29(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record30(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record30(#{servedPDPAddress := {iPAddress,
+		{_, {_, IPAddress}}}} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"servedPDPAddress">> => IPAddress},
+	sgsn_pdp_record31(SGSNPDPRecord, Acc1);
+sgsn_pdp_record30(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record31(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record31(#{servedPDPPDNAddressExt := GSNAddressList}
+		= SGSNPDPRecord, Acc) ->
+	ParsedAddressList = [bcd(GSNAddress) || {_,{_,GSNAddress}} <- GSNAddressList],
+	Acc1 = Acc#{<<"servedPDPPDNAddressExt">> => ParsedAddressList},
+	sgsn_pdp_record32(SGSNPDPRecord, Acc1);
+sgsn_pdp_record31(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record32(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record32(#{servingNodePLMNIdentifier := Identifer}
+		= SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"servingNodePLMNIdentifier">> => bcd(Identifer)},
+	sgsn_pdp_record33(SGSNPDPRecord, Acc1);
+sgsn_pdp_record32(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record33(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record33(#{servingNodeType := NodeTypes}
+		= SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"servingNodeType">> => NodeTypes},
+	sgsn_pdp_record34(SGSNPDPRecord, Acc1);
+sgsn_pdp_record33(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record34(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record34(#{servingNodeiPv6Address := IPV6Addresses}
+		= SGSNPDPRecord, Acc) ->
+	ParsedAddressList = [bcd(Address) || {_,{_,Address}} <- IPV6Addresses],
+	Acc1 = Acc#{<<"servingNodeiPv6Address">> => ParsedAddressList},
+	sgsn_pdp_record35(SGSNPDPRecord, Acc1);
+sgsn_pdp_record34(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record35(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record35(#{servingPLMNRateControl := RateControl}
+		= SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"servingPLMNRateControl">> => RateControl},
+	sgsn_pdp_record36(SGSNPDPRecord, Acc1);
+sgsn_pdp_record35(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record36(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record36(#{startTime := StartTime}
+		= SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"startTime">> => bcd(StartTime)},
+	sgsn_pdp_record37(SGSNPDPRecord, Acc1);
+sgsn_pdp_record36(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record37(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record37(#{stopTime := StopTime}
+		= SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"stopTime">> => bcd(StopTime)},
+	sgsn_pdp_record38(SGSNPDPRecord, Acc1);
+sgsn_pdp_record37(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record38(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record38(#{uNIPDUCPOnlyFlag := UNIPDUCPOnlyFlag}
+		= SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"uNIPDUCPOnlyFlag">> => UNIPDUCPOnlyFlag},
+	sgsn_pdp_record39(SGSNPDPRecord, Acc1);
+sgsn_pdp_record38(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record39(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record39(#{userCSGInformation := UserCSGInformation}
+		= SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"uNIPDUCPOnlyFlag">> => bcd(UserCSGInformation)},
+	sgsn_pdp_record40(SGSNPDPRecord, Acc1);
+sgsn_pdp_record39(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record40(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record40(#{userLocationInfoTime := UserLocationInfoTime}
+		= SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"userLocationInfoTime">> => bcd(UserLocationInfoTime)},
+	sgsn_pdp_record41(SGSNPDPRecord, Acc1);
+sgsn_pdp_record40(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record41(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record41(#{userLocationInfoTime := UserLocationInfoTime}
+		= SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"userLocationInfoTime">> => bcd(UserLocationInfoTime)},
+	sgsn_pdp_record42(SGSNPDPRecord, Acc1);
+sgsn_pdp_record41(SGSNPDPRecord, Acc) ->
+	sgsn_pdp_record42(SGSNPDPRecord, Acc).
+%% @hidden
+sgsn_pdp_record42(#{userLocationInformation := UserLocationInfo}
+		= _SGSNPDPRecord, Acc) ->
+	Acc#{<<"userLocationInformation">> => bcd(UserLocationInfo)};
+sgsn_pdp_record42(_SGSNPDPRecord, Acc) ->
+	Acc.
+
+%% @hidden
+traffic_volumes(#{accessAvailabilityChangeReason
+		:= AAC} = TV) ->
+	Acc = #{<<"accessAvailabilityChangeReason">> => AAC},
+	traffic_volumes1(TV, Acc);
+traffic_volumes(TV) ->
+	traffic_volumes1(TV, #{}).
+%% @hidden
+traffic_volumes1(#{cPCIoTEPSOptimisationIndicator
+		:= Indicator} = TV, Acc) ->
+	Acc1 = Acc#{<<"cPCIoTEPSOptimisationIndicator">> => Indicator},
+	traffic_volumes2(TV, Acc1);
+traffic_volumes1(TV, Acc) ->
+	traffic_volumes2(TV, Acc).
+%% @hidden
+traffic_volumes2(#{changeCondition
+		:= CC} = TV, Acc) ->
+	Acc1 = Acc#{<<"changeCondition">> => CC},
+	traffic_volumes3(TV, Acc1);
+traffic_volumes2(TV, Acc) ->
+	traffic_volumes3(TV, Acc).
+%% @hidden
+traffic_volumes3(#{changeTime
+		:= CT} = TV, Acc) ->
+	Acc1 = Acc#{<<"changeTime">> => bcd(CT)},
+	traffic_volumes4(TV, Acc1);
+traffic_volumes3(TV, Acc) ->
+	traffic_volumes4(TV, Acc).
+%% @hidden
+traffic_volumes4(#{chargingID
+		:= CI} = TV, Acc) ->
+	Acc1 = Acc#{<<"chargingID">> => CI},
+	traffic_volumes5(TV, Acc1);
+traffic_volumes4(TV, Acc) ->
+	traffic_volumes5(TV, Acc).
+%% @hidden
+traffic_volumes5(#{dataVolumeGPRSDownlink
+		:= DownLink} = TV, Acc) ->
+	Acc1 = Acc#{<<"dataVolumeGPRSDownlink">> => DownLink},
+	traffic_volumes6(TV, Acc1);
+traffic_volumes5(TV, Acc) ->
+	traffic_volumes6(TV, Acc).
+%% @hidden
+traffic_volumes6(#{dataVolumeGPRSUplink
+		:= UpLink} = TV, Acc) ->
+	Acc1 = Acc#{<<"dataVolumeGPRSUplink">> => UpLink},
+	traffic_volumes7(TV, Acc1);
+traffic_volumes6(TV, Acc) ->
+	traffic_volumes7(TV, Acc).
+%% @hidden
+traffic_volumes7(#{diagnostics
+		:= DIA} = TV, Acc) ->
+	Acc1 = Acc#{<<"diagnostics">> => DIA},
+	traffic_volumes8(TV, Acc1);
+traffic_volumes7(TV, Acc) ->
+	traffic_volumes8(TV, Acc).
+%% @hidden
+traffic_volumes8(#{diagnostics
+		:= DIA} = TV, Acc) ->
+	Acc1 = Acc#{<<"diagnostics">> => DIA},
+	traffic_volumes9(TV, Acc1);
+traffic_volumes8(TV, Acc) ->
+	traffic_volumes9(TV, Acc).
+%% @hidden
+traffic_volumes9(#{ePCQoSInformation
+		:= EPCQoSInformation} = TV, Acc) ->
+	Acc1 = Acc#{<<"ePCQoSInformation">> => EPCQoSInformation},
+	traffic_volumes10(TV, Acc1);
+traffic_volumes9(TV, Acc) ->
+	traffic_volumes10(TV, Acc).
+%% @hidden
+traffic_volumes10(#{enhancedDiagnostics
+		:= EnhancedDiagnostics} = TV, Acc) ->
+	Acc1 = Acc#{<<"enhancedDiagnostics">> => EnhancedDiagnostics},
+	traffic_volumes11(TV, Acc1);
+traffic_volumes10(TV, Acc) ->
+	traffic_volumes11(TV, Acc).
+%% @hidden
+traffic_volumes11(#{listOfPresenceReportingAreaInformation
+		:= ListOfPRA} = TV, Acc) ->
+	Acc1 = Acc#{<<"listOfPresenceReportingAreaInformation">> => ListOfPRA},
+	traffic_volumes12(TV, Acc1);
+traffic_volumes11(TV, Acc) ->
+	traffic_volumes12(TV, Acc).
+%% @hidden
+traffic_volumes12(#{qosNegotiated
+		:= QOSNegotiated} = TV, Acc) ->
+	Acc1 = Acc#{<<"qosNegotiated">> => bcd(QOSNegotiated)},
+	traffic_volumes13(TV, Acc1);
+traffic_volumes12(TV, Acc) ->
+	traffic_volumes13(TV, Acc).
+%% @hidden
+traffic_volumes13(#{qosRequested
+		:= QOSRequested} = TV, Acc) ->
+	Acc1 = Acc#{<<"qosRequested">> => binary_to_list(QOSRequested)},
+	traffic_volumes14(TV, Acc1);
+traffic_volumes13(TV, Acc) ->
+	traffic_volumes14(TV, Acc).
+%% @hidden
+traffic_volumes14(#{relatedChangeOfCharCondition
+		:= ChangeOfCharCon} = TV, Acc) ->
+	Acc1 = Acc#{<<"relatedChangeOfCharCondition">> => ChangeOfCharCon},
+	traffic_volumes15(TV, Acc1);
+traffic_volumes14(TV, Acc) ->
+	traffic_volumes15(TV, Acc).
+%% @hidden
+traffic_volumes15(#{servingPLMNRateControl
+		:= RateControl} = TV, Acc) ->
+	Acc1 = Acc#{<<"servingPLMNRateControl">> => RateControl},
+	traffic_volumes16(TV, Acc1);
+traffic_volumes15(TV, Acc) ->
+	traffic_volumes16(TV, Acc).
+%% @hidden
+traffic_volumes16(#{threeGPPPSDataOffStatus
+		:= DataOffStatus} = TV, Acc) ->
+	Acc1 = Acc#{<<"threeGPPPSDataOffStatus">> => DataOffStatus},
+	traffic_volumes17(TV, Acc1);
+traffic_volumes16(TV, Acc) ->
+	traffic_volumes17(TV, Acc).
+%% @hidden
+traffic_volumes17(#{uWANUserLocationInformation
+		:= WanUserLocInfo} = TV, Acc) ->
+	Acc1 = Acc#{<<"uWANUserLocationInformation">> => WanUserLocInfo},
+	traffic_volumes18(TV, Acc1);
+traffic_volumes17(TV, Acc) ->
+	traffic_volumes18(TV, Acc).
+%% @hidden
+traffic_volumes18(#{userCSGInformation
+		:= CSGInfo} = TV, Acc) ->
+	Acc1 = Acc#{<<"userCSGInformation">> => CSGInfo},
+	traffic_volumes19(TV, Acc1);
+traffic_volumes18(TV, Acc) ->
+	traffic_volumes19(TV, Acc).
+%% @hidden
+traffic_volumes19(#{userLocationInformation
+		:= UserLocInfo} = _TV, Acc) ->
+	Acc#{<<"userLocationInformation">> => UserLocInfo};
+traffic_volumes19(_TV, Acc) ->
+	Acc.
+%% To-Do Add RATType into traffic list
+
+%% @hidden
+bcd(Binary) ->
+	bcd(Binary, []).
+%% @hidden
+bcd(<<D:4, 15:4>>, Acc) ->
+	bcd1([D | Acc], []);
+bcd(<<D1:4, D2:4>>, Acc) ->
+	bcd1([D2, D1 | Acc], []);
+bcd(<<D1:4, D2:4, Rest/binary>>, Acc) ->
+	bcd(Rest, [D2, D1 | Acc]).
+%% @hidden
+bcd1([0 | T], Acc) ->
+	bcd1(T, [$0 | Acc]);
+bcd1([1 | T], Acc) ->
+	bcd1(T, [$1 | Acc]);
+bcd1([2 | T], Acc) ->
+	bcd1(T, [$2 | Acc]);
+bcd1([3 | T], Acc) ->
+	bcd1(T, [$3 | Acc]);
+bcd1([4 | T], Acc) ->
+	bcd1(T, [$4 | Acc]);
+bcd1([5 | T], Acc) ->
+	bcd1(T, [$5 | Acc]);
+bcd1([6 | T], Acc) ->
+	bcd1(T, [$6 | Acc]);
+bcd1([7 | T], Acc) ->
+	bcd1(T, [$7 | Acc]);
+bcd1([8 | T], Acc) ->
+	bcd1(T, [$8 | Acc]);
+bcd1([9 | T], Acc) ->
+	bcd1(T, [$9 | Acc]);
+bcd1([10 | T], Acc) ->
+	bcd1(T, [$a | Acc]);
+bcd1([11 | T], Acc) ->
+	bcd1(T, [$b | Acc]);
+bcd1([12 | T], Acc) ->
+	bcd1(T, [$c | Acc]);
+bcd1([13 | T], Acc) ->
+	bcd1(T, [$d | Acc]);
+bcd1([14 | T], Acc) ->
+	bcd1(T, [$e | Acc]);
+bcd1([15 | T], Acc) ->
+	bcd1(T, [$f | Acc]);
+bcd1([], Acc) ->
+	Acc.
