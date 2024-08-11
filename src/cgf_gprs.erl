@@ -771,7 +771,7 @@ traffic_volumes12(TV, Acc) ->
 %% @hidden
 traffic_volumes13(#{qosRequested
 		:= QOSRequested} = TV, Acc) ->
-	Acc1 = Acc#{<<"qosRequested">> => binary_to_list(QOSRequested)},
+	Acc1 = Acc#{<<"qosRequested">> => bcd(QOSRequested)},
 	traffic_volumes14(TV, Acc1);
 traffic_volumes13(TV, Acc) ->
 	traffic_volumes14(TV, Acc).
