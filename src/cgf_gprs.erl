@@ -425,7 +425,7 @@ sgsn_pdp_record6(SGSNPDPRecord, Acc) ->
 %% @hidden
 sgsn_pdp_record7(#{chargingCharacteristics
 		:= CC} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"chargingCharacteristics">> => binary_to_list(CC)},
+	Acc1 = Acc#{<<"chargingCharacteristics">> => bcd(CC)},
 	sgsn_pdp_record8(SGSNPDPRecord, Acc1);
 sgsn_pdp_record7(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record8(SGSNPDPRecord, Acc).
@@ -489,7 +489,7 @@ sgsn_pdp_record15(SGSNPDPRecord, Acc) ->
 %% @hidden
 sgsn_pdp_record16(#{mSNetworkCapability
 		:= MSNetworkCapability} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"mSNetworkCapability">> => binary_to_list(MSNetworkCapability)},
+	Acc1 = Acc#{<<"mSNetworkCapability">> => bcd(MSNetworkCapability)},
 	sgsn_pdp_record17(SGSNPDPRecord, Acc1);
 sgsn_pdp_record16(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record17(SGSNPDPRecord, Acc).
