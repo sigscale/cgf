@@ -352,29 +352,17 @@ parse_session(_Log, _Metadata, _MobileSession) ->
 parse_accounting(AccountingInfo) ->
 	parse_accounting(AccountingInfo, #{}).
 %% @hidden
-parse_accounting(#{currencyConversionInfo := CurrencyConversionInfo} = AI, Acc) ->
-	case parse_cci(CurrencyConversionInfo) of
-		ConvertedCurrencyInfo when is_list(ConvertedCurrencyInfo) ->
-			parse_accounting1(AI,
-				Acc#{currencyConversionInfo => ConvertedCurrencyInfo});
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
-					{error, Reason}]),
-			{error, Reason}
-	end;
+parse_accounting(#{currencyConversionInfo
+		:= CurrencyConversionInfo} = AI, Acc) ->
+	ConvertedCurrencyInfo = parse_cci(CurrencyConversionInfo),
+	parse_accounting1(AI,
+			Acc#{currencyConversionInfo => ConvertedCurrencyInfo});
 parse_accounting(AI, Acc) ->
 	parse_accounting1(AI, Acc).
 %% @hidden
 parse_accounting1(#{auditControlInfo := AuditControlInfo} = AI, Acc) ->
-	case parse_discounting(AuditControlInfo) of
-		#{} = Discounting ->
-			parse_accounting2(AI,
-				Acc#{discounting => Discounting});
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
-					{error, Reason}]),
-			{error, Reason}
-	end;
+	Discounting = parse_discounting(AuditControlInfo),
+	parse_accounting2(AI, Acc#{discounting => Discounting});
 parse_accounting1(AI, Acc) ->
 	parse_accounting2(AI, Acc).
 %% @hidden
@@ -400,14 +388,7 @@ parse_accounting4(AI, Acc) ->
 	parse_accounting5(AI, Acc).
 %% @hidden
 parse_accounting5(#{taxation := Taxation} = _AI, Acc) ->
-	case parse_tax(Taxation) of
-		TaxValue when is_list(TaxValue) ->
-			Acc#{taxation => TaxValue};
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
-					{error, Reason}]),
-			{error, Reason}
-	end;
+	Acc#{taxation => parse_tax(Taxation)};
 parse_accounting5(_AI, Acc) ->
 	Acc.
 
