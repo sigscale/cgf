@@ -98,10 +98,23 @@ import2(Filename, Log, Metadata, TransferBatch) ->
 	import3(Filename, Log, Metadata, TransferBatch).
 %% @hidden
 import3(Filename, Log, Metadata,
+		#{batchControlInfo := BatchControlInfo} = TransferBatch)
+		when map_size(BatchControlInfo) > 0 ->
+	Metadata1 = case parse_batchcontrol(BatchControlInfo) of
+		BatchControlInfo1 when map_size(BatchControlInfo1) > 0 ->
+			[{roam_batchControlInfo, BatchControlInfo1} | Metadata];
+		_ ->
+			Metadata
+	end,
+	import4(Filename, Log, Metadata1, TransferBatch);
+import3(Filename, Log, Metadata, TransferBatch) ->
+	import4(Filename, Log, Metadata, TransferBatch).
+%% @hidden
+import4(Filename, Log, Metadata,
 		#{callEventDetails := CDRs} = _TransferBatch)
 		when CDRs /= [] ->
 	parse(Filename, Log, Metadata, CDRs);
-import3(Filename, _Log, _Metadata, _TransferBatch) ->
+import4(Filename, _Log, _Metadata, _TransferBatch) ->
 	?LOG_WARNING([{?MODULE, import},
 			{filename, Filename},
 			{reason, empty}]),
@@ -400,6 +413,91 @@ parse_accounting4(AI, Acc) ->
 parse_accounting5(#{taxation := Taxation} = _AI, Acc) ->
 	Acc#{taxation => parse_tax(Taxation)};
 parse_accounting5(_AI, Acc) ->
+	Acc.
+
+-spec parse_batchcontrol(BatchControlInfo) -> Result
+	when
+		BatchControlInfo:: map(),
+		Result :: map().
+%% @doc Parse Batch Control Info from the import file.
+%% @private
+parse_batchcontrol(BatchControlInfo) ->
+	parse_batchcontrol(BatchControlInfo, #{}).
+%% @hidden
+parse_batchcontrol(#{sender := Sender}
+		= BatchControlInfo, Acc) when byte_size(Sender) > 0 ->
+	Acc1 = Acc#{<<"sender">> => Sender},
+	parse_batchcontrol1(BatchControlInfo, Acc1);
+parse_batchcontrol(BatchControlInfo, Acc) ->
+	parse_batchcontrol1(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol1(#{recipient := Recipient}
+		= BatchControlInfo, Acc) when byte_size(Recipient) > 0 ->
+	Acc1 = Acc#{<<"recipient">> => Recipient},
+	parse_batchcontrol2(BatchControlInfo, Acc1);
+parse_batchcontrol1(BatchControlInfo, Acc) ->
+	parse_batchcontrol2(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol2(#{fileSequenceNumber := FSN}
+		= BatchControlInfo, Acc) when byte_size(FSN) > 0 ->
+	Acc1 = Acc#{<<"fileSequenceNumber">> => binary_to_integer(FSN)},
+	parse_batchcontrol3(BatchControlInfo, Acc1);
+parse_batchcontrol2(BatchControlInfo, Acc) ->
+	parse_batchcontrol3(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol3(#{fileCreationTimeStamp := TS}
+		= BatchControlInfo, Acc) when map_size(TS) > 0 ->
+	Acc1 = Acc#{<<"fileCreationTimeStamp">> => timestamp(TS)},
+	parse_batchcontrol4(BatchControlInfo, Acc1);
+parse_batchcontrol3(BatchControlInfo, Acc) ->
+	parse_batchcontrol4(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol4(#{transferCutOffTimeStamp := TS}
+		= BatchControlInfo, Acc) when map_size(TS) > 0 ->
+	Acc1 = Acc#{<<"transferCutOffTimeStamp">> => timestamp(TS)},
+	parse_batchcontrol5(BatchControlInfo, Acc1);
+parse_batchcontrol4(BatchControlInfo, Acc) ->
+	parse_batchcontrol5(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol5(#{fileAvailableTimeStamp := TS}
+		= BatchControlInfo, Acc) when map_size(TS) > 0 ->
+	Acc1 = Acc#{<<"fileAvailableTimeStamp">> => timestamp(TS)},
+	parse_batchcontrol6(BatchControlInfo, Acc1);
+parse_batchcontrol5(BatchControlInfo, Acc) ->
+	parse_batchcontrol6(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol6(#{specificationVersionNumber := VSN}
+		= BatchControlInfo, Acc) when is_integer(VSN) > 0 ->
+	Acc1 = Acc#{<<"specificationVersionNumber">> => VSN},
+	parse_batchcontrol7(BatchControlInfo, Acc1);
+parse_batchcontrol6(BatchControlInfo, Acc) ->
+	parse_batchcontrol7(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol7(#{releaseVersionNumber := VSN}
+		= BatchControlInfo, Acc) when is_integer(VSN) > 0 ->
+	Acc1 = Acc#{<<"releaseVersionNumber">> => VSN},
+	parse_batchcontrol8(BatchControlInfo, Acc1);
+parse_batchcontrol7(BatchControlInfo, Acc) ->
+	parse_batchcontrol8(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol8(#{fileTypeIndicator := FTI}
+		= BatchControlInfo, Acc) when byte_size(FTI) > 0 ->
+	Acc1 = Acc#{<<"fileTypeIndicator">> => FTI},
+	parse_batchcontrol9(BatchControlInfo, Acc1);
+parse_batchcontrol8(BatchControlInfo, Acc) ->
+	parse_batchcontrol9(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol9(#{rapFileSequenceNumber := FSN}
+		= BatchControlInfo, Acc) when byte_size(FSN) > 0 ->
+	Acc1 = Acc#{<<"rapFileSequenceNumber">> => binary_to_integer(FSN)},
+	parse_batchcontrol10(BatchControlInfo, Acc1);
+parse_batchcontrol9(BatchControlInfo, Acc) ->
+	parse_batchcontrol10(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol10(#{operatorSpecInformation := OSI}
+		= _BatchControlInfo, Acc) when length(OSI) > 0 ->
+	Acc#{<<"operatorSpecInformation">> => OSI};
+parse_batchcontrol10(_BatchControlInfo, Acc) ->
 	Acc.
 
 -spec parse_cci(CCI) -> Result
@@ -795,6 +893,11 @@ octet_string(OctetString) when is_binary(OctetString) ->
 timestamp(#{localTimeStamp := <<Year:4/binary, Month:2/binary,
 		Day:2/binary, Hour:2/binary, Minute:2/binary, Second:2/binary>>,
 		utcTimeOffsetCode := Z}) ->
+	<<Year/binary, $-, Month/binary, $-, Day/binary, $T, Hour/binary,
+			$:, Minute/binary, $:, Second/binary>>;
+timestamp(#{localTimeStamp := <<Year:4/binary, Month:2/binary,
+		Day:2/binary, Hour:2/binary, Minute:2/binary, Second:2/binary>>,
+		utcTimeOffset := Offset}) ->
 	<<Year/binary, $-, Month/binary, $-, Day/binary, $T, Hour/binary,
 			$:, Minute/binary, $:, Second/binary>>.
 

@@ -36,10 +36,12 @@
 -spec bx(CDR) -> iodata()
 	when
 		CDR :: [{RecordType, Parameters}],
-		RecordType :: moCall | mtCall | moSMS | mtSMS
-				| scSMO | scSMT | sgw | rated | abmf
+		RecordType :: moCall | mtCall
+				| moSMS | mtSMS | scSMO | scSMT
+				| sgw | vas | rated | abmf
+				| roam_batchControlInfo | roam_accountingInfo
 				| roam_moCall | roam_mtCall | roam_gprs
-				| vas | roam_accountingInfo | string(),
+				| string(),
 		Parameters :: #{_Name := binary(), _Value := term()}.
 %% @doc Bx interface CODEC for Elastic Stack logs.
 %%
@@ -177,6 +179,10 @@ bx([{roam_gprs = _RecordType, Parameters} | T] = _CDR) ->
 %% @hidden
 bx1([{rated, Rated} | T], Acc) ->
 	Acc1 = [$,, $", "Bx_rated", $", $:, zj:encode(Rated)],
+	bx1(T, [Acc | Acc1]);
+bx1([{roam_batchControlInfo, BatchControlInfo} | T], Acc) ->
+	Acc1 = [$,, $", "Bx_roam_batchControlInfo", $", $:,
+			zj:encode(BatchControlInfo)],
 	bx1(T, [Acc | Acc1]);
 bx1([{roam_accountingInfo, AccountingInfo} | T], Acc) ->
 	Acc1 = [$,, $", "Bx_roam_accountingInfo", $", $:, zj:encode(AccountingInfo)],
