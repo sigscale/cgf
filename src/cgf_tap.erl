@@ -102,15 +102,8 @@ import1(Filename, _Log, _Metadata, {error, Reason}) ->
 %% @doc Parse CDRs from the import file.
 %% @private
 parse(Filename, Log, Metadata, AccountingInfo, CDRs) ->
-	case parse_accounting(AccountingInfo) of
-		#{} = AccountingMap ->
-			parse1(Filename, Log, Metadata, AccountingMap, CDRs);
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
-					{filename, Filename},
-					{error, Reason}]),
-			{error, Reason}
-	end.
+	AccountingInfo1 = parse_accounting(AccountingInfo),
+	parse1(Filename, Log, Metadata, AccountingInfo1, CDRs).
 %% @hidden
 parse1(Filename, Log, Metadata, AccountingMap,
 		[{mobileOriginatedCall, MobileOriginatedCall} | T]) ->
@@ -345,8 +338,7 @@ parse_session(_Log, _Metadata, _MobileSession) ->
 			localCurrency => list(),
 			tapCurrency => list(),
 			tapDecimalPlaces => integer(),
-			taxation => [map()]}| {error, Reason},
-		Reason :: term().
+			taxation => [map()]}.
 %% @doc Parse Accounting Info from the import file.
 %% @private
 parse_accounting(AccountingInfo) ->
