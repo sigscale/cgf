@@ -61,35 +61,30 @@ import(Filename, Log, Metadata)
 			import1(Filename, Log, Metadata,
 					'GPRSChargingDataTypes':decode('GPRSRecord', Bin));
 		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+			?LOG_ERROR([{?MODULE, import},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end.
 %% @hidden
 import1(Filename, Log, Metadata, {ok, CDR, Rest}) ->
-	case parse(Log, Metadata, CDR) of
+	case Rest of
+		<<>> ->
+			ok;
+		_ ->
+			?LOG_WARNING([{?MODULE, import},
+					{reason, ignored},
+					{size, byte_size(Rest)}])
+	end,
+	case parse(Filename, Log, Metadata, CDR) of
 		ok ->
 			import1(Filename, Log, Metadata,
 					'GPRSChargingDataTypes':decode('GPRSRecord', Rest));
 		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
-					{filename, Filename},
-					{error, Reason}]),
-			{error, Reason}
-	end;
-import1(Filename, Log, Metadata, {ok, CDR}) ->
-	case parse(Log, Metadata, CDR) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
-					{filename, Filename},
-					{error, Reason}]),
 			{error, Reason}
 	end;
 import1(Filename, _Log, _Metadata, {error, Reason}) ->
-	?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+	?LOG_ERROR([{?MODULE, import},
 			{filename, Filename},
 			{error, Reason}]).
 
@@ -97,8 +92,9 @@ import1(Filename, _Log, _Metadata, {error, Reason}) ->
 %%  Internal functions
 %%----------------------------------------------------------------------
 
--spec parse(Log, Metadata, CDR) -> Result
+-spec parse(Filename, Log, Metadata, CDR) -> Result
 	when
+		Filename :: file:filename(),
 		Log :: disk_log:log(),
 		Metadata :: [{AttributeName, AttributeValue}],
 		AttributeName :: string(),
@@ -114,54 +110,182 @@ import1(Filename, _Log, _Metadata, {error, Reason}) ->
 		Reason :: term().
 %% @doc Parse CDRs from the import file.
 %% @private
-parse(Log, Metadata,
+parse(Filename, Log, Metadata,
 		{sgsnPDPRecord, SGSNPDPRecord} = _CDR) ->
-	parse_sgsn_pdp(Log, Metadata, SGSNPDPRecord);
-parse(Log, Metadata,
+	case parse_sgsn_pdp(Log, Metadata, SGSNPDPRecord) of
+		ok ->
+			ok;
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, parse_sgsn_pdp},
+					{filename, Filename},
+					{error, Reason}]),
+			{error, Reason}
+	end;
+parse(Filename, Log, Metadata,
 		{sgsnMMRecord, SGSNMMRecord}) ->
-	parse_sgsn_mmr(Log, Metadata, SGSNMMRecord);
-parse(Log, Metadata,
+	case parse_sgsn_mmr(Log, Metadata, SGSNMMRecord) of
+		ok ->
+			ok;
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, parse_sgsn_mmr},
+					{filename, Filename},
+					{error, Reason}]),
+			{error, Reason}
+	end;
+parse(Filename, Log, Metadata,
 		{sgsnSMORecord, SGSNSMORecord}) ->
-	parse_sgsn_smo(Log, Metadata, SGSNSMORecord);
-parse(Log, Metadata,
+	case parse_sgsn_smo(Log, Metadata, SGSNSMORecord) of
+		ok ->
+			ok;
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, parse_sgsn_smo},
+					{filename, Filename},
+					{error, Reason}]),
+			{error, Reason}
+	end;
+parse(Filename, Log, Metadata,
 		{sgsnSMTRecord, SGSNSMTRecord}) ->
-	parse_sgsn_smt(Log, Metadata, SGSNSMTRecord);
-parse(Log, Metadata,
+	case parse_sgsn_smt(Log, Metadata, SGSNSMTRecord) of
+		ok ->
+			ok;
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, parse_sgsn_smt},
+					{filename, Filename},
+					{error, Reason}]),
+			{error, Reason}
+	end;
+parse(Filename, Log, Metadata,
 		{sgsnMTLCSRecord, SGSNMTLCSRecord}) ->
-	parse_sgsn_mt_lcs(Log, Metadata, SGSNMTLCSRecord);
-parse(Log, Metadata,
+	case parse_sgsn_mt_lcs(Log, Metadata, SGSNMTLCSRecord) of
+		ok ->
+			ok;
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, parse_sgsn_mt_lcs},
+					{filename, Filename},
+					{error, Reason}]),
+			{error, Reason}
+	end;
+parse(Filename, Log, Metadata,
 		{sgsnMOLCSRecord, SGSNMOLCSRecord}) ->
-	parse_sgsn_mo_lcs(Log, Metadata, SGSNMOLCSRecord);
-parse(Log, Metadata,
+	case parse_sgsn_mo_lcs(Log, Metadata, SGSNMOLCSRecord) of
+		ok ->
+			ok;
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, parse_sgsn_mo_lcs},
+					{filename, Filename},
+					{error, Reason}]),
+			{error, Reason}
+	end;
+parse(Filename, Log, Metadata,
 		{sgsnNILCSRecord, SGSNNILCSRecord}) ->
-	parse_sgsn_ni_lcs(Log, Metadata, SGSNNILCSRecord);
-parse(Log, Metadata,
+	case parse_sgsn_ni_lcs(Log, Metadata, SGSNNILCSRecord) of
+		ok ->
+			ok;
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, parse_sgsn_ni_lcs},
+					{filename, Filename},
+					{error, Reason}]),
+			{error, Reason}
+	end;
+parse(Filename, Log, Metadata,
 		{sgsnMBMSRecord, SGSNMBMSRecord}) ->
-	parse_sgsn_mbms(Log, Metadata, SGSNMBMSRecord);
-parse(Log, Metadata,
+	case parse_sgsn_mbms(Log, Metadata, SGSNMBMSRecord) of
+		ok ->
+			ok;
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, parse_sgsn_mbms},
+					{filename, Filename},
+					{error, Reason}]),
+			{error, Reason}
+	end;
+parse(Filename, Log, Metadata,
 		{ggsnMBMSRecord, GGSNMBMSRecord}) ->
-	parse_ggsn_mbms(Log, Metadata, GGSNMBMSRecord);
-parse(Log, Metadata,
+	case parse_ggsn_mbms(Log, Metadata, GGSNMBMSRecord) of
+		ok ->
+			ok;
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, parse_ggsn_mbms},
+					{filename, Filename},
+					{error, Reason}]),
+			{error, Reason}
+	end;
+parse(Filename, Log, Metadata,
 		{sGWRecord, SGWRecord}) ->
-	parse_sgw(Log, Metadata, SGWRecord);
-parse(Log, Metadata,
+	case parse_sgw(Log, Metadata, SGWRecord) of
+		ok ->
+			ok;
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, parse_sgw},
+					{filename, Filename},
+					{error, Reason}]),
+			{error, Reason}
+	end;
+parse(Filename, Log, Metadata,
 		{pGWRecord, PGWRecord}) ->
-	parse_pgw(Log, Metadata, PGWRecord);
-parse(Log, Metadata,
+	case parse_pgw(Log, Metadata, PGWRecord) of
+		ok ->
+			ok;
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, parse_pgw},
+					{filename, Filename},
+					{error, Reason}]),
+			{error, Reason}
+	end;
+parse(Filename, Log, Metadata,
 		{gwMBMSRecord, GWMBMSRecord}) ->
-	parse_gw_mbms(Log, Metadata, GWMBMSRecord);
-parse(Log, Metadata,
+	case parse_gw_mbms(Log, Metadata, GWMBMSRecord) of
+		ok ->
+			ok;
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, parse_gw_mbms},
+					{filename, Filename},
+					{error, Reason}]),
+			{error, Reason}
+	end;
+parse(Filename, Log, Metadata,
 		{tDFRecord, TDFRecord}) ->
-	parse_tdf(Log, Metadata, TDFRecord);
-parse(Log, Metadata,
+	case parse_tdf(Log, Metadata, TDFRecord) of
+		ok ->
+			ok;
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, parse_tdf},
+					{filename, Filename},
+					{error, Reason}]),
+			{error, Reason}
+	end;
+parse(Filename, Log, Metadata,
 		{iPERecord, IPERecord}) ->
-	parse_ipe(Log, Metadata, IPERecord);
-parse(Log, Metadata,
+	case parse_ipe(Log, Metadata, IPERecord) of
+		ok ->
+			ok;
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, parse_ipe},
+					{filename, Filename},
+					{error, Reason}]),
+			{error, Reason}
+	end;
+parse(Filename, Log, Metadata,
 		{ePDGRecord, EPDGRecord}) ->
-	parse_epdg(Log, Metadata, EPDGRecord);
-parse(Log, Metadata,
+	case parse_epdg(Log, Metadata, EPDGRecord) of
+		ok ->
+			ok;
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, parse_epdg},
+					{filename, Filename},
+					{error, Reason}]),
+			{error, Reason}
+	end;
+parse(Filename, Log, Metadata,
 		{tWAGRecord, TWAGRecord}) ->
-	parse_twag(Log, Metadata, TWAGRecord).
+	case parse_twag(Log, Metadata, TWAGRecord) of
+		ok ->
+			ok;
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, parse_twag},
+					{filename, Filename},
+					{error, Reason}]),
+			{error, Reason}
+	end.
 
 -spec parse_sgsn_pdp(Log, Metadata, SGSNPDPRecord) -> Result
 	when

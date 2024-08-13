@@ -65,22 +65,23 @@ import(Filename, Log, Metadata)
 			import1(Filename, Log, Metadata,
 					'TAP-0312':decode('DataInterChange', Bin));
 		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+			?LOG_ERROR([{?MODULE, import},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end.
 %% @hidden
-import1(Filename, Log, Metadata, {ok, {transferBatch, TransferBatch}}) ->
+import1(Filename, Log, Metadata, {ok, {transferBatch, TransferBatch}, <<>>}) ->
 	import2(Filename, Log, Metadata, TransferBatch);
 import1(Filename, Log, Metadata, {ok, {transferBatch, TransferBatch}, Rest}) ->
-	?LOG_WARNING([{?MODULE, ?FUNCTION_NAME},
-			{reason, ignored}, {size, byte_size(Rest)}]),
+	?LOG_WARNING([{?MODULE, import},
+			{reason, ignored},
+			{size, byte_size(Rest)}]),
 	import2(Filename, Log, Metadata, TransferBatch);
 import1(_Filename, _Log, _Metadata, {ok, {notification, _Notification}}) ->
 	{error, not_implemented};
 import1(Filename, _Log, _Metadata, {error, Reason}) ->
-	?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+	?LOG_ERROR([{?MODULE, import},
 			{filename, Filename},
 			{error, Reason}]).
 %% @hidden
@@ -101,7 +102,7 @@ import3(Filename, Log, Metadata,
 		when CDRs /= [] ->
 	parse(Filename, Log, Metadata, CDRs);
 import3(Filename, _Log, _Metadata, _TransferBatch) ->
-	?LOG_WARNING([{?MODULE, ?FUNCTION_NAME},
+	?LOG_WARNING([{?MODULE, import},
 			{filename, Filename},
 			{reason, empty}]),
 	ok.
@@ -128,7 +129,7 @@ parse(Filename, Log, Metadata,
 		ok ->
 			parse(Filename, Log, Metadata, T );
 		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+			?LOG_ERROR([{?MODULE, parse_mo_call},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
@@ -139,7 +140,7 @@ parse(Filename, Log, Metadata,
 		ok ->
 			parse(Filename, Log, Metadata, T);
 		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+			?LOG_ERROR([{?MODULE, parse_mt_call},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
@@ -150,7 +151,7 @@ parse(Filename, Log, Metadata,
 		ok ->
 			parse(Filename, Log, Metadata, T);
 		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+			?LOG_ERROR([{?MODULE, parse_mmtel},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
@@ -161,7 +162,7 @@ parse(Filename, Log, Metadata,
 		ok ->
 			parse(Filename, Log, Metadata, T);
 		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+			?LOG_ERROR([{?MODULE, parse_sc_sm},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
@@ -172,7 +173,7 @@ parse(Filename, Log, Metadata,
 		ok ->
 			parse(Filename, Log, Metadata, T);
 		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+			?LOG_ERROR([{?MODULE, parse_gprs},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
@@ -183,7 +184,7 @@ parse(Filename, Log, Metadata,
 		ok ->
 			parse(Filename, Log, Metadata, T);
 		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+			?LOG_ERROR([{?MODULE, parse_content},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
@@ -194,7 +195,7 @@ parse(Filename, Log, Metadata,
 		ok ->
 			parse(Filename, Log, Metadata, T);
 		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+			?LOG_ERROR([{?MODULE, parse_location},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
@@ -205,7 +206,7 @@ parse(Filename, Log, Metadata,
 		ok ->
 			parse(Filename, Log, Metadata, T);
 		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+			?LOG_ERROR([{?MODULE, parse_message},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
@@ -216,7 +217,7 @@ parse(Filename, Log, Metadata,
 		ok ->
 			parse(Filename, Log, Metadata, T);
 		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+			?LOG_ERROR([{?MODULE, parse_session},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
