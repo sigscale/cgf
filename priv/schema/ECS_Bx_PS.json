@@ -981,9 +981,7 @@
 		"QoSInformation": {
 			"description": "Bearer quality of service (TS 29.274).",
 			"type": "string",
-			"minLength": 4,
-			"maxLength": 255,
-			"pattern": "^([0-9a-f]{2})*$"
+			"pattern": "^[0-9a-fA-F]{8,510}$"
 		},
 		"RateControlTimeUnit": {
 			"type": "string",
