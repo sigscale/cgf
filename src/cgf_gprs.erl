@@ -395,287 +395,224 @@ sgsn_pdp_record2(#{apnSelectionMode
 sgsn_pdp_record2(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record3(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record3(#{apnSelectionMode
-		:= APNSM} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"apnSelectionMode">> => APNSM},
+sgsn_pdp_record3(#{causeForRecClosing
+		:= CFRC} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"causeForRecClosing">> => CFRC},
 	sgsn_pdp_record4(SGSNPDPRecord, Acc1);
 sgsn_pdp_record3(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record4(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record4(#{causeForRecClosing
-		:= CFRC} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"causeForRecClosing">> => CFRC},
+sgsn_pdp_record4(#{cellIdentifier
+		:= CI} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"cellIdentifier">> => con_string(CI)},
 	sgsn_pdp_record5(SGSNPDPRecord, Acc1);
 sgsn_pdp_record4(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record5(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record5(#{cellIdentifier
-		:= CI} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"cellIdentifier">> => bcd(CI)},
+sgsn_pdp_record5(#{chChSelectionMode
+		:= CHCHSM} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"chChSelectionMode">> => CHCHSM},
 	sgsn_pdp_record6(SGSNPDPRecord, Acc1);
 sgsn_pdp_record5(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record6(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record6(#{chChSelectionMode
-		:= CHCHSM} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"chChSelectionMode">> => CHCHSM},
+sgsn_pdp_record6(#{chargingCharacteristics
+		:= CC} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"chargingCharacteristics">> => con_string(CC)},
 	sgsn_pdp_record7(SGSNPDPRecord, Acc1);
 sgsn_pdp_record6(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record7(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record7(#{chargingCharacteristics
-		:= CC} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"chargingCharacteristics">> => bcd(CC)},
+sgsn_pdp_record7(#{chargingID
+		:= CID} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"chargingID">> => CID},
 	sgsn_pdp_record8(SGSNPDPRecord, Acc1);
 sgsn_pdp_record7(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record8(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record8(#{chargingID
-		:= CID} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"chargingID">> => CID},
+sgsn_pdp_record8(#{diagnostics
+		:= Dia} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"diagnostics">> => Dia},
 	sgsn_pdp_record9(SGSNPDPRecord, Acc1);
 sgsn_pdp_record8(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record9(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record9(#{diagnostics
-		:= Dia} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"diagnostics">> => Dia},
+sgsn_pdp_record9(#{duration
+		:= Duration} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"duration">> => Duration},
 	sgsn_pdp_record10(SGSNPDPRecord, Acc1);
 sgsn_pdp_record9(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record10(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record10(#{duration
-		:= Duration} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"duration">> => Duration},
+sgsn_pdp_record10(#{dynamicAddressFlag
+		:= DAF} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"dynamicAddressFlag">> => DAF},
 	sgsn_pdp_record11(SGSNPDPRecord, Acc1);
 sgsn_pdp_record10(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record11(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record11(#{dynamicAddressFlag
-		:= DAF} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"dynamicAddressFlag">> => DAF},
+sgsn_pdp_record11(#{ggsnAddressUsed
+		:= {_, {_, Address}}} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"ggsnAddressUsed">> => Address},
 	sgsn_pdp_record12(SGSNPDPRecord, Acc1);
 sgsn_pdp_record11(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record12(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record12(#{ggsnAddressUsed
-		:= {_, {_, Address}}} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"ggsnAddressUsed">> => Address},
+sgsn_pdp_record12(#{listOfTrafficVolumes
+		:= ListOfTrafficVolumes} = SGSNPDPRecord, Acc) ->
+	LOTV = [traffic_volumes(TV) || TV <- ListOfTrafficVolumes],
+	Acc1 = Acc#{<<"listOfTrafficVolumes">> => LOTV},
 	sgsn_pdp_record13(SGSNPDPRecord, Acc1);
 sgsn_pdp_record12(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record13(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record13(#{listOfTrafficVolumes
-		:= ListOfTrafficVolumes} = SGSNPDPRecord, Acc) ->
-	LOTV = [traffic_volumes(TV) || TV <- ListOfTrafficVolumes],
-	Acc1 = Acc#{<<"listOfTrafficVolumes">> => LOTV},
+sgsn_pdp_record13(#{localSequenceNumber
+		:= LocalSequenceNumber} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"localSequenceNumber">> => LocalSequenceNumber},
 	sgsn_pdp_record14(SGSNPDPRecord, Acc1);
 sgsn_pdp_record13(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record14(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record14(#{localSequenceNumber
-		:= LocalSequenceNumber} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"localSequenceNumber">> => LocalSequenceNumber},
+sgsn_pdp_record14(#{locationAreaCode
+		:= LocationAreaCode} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"locationAreaCode">> => con_string(LocationAreaCode)},
 	sgsn_pdp_record15(SGSNPDPRecord, Acc1);
 sgsn_pdp_record14(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record15(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record15(#{locationAreaCode
-		:= LocationAreaCode} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"locationAreaCode">> => bcd(LocationAreaCode)},
+sgsn_pdp_record15(#{mSNetworkCapability
+		:= MSNetworkCapability} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"mSNetworkCapability">> => binary_to_list(MSNetworkCapability)},
 	sgsn_pdp_record16(SGSNPDPRecord, Acc1);
 sgsn_pdp_record15(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record16(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record16(#{mSNetworkCapability
-		:= MSNetworkCapability} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"mSNetworkCapability">> => bcd(MSNetworkCapability)},
+sgsn_pdp_record16(#{lowPriorityIndicator
+		:= LowPriorityIndicator} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"lowPriorityIndicator">> => LowPriorityIndicator},
 	sgsn_pdp_record17(SGSNPDPRecord, Acc1);
 sgsn_pdp_record16(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record17(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record17(#{lowPriorityIndicator
-		:= LowPriorityIndicator} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"lowPriorityIndicator">> => LowPriorityIndicator},
+sgsn_pdp_record17(#{networkInitiation
+		:= NetworkInitiation} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"networkInitiation">> => NetworkInitiation},
 	sgsn_pdp_record18(SGSNPDPRecord, Acc1);
 sgsn_pdp_record17(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record18(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record18(#{networkInitiation
-		:= NetworkInitiation} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"networkInitiation">> => NetworkInitiation},
+sgsn_pdp_record18(#{pdpType
+		:= PDPType} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"pdpType">> => binary_to_list(PDPType)},
 	sgsn_pdp_record19(SGSNPDPRecord, Acc1);
 sgsn_pdp_record18(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record19(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record19(#{pdpType
-		:= PDPType} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"pdpType">> => PDPType},
+sgsn_pdp_record19(#{rATType
+		:= RATType} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"rATType">> => RATType},
 	sgsn_pdp_record20(SGSNPDPRecord, Acc1);
 sgsn_pdp_record19(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record20(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record20(#{rATType
-		:= RATType} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"rATType">> => RATType},
+sgsn_pdp_record20(#{rNCUnsentDownlinkVolume
+		:= DownLinkVolume} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"rNCUnsentDownlinkVolume">> => DownLinkVolume},
 	sgsn_pdp_record21(SGSNPDPRecord, Acc1);
 sgsn_pdp_record20(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record21(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record21(#{rATType
-		:= RATType} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"rATType">> => RATType},
+sgsn_pdp_record21(#{recordExtensions
+		:= RecordExtensions} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"recordExtensions">> => RecordExtensions},
 	sgsn_pdp_record22(SGSNPDPRecord, Acc1);
 sgsn_pdp_record21(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record22(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record22(#{rNCUnsentDownlinkVolume
-		:= DownLinkVolume} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"rNCUnsentDownlinkVolume">> => DownLinkVolume},
+sgsn_pdp_record22(#{recordOpeningTime
+		:= RecordOpeningTime} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"recordOpeningTime">> => bcd(RecordOpeningTime)},
 	sgsn_pdp_record23(SGSNPDPRecord, Acc1);
 sgsn_pdp_record22(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record23(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record23(#{recordExtensions
-		:= RecordExtensions} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"recordExtensions">> => RecordExtensions},
+sgsn_pdp_record23(#{recordType
+		:= RecordType} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"recordType">> => RecordType},
 	sgsn_pdp_record24(SGSNPDPRecord, Acc1);
 sgsn_pdp_record23(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record24(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record24(#{recordOpeningTime
-		:= RecordOpeningTime} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"recordOpeningTime">> => bcd(RecordOpeningTime)},
+sgsn_pdp_record24(#{routingArea
+		:= RoutingArea} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"routingArea">> => con_string(RoutingArea)},
 	sgsn_pdp_record25(SGSNPDPRecord, Acc1);
 sgsn_pdp_record24(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record25(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record25(#{recordType
-		:= RecordType} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"recordType">> => RecordType},
+sgsn_pdp_record25(#{servedIMEI
+		:= IMEI} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"servedIMEI">> => bcd(IMEI)},
 	sgsn_pdp_record26(SGSNPDPRecord, Acc1);
 sgsn_pdp_record25(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record26(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record26(#{routingArea
-		:= RoutingArea} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"routingArea">> => bcd(RoutingArea)},
+sgsn_pdp_record26(#{servedIMSI
+		:= IMSI} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"servedIMSI">> => bcd(IMSI)},
 	sgsn_pdp_record27(SGSNPDPRecord, Acc1);
 sgsn_pdp_record26(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record27(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record27(#{servedIMEI
-		:= IMEI} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"servedIMEI">> => bcd(IMEI)},
+sgsn_pdp_record27(#{servedMSISDN
+		:= MSISDN} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"servedMSISDN">> => bcd(MSISDN)},
 	sgsn_pdp_record28(SGSNPDPRecord, Acc1);
 sgsn_pdp_record27(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record28(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record28(#{servedIMSI
-		:= IMSI} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"servedIMSI">> => bcd(IMSI)},
+sgsn_pdp_record28(#{servedPDPAddress := {iPAddress,
+		{_, {_, IPAddress}}}} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"servedPDPAddress">> => IPAddress},
 	sgsn_pdp_record29(SGSNPDPRecord, Acc1);
 sgsn_pdp_record28(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record29(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record29(#{servedMSISDN
-		:= MSISDN} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"servedMSISDN">> => bcd(MSISDN)},
+sgsn_pdp_record29(#{servedPDPPDNAddressExt := GSNAddressList}
+		= SGSNPDPRecord, Acc) ->
+	ParsedAddressList = [to_ipv4(GSNAddress) || {_,{iPBinV4Address ,GSNAddress}} <- GSNAddressList],
+	Acc1 = Acc#{<<"servedPDPPDNAddressExt">> => ParsedAddressList},
 	sgsn_pdp_record30(SGSNPDPRecord, Acc1);
 sgsn_pdp_record29(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record30(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record30(#{servedPDPAddress := {iPAddress,
-		{_, {_, IPAddress}}}} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"servedPDPAddress">> => IPAddress},
+sgsn_pdp_record30(#{servingNodePLMNIdentifier := Identifer}
+		= SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"servingNodePLMNIdentifier">> => con_string(Identifer)},
 	sgsn_pdp_record31(SGSNPDPRecord, Acc1);
 sgsn_pdp_record30(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record31(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record31(#{servedPDPPDNAddressExt := GSNAddressList}
+sgsn_pdp_record31(#{sgsnAddress := AddressList}
 		= SGSNPDPRecord, Acc) ->
-	ParsedAddressList = [bcd(GSNAddress) || {_,{_,GSNAddress}} <- GSNAddressList],
-	Acc1 = Acc#{<<"servedPDPPDNAddressExt">> => ParsedAddressList},
+	ParsedAddressList = [to_ipv4(Address) || {_,{iPBinV4Address ,Address}} <- AddressList],
+	Acc1 = Acc#{<<"sgsnAddress">> => ParsedAddressList},
 	sgsn_pdp_record32(SGSNPDPRecord, Acc1);
 sgsn_pdp_record31(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record32(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record32(#{servingNodePLMNIdentifier := Identifer}
+sgsn_pdp_record32(#{sgsnChange := SgsnChange}
 		= SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"servingNodePLMNIdentifier">> => bcd(Identifer)},
+	Acc1 = Acc#{<<"sgsnChange">> => SgsnChange},
 	sgsn_pdp_record33(SGSNPDPRecord, Acc1);
 sgsn_pdp_record32(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record33(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record33(#{servingNodeType := NodeTypes}
-		= SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"servingNodeType">> => NodeTypes},
-	sgsn_pdp_record34(SGSNPDPRecord, Acc1);
-sgsn_pdp_record33(SGSNPDPRecord, Acc) ->
-	sgsn_pdp_record34(SGSNPDPRecord, Acc).
-%% @hidden
-sgsn_pdp_record34(#{servingNodeiPv6Address := IPV6Addresses}
-		= SGSNPDPRecord, Acc) ->
-	ParsedAddressList = [bcd(Address) || {_,{_,Address}} <- IPV6Addresses],
-	Acc1 = Acc#{<<"servingNodeiPv6Address">> => ParsedAddressList},
-	sgsn_pdp_record35(SGSNPDPRecord, Acc1);
-sgsn_pdp_record34(SGSNPDPRecord, Acc) ->
-	sgsn_pdp_record35(SGSNPDPRecord, Acc).
-%% @hidden
-sgsn_pdp_record35(#{servingPLMNRateControl := RateControl}
-		= SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"servingPLMNRateControl">> => RateControl},
-	sgsn_pdp_record36(SGSNPDPRecord, Acc1);
-sgsn_pdp_record35(SGSNPDPRecord, Acc) ->
-	sgsn_pdp_record36(SGSNPDPRecord, Acc).
-%% @hidden
-sgsn_pdp_record36(#{startTime := StartTime}
-		= SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"startTime">> => bcd(StartTime)},
-	sgsn_pdp_record37(SGSNPDPRecord, Acc1);
-sgsn_pdp_record36(SGSNPDPRecord, Acc) ->
-	sgsn_pdp_record37(SGSNPDPRecord, Acc).
-%% @hidden
-sgsn_pdp_record37(#{stopTime := StopTime}
-		= SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"stopTime">> => bcd(StopTime)},
-	sgsn_pdp_record38(SGSNPDPRecord, Acc1);
-sgsn_pdp_record37(SGSNPDPRecord, Acc) ->
-	sgsn_pdp_record38(SGSNPDPRecord, Acc).
-%% @hidden
-sgsn_pdp_record38(#{uNIPDUCPOnlyFlag := UNIPDUCPOnlyFlag}
-		= SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"uNIPDUCPOnlyFlag">> => UNIPDUCPOnlyFlag},
-	sgsn_pdp_record39(SGSNPDPRecord, Acc1);
-sgsn_pdp_record38(SGSNPDPRecord, Acc) ->
-	sgsn_pdp_record39(SGSNPDPRecord, Acc).
-%% @hidden
-sgsn_pdp_record39(#{userCSGInformation := UserCSGInformation}
-		= SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"uNIPDUCPOnlyFlag">> => bcd(UserCSGInformation)},
-	sgsn_pdp_record40(SGSNPDPRecord, Acc1);
-sgsn_pdp_record39(SGSNPDPRecord, Acc) ->
-	sgsn_pdp_record40(SGSNPDPRecord, Acc).
-%% @hidden
-sgsn_pdp_record40(#{userLocationInfoTime := UserLocationInfoTime}
-		= SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"userLocationInfoTime">> => bcd(UserLocationInfoTime)},
-	sgsn_pdp_record41(SGSNPDPRecord, Acc1);
-sgsn_pdp_record40(SGSNPDPRecord, Acc) ->
-	sgsn_pdp_record41(SGSNPDPRecord, Acc).
-%% @hidden
-sgsn_pdp_record41(#{userLocationInfoTime := UserLocationInfoTime}
-		= SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"userLocationInfoTime">> => bcd(UserLocationInfoTime)},
-	sgsn_pdp_record42(SGSNPDPRecord, Acc1);
-sgsn_pdp_record41(SGSNPDPRecord, Acc) ->
-	sgsn_pdp_record42(SGSNPDPRecord, Acc).
-%% @hidden
-sgsn_pdp_record42(#{userLocationInformation := UserLocationInfo}
+sgsn_pdp_record33(#{userCSGInformation := UserCSGInformation}
 		= _SGSNPDPRecord, Acc) ->
-	Acc#{<<"userLocationInformation">> => bcd(UserLocationInfo)};
-sgsn_pdp_record42(_SGSNPDPRecord, Acc) ->
-	Acc.
+	Acc#{<<"userCSGInformation">> => UserCSGInformation};
+sgsn_pdp_record33(_SGSNPDPRecord, Acc) ->
+		Acc.
 
 %% @hidden
 traffic_volumes(#{accessAvailabilityChangeReason
@@ -764,14 +701,14 @@ traffic_volumes11(TV, Acc) ->
 %% @hidden
 traffic_volumes12(#{qosNegotiated
 		:= QOSNegotiated} = TV, Acc) ->
-	Acc1 = Acc#{<<"qosNegotiated">> => bcd(QOSNegotiated)},
+	Acc1 = Acc#{<<"qosNegotiated">> => octet_string(QOSNegotiated)},
 	traffic_volumes13(TV, Acc1);
 traffic_volumes12(TV, Acc) ->
 	traffic_volumes13(TV, Acc).
 %% @hidden
 traffic_volumes13(#{qosRequested
 		:= QOSRequested} = TV, Acc) ->
-	Acc1 = Acc#{<<"qosRequested">> => bcd(QOSRequested)},
+	Acc1 = Acc#{<<"qosRequested">> => octet_string(QOSRequested)},
 	traffic_volumes14(TV, Acc1);
 traffic_volumes13(TV, Acc) ->
 	traffic_volumes14(TV, Acc).
@@ -863,3 +800,28 @@ bcd1([15 | T], Acc) ->
 	bcd1(T, [$f | Acc]);
 bcd1([], Acc) ->
 	Acc.
+
+%% @hidden
+to_ipv4(<<A:8, B:8, C:8, D:8>>) ->
+	integer_to_list(A) ++ [$.] ++
+		integer_to_list(B) ++ [$.] ++
+		integer_to_list(C) ++ [$.] ++
+		integer_to_list(D).
+
+%% @hidden
+con_string(Binary) when is_binary(Binary) ->
+	con_string(Binary, []).
+%% @hidden
+con_string(<<Byte:8, Rest/binary>>, Acc) ->
+	NewAcc = [integer_to_list(Byte) | Acc],
+	con_string(Rest, NewAcc);
+con_string(<<>>, Acc) ->
+	lists:flatten(lists:reverse(Acc)).
+
+%% @hidden
+octet_string(OctetString) when is_binary(OctetString) ->
+	ByteSize = byte_size(OctetString),
+	FieldWidth = 2 * ByteSize,
+	BitSize = ByteSize * 8,
+	<<N:BitSize>> = OctetString,
+	io_lib:fwrite("~*.16.0b", [FieldWidth, N]).
