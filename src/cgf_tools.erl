@@ -292,6 +292,12 @@ get_sequence([], _Refs, Acc) ->
 get_constraint([{element_set, {'ValueRange', {Min, Max}}, none} | T],
 		Acc) when is_integer(Min), is_integer(Max) ->
 	get_constraint(T, Acc#{"minimum" => Min, "maximum" => Max});
+get_constraint([{element_set, {'ValueRange', {'MIN', Max}}, none} | T],
+		Acc) when is_integer(Max) ->
+	get_constraint(T, Acc#{"maximum" => Max});
+get_constraint([{element_set, {'ValueRange', {Min, 'MAX'}}, none} | T],
+		Acc) when is_integer(Min) ->
+	get_constraint(T, Acc#{"minimum" => Min});
 get_constraint([{element_set, {'SizeConstraint',
 		{element_set, {'SingleValue', Size}, none}}, none} | T],
 		Acc) when is_integer(Size) ->
@@ -300,6 +306,14 @@ get_constraint([{element_set, {'SizeConstraint',
 		{element_set, {'ValueRange', {Min, Max}}, none}}, none} | T],
 		Acc) when is_integer(Min), is_integer(Max) ->
 	get_constraint(T, Acc#{"minLength" => Min, "maxLength" => Max});
+get_constraint([{element_set, {'SizeConstraint',
+		{element_set, {'ValueRange', {'MIN', Max}}, none}}, none} | T],
+		Acc) when is_integer(Max) ->
+	get_constraint(T, Acc#{"maxLength" => Max});
+get_constraint([{element_set, {'SizeConstraint',
+		{element_set, {'ValueRange', {Min, 'MAX'}}, none}}, none} | T],
+		Acc) when is_integer(Min) ->
+	get_constraint(T, Acc#{"minLength" => Min});
 get_constraint([], Acc) ->
 	Acc.
 
