@@ -22,13 +22,100 @@
 -copyright('Copyright (c) 2024 SigScale Global Inc.').
 -author('Vance Shipley <vances@sigscale.org>').
 
--export([]).
+-export([bcd_dn/1]).
 
 %%----------------------------------------------------------------------
 %%  The cgf_lib public API
 %%----------------------------------------------------------------------
 
+-spec bcd_dn(BCD) -> PartyAddress
+	when
+		BCD :: binary(),
+		PartyAddress :: #{Attribute => Value},
+		Attribute :: binary(),
+		Value :: binary().
+%% @doc Decode binary coded decimal (BCD) directory number (DN).
+%%
+%% 	Decode the ASN.1 type `BCDDirectoryNumber' in 3GPP TS 32.298.
+%% 	The encoding is as for the information elements Connected Number
+%% 	and Called Party BCD Number in 3GPP TS 24.008.
+%%
+bcd_dn(<<1:1, TON:3, NPI:4, Rest/binary>> = _BCD) ->
+	PA = #{<<"natureOfAddress">> => type_of_number(TON),
+			<<"numberingPlan">> => numbering_plan(NPI),
+			<<"address">> => <<>>},
+	bcd_dn(Rest, PA).
+%% @hidden
+bcd_dn(<<2#1111:4, N:4>>,
+		#{<<"address">> := Address} = Acc) ->
+	D = digit(N),
+	Acc#{<<"address">> => <<Address/binary, D>>};
+bcd_dn(<<N2:4, N1:4, Rest/binary>>,
+		#{<<"address">> := Address} = Acc) ->
+	D1 = digit(N1),
+	D2 = digit(N2),
+	Acc1 = Acc#{<<"address">> => <<Address/binary, D1, D2>>},
+	bcd_dn(Rest, Acc1);
+bcd_dn(<<>>, Acc) ->
+	Acc.
+
 %%----------------------------------------------------------------------
 %%  Internal functions
 %%----------------------------------------------------------------------
+
+%% @hidden
+type_of_number(0) ->
+	<<"unknown">>;
+type_of_number(1) ->
+	<<"international">>;
+type_of_number(2) ->
+	<<"national">>;
+type_of_number(_) ->
+	<<"reserved">>.
+
+%% @hidden
+numbering_plan(0) ->
+	<<"unknown">>;
+numbering_plan(1) ->
+	<<"e164">>;
+numbering_plan(3) ->
+	<<"x121">>;
+numbering_plan(8) ->
+	<<"national">>;
+numbering_plan(9) ->
+	<<"private">>;
+numbering_plan(_) ->
+	<<"reserved">>.
+
+%% @hidden
+digit(0) ->
+	$0;
+digit(1) ->
+	$1;
+digit(2) ->
+	$2;
+digit(3) ->
+	$3;
+digit(4) ->
+	$4;
+digit(5) ->
+	$5;
+digit(6) ->
+	$6;
+digit(7) ->
+	$7;
+digit(8) ->
+	$8;
+digit(9) ->
+	$9;
+digit(10) ->
+	$*;
+digit(11) ->
+	$#;
+digit(12) ->
+	$A;
+digit(13) ->
+	$B;
+digit(14) ->
+	$C.
 
