@@ -656,7 +656,7 @@ sgsn_pdp_record21(SGSNPDPRecord, Acc) ->
 %% @hidden
 sgsn_pdp_record22(#{recordOpeningTime
 		:= RecordOpeningTime} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"recordOpeningTime">> => bcd(RecordOpeningTime)},
+	Acc1 = Acc#{<<"recordOpeningTime">> => cgf_lib:bcd_dn(RecordOpeningTime)},
 	sgsn_pdp_record23(SGSNPDPRecord, Acc1);
 sgsn_pdp_record22(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record23(SGSNPDPRecord, Acc).
@@ -677,21 +677,21 @@ sgsn_pdp_record24(SGSNPDPRecord, Acc) ->
 %% @hidden
 sgsn_pdp_record25(#{servedIMEI
 		:= IMEI} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"servedIMEI">> => bcd(IMEI)},
+	Acc1 = Acc#{<<"servedIMEI">> => cgf_lib:bcd_dn(IMEI)},
 	sgsn_pdp_record26(SGSNPDPRecord, Acc1);
 sgsn_pdp_record25(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record26(SGSNPDPRecord, Acc).
 %% @hidden
 sgsn_pdp_record26(#{servedIMSI
 		:= IMSI} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"servedIMSI">> => bcd(IMSI)},
+	Acc1 = Acc#{<<"servedIMSI">> => cgf_lib:bcd_dn(IMSI)},
 	sgsn_pdp_record27(SGSNPDPRecord, Acc1);
 sgsn_pdp_record26(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record27(SGSNPDPRecord, Acc).
 %% @hidden
 sgsn_pdp_record27(#{servedMSISDN
 		:= MSISDN} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"servedMSISDN">> => bcd(MSISDN)},
+	Acc1 = Acc#{<<"servedMSISDN">> => cgf_lib:bcd_dn(MSISDN)},
 	sgsn_pdp_record28(SGSNPDPRecord, Acc1);
 sgsn_pdp_record27(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record28(SGSNPDPRecord, Acc).
@@ -763,7 +763,7 @@ traffic_volumes2(TV, Acc) ->
 %% @hidden
 traffic_volumes3(#{changeTime
 		:= CT} = TV, Acc) ->
-	Acc1 = Acc#{<<"changeTime">> => bcd(CT)},
+	Acc1 = Acc#{<<"changeTime">> => cgf_lib:bcd_dn(CT)},
 	traffic_volumes4(TV, Acc1);
 traffic_volumes3(TV, Acc) ->
 	traffic_volumes4(TV, Acc).
@@ -877,53 +877,6 @@ traffic_volumes19(#{userLocationInformation
 		:= UserLocInfo} = _TV, Acc) ->
 	Acc#{<<"userLocationInformation">> => UserLocInfo};
 traffic_volumes19(_TV, Acc) ->
-	Acc.
-%% To-Do Add RATType into traffic list
-
-%% @hidden
-bcd(Binary) ->
-	bcd(Binary, []).
-%% @hidden
-bcd(<<D:4, 15:4>>, Acc) ->
-	bcd1([D | Acc], []);
-bcd(<<D1:4, D2:4>>, Acc) ->
-	bcd1([D2, D1 | Acc], []);
-bcd(<<D1:4, D2:4, Rest/binary>>, Acc) ->
-	bcd(Rest, [D2, D1 | Acc]).
-%% @hidden
-bcd1([0 | T], Acc) ->
-	bcd1(T, [$0 | Acc]);
-bcd1([1 | T], Acc) ->
-	bcd1(T, [$1 | Acc]);
-bcd1([2 | T], Acc) ->
-	bcd1(T, [$2 | Acc]);
-bcd1([3 | T], Acc) ->
-	bcd1(T, [$3 | Acc]);
-bcd1([4 | T], Acc) ->
-	bcd1(T, [$4 | Acc]);
-bcd1([5 | T], Acc) ->
-	bcd1(T, [$5 | Acc]);
-bcd1([6 | T], Acc) ->
-	bcd1(T, [$6 | Acc]);
-bcd1([7 | T], Acc) ->
-	bcd1(T, [$7 | Acc]);
-bcd1([8 | T], Acc) ->
-	bcd1(T, [$8 | Acc]);
-bcd1([9 | T], Acc) ->
-	bcd1(T, [$9 | Acc]);
-bcd1([10 | T], Acc) ->
-	bcd1(T, [$a | Acc]);
-bcd1([11 | T], Acc) ->
-	bcd1(T, [$b | Acc]);
-bcd1([12 | T], Acc) ->
-	bcd1(T, [$c | Acc]);
-bcd1([13 | T], Acc) ->
-	bcd1(T, [$d | Acc]);
-bcd1([14 | T], Acc) ->
-	bcd1(T, [$e | Acc]);
-bcd1([15 | T], Acc) ->
-	bcd1(T, [$f | Acc]);
-bcd1([], Acc) ->
 	Acc.
 
 %% @hidden
