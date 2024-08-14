@@ -606,7 +606,8 @@ sgsn_pdp_record14(SGSNPDPRecord, Acc) ->
 %% @hidden
 sgsn_pdp_record15(#{mSNetworkCapability
 		:= MSNetworkCapability} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"mSNetworkCapability">> => binary_to_list(MSNetworkCapability)},
+	Acc1 = Acc#{<<"mSNetworkCapability">> =>
+			cgf_lib:octet_string(MSNetworkCapability)},
 	sgsn_pdp_record16(SGSNPDPRecord, Acc1);
 sgsn_pdp_record15(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record16(SGSNPDPRecord, Acc).
@@ -627,7 +628,7 @@ sgsn_pdp_record17(SGSNPDPRecord, Acc) ->
 %% @hidden
 sgsn_pdp_record18(#{pdpType
 		:= PDPType} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"pdpType">> => binary_to_list(PDPType)},
+	Acc1 = Acc#{<<"pdpType">> => cgf_lib:octet_string(PDPType)},
 	sgsn_pdp_record19(SGSNPDPRecord, Acc1);
 sgsn_pdp_record18(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record19(SGSNPDPRecord, Acc).
@@ -825,14 +826,14 @@ traffic_volumes11(TV, Acc) ->
 %% @hidden
 traffic_volumes12(#{qosNegotiated
 		:= QOSNegotiated} = TV, Acc) ->
-	Acc1 = Acc#{<<"qosNegotiated">> => octet_string(QOSNegotiated)},
+	Acc1 = Acc#{<<"qosNegotiated">> => cgf_lib:octet_string(QOSNegotiated)},
 	traffic_volumes13(TV, Acc1);
 traffic_volumes12(TV, Acc) ->
 	traffic_volumes13(TV, Acc).
 %% @hidden
 traffic_volumes13(#{qosRequested
 		:= QOSRequested} = TV, Acc) ->
-	Acc1 = Acc#{<<"qosRequested">> => octet_string(QOSRequested)},
+	Acc1 = Acc#{<<"qosRequested">> => cgf_lib:octet_string(QOSRequested)},
 	traffic_volumes14(TV, Acc1);
 traffic_volumes13(TV, Acc) ->
 	traffic_volumes14(TV, Acc).
@@ -942,10 +943,3 @@ con_string(<<Byte:8, Rest/binary>>, Acc) ->
 con_string(<<>>, Acc) ->
 	lists:flatten(lists:reverse(Acc)).
 
-%% @hidden
-octet_string(OctetString) when is_binary(OctetString) ->
-	ByteSize = byte_size(OctetString),
-	FieldWidth = 2 * ByteSize,
-	BitSize = ByteSize * 8,
-	<<N:BitSize>> = OctetString,
-	io_lib:fwrite("~*.16.0b", [FieldWidth, N]).
