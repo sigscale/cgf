@@ -1,4 +1,4 @@
-%%% cgf_gprs.erl
+
 %%% vim: ts=3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% @copyright 2024 SigScale Global Inc.
@@ -528,7 +528,7 @@ sgsn_pdp_record3(SGSNPDPRecord, Acc) ->
 %% @hidden
 sgsn_pdp_record4(#{cellIdentifier
 		:= CI} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"cellIdentifier">> => con_string(CI)},
+	Acc1 = Acc#{<<"cellIdentifier">> => cgf_lib:octet_string(CI)},
 	sgsn_pdp_record5(SGSNPDPRecord, Acc1);
 sgsn_pdp_record4(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record5(SGSNPDPRecord, Acc).
@@ -542,7 +542,7 @@ sgsn_pdp_record5(SGSNPDPRecord, Acc) ->
 %% @hidden
 sgsn_pdp_record6(#{chargingCharacteristics
 		:= CC} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"chargingCharacteristics">> => con_string(CC)},
+	Acc1 = Acc#{<<"chargingCharacteristics">> => cgf_lib:octet_string(CC)},
 	sgsn_pdp_record7(SGSNPDPRecord, Acc1);
 sgsn_pdp_record6(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record7(SGSNPDPRecord, Acc).
@@ -599,7 +599,7 @@ sgsn_pdp_record13(SGSNPDPRecord, Acc) ->
 %% @hidden
 sgsn_pdp_record14(#{locationAreaCode
 		:= LocationAreaCode} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"locationAreaCode">> => con_string(LocationAreaCode)},
+	Acc1 = Acc#{<<"locationAreaCode">> => cgf_lib:octet_string(LocationAreaCode)},
 	sgsn_pdp_record15(SGSNPDPRecord, Acc1);
 sgsn_pdp_record14(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record15(SGSNPDPRecord, Acc).
@@ -670,7 +670,7 @@ sgsn_pdp_record23(SGSNPDPRecord, Acc) ->
 %% @hidden
 sgsn_pdp_record24(#{routingArea
 		:= RoutingArea} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"routingArea">> => con_string(RoutingArea)},
+	Acc1 = Acc#{<<"routingArea">> => cgf_lib:octet_string(RoutingArea)},
 	sgsn_pdp_record25(SGSNPDPRecord, Acc1);
 sgsn_pdp_record24(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record25(SGSNPDPRecord, Acc).
@@ -713,7 +713,7 @@ sgsn_pdp_record29(SGSNPDPRecord, Acc) ->
 %% @hidden
 sgsn_pdp_record30(#{servingNodePLMNIdentifier := Identifer}
 		= SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"servingNodePLMNIdentifier">> => con_string(Identifer)},
+	Acc1 = Acc#{<<"servingNodePLMNIdentifier">> => cgf_lib:octet_string(Identifer)},
 	sgsn_pdp_record31(SGSNPDPRecord, Acc1);
 sgsn_pdp_record30(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record31(SGSNPDPRecord, Acc).
@@ -885,14 +885,4 @@ to_ipv4(<<A:8, B:8, C:8, D:8>>) ->
 		integer_to_list(B) ++ [$.] ++
 		integer_to_list(C) ++ [$.] ++
 		integer_to_list(D).
-
-%% @hidden
-con_string(Binary) when is_binary(Binary) ->
-	con_string(Binary, []).
-%% @hidden
-con_string(<<Byte:8, Rest/binary>>, Acc) ->
-	NewAcc = [integer_to_list(Byte) | Acc],
-	con_string(Rest, NewAcc);
-con_string(<<>>, Acc) ->
-	lists:flatten(lists:reverse(Acc)).
 
