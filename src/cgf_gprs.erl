@@ -705,7 +705,8 @@ sgsn_pdp_record28(SGSNPDPRecord, Acc) ->
 %% @hidden
 sgsn_pdp_record29(#{servedPDPPDNAddressExt := GSNAddressList}
 		= SGSNPDPRecord, Acc) ->
-	ParsedAddressList = [to_ipv4(GSNAddress) || {_,{iPBinV4Address ,GSNAddress}} <- GSNAddressList],
+	ParsedAddressList = [cgf_lib:octet_ip_address(GSNAddress)
+			|| {_,{iPBinV4Address ,GSNAddress}} <- GSNAddressList],
 	Acc1 = Acc#{<<"servedPDPPDNAddressExt">> => ParsedAddressList},
 	sgsn_pdp_record30(SGSNPDPRecord, Acc1);
 sgsn_pdp_record29(SGSNPDPRecord, Acc) ->
@@ -720,7 +721,8 @@ sgsn_pdp_record30(SGSNPDPRecord, Acc) ->
 %% @hidden
 sgsn_pdp_record31(#{sgsnAddress := AddressList}
 		= SGSNPDPRecord, Acc) ->
-	ParsedAddressList = [to_ipv4(Address) || {_,{iPBinV4Address ,Address}} <- AddressList],
+	ParsedAddressList = [cgf_lib:octet_ip_address(Address)
+			|| {_,{iPBinV4Address ,Address}} <- AddressList],
 	Acc1 = Acc#{<<"sgsnAddress">> => ParsedAddressList},
 	sgsn_pdp_record32(SGSNPDPRecord, Acc1);
 sgsn_pdp_record31(SGSNPDPRecord, Acc) ->
@@ -878,11 +880,4 @@ traffic_volumes19(#{userLocationInformation
 	Acc#{<<"userLocationInformation">> => UserLocInfo};
 traffic_volumes19(_TV, Acc) ->
 	Acc.
-
-%% @hidden
-to_ipv4(<<A:8, B:8, C:8, D:8>>) ->
-	integer_to_list(A) ++ [$.] ++
-		integer_to_list(B) ++ [$.] ++
-		integer_to_list(C) ++ [$.] ++
-		integer_to_list(D).
 

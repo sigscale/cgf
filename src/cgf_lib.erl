@@ -22,7 +22,7 @@
 -copyright('Copyright (c) 2024 SigScale Global Inc.').
 -author('Vance Shipley <vances@sigscale.org>').
 
--export([octet_string/1, bcd_dn/1]).
+-export([octet_string/1, bcd_dn/1, octet_ip_address/1]).
 
 %%----------------------------------------------------------------------
 %%  The cgf_lib public API
@@ -74,6 +74,24 @@ bcd_dn(<<N2:4, N1:4, Rest/binary>>,
 	bcd_dn(Rest, Acc1);
 bcd_dn(<<>>, Acc) ->
 	Acc.
+
+-spec octet_ip_address(Octets) -> String
+	when
+		Octets :: binary(),
+		String :: list().
+%% @doc Converts a `OCTET STRING' to an `IPV4' or an `IPv6' address in string format.
+octet_ip_address(Octets)
+		when byte_size(Octets) == 4 ->
+	<<A, B, C, D>> = Octets,
+	lists:concat([integer_to_list(A), ".", integer_to_list(B),
+			".", integer_to_list(C), ".", integer_to_list(D)]);
+octet_ip_address(Binary)
+		when byte_size(Binary) == 16 ->
+	<<H1:16, H2:16, H3:16, H4:16, H5:16, H6:16, H7:16, H8:16>> = Binary,
+	lists:concat([integer_to_hex(H1), ":", integer_to_hex(H2),
+			":", integer_to_hex(H3), ":", integer_to_hex(H4), ":",
+			integer_to_hex(H5), ":", integer_to_hex(H6), ":",
+			integer_to_hex(H7), ":", integer_to_hex(H8)]).
 
 %%----------------------------------------------------------------------
 %%  Internal functions
@@ -168,4 +186,9 @@ hex(14) ->
 	$e;
 hex(15) ->
 	$f.
+
+
+%% @hidden
+integer_to_hex(Int) ->
+	lists:flatten(io_lib:format("~.16B", [Int])).
 
