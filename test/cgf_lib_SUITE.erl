@@ -26,7 +26,8 @@
 -export([init_per_testcase/2, end_per_testcase/2]).
 
 %% export test cases
--export([bcd/0, bcd/1]).
+-export([octets/0, octets/1,
+		bcd/0, bcd/1]).
 
 -include_lib("common_test/include/ct.hrl").
 
@@ -74,11 +75,21 @@ sequences() ->
 %% Returns a list of all test cases in this test suite.
 %%
 all() ->
-	[bcd].
+	[octets, bcd].
 
 %%---------------------------------------------------------------------
 %%  Test cases
 %%---------------------------------------------------------------------
+
+octets() ->
+	[{userdata, [{doc, "Convert an OCTET STRING to hexadecimal"}]}].
+
+octets(_Config) ->
+	Size = rand:uniform(64),
+	Octets = rand:bytes(Size),
+	<<Integer:(Size * 8)>> = Octets,
+	HexString = cgf_lib:octet_string(Octets),
+	HexString = iolist_to_binary(io_lib:fwrite("~*.16.0b", [Size * 2, Integer])).
 
 bcd() ->
 	[{userdata, [{doc, "Decode a BCD directory number (DN)"}]}].

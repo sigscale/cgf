@@ -22,11 +22,27 @@
 -copyright('Copyright (c) 2024 SigScale Global Inc.').
 -author('Vance Shipley <vances@sigscale.org>').
 
--export([bcd_dn/1]).
+-export([octet_string/1, bcd_dn/1]).
 
 %%----------------------------------------------------------------------
 %%  The cgf_lib public API
 %%----------------------------------------------------------------------
+
+-spec octet_string(Octets) -> String
+	when
+		Octets :: binary(),
+		String :: binary().
+%% @doc Convert an `OCTET STRING' to hexadecimal characters.
+octet_string(Octets) ->
+	octet_string(Octets, <<>>).
+%% @hidden
+octet_string(<<UpperNibble:4, LowerNibble:4, Rest/binary>>, Acc) ->
+	Hex1 = hex(UpperNibble),
+	Hex2 = hex(LowerNibble),
+	Acc1 = <<Acc/binary, Hex1, Hex2>>,
+	octet_string(Rest, Acc1);
+octet_string(<<>>, Acc) ->
+	Acc.
 
 -spec bcd_dn(BCD) -> PartyAddress
 	when
@@ -118,4 +134,38 @@ digit(13) ->
 	$B;
 digit(14) ->
 	$C.
+
+%% @hidden
+hex(0) ->
+	$0;
+hex(1) ->
+	$1;
+hex(2) ->
+	$2;
+hex(3) ->
+	$3;
+hex(4) ->
+	$4;
+hex(5) ->
+	$5;
+hex(6) ->
+	$6;
+hex(7) ->
+	$7;
+hex(8) ->
+	$8;
+hex(9) ->
+	$9;
+hex(10) ->
+	$a;
+hex(11) ->
+	$b;
+hex(12) ->
+	$c;
+hex(13) ->
+	$d;
+hex(14) ->
+	$e;
+hex(15) ->
+	$f.
 
