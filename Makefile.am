@@ -2,7 +2,7 @@
 ##
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = src asn_src ebin doc priv
+SUBDIRS = src asn_src ebin doc priv test
 
 beam_DATA = ebin/cgf.appup
 
