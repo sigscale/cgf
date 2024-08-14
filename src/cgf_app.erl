@@ -28,7 +28,7 @@
 -export([start/2, stop/1, config_change/3]).
 %% optional callbacks for application behaviour
 -export([prep_stop/1, start_phase/3]).
-%% export the cse private API for installation
+%% export the cgf private API for installation
 -export([install/0, install/1]).
 
 -type state() :: #{}.

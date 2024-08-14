@@ -124,19 +124,37 @@ get_type(#type{def = {'INTEGER', NamedNumbers}, constraint = []}, _Refs) ->
 get_type(#type{def = {'ENUMERATED', NamedNumbers}, constraint = []}, _Refs) ->
 	Enum = [atom_to_list(Name) || {'NamedNumber', Name, _N} <- NamedNumbers],
 	#{"type" => "string", "enum" => Enum};
-get_type(#type{def = 'OCTET STRING', constraint = Constraints}, _Refs) ->
-	get_constraint(Constraints,
-			#{"type" => "string", "pattern" => "^([0-9a-fA-F]{2})*$"});
+get_type(#type{def = 'OCTET STRING', constraint = []}, _Refs) ->
+	#{"type" => "string", "pattern" => "^([0-9a-fA-F]{2})*$"};
+get_type(#type{def = 'OCTET STRING', constraint = [{element_set,
+		{'SizeConstraint', {element_set, {'SingleValue', Size}, none}},
+		none}]}, _Refs) ->
+	Pattern = lists:flatten(["^[0-9a-fA-F]", ${,
+			integer_to_list(Size * 2), $}, $$]),
+	#{"type" => "string", "pattern" => Pattern};
+get_type(#type{def = 'OCTET STRING', constraint = [{element_set,
+		{'SizeConstraint', {element_set, {'ValueRange', {Min, Max}},
+		none}}, none}]}, _Refs) when is_integer(Min), is_integer(Max) ->
+	Pattern = lists:flatten(["^[0-9a-fA-F]", ${,
+			integer_to_list(Min * 2), $,,
+			integer_to_list(Max * 2), $}, $$]),
+	#{"type" => "string", "pattern" => Pattern};
 get_type(#type{def = 'BIT STRING', constraint = []}, _Refs) ->
 	#{"type" => "string", "pattern" => "^[0-9a-fA-F]*$"};
 get_type(#type{def = {'BIT STRING', []}, constraint = [{element_set,
-		{'SizeConstraint', {element_set, {'SingleValue', Size}, none}},
-		none}]}, _Refs) when is_integer(Size), (Size rem 4) == 0 ->
-	Length = Size div 4,
-	Pattern = lists:flatten(["^[0-9a-fA-F]",
-			${, integer_to_list(Length), $}, $$]),
-	#{"type" => "string", "minLength" => Length,
-			"maxLength" => Length, "pattern" => Pattern};
+		{'SizeConstraint', {element_set, {'SingleValue', Size},
+		none}}, none}]}, _Refs) when is_integer(Size), (Size rem 4) == 0 ->
+	Pattern = lists:flatten(["^[0-9a-fA-F]", ${,
+			integer_to_list(Size div 4), $}, $$]),
+	#{"type" => "string", "pattern" => Pattern};
+get_type(#type{def = {'BIT STRING', []}, constraint = [{element_set,
+		{'SizeConstraint', {element_set, {'ValueRange', {Min, Max}},
+		none}}, none}]}, _Refs) when is_integer(Min), is_integer(Max),
+		(Min rem 4) == 0, (Max rem 4) == 0 ->
+	Pattern = lists:flatten(["^[0-9a-fA-F]", ${,
+			integer_to_list(Min div 4), $,,
+			integer_to_list(Max div 4), $}, $$]),
+	#{"type" => "string", "pattern" => Pattern};
 get_type(#type{def = {'BIT STRING', NamedNumbers}, constraint = []}, _Refs) ->
 	Enum = [atom_to_list(Name) || {'NamedNumber', Name, _N} <- NamedNumbers],
 	#{"type" => "string", "enum" => Enum};
@@ -274,6 +292,12 @@ get_sequence([], _Refs, Acc) ->
 get_constraint([{element_set, {'ValueRange', {Min, Max}}, none} | T],
 		Acc) when is_integer(Min), is_integer(Max) ->
 	get_constraint(T, Acc#{"minimum" => Min, "maximum" => Max});
+get_constraint([{element_set, {'ValueRange', {'MIN', Max}}, none} | T],
+		Acc) when is_integer(Max) ->
+	get_constraint(T, Acc#{"maximum" => Max});
+get_constraint([{element_set, {'ValueRange', {Min, 'MAX'}}, none} | T],
+		Acc) when is_integer(Min) ->
+	get_constraint(T, Acc#{"minimum" => Min});
 get_constraint([{element_set, {'SizeConstraint',
 		{element_set, {'SingleValue', Size}, none}}, none} | T],
 		Acc) when is_integer(Size) ->
@@ -282,6 +306,14 @@ get_constraint([{element_set, {'SizeConstraint',
 		{element_set, {'ValueRange', {Min, Max}}, none}}, none} | T],
 		Acc) when is_integer(Min), is_integer(Max) ->
 	get_constraint(T, Acc#{"minLength" => Min, "maxLength" => Max});
+get_constraint([{element_set, {'SizeConstraint',
+		{element_set, {'ValueRange', {'MIN', Max}}, none}}, none} | T],
+		Acc) when is_integer(Max) ->
+	get_constraint(T, Acc#{"maxLength" => Max});
+get_constraint([{element_set, {'SizeConstraint',
+		{element_set, {'ValueRange', {Min, 'MAX'}}, none}}, none} | T],
+		Acc) when is_integer(Min) ->
+	get_constraint(T, Acc#{"minLength" => Min});
 get_constraint([], Acc) ->
 	Acc.
 

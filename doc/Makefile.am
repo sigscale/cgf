@@ -14,6 +14,7 @@ modhtml = cgf.html \
 		cgf_log_job_sup.html \
 		cgf_log.html \
 		cgf_log_codec_ecs.html \
+		cgf_lib.html \
 		cgf_tools.html \
 		cgf_tap.html \
 		cgf_gprs.html \

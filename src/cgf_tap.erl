@@ -65,30 +65,66 @@ import(Filename, Log, Metadata)
 			import1(Filename, Log, Metadata,
 					'TAP-0312':decode('DataInterChange', Bin));
 		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+			?LOG_ERROR([{?MODULE, import},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end.
 %% @hidden
-import1(Filename, Log, Metadata, {ok, {transferBatch,
-		#{callEventDetails := CDRs, accountingInfo := AccountingInfo}}}) ->
-	parse(Filename, Log, Metadata, AccountingInfo, CDRs);
-import1(Filename, Log, Metadata, {ok, {transferBatch,
-		#{callEventDetails := CDRs, accountingInfo := AccountingInfo}}, _}) ->
-	parse(Filename, Log, Metadata, AccountingInfo, CDRs);
+import1(Filename, Log, Metadata, {ok, {transferBatch, TransferBatch}, <<>>}) ->
+	import2(Filename, Log, Metadata, TransferBatch);
+import1(Filename, Log, Metadata, {ok, {transferBatch, TransferBatch}, Rest}) ->
+	?LOG_WARNING([{?MODULE, import},
+			{reason, ignored},
+			{size, byte_size(Rest)}]),
+	import2(Filename, Log, Metadata, TransferBatch);
 import1(_Filename, _Log, _Metadata, {ok, {notification, _Notification}}) ->
 	{error, not_implemented};
 import1(Filename, _Log, _Metadata, {error, Reason}) ->
-	?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+	?LOG_ERROR([{?MODULE, import},
 			{filename, Filename},
 			{error, Reason}]).
+%% @hidden
+import2(Filename, Log, Metadata,
+		#{accountingInfo := AccountingInfo} = TransferBatch) ->
+	Metadata1 = case parse_accounting(AccountingInfo) of
+		AccountingInfo1 when map_size(AccountingInfo1) > 0 ->
+			[{roam_accountingInfo, AccountingInfo1} | Metadata];
+		_ ->
+			Metadata
+	end,
+	import3(Filename, Log, Metadata1, TransferBatch);
+import2(Filename, Log, Metadata, TransferBatch) ->
+	import3(Filename, Log, Metadata, TransferBatch).
+%% @hidden
+import3(Filename, Log, Metadata,
+		#{batchControlInfo := BatchControlInfo} = TransferBatch)
+		when map_size(BatchControlInfo) > 0 ->
+	Metadata1 = case parse_batchcontrol(BatchControlInfo) of
+		BatchControlInfo1 when map_size(BatchControlInfo1) > 0 ->
+			[{roam_batchControlInfo, BatchControlInfo1} | Metadata];
+		_ ->
+			Metadata
+	end,
+	import4(Filename, Log, Metadata1, TransferBatch);
+import3(Filename, Log, Metadata, TransferBatch) ->
+	import4(Filename, Log, Metadata, TransferBatch).
+%% @hidden
+import4(Filename, Log, Metadata,
+		#{callEventDetails := CDRs} = _TransferBatch)
+		when CDRs /= [] ->
+	parse(Filename, Log, Metadata, CDRs);
+import4(Filename, _Log, _Metadata, _TransferBatch) ->
+	?LOG_WARNING([{?MODULE, import},
+			{filename, Filename},
+			{reason, empty}]),
+	ok.
 
 %%----------------------------------------------------------------------
 %%  Internal functions
 %%----------------------------------------------------------------------
 
--spec parse(Filename, Log, Metadata, AccountingInfo, CDRs) -> Result
+-spec parse(Filename, Log, Metadata, CDRs) -> Result
 	when
 		Filename :: file:filename(),
 		Log :: disk_log:log(),
@@ -96,122 +132,110 @@ import1(Filename, _Log, _Metadata, {error, Reason}) ->
 		AttributeName :: string(),
 		AttributeValue :: term(),
 		CDRs :: [tuple()],
-		AccountingInfo :: map(),
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse CDRs from the import file.
 %% @private
-parse(Filename, Log, Metadata, AccountingInfo, CDRs) ->
-	case parse_accounting(AccountingInfo) of
-		#{} = AccountingMap ->
-			parse1(Filename, Log, Metadata, AccountingMap, CDRs);
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
-					{filename, Filename},
-					{error, Reason}]),
-			{error, Reason}
-	end.
-%% @hidden
-parse1(Filename, Log, Metadata, AccountingMap,
+parse(Filename, Log, Metadata,
 		[{mobileOriginatedCall, MobileOriginatedCall} | T]) ->
-	case parse_mo_call(Log, [{roam_accountingInfo, AccountingMap} | Metadata], MobileOriginatedCall) of
+	case parse_mo_call(Log, Metadata, MobileOriginatedCall) of
 		ok ->
-			parse1(Filename, Log, Metadata, AccountingMap,T );
+			parse(Filename, Log, Metadata, T );
 		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+			?LOG_ERROR([{?MODULE, parse_mo_call},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end;
-parse1(Filename, Log, Metadata, AccountingMap,
+parse(Filename, Log, Metadata,
 		[{mobileTerminatedCall, MobileTerminatedCall} | T]) ->
-	case parse_mt_call(Log, [{roam_accountingInfo, AccountingMap} | Metadata], MobileTerminatedCall) of
+	case parse_mt_call(Log, Metadata, MobileTerminatedCall) of
 		ok ->
-			parse1(Filename, Log, Metadata, AccountingMap, T);
+			parse(Filename, Log, Metadata, T);
 		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+			?LOG_ERROR([{?MODULE, parse_mt_call},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end;
-parse1(Filename, Log, Metadata, AccountingMap,
+parse(Filename, Log, Metadata,
 		[{supplServiceEvent, SupplServiceEvent} | T]) ->
-	case parse_mmtel(Log, [{roam_accountingInfo, AccountingMap} | Metadata], SupplServiceEvent) of
+	case parse_mmtel(Log, Metadata, SupplServiceEvent) of
 		ok ->
-			parse1(Filename, Log, Metadata, AccountingMap, T);
+			parse(Filename, Log, Metadata, T);
 		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+			?LOG_ERROR([{?MODULE, parse_mmtel},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end;
-parse1(Filename, Log, Metadata, AccountingMap,
+parse(Filename, Log, Metadata,
 		[{serviceCentreUsage, ServiceCentreUsage} | T]) ->
-	case parse_sc_sm(Log, [{roam_accountingInfo, AccountingMap} | Metadata], ServiceCentreUsage) of
+	case parse_sc_sm(Log, Metadata, ServiceCentreUsage) of
 		ok ->
-			parse1(Filename, Log, Metadata, AccountingMap, T);
+			parse(Filename, Log, Metadata, T);
 		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+			?LOG_ERROR([{?MODULE, parse_sc_sm},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end;
-parse1(Filename, Log, Metadata, AccountingMap,
+parse(Filename, Log, Metadata,
 		[{gprsCall, GprsCall} | T]) ->
-	case parse_gprs(Log, [{roam_accountingInfo, AccountingMap} | Metadata], GprsCall) of
+	case parse_gprs(Log, Metadata, GprsCall) of
 		ok ->
-			parse1(Filename, Log, Metadata, AccountingMap, T);
+			parse(Filename, Log, Metadata, T);
 		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+			?LOG_ERROR([{?MODULE, parse_gprs},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end;
-parse1(Filename, Log, Metadata, AccountingMap,
+parse(Filename, Log, Metadata,
 		[{contentTransaction, ContentTransaction} | T]) ->
-	case parse_content(Log, [{roam_accountingInfo, AccountingMap} | Metadata], ContentTransaction) of
+	case parse_content(Log, Metadata, ContentTransaction) of
 		ok ->
-			parse1(Filename, Log, Metadata, AccountingMap, T);
+			parse(Filename, Log, Metadata, T);
 		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+			?LOG_ERROR([{?MODULE, parse_content},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end;
-parse1(Filename, Log, Metadata, AccountingMap,
+parse(Filename, Log, Metadata,
 		[{locationService, LocationService} | T]) ->
-	case parse_location(Log, [{roam_accountingInfo, AccountingMap} | Metadata], LocationService) of
+	case parse_location(Log, Metadata, LocationService) of
 		ok ->
-			parse1(Filename, Log, Metadata, AccountingMap, T);
+			parse(Filename, Log, Metadata, T);
 		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+			?LOG_ERROR([{?MODULE, parse_location},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end;
-parse1(Filename, Log, Metadata, AccountingMap,
+parse(Filename, Log, Metadata,
 		[{messagingEvent, MessagingEvent} | T]) ->
-	case parse_message(Log, [{roam_accountingInfo, AccountingMap} | Metadata], MessagingEvent) of
+	case parse_message(Log, Metadata, MessagingEvent) of
 		ok ->
-			parse1(Filename, Log, Metadata, AccountingMap, T);
+			parse(Filename, Log, Metadata, T);
 		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+			?LOG_ERROR([{?MODULE, parse_message},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end;
-parse1(Filename, Log, Metadata, AccountingMap,
+parse(Filename, Log, Metadata,
 		[{mobileSession, MobileSession} | T]) ->
-	case parse_session(Log, [{roam_accountingInfo, AccountingMap} | Metadata], MobileSession) of
+	case parse_session(Log, Metadata, MobileSession) of
 		ok ->
-			parse1(Filename, Log, Metadata, AccountingMap, T);
+			parse(Filename, Log, Metadata, T);
 		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
+			?LOG_ERROR([{?MODULE, parse_session},
 					{filename, Filename},
 					{error, Reason}]),
 			{error, Reason}
 	end;
-parse1(_Filename, _Log, _Metadata, _AccountingMap, []) ->
+parse(_Filename, _Log, _Metadata, []) ->
 	ok.
 
 -spec parse_mo_call(Log, Metadata, MOC) -> Result
@@ -345,36 +369,23 @@ parse_session(_Log, _Metadata, _MobileSession) ->
 			localCurrency => list(),
 			tapCurrency => list(),
 			tapDecimalPlaces => integer(),
-			taxation => [map()]}| {error, Reason},
-		Reason :: term().
+			taxation => [map()]}.
 %% @doc Parse Accounting Info from the import file.
 %% @private
 parse_accounting(AccountingInfo) ->
 	parse_accounting(AccountingInfo, #{}).
 %% @hidden
-parse_accounting(#{currencyConversionInfo := CurrencyConversionInfo} = AI, Acc) ->
-	case parse_cci(CurrencyConversionInfo) of
-		ConvertedCurrencyInfo when is_list(ConvertedCurrencyInfo) ->
-			parse_accounting1(AI,
-				Acc#{currencyConversionInfo => ConvertedCurrencyInfo});
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
-					{error, Reason}]),
-			{error, Reason}
-	end;
+parse_accounting(#{currencyConversionInfo
+		:= CurrencyConversionInfo} = AI, Acc) ->
+	ConvertedCurrencyInfo = parse_cci(CurrencyConversionInfo),
+	parse_accounting1(AI,
+			Acc#{currencyConversionInfo => ConvertedCurrencyInfo});
 parse_accounting(AI, Acc) ->
 	parse_accounting1(AI, Acc).
 %% @hidden
 parse_accounting1(#{auditControlInfo := AuditControlInfo} = AI, Acc) ->
-	case parse_discounting(AuditControlInfo) of
-		#{} = Discounting ->
-			parse_accounting2(AI,
-				Acc#{discounting => Discounting});
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
-					{error, Reason}]),
-			{error, Reason}
-	end;
+	Discounting = parse_discounting(AuditControlInfo),
+	parse_accounting2(AI, Acc#{discounting => Discounting});
 parse_accounting1(AI, Acc) ->
 	parse_accounting2(AI, Acc).
 %% @hidden
@@ -400,15 +411,93 @@ parse_accounting4(AI, Acc) ->
 	parse_accounting5(AI, Acc).
 %% @hidden
 parse_accounting5(#{taxation := Taxation} = _AI, Acc) ->
-	case parse_tax(Taxation) of
-		TaxValue when is_list(TaxValue) ->
-			Acc#{taxation => TaxValue};
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, ?FUNCTION_NAME},
-					{error, Reason}]),
-			{error, Reason}
-	end;
+	Acc#{taxation => parse_tax(Taxation)};
 parse_accounting5(_AI, Acc) ->
+	Acc.
+
+-spec parse_batchcontrol(BatchControlInfo) -> Result
+	when
+		BatchControlInfo:: map(),
+		Result :: map().
+%% @doc Parse Batch Control Info from the import file.
+%% @private
+parse_batchcontrol(BatchControlInfo) ->
+	parse_batchcontrol(BatchControlInfo, #{}).
+%% @hidden
+parse_batchcontrol(#{sender := Sender}
+		= BatchControlInfo, Acc) when byte_size(Sender) > 0 ->
+	Acc1 = Acc#{<<"sender">> => Sender},
+	parse_batchcontrol1(BatchControlInfo, Acc1);
+parse_batchcontrol(BatchControlInfo, Acc) ->
+	parse_batchcontrol1(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol1(#{recipient := Recipient}
+		= BatchControlInfo, Acc) when byte_size(Recipient) > 0 ->
+	Acc1 = Acc#{<<"recipient">> => Recipient},
+	parse_batchcontrol2(BatchControlInfo, Acc1);
+parse_batchcontrol1(BatchControlInfo, Acc) ->
+	parse_batchcontrol2(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol2(#{fileSequenceNumber := FSN}
+		= BatchControlInfo, Acc) when byte_size(FSN) > 0 ->
+	Acc1 = Acc#{<<"fileSequenceNumber">> => binary_to_integer(FSN)},
+	parse_batchcontrol3(BatchControlInfo, Acc1);
+parse_batchcontrol2(BatchControlInfo, Acc) ->
+	parse_batchcontrol3(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol3(#{fileCreationTimeStamp := TS}
+		= BatchControlInfo, Acc) when map_size(TS) > 0 ->
+	Acc1 = Acc#{<<"fileCreationTimeStamp">> => timestamp(TS)},
+	parse_batchcontrol4(BatchControlInfo, Acc1);
+parse_batchcontrol3(BatchControlInfo, Acc) ->
+	parse_batchcontrol4(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol4(#{transferCutOffTimeStamp := TS}
+		= BatchControlInfo, Acc) when map_size(TS) > 0 ->
+	Acc1 = Acc#{<<"transferCutOffTimeStamp">> => timestamp(TS)},
+	parse_batchcontrol5(BatchControlInfo, Acc1);
+parse_batchcontrol4(BatchControlInfo, Acc) ->
+	parse_batchcontrol5(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol5(#{fileAvailableTimeStamp := TS}
+		= BatchControlInfo, Acc) when map_size(TS) > 0 ->
+	Acc1 = Acc#{<<"fileAvailableTimeStamp">> => timestamp(TS)},
+	parse_batchcontrol6(BatchControlInfo, Acc1);
+parse_batchcontrol5(BatchControlInfo, Acc) ->
+	parse_batchcontrol6(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol6(#{specificationVersionNumber := VSN}
+		= BatchControlInfo, Acc) when is_integer(VSN) > 0 ->
+	Acc1 = Acc#{<<"specificationVersionNumber">> => VSN},
+	parse_batchcontrol7(BatchControlInfo, Acc1);
+parse_batchcontrol6(BatchControlInfo, Acc) ->
+	parse_batchcontrol7(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol7(#{releaseVersionNumber := VSN}
+		= BatchControlInfo, Acc) when is_integer(VSN) > 0 ->
+	Acc1 = Acc#{<<"releaseVersionNumber">> => VSN},
+	parse_batchcontrol8(BatchControlInfo, Acc1);
+parse_batchcontrol7(BatchControlInfo, Acc) ->
+	parse_batchcontrol8(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol8(#{fileTypeIndicator := FTI}
+		= BatchControlInfo, Acc) when byte_size(FTI) > 0 ->
+	Acc1 = Acc#{<<"fileTypeIndicator">> => FTI},
+	parse_batchcontrol9(BatchControlInfo, Acc1);
+parse_batchcontrol8(BatchControlInfo, Acc) ->
+	parse_batchcontrol9(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol9(#{rapFileSequenceNumber := FSN}
+		= BatchControlInfo, Acc) when byte_size(FSN) > 0 ->
+	Acc1 = Acc#{<<"rapFileSequenceNumber">> => binary_to_integer(FSN)},
+	parse_batchcontrol10(BatchControlInfo, Acc1);
+parse_batchcontrol9(BatchControlInfo, Acc) ->
+	parse_batchcontrol10(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol10(#{operatorSpecInformation := OSI}
+		= _BatchControlInfo, Acc) when length(OSI) > 0 ->
+	Acc#{<<"operatorSpecInformation">> => OSI};
+parse_batchcontrol10(_BatchControlInfo, Acc) ->
 	Acc.
 
 -spec parse_cci(CCI) -> Result
@@ -804,6 +893,11 @@ octet_string(OctetString) when is_binary(OctetString) ->
 timestamp(#{localTimeStamp := <<Year:4/binary, Month:2/binary,
 		Day:2/binary, Hour:2/binary, Minute:2/binary, Second:2/binary>>,
 		utcTimeOffsetCode := Z}) ->
+	<<Year/binary, $-, Month/binary, $-, Day/binary, $T, Hour/binary,
+			$:, Minute/binary, $:, Second/binary>>;
+timestamp(#{localTimeStamp := <<Year:4/binary, Month:2/binary,
+		Day:2/binary, Hour:2/binary, Minute:2/binary, Second:2/binary>>,
+		utcTimeOffset := Offset}) ->
 	<<Year/binary, $-, Month/binary, $-, Day/binary, $T, Hour/binary,
 			$:, Minute/binary, $:, Second/binary>>.
 

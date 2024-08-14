@@ -82,6 +82,14 @@
 		{
 			"type": "object",
 			"properties": {
+				"Bx_roam_batchControlInfo": {
+					"$ref": "#/$defs/BatchControlInfo"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
 				"Bx_roam_accountingInfo": {
 					"$ref": "#/$defs/AccountingInfo"
 				}
@@ -318,6 +326,47 @@
 				}
 			}
 		},
+		"BatchControlInfo": {
+			"type": "object",
+			"properties" : {
+				"sender": {
+					"$ref": "#/$defs/PlmnId"
+				},
+				"recipient": {
+					"$ref": "#/$defs/PlmnId"
+				},
+				"fileSequenceNumber": {
+					"$ref": "#/$defs/FileSequenceNumber"
+				},
+				"fileCreationTimeStamp": {
+					"$ref": "#/$defs/DateTimeLong"
+				},
+				"transferCutOffTimeStamp": {
+					"$ref": "#/$defs/DateTimeLong"
+				},
+				"fileAvailableTimeStamp": {
+					"$ref": "#/$defs/DateTimeLong"
+				},
+				"specificationVersionNumber": {
+					"type": "integer"
+				},
+				"releaseVersionNumber": {
+					"type": "integer"
+				},
+				"fileTypeIndicator": {
+					"type": "string"
+				},
+				"rapFileSequenceNumber": {
+					"$ref": "#/$defs/FileSequenceNumber"
+				},
+				"operatorSpecInformation": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			}
+		},
 		"BearerServiceCode": {
 			"type": "string",
 			"pattern": "^([0-9a-fA-F]{2})*$"
@@ -494,6 +543,19 @@
 				}
 			}
 		},
+		"DateTimeLong": {
+			"type": "object",
+			"properties": {
+				"localTimeStamp": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"utcTimeOffset": {
+					"type": "string",
+					"pattern": "^[\\-+][0-9]{1,4}$"
+				}
+			}
+		},
 		"Destination": {
 			"type": "object",
 			"properties": {
@@ -579,6 +641,11 @@
 				}
 			}
 		},
+		"FileSequenceNumber": {
+			"type": "integer",
+			"minimum": 1,
+			"maximum": 99999
+		},
 		"GeographicalLocation": {
 			"type": "object",
 			"properties": {
@@ -600,6 +667,7 @@
 					"$ref": "#/$defs/GprsChargeableSubscriber"
 				},
 				"rapFileSequenceNumber": {
+					"$ref": "#/$defs/FileSequenceNumber"
 				},
 				"gprsDestination": {
 					"$ref": "#/$defs/GprsDestination"
@@ -797,6 +865,7 @@
 					"$ref": "#/$defs/NetworkId"
 				},
 				"rapFileSequenceNumber": {
+					"$ref": "#/$defs/FileSequenceNumber"
 				},
 				"simToolkitIndicator": {
 				},
@@ -829,6 +898,7 @@
 					"$ref": "#/$defs/NetworkId"
 				},
 				"rapFileSequenceNumber": {
+					"$ref": "#/$defs/FileSequenceNumber"
 				},
 				"simToolkitIndicator": {
 				},
@@ -862,6 +932,10 @@
 		"PDPContextStartTimestamp": {
 			"type": "string",
 			"format": "date-time"
+		},
+		"PlmnId": {
+			"type": "string",
+			"pattern": "^[A-Z0-9]{5}$"
 		},
 		"SimChargeableSubscriber": {
 			"type": "object",
