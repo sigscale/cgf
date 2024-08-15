@@ -1,4 +1,4 @@
-%%% cgf_lib.erl
+%% cgf_lib.erl
 %%% vim: ts=3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% @copyright 2024 SigScale Global Inc.
@@ -82,16 +82,12 @@ bcd_dn(<<>>, Acc) ->
 %% @doc Converts a `OCTET STRING' to an `IPV4' or an `IPv6' address in string format.
 octet_ip_address(Octets)
 		when byte_size(Octets) == 4 ->
-	<<A, B, C, D>> = Octets,
-	lists:concat([integer_to_list(A), ".", integer_to_list(B),
-			".", integer_to_list(C), ".", integer_to_list(D)]);
+	<<A:8, B:8, C:8, D:8>> = Octets,
+	inet:ntoa({A, B, C, D});
 octet_ip_address(Binary)
 		when byte_size(Binary) == 16 ->
 	<<H1:16, H2:16, H3:16, H4:16, H5:16, H6:16, H7:16, H8:16>> = Binary,
-	lists:concat([integer_to_hex(H1), ":", integer_to_hex(H2),
-			":", integer_to_hex(H3), ":", integer_to_hex(H4), ":",
-			integer_to_hex(H5), ":", integer_to_hex(H6), ":",
-			integer_to_hex(H7), ":", integer_to_hex(H8)]).
+	inet:ntoa({H1, H2, H3, H4, H5, H6, H7, H8}).
 
 %%----------------------------------------------------------------------
 %%  Internal functions
@@ -186,9 +182,4 @@ hex(14) ->
 	$e;
 hex(15) ->
 	$f.
-
-
-%% @hidden
-integer_to_hex(Int) ->
-	lists:flatten(io_lib:format("~.16B", [Int])).
 
