@@ -1,4 +1,4 @@
-%%% cgf_gprs.erl
+
 %%% vim: ts=3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% @copyright 2024 SigScale Global Inc.
@@ -528,7 +528,7 @@ sgsn_pdp_record3(SGSNPDPRecord, Acc) ->
 %% @hidden
 sgsn_pdp_record4(#{cellIdentifier
 		:= CI} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"cellIdentifier">> => con_string(CI)},
+	Acc1 = Acc#{<<"cellIdentifier">> => cgf_lib:octet_string(CI)},
 	sgsn_pdp_record5(SGSNPDPRecord, Acc1);
 sgsn_pdp_record4(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record5(SGSNPDPRecord, Acc).
@@ -542,7 +542,7 @@ sgsn_pdp_record5(SGSNPDPRecord, Acc) ->
 %% @hidden
 sgsn_pdp_record6(#{chargingCharacteristics
 		:= CC} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"chargingCharacteristics">> => con_string(CC)},
+	Acc1 = Acc#{<<"chargingCharacteristics">> => cgf_lib:octet_string(CC)},
 	sgsn_pdp_record7(SGSNPDPRecord, Acc1);
 sgsn_pdp_record6(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record7(SGSNPDPRecord, Acc).
@@ -599,7 +599,7 @@ sgsn_pdp_record13(SGSNPDPRecord, Acc) ->
 %% @hidden
 sgsn_pdp_record14(#{locationAreaCode
 		:= LocationAreaCode} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"locationAreaCode">> => con_string(LocationAreaCode)},
+	Acc1 = Acc#{<<"locationAreaCode">> => cgf_lib:octet_string(LocationAreaCode)},
 	sgsn_pdp_record15(SGSNPDPRecord, Acc1);
 sgsn_pdp_record14(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record15(SGSNPDPRecord, Acc).
@@ -656,7 +656,7 @@ sgsn_pdp_record21(SGSNPDPRecord, Acc) ->
 %% @hidden
 sgsn_pdp_record22(#{recordOpeningTime
 		:= RecordOpeningTime} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"recordOpeningTime">> => bcd(RecordOpeningTime)},
+	Acc1 = Acc#{<<"recordOpeningTime">> => cgf_lib:bcd_dn(RecordOpeningTime)},
 	sgsn_pdp_record23(SGSNPDPRecord, Acc1);
 sgsn_pdp_record22(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record23(SGSNPDPRecord, Acc).
@@ -670,28 +670,28 @@ sgsn_pdp_record23(SGSNPDPRecord, Acc) ->
 %% @hidden
 sgsn_pdp_record24(#{routingArea
 		:= RoutingArea} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"routingArea">> => con_string(RoutingArea)},
+	Acc1 = Acc#{<<"routingArea">> => cgf_lib:octet_string(RoutingArea)},
 	sgsn_pdp_record25(SGSNPDPRecord, Acc1);
 sgsn_pdp_record24(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record25(SGSNPDPRecord, Acc).
 %% @hidden
 sgsn_pdp_record25(#{servedIMEI
 		:= IMEI} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"servedIMEI">> => bcd(IMEI)},
+	Acc1 = Acc#{<<"servedIMEI">> => cgf_lib:bcd_dn(IMEI)},
 	sgsn_pdp_record26(SGSNPDPRecord, Acc1);
 sgsn_pdp_record25(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record26(SGSNPDPRecord, Acc).
 %% @hidden
 sgsn_pdp_record26(#{servedIMSI
 		:= IMSI} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"servedIMSI">> => bcd(IMSI)},
+	Acc1 = Acc#{<<"servedIMSI">> => cgf_lib:bcd_dn(IMSI)},
 	sgsn_pdp_record27(SGSNPDPRecord, Acc1);
 sgsn_pdp_record26(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record27(SGSNPDPRecord, Acc).
 %% @hidden
 sgsn_pdp_record27(#{servedMSISDN
 		:= MSISDN} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"servedMSISDN">> => bcd(MSISDN)},
+	Acc1 = Acc#{<<"servedMSISDN">> => cgf_lib:bcd_dn(MSISDN)},
 	sgsn_pdp_record28(SGSNPDPRecord, Acc1);
 sgsn_pdp_record27(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record28(SGSNPDPRecord, Acc).
@@ -705,7 +705,8 @@ sgsn_pdp_record28(SGSNPDPRecord, Acc) ->
 %% @hidden
 sgsn_pdp_record29(#{servedPDPPDNAddressExt := GSNAddressList}
 		= SGSNPDPRecord, Acc) ->
-	ParsedAddressList = [to_ipv4(GSNAddress) || {_,{iPBinV4Address ,GSNAddress}} <- GSNAddressList],
+	ParsedAddressList = [cgf_lib:octet_ip_address(GSNAddress)
+			|| {_,{iPBinV4Address ,GSNAddress}} <- GSNAddressList],
 	Acc1 = Acc#{<<"servedPDPPDNAddressExt">> => ParsedAddressList},
 	sgsn_pdp_record30(SGSNPDPRecord, Acc1);
 sgsn_pdp_record29(SGSNPDPRecord, Acc) ->
@@ -713,14 +714,15 @@ sgsn_pdp_record29(SGSNPDPRecord, Acc) ->
 %% @hidden
 sgsn_pdp_record30(#{servingNodePLMNIdentifier := Identifer}
 		= SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"servingNodePLMNIdentifier">> => con_string(Identifer)},
+	Acc1 = Acc#{<<"servingNodePLMNIdentifier">> => cgf_lib:octet_string(Identifer)},
 	sgsn_pdp_record31(SGSNPDPRecord, Acc1);
 sgsn_pdp_record30(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record31(SGSNPDPRecord, Acc).
 %% @hidden
 sgsn_pdp_record31(#{sgsnAddress := AddressList}
 		= SGSNPDPRecord, Acc) ->
-	ParsedAddressList = [to_ipv4(Address) || {_,{iPBinV4Address ,Address}} <- AddressList],
+	ParsedAddressList = [cgf_lib:octet_ip_address(Address)
+			|| {_,{iPBinV4Address ,Address}} <- AddressList],
 	Acc1 = Acc#{<<"sgsnAddress">> => ParsedAddressList},
 	sgsn_pdp_record32(SGSNPDPRecord, Acc1);
 sgsn_pdp_record31(SGSNPDPRecord, Acc) ->
@@ -763,7 +765,7 @@ traffic_volumes2(TV, Acc) ->
 %% @hidden
 traffic_volumes3(#{changeTime
 		:= CT} = TV, Acc) ->
-	Acc1 = Acc#{<<"changeTime">> => bcd(CT)},
+	Acc1 = Acc#{<<"changeTime">> => cgf_lib:bcd_dn(CT)},
 	traffic_volumes4(TV, Acc1);
 traffic_volumes3(TV, Acc) ->
 	traffic_volumes4(TV, Acc).
@@ -878,68 +880,4 @@ traffic_volumes19(#{userLocationInformation
 	Acc#{<<"userLocationInformation">> => UserLocInfo};
 traffic_volumes19(_TV, Acc) ->
 	Acc.
-%% To-Do Add RATType into traffic list
-
-%% @hidden
-bcd(Binary) ->
-	bcd(Binary, []).
-%% @hidden
-bcd(<<D:4, 15:4>>, Acc) ->
-	bcd1([D | Acc], []);
-bcd(<<D1:4, D2:4>>, Acc) ->
-	bcd1([D2, D1 | Acc], []);
-bcd(<<D1:4, D2:4, Rest/binary>>, Acc) ->
-	bcd(Rest, [D2, D1 | Acc]).
-%% @hidden
-bcd1([0 | T], Acc) ->
-	bcd1(T, [$0 | Acc]);
-bcd1([1 | T], Acc) ->
-	bcd1(T, [$1 | Acc]);
-bcd1([2 | T], Acc) ->
-	bcd1(T, [$2 | Acc]);
-bcd1([3 | T], Acc) ->
-	bcd1(T, [$3 | Acc]);
-bcd1([4 | T], Acc) ->
-	bcd1(T, [$4 | Acc]);
-bcd1([5 | T], Acc) ->
-	bcd1(T, [$5 | Acc]);
-bcd1([6 | T], Acc) ->
-	bcd1(T, [$6 | Acc]);
-bcd1([7 | T], Acc) ->
-	bcd1(T, [$7 | Acc]);
-bcd1([8 | T], Acc) ->
-	bcd1(T, [$8 | Acc]);
-bcd1([9 | T], Acc) ->
-	bcd1(T, [$9 | Acc]);
-bcd1([10 | T], Acc) ->
-	bcd1(T, [$a | Acc]);
-bcd1([11 | T], Acc) ->
-	bcd1(T, [$b | Acc]);
-bcd1([12 | T], Acc) ->
-	bcd1(T, [$c | Acc]);
-bcd1([13 | T], Acc) ->
-	bcd1(T, [$d | Acc]);
-bcd1([14 | T], Acc) ->
-	bcd1(T, [$e | Acc]);
-bcd1([15 | T], Acc) ->
-	bcd1(T, [$f | Acc]);
-bcd1([], Acc) ->
-	Acc.
-
-%% @hidden
-to_ipv4(<<A:8, B:8, C:8, D:8>>) ->
-	integer_to_list(A) ++ [$.] ++
-		integer_to_list(B) ++ [$.] ++
-		integer_to_list(C) ++ [$.] ++
-		integer_to_list(D).
-
-%% @hidden
-con_string(Binary) when is_binary(Binary) ->
-	con_string(Binary, []).
-%% @hidden
-con_string(<<Byte:8, Rest/binary>>, Acc) ->
-	NewAcc = [integer_to_list(Byte) | Acc],
-	con_string(Rest, NewAcc);
-con_string(<<>>, Acc) ->
-	lists:flatten(lists:reverse(Acc)).
 

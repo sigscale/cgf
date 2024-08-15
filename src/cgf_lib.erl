@@ -1,4 +1,4 @@
-%%% cgf_lib.erl
+%% cgf_lib.erl
 %%% vim: ts=3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% @copyright 2024 SigScale Global Inc.
@@ -22,7 +22,7 @@
 -copyright('Copyright (c) 2024 SigScale Global Inc.').
 -author('Vance Shipley <vances@sigscale.org>').
 
--export([octet_string/1, bcd_dn/1]).
+-export([octet_string/1, bcd_dn/1, octet_ip_address/1]).
 
 %%----------------------------------------------------------------------
 %%  The cgf_lib public API
@@ -74,6 +74,16 @@ bcd_dn(<<N2:4, N1:4, Rest/binary>>,
 	bcd_dn(Rest, Acc1);
 bcd_dn(<<>>, Acc) ->
 	Acc.
+
+-spec octet_ip_address(Octets) -> String
+	when
+		Octets :: binary(),
+		String :: list().
+%% @doc Converts a `OCTET STRING' to an `IPV4' or an `IPv6' address in string format.
+octet_ip_address(<<A:8, B:8, C:8, D:8>>) ->
+	inet:ntoa({A, B, C, D});
+octet_ip_address(<<H1:16, H2:16, H3:16, H4:16, H5:16, H6:16, H7:16, H8:16>> ->)
+	inet:ntoa({H1, H2, H3, H4, H5, H6, H7, H8}).
 
 %%----------------------------------------------------------------------
 %%  Internal functions
