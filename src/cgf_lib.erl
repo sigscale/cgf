@@ -82,7 +82,7 @@ bcd_dn(<<>>, Acc) ->
 %% @doc Converts a `OCTET STRING' to an `IPV4' or an `IPv6' address in string format.
 octet_ip_address(<<A:8, B:8, C:8, D:8>>) ->
 	inet:ntoa({A, B, C, D});
-octet_ip_address(<<H1:16, H2:16, H3:16, H4:16, H5:16, H6:16, H7:16, H8:16>> ->)
+octet_ip_address(<<H1:16, H2:16, H3:16, H4:16, H5:16, H6:16, H7:16, H8:16>>) ->
 	inet:ntoa({H1, H2, H3, H4, H5, H6, H7, H8}).
 
 %%----------------------------------------------------------------------
