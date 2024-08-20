@@ -175,7 +175,14 @@ bx([{roam_gprs = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_user(MSISDN, IMSI, []), $,,
 			ecs_event(StartTime, [], Duration,
 					"event", "session", ["connection"], Outcome), $,,
-			$", "Bx_roam_gprsCall", $", $:, zj:encode(Parameters)]).
+			$", "Bx_roam_gprsCall", $", $:, zj:encode(Parameters)]);
+bx([{RecordType, Parameters} | T] = _CDR)
+		when is_list(RecordType) ->
+	Now = cgf_log:iso8601(erlang:system_time(millisecond)),
+	bx1(T, [${,
+			ecs_base(Now), $,,
+			ecs_service("bx", "cgf"), $,,
+			$", RecordType, $", $:, zj:encode(Parameters)]).
 %% @hidden
 bx1([{rated, Rated} | T], Acc) ->
 	Acc1 = [$,, $", "Bx_rated", $", $:, zj:encode(Rated)],
