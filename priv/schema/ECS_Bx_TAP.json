@@ -745,7 +745,7 @@
 				"recEntity": {
 					"type": "array",
 					"items": {
-						"type": "integer"
+						"$ref": "#/$defs/RecEntityInformation"
 					}
 				}
 			}
@@ -924,8 +924,8 @@
 				"locationArea": {
 					"type": "integer"
 				},
-				"recEntityCode": {
-					"type": "integer"
+				"recEntity": {
+					"$ref": "#/$defs/RecEntityInformation"
 				}
 			}
 		},
@@ -936,6 +936,20 @@
 		"PlmnId": {
 			"type": "string",
 			"pattern": "^[A-Z0-9]{5}$"
+		},
+		"RecEntityInformation": {
+			"type": "object",
+			"properties": {
+				"recEntityCode": {
+					"type": "integer"
+				},
+				"recEntityId": {
+					"type": "string"
+				},
+				"recEntityType": {
+					"type": "integer"
+				}
+			}
 		},
 		"SimChargeableSubscriber": {
 			"type": "object",
