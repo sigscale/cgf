@@ -66,7 +66,7 @@ import(Filename, Log, Metadata)
 		when is_list(Filename), is_list(Metadata) ->
 	case file:read_file(Filename) of
 		{ok, Bin} ->
-			State = #{time_zone => #{}, rec_ent => #{}},
+			State = #{zones => #{}, entities => #{}},
 			import1(Filename, Log, Metadata, State,
 					'TAP-0312':decode('DataInterChange', Bin));
 		{error, Reason} ->
