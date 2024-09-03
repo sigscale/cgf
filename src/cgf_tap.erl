@@ -398,9 +398,9 @@ parse_accounting(AccountingInfo) ->
 %% @hidden
 parse_accounting(#{currencyConversionInfo
 		:= CurrencyConversionInfo} = AI, Acc) ->
-	ConvertedCurrencyInfo = parse_cci(CurrencyConversionInfo),
+	CCI = parse_cci(CurrencyConversionInfo),
 	parse_accounting1(AI,
-			Acc#{currencyConversionInfo => ConvertedCurrencyInfo});
+			Acc#{currencyConversionInfo => CCI});
 parse_accounting(AI, Acc) ->
 	parse_accounting1(AI, Acc).
 %% @hidden
@@ -543,7 +543,7 @@ parse_batchcontrol10(_BatchControlInfo, _State, Acc) ->
 -spec parse_cci(CCI) -> Result
 	when
 		CCI :: [map()],
-		Result :: map().
+		Result :: [map()].
 %% @doc Parse Converted Currency Info from Import File
 %% @private
 parse_cci(CCI) when is_list(CCI) ->
@@ -595,7 +595,7 @@ parse_discounting1(_Discount, Acc) ->
 -spec parse_tax(TaxationList) -> Result
 	when
 		TaxationList :: [map()],
-		Result :: map().
+		Result :: [map()].
 %% @doc Parse Taxation from Import File
 %% @private
 parse_tax(TL) when is_list(TL) ->
