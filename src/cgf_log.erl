@@ -181,9 +181,11 @@ date(MilliSeconds) when is_integer(MilliSeconds) ->
 
 -spec iso8601(DateTime) -> DateTime
 	when
-		DateTime :: pos_integer() | string().
+		DateTime :: pos_integer() | string() | binary().
 %% @doc Convert between ISO 8601 and Unix epoch milliseconds.
 %% 	Parsing is not strict to allow prefix matching.
+iso8601(DateTime) when is_binary(DateTime) ->
+	iso8601(binary_to_list(DateTime));
 iso8601(DateTime) when is_integer(DateTime) ->
 	{{Year, Month, Day}, {Hour, Minute, Second}} = date(DateTime),
 	DateFormat = "~4.10.0b-~2.10.0b-~2.10.0b",
