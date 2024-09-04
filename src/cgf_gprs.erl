@@ -26,7 +26,7 @@
 -copyright('Copyright (c) 2024 SigScale Global Inc.').
 -author('Vance Shipley <vances@sigscale.org>').
 
--export([import/2, import/3]).
+-export([import/2, import/3, parse/3]).
 
 -include_lib("kernel/include/logger.hrl").
 
