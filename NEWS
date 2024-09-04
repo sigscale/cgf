@@ -1,6 +1,7 @@
 September 4, 2024
 -----------------
 	- Import ASN.1 CDR and log with Elastic Stack Schema (JSON)
+	- Include ASN.1 specifications in release package
 
 May 20, 2024
 ------------

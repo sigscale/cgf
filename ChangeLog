@@ -1,6 +1,7 @@
 2024-09-04   Vance Shipley <vances@sigscale.org>
 
-	* remove unused include dir
+	* accept cdr file to import as filename or binary
+	* asn1 source files in release package
 	* make all charging data record types extensible
 	* add handling for sgsn_mmr record import
 	* correct typespec in accounting info
