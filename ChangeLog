@@ -1,3 +1,71 @@
+2024-09-04   Vance Shipley <vances@sigscale.org>
+
+	* remove unused include dir
+	* make all charging data record types extensible
+	* add handling for sgsn_mmr record import
+	* correct typespec in accounting info
+	* correct state key names
+	* accept binary in iso8601 codec
+	* make check test suite
+	* tap3 timezone and recording entity information
+	* add handling for pgwrecord
+	* handle open record type in log codec
+	* match in clause head
+	* use inet:ntoa/1 for ipv4/6 format to string conversion
+	* move octet to ip conversion to common lib module
+	* replace usage of cgf_gprs:con_string/1,2 with cgf_lib:octet_string/1
+	* use common lib function cgf_lib:bcd_dn/1
+	* use common lib function cgf_lib:octet_string/1
+	* convert (octet string) binary to hexadecimal string
+	* test suite for common library functions
+	* bcd to dn codec for 32.298 cdr
+	* add common functions library module
+	* refactor; fix numbering; remove non-schema fields; fix conversions
+	* correct string length in qos information schema
+	* handle min, max constraints in trasnpiler
+	* correct transpiling binary constraints
+	* handle tap batch control info in import
+	* refactor console logging
+	* refactor accounting info metadata handling
+	* remove handling non-existent error results
+	* correct conversion
+	* import sgsn_pdp
+	* correct parameterized camel
+	* correct asn1 compiler flag for ber encoding
+	* location information in tap
+	* gprs service used in tap schema
+	* simplify schema by collapsing type inheritance
+	* gprs location information in ecs tap schema
+	* correct function description
+	* correct order of arguments
+	* pattern match in clause head
+	* handle accountingInfo in import/1; add accountingInfo to cdrs
+	* add roam_accountingInfo to type spec; handle roam_accountingInfo in bx1/2
+	* refactor for stream
+	* include undecoded rest in result
+	* module for importing gprs cdr (issue #2)
+	* extend ecs_bx_tap schema with accounting information (issue #1)
+	* handle value added services (vas) cdr
+	* refactor gsma tap3 import for maps
+	* asn1 sequences and sets as maps
+	* add edoc references to gsma tap3 specifications
+	* handle tap cdr for mobile calls and gprs
+	* charging records for gsma tap
+	* handle extension marks and constraints on external refs (sort of)
+	* import gsma tap3 files
+	* codec for gsma tap3
+	* ecs log metadata with file and user
+	* ecs data stream naming metadata
+	* handle arbitrary additional attributes in ecs codec
+	* refactor ecs codec for variable length argument list
+	* cdr for ims as
+	* omit tags from ecs
+	* refactor timestamps; do not output empty attributes
+	* timestamp in abmf cdr
+	* charging records for account balance management function
+	* examples of product
+	* refactor bx_rf product into subscribed and rated
+
 2024-05-21   Vance Shipley <vances@sigscale.org>
 
 	* instruction on adding subdir for user
