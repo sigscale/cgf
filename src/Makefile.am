@@ -33,5 +33,6 @@ ssh_sftpd.hrl:
 			${ERLANG_LIB_DIR_ssh}/src/ssh_sftpd.erl > $@
 
 CLEANFILES = $(noinst_DATA) \
+		$(einclude_DATA) \
 		*.asn1db
 
