@@ -42,19 +42,19 @@
 %%  The cgf_tap public API
 %%----------------------------------------------------------------------
 
--spec import(Filename, Log) -> Result
+-spec import(File, Log) -> Result
 	when
-		Filename :: file:filename(),
+		File :: file:filename() | binary(),
 		Log :: disk_log:log(),
 		Result :: ok | {error, Reason},
 		Reason :: term().
-%% @equiv import(Filename, Log, [])
-import(Filename, Log) ->
-	import(Filename, Log, []).
+%% @equiv import(File, Log, [])
+import(File, Log) ->
+	import(File, Log, []).
 
--spec import(Filename, Log, Metadata) -> Result
+-spec import(File, Log, Metadata) -> Result
 	when
-		Filename :: file:filename(),
+		File :: file:filename() | binary(),
 		Log :: disk_log:log(),
 		Metadata :: [{AttributeName, AttributeValue}],
 		AttributeName :: string(),
@@ -62,38 +62,35 @@ import(Filename, Log) ->
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Import TAP3 file and write to Bx interface log.
-import(Filename, Log, Metadata)
-		when is_list(Filename), is_list(Metadata) ->
-	case file:read_file(Filename) of
+import(File, Log, Metadata) when is_list(File) ->
+	case file:read_file(File) of
 		{ok, Bin} ->
 			State = #{zones => #{}, entities => #{}},
-			import1(Filename, Log, Metadata, State,
-					'TAP-0312':decode('DataInterChange', Bin));
+			import1(Log, Metadata, State, Bin);
 		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, import},
-					{filename, Filename},
-					{error, Reason}]),
+			{error, Reason}
+	end;
+import(Bin, Log, Metadata)
+		when is_binary(Bin), is_list(Metadata) ->
+	State = #{zones => #{}, entities => #{}},
+	import1(Log, Metadata, State, Bin).
+%% @hidden
+import1(Log, Metadata, State, Bin) ->
+	case 'TAP-0312':decode('DataInterChange', Bin) of
+		{ok, {transferBatch, TransferBatch}, <<>>} ->
+			import2(Log, Metadata, State, TransferBatch);
+		{ok, {transferBatch, TransferBatch}, Rest} ->
+			?LOG_WARNING([{?MODULE, import},
+					{reason, ignored},
+					{size, byte_size(Rest)}]),
+			import2(Log, Metadata, State, TransferBatch);
+		{ok, {notification, _Notification}} ->
+			{error, not_implemented};
+		{error, Reason} ->
 			{error, Reason}
 	end.
 %% @hidden
-import1(Filename, Log, Metadata, State,
-		{ok, {transferBatch, TransferBatch}, <<>>}) ->
-	import2(Filename, Log, Metadata, State, TransferBatch);
-import1(Filename, Log, Metadata, State,
-		{ok, {transferBatch, TransferBatch}, Rest}) ->
-	?LOG_WARNING([{?MODULE, import},
-			{reason, ignored},
-			{size, byte_size(Rest)}]),
-	import2(Filename, Log, Metadata, State, TransferBatch);
-import1(_Filename, _Log, _Metadata, _State,
-		{ok, {notification, _Notification}}) ->
-	{error, not_implemented};
-import1(Filename, _Log, _Metadata, _State, {error, Reason}) ->
-	?LOG_ERROR([{?MODULE, import},
-			{filename, Filename},
-			{error, Reason}]).
-%% @hidden
-import2(Filename, Log, Metadata, State,
+import2(Log, Metadata, State,
 		#{accountingInfo := AccountingInfo} = TransferBatch) ->
 	Metadata1 = case parse_accounting(AccountingInfo) of
 		AccountingInfo1 when map_size(AccountingInfo1) > 0 ->
@@ -101,11 +98,11 @@ import2(Filename, Log, Metadata, State,
 		_ ->
 			Metadata
 	end,
-	import3(Filename, Log, Metadata1, State, TransferBatch);
-import2(Filename, Log, Metadata, State, TransferBatch) ->
-	import3(Filename, Log, Metadata, State, TransferBatch).
+	import3(Log, Metadata1, State, TransferBatch);
+import2(Log, Metadata, State, TransferBatch) ->
+	import3(Log, Metadata, State, TransferBatch).
 %% @hidden
-import3(Filename, Log, Metadata, State,
+import3(Log, Metadata, State,
 		#{batchControlInfo := BatchControlInfo} = TransferBatch)
 		when map_size(BatchControlInfo) > 0 ->
 	Metadata1 = case parse_batchcontrol(BatchControlInfo, State) of
@@ -114,36 +111,32 @@ import3(Filename, Log, Metadata, State,
 		_ ->
 			Metadata
 	end,
-	import4(Filename, Log, Metadata1, State, TransferBatch);
-import3(Filename, Log, Metadata, State, TransferBatch) ->
-	import4(Filename, Log, Metadata, State, TransferBatch).
+	import4(Log, Metadata1, State, TransferBatch);
+import3(Log, Metadata, State, TransferBatch) ->
+	import4(Log, Metadata, State, TransferBatch).
 %% @hidden
-import4(Filename, Log, Metadata, State,
+import4(Log, Metadata, State,
 		#{networkInfo := NetworkInfo} = TransferBatch)
 		when map_size(NetworkInfo) > 0 ->
 	State1 = parse_networkinfo(NetworkInfo, State),
-	import5(Filename, Log, Metadata, State1, TransferBatch);
-import4(Filename, Log, Metadata, State, TransferBatch) ->
-	import5(Filename, Log, Metadata, State, TransferBatch).
+	import5(Log, Metadata, State1, TransferBatch);
+import4(Log, Metadata, State, TransferBatch) ->
+	import5(Log, Metadata, State, TransferBatch).
 
 %% @hidden
-import5(Filename, Log, Metadata, State,
+import5(Log, Metadata, State,
 		#{callEventDetails := CDRs} = _TransferBatch)
 		when CDRs /= [] ->
-	parse(Filename, Log, Metadata, State, CDRs);
-import5(Filename, _Log, _Metadata, _State, _TransferBatch) ->
-	?LOG_WARNING([{?MODULE, import},
-			{filename, Filename},
-			{reason, empty}]),
-	ok.
+	parse(Log, Metadata, State, CDRs);
+import5(_Log, _Metadata, _State, _TransferBatch) ->
+	{reason, empty}.
 
 %%----------------------------------------------------------------------
 %%  Internal functions
 %%----------------------------------------------------------------------
 
--spec parse(Filename, Log, Metadata, State, CDRs) -> Result
+-spec parse(Log, Metadata, State, CDRs) -> Result
 	when
-		Filename :: file:filename(),
 		Log :: disk_log:log(),
 		Metadata :: [{AttributeName, AttributeValue}],
 		State :: state(),
@@ -154,106 +147,97 @@ import5(Filename, _Log, _Metadata, _State, _TransferBatch) ->
 		Reason :: term().
 %% @doc Parse CDRs from the import file.
 %% @private
-parse(Filename, Log, Metadata, State,
+parse(Log, Metadata, State,
 		[{mobileOriginatedCall, MobileOriginatedCall} | T]) ->
 	case parse_mo_call(Log, Metadata, State, MobileOriginatedCall) of
 		ok ->
-			parse(Filename, Log, Metadata, State, T);
+			parse(Log, Metadata, State, T);
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, parse_mo_call},
-					{filename, Filename},
 					{error, Reason}]),
-			{error, Reason}
+			parse(Log, Metadata, State, T)
 	end;
-parse(Filename, Log, Metadata, State,
+parse(Log, Metadata, State,
 		[{mobileTerminatedCall, MobileTerminatedCall} | T]) ->
 	case parse_mt_call(Log, Metadata, State, MobileTerminatedCall) of
 		ok ->
-			parse(Filename, Log, Metadata, State, T);
+			parse(Log, Metadata, State, T);
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, parse_mt_call},
-					{filename, Filename},
 					{error, Reason}]),
-			{error, Reason}
+			parse(Log, Metadata, State, T)
 	end;
-parse(Filename, Log, Metadata, State,
+parse(Log, Metadata, State,
 		[{supplServiceEvent, SupplServiceEvent} | T]) ->
 	case parse_mmtel(Log, Metadata, SupplServiceEvent) of
 		ok ->
-			parse(Filename, Log, Metadata, State, T);
+			parse(Log, Metadata, State, T);
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, parse_mmtel},
-					{filename, Filename},
 					{error, Reason}]),
-			{error, Reason}
+			parse(Log, Metadata, State, T)
 	end;
-parse(Filename, Log, Metadata, State,
+parse(Log, Metadata, State,
 		[{serviceCentreUsage, ServiceCentreUsage} | T]) ->
 	case parse_sc_sm(Log, Metadata, ServiceCentreUsage) of
 		ok ->
-			parse(Filename, Log, Metadata, State, T);
+			parse(Log, Metadata, State, T);
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, parse_sc_sm},
-					{filename, Filename},
 					{error, Reason}]),
-			{error, Reason}
+			parse(Log, Metadata, State, T)
 	end;
-parse(Filename, Log, Metadata, State,
+parse(Log, Metadata, State,
 		[{gprsCall, GprsCall} | T]) ->
 	case parse_gprs(Log, Metadata, State, GprsCall) of
 		ok ->
-			parse(Filename, Log, Metadata, State, T);
+			parse(Log, Metadata, State, T);
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, parse_gprs},
-					{filename, Filename},
 					{error, Reason}]),
-			{error, Reason}
+			parse(Log, Metadata, State, T)
 	end;
-parse(Filename, Log, Metadata, State,
+parse(Log, Metadata, State,
 		[{contentTransaction, ContentTransaction} | T]) ->
 	case parse_content(Log, Metadata, ContentTransaction) of
 		ok ->
-			parse(Filename, Log, Metadata, State, T);
+			parse(Log, Metadata, State, T);
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, parse_content},
-					{filename, Filename},
 					{error, Reason}]),
-			{error, Reason}
+			parse(Log, Metadata, State, T)
 	end;
-parse(Filename, Log, Metadata, State,
+parse(Log, Metadata, State,
 		[{locationService, LocationService} | T]) ->
 	case parse_location(Log, Metadata, LocationService) of
 		ok ->
-			parse(Filename, Log, Metadata, State, T);
+			parse(Log, Metadata, State, T);
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, parse_location},
-					{filename, Filename},
 					{error, Reason}]),
-			{error, Reason}
+			parse(Log, Metadata, State, T)
 	end;
-parse(Filename, Log, Metadata, State,
+parse(Log, Metadata, State,
 		[{messagingEvent, MessagingEvent} | T]) ->
 	case parse_message(Log, Metadata, MessagingEvent) of
 		ok ->
-			parse(Filename, Log, Metadata, State, T);
+			parse(Log, Metadata, State, T);
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, parse_message},
-					{filename, Filename},
 					{error, Reason}]),
-			{error, Reason}
+			parse(Log, Metadata, State, T)
 	end;
-parse(Filename, Log, Metadata, State,
+parse(Log, Metadata, State,
 		[{mobileSession, MobileSession} | T]) ->
 	case parse_session(Log, Metadata, MobileSession) of
 		ok ->
-			parse(Filename, Log, Metadata, State, T);
+			parse(Log, Metadata, State, T);
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, parse_session},
-					{filename, Filename},
 					{error, Reason}]),
-			{error, Reason}
+			parse(Log, Metadata, State, T)
 	end;
-parse(_Filename, _Log, _Metadata, _State, []) ->
+parse(_Log, _Metadata, _State, []) ->
 	ok.
 
 -spec parse_mo_call(Log, Metadata, State, MOC) -> Result
