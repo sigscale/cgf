@@ -312,8 +312,10 @@ parse_sgsn_pdp(Log, Metadata, SGSNPDPRecord) ->
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a CDR event detail for an SGSN MMR.
-parse_sgsn_mmr(_Log, _Metadata, _SGSNMMRecord) ->
-	{error, not_implemented}.
+parse_sgsn_mmr(Log, Metadata, SGSNMMRecord) ->
+	Call = sgsn_mmr(SGSNMMRecord),
+	CDR = [{sgsn_mrr, Call} | Metadata],
+	cgf_log:blog(Log, CDR).
 
 -spec parse_sgsn_smo(Log, Metadata, SGSNSMORecord) -> Result
 	when
@@ -1112,8 +1114,8 @@ pgw_record36(#{recordExtensions := PGWRecordExtensions} = PGWRecord, Acc) ->
 pgw_record36(PGWRecord, Acc) ->
 	pgw_record37(PGWRecord, Acc).
 %% @hidden
-pgw_record37(#{recordOpeningTime := PGWRecordOpeningTime} = PGWRecord, Acc) ->
-	Acc1 = Acc#{<<"recordOpeningTime">> => cgf_lib:octet_string(PGWRecordOpeningTime)},
+pgw_record37(#{recordOpeningTime := RecordOpeningTime} = PGWRecord, Acc) ->
+	Acc1 = Acc#{<<"recordOpeningTime">> => cgf_lib:bcd_dn(RecordOpeningTime)},
 	pgw_record38(PGWRecord, Acc1);
 pgw_record37(PGWRecord, Acc) ->
 	pgw_record38(PGWRecord, Acc).
@@ -1709,5 +1711,193 @@ event_charging_info(Info) ->
 event_charging_info1(#{numberOfEvents := NumberOfEvents} = _Info, Acc) ->
 	Acc#{<<"numberOfEvents">> => NumberOfEvents};
 event_charging_info1(_Info, Acc) ->
+	Acc.
+
+sgsn_mmr(#{cAMELInformationMM := CAMELInformationMM} = SGSNMMRRecord) ->
+	Acc = #{<<"cAMELInformationMM">> => CAMELInformationMM},
+	sgsn_mmr1(SGSNMMRRecord, Acc);
+sgsn_mmr(SGSNMMRRecord) ->
+	sgsn_mmr1(SGSNMMRRecord, #{}).
+%% @hidden
+sgsn_mmr1(#{cNOperatorSelectionEnt := CNOperatorSelectionEnt} = SGSNMMRRecord, Acc) ->
+	Acc1 = Acc#{<<"cNOperatorSelectionEnt">> => CNOperatorSelectionEnt},
+	sgsn_mmr2(SGSNMMRRecord, Acc1);
+sgsn_mmr1(SGSNMMRRecord, Acc) ->
+	sgsn_mmr2(SGSNMMRRecord, Acc).
+%% @hidden
+sgsn_mmr2(#{causeForRecClosing := CauseForRecClosing} = SGSNMMRRecord, Acc) ->
+	Acc1 = Acc#{<<"causeForRecClosing">> => CauseForRecClosing},
+	sgsn_mmr3(SGSNMMRRecord, Acc1);
+sgsn_mmr2(SGSNMMRRecord, Acc) ->
+	sgsn_mmr3(SGSNMMRRecord, Acc).
+%% @hidden
+sgsn_mmr3(#{cellIdentifier := CellIdentifier} = SGSNMMRRecord, Acc) ->
+	Acc1 = Acc#{<<"cellIdentifier">> => CellIdentifier},
+	sgsn_mmr4(SGSNMMRRecord, Acc1);
+sgsn_mmr3(SGSNMMRRecord, Acc) ->
+	sgsn_mmr4(SGSNMMRRecord, Acc).
+%% @hidden
+sgsn_mmr4(#{cellPLMNId := CellPLMNId} = SGSNMMRRecord, Acc) ->
+	Acc1 = Acc#{<<"cellPLMNId">> => CellPLMNId},
+	sgsn_mmr5(SGSNMMRRecord, Acc1);
+sgsn_mmr4(SGSNMMRRecord, Acc) ->
+	sgsn_mmr5(SGSNMMRRecord, Acc).
+%% @hidden
+sgsn_mmr5(#{chChSelectionMode := ChChSelectionMode} = SGSNMMRRecord, Acc) ->
+	Acc1 = Acc#{<<"chChSelectionMode">> => ChChSelectionMode},
+	sgsn_mmr6(SGSNMMRRecord, Acc1);
+sgsn_mmr5(SGSNMMRRecord, Acc) ->
+	sgsn_mmr6(SGSNMMRRecord, Acc).
+%% @hidden
+sgsn_mmr6(#{changeLocation := ChangeLocation} = SGSNMMRRecord, Acc) ->
+	Acc1 = Acc#{<<"changeLocation">> => change_location(ChangeLocation)}, %% Array
+	sgsn_mmr7(SGSNMMRRecord, Acc1);
+sgsn_mmr6(SGSNMMRRecord, Acc) ->
+	sgsn_mmr7(SGSNMMRRecord, Acc).
+%% @hidden
+sgsn_mmr7(#{chargingCharacteristics := CC} = SGSNMMRRecord, Acc) ->
+	Acc1 = Acc#{<<"chargingCharacteristics">> => cgf_lib:octet_string(CC)},
+	sgsn_mmr8(SGSNMMRRecord, Acc1);
+sgsn_mmr7(SGSNMMRRecord, Acc) ->
+	sgsn_mmr8(SGSNMMRRecord, Acc).
+%% @hidden
+sgsn_mmr8(#{diagnostics := Diagnostics} = SGSNMMRRecord, Acc) ->
+	Acc1 = Acc#{<<"diagnostics">> => Diagnostics},
+	sgsn_mmr9(SGSNMMRRecord, Acc1);
+sgsn_mmr8(SGSNMMRRecord, Acc) ->
+	sgsn_mmr9(SGSNMMRRecord, Acc).
+%% @hidden
+sgsn_mmr9(#{duration := Duration} = SGSNMMRRecord, Acc) ->
+	Acc1 = Acc#{<<"duration">> => Duration},
+	sgsn_mmr10(SGSNMMRRecord, Acc1);
+sgsn_mmr9(SGSNMMRRecord, Acc) ->
+	sgsn_mmr10(SGSNMMRRecord, Acc).
+%% @hidden
+sgsn_mmr10(#{localSequenceNumber := LocalSequenceNumber} = SGSNMMRRecord, Acc) ->
+	Acc1 = Acc#{<<"localSequenceNumber">> => LocalSequenceNumber},
+	sgsn_mmr11(SGSNMMRRecord, Acc1);
+sgsn_mmr10(SGSNMMRRecord, Acc) ->
+	sgsn_mmr11(SGSNMMRRecord, Acc).
+%% @hidden
+sgsn_mmr11(#{locationAreaCode := LocationAreaCode} = SGSNMMRRecord, Acc) ->
+	Acc1 = Acc#{<<"locationAreaCode">> => cgf_lib:octet_string(LocationAreaCode)},
+	sgsn_mmr12(SGSNMMRRecord, Acc1);
+sgsn_mmr11(SGSNMMRRecord, Acc) ->
+	sgsn_mmr12(SGSNMMRRecord, Acc).
+%% @hidden
+sgsn_mmr12(#{msNetworkCapability := MSNetworkCapability} = SGSNMMRRecord, Acc) ->
+	Acc1 = Acc#{<<"msNetworkCapability">> => MSNetworkCapability},
+	sgsn_mmr13(SGSNMMRRecord, Acc1);
+sgsn_mmr12(SGSNMMRRecord, Acc) ->
+	sgsn_mmr13(SGSNMMRRecord, Acc).
+%% @hidden
+sgsn_mmr13(#{nodeID := NodeID} = SGSNMMRRecord, Acc) ->
+	Acc1 = Acc#{<<"nodeID">> => NodeID},
+	sgsn_mmr14(SGSNMMRRecord, Acc1);
+sgsn_mmr13(SGSNMMRRecord, Acc) ->
+	sgsn_mmr14(SGSNMMRRecord, Acc).
+%% @hidden
+sgsn_mmr14(#{rATType := RATType} = SGSNMMRRecord, Acc) ->
+	Acc1 = Acc#{<<"rATType">> => RATType},
+	sgsn_mmr15(SGSNMMRRecord, Acc1);
+sgsn_mmr14(SGSNMMRRecord, Acc) ->
+	sgsn_mmr15(SGSNMMRRecord, Acc).
+%% @hidden
+sgsn_mmr15(#{recordExtensions := SGSNMMRRecordExtensions} = SGSNMMRRecord, Acc) ->
+	Acc1 = Acc#{<<"recordExtensions">> => SGSNMMRRecordExtensions},
+	sgsn_mmr16(SGSNMMRRecord, Acc1);
+sgsn_mmr15(SGSNMMRRecord, Acc) ->
+	sgsn_mmr16(SGSNMMRRecord, Acc).
+%% @hidden
+sgsn_mmr16(#{recordOpeningTime := SGSNMMRRecordOpeningTime} = SGSNMMRRecord, Acc) ->
+	Acc1 = Acc#{<<"recordOpeningTime">> => cgf_lib:bcd_dn(SGSNMMRRecordOpeningTime)},
+	sgsn_mmr17(SGSNMMRRecord, Acc1);
+sgsn_mmr16(SGSNMMRRecord, Acc) ->
+	sgsn_mmr17(SGSNMMRRecord, Acc).
+%% @hidden
+sgsn_mmr17(#{recordSequenceNumber := SGSNMMRRecordSequenceNumber} = SGSNMMRRecord, Acc) ->
+	Acc1 = Acc#{<<"recordSequenceNumber">> => SGSNMMRRecordSequenceNumber},
+	sgsn_mmr18(SGSNMMRRecord, Acc1);
+sgsn_mmr17(SGSNMMRRecord, Acc) ->
+	sgsn_mmr18(SGSNMMRRecord, Acc).
+%% @hidden
+sgsn_mmr18(#{recordType := SGSNMMRRecordType} = SGSNMMRRecord, Acc) ->
+	Acc1 = Acc#{<<"recordType">> => SGSNMMRRecordType},
+	sgsn_mmr19(SGSNMMRRecord, Acc1);
+sgsn_mmr18(SGSNMMRRecord, Acc) ->
+	sgsn_mmr19(SGSNMMRRecord, Acc).
+%% @hidden
+sgsn_mmr19(#{routingArea := RoutingArea} = SGSNMMRRecord, Acc) ->
+	Acc1 = Acc#{<<"routingArea">> => cgf_lib:octet_string(RoutingArea)},
+	sgsn_mmr20(SGSNMMRRecord, Acc1);
+sgsn_mmr19(SGSNMMRRecord, Acc) ->
+	sgsn_mmr20(SGSNMMRRecord, Acc).
+%% @hidden
+sgsn_mmr20(#{servedIMEI := ServedIMEI} = SGSNMMRRecord, Acc) ->
+	Acc1 = Acc#{<<"servedIMEI">> => cgf_lib:bcd_dn(ServedIMEI)},
+	sgsn_mmr21(SGSNMMRRecord, Acc1);
+sgsn_mmr20(SGSNMMRRecord, Acc) ->
+	sgsn_mmr21(SGSNMMRRecord, Acc).
+%% @hidden
+sgsn_mmr21(#{servedIMSI := ServedIMSI} = SGSNMMRRecord, Acc) ->
+	Acc1 = Acc#{<<"servedIMSI">> => cgf_lib:bcd_dn(ServedIMSI)},
+	sgsn_mmr22(SGSNMMRRecord, Acc1);
+sgsn_mmr21(SGSNMMRRecord, Acc) ->
+	sgsn_mmr22(SGSNMMRRecord, Acc).
+%% @hidden
+sgsn_mmr22(#{servedMSISDN := ServedMSISDN} = SGSNMMRRecord, Acc) ->
+	Acc1 = Acc#{<<"servedMSISDN">> => cgf_lib:bcd_dn(ServedMSISDN)},
+	sgsn_mmr23(SGSNMMRRecord, Acc1);
+sgsn_mmr22(SGSNMMRRecord, Acc) ->
+	sgsn_mmr23(SGSNMMRRecord, Acc).
+%% @hidden
+sgsn_mmr23(#{servingNodePLMNIdentifier := Identifer} = SGSNMMRRecord, Acc) ->
+	Acc1 = Acc#{<<"servingNodePLMNIdentifier">> => cgf_lib:octet_string(Identifer)},
+	sgsn_mmr24(SGSNMMRRecord, Acc1);
+sgsn_mmr23(SGSNMMRRecord, Acc) ->
+	sgsn_mmr24(SGSNMMRRecord, Acc).
+%% @hidden
+sgsn_mmr24(#{sgsnAddress := AddressList}
+		= SGSNMMRRecord, Acc) ->
+	ParsedAddressList = [cgf_lib:octet_ip_address(Address)
+			|| {_,{_, Address}} <- AddressList],
+	Acc1 = Acc#{<<"sgsnAddress">> => ParsedAddressList},
+	sgsn_mmr25(SGSNMMRRecord, Acc1);
+sgsn_mmr24(SGSNMMRRecord, Acc) ->
+	sgsn_mmr25(SGSNMMRRecord, Acc).
+%% @hidden
+sgsn_mmr25(#{sgsnChange := SgsnChange} = _SGSNMMRRecord, Acc) ->
+	Acc#{<<"sgsnChange">> => SgsnChange};
+sgsn_mmr25(_SGSNMMRRecord, Acc) ->
+	Acc.
+
+%% @hidden
+change_location(#{cellId := CellId} = ChangeLocation) ->
+	Acc = #{<<"cellId">> => CellId},
+	change_location1(ChangeLocation, Acc);
+change_location(ChangeLocation) ->
+	change_location1(ChangeLocation, #{}).
+%% @hidden
+change_location1(#{changeTime := ChangeTime} = ChangeLocation, Acc) ->
+	Acc1 = Acc#{<<"changeTime">> => cgf_lib:octet_string(ChangeTime)},
+	change_location2(ChangeLocation, Acc1);
+change_location1(ChangeLocation, Acc) ->
+	change_location2(ChangeLocation, Acc).
+%% @hidden
+change_location2(#{locationAreaCode := LocationAreaCode} = ChangeLocation, Acc) ->
+	Acc1 = Acc#{<<"locationAreaCode">> => cgf_lib:octet_string(LocationAreaCode)},
+	change_location3(ChangeLocation, Acc1);
+change_location2(ChangeLocation, Acc) ->
+	change_location3(ChangeLocation, Acc).
+%% @hidden
+change_location3(#{'mCC-MNC' := MCCMNC} = ChangeLocation, Acc) ->
+	Acc1 = Acc#{<<"mCC-MNC">> => MCCMNC},
+	change_location4(ChangeLocation, Acc1);
+change_location3(ChangeLocation, Acc) ->
+	change_location4(ChangeLocation, Acc).
+%% @hidden
+change_location4(#{routingAreaCode := RoutingAreaCode} = _ChangeLocation, Acc) ->
+	Acc#{<<"routingAreaCode">> => RoutingAreaCode};
+change_location4(_ChangeLocation, Acc) ->
 	Acc.
 
