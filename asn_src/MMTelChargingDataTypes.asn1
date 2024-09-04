@@ -106,7 +106,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		outgoingSessionId                     [104] Session-Id OPTIONAL,
 		mMTelInformation                      [110] MMTelInformation OPTIONAL,
 		threeGPPPSDataOffStatus               [112] ThreeGPPPSDataOffStatus OPTIONAL,
-		fEIdentifierList                      [113] FEIdentifierList OPTIONAL
+		fEIdentifierList                      [113] FEIdentifierList OPTIONAL,
+		...
 	}
 
 	--

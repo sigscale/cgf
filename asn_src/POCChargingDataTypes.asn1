@@ -67,7 +67,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		userLocationInfo              [23] OCTET STRING OPTIONAL,
 		poCInformation                [24] POCInformation    OPTIONAL,
 		recordExtensions              [25] ManagementExtensions OPTIONAL,
-		serviceContextID              [26] ServiceContextID OPTIONAL
+		serviceContextID              [26] ServiceContextID OPTIONAL,
+		...
 	}
 
 	CPFRecord ::=    SET
@@ -98,7 +99,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		userLocationInfo              [23] OCTET STRING OPTIONAL,
 		poCInformation                [24] POCInformation OPTIONAL,
 		recordExtensions              [25] ManagementExtensions OPTIONAL,
-		serviceContextID              [26] ServiceContextID OPTIONAL
+		serviceContextID              [26] ServiceContextID OPTIONAL,
+		...
 	}
 
 	--

@@ -55,7 +55,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		accuracy                             [18] Accuracy OPTIONAL,
 		listofLocations                      [19] SEQUENCE OF EPSLocationInfo OPTIONAL,
 		monitoringEventConfigStatus          [20] MonitoringEventConfigStatus OPTIONAL,
-		recordExtensions                     [21] ManagementExtensions OPTIONAL
+		recordExtensions                     [21] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	MERERecord ::= SET
@@ -67,7 +68,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		recordTimeStamp                   [4] TimeStamp OPTIONAL,
 		localRecordSequenceNumber         [5] LocalSequenceNumber OPTIONAL,
 		listofMonitoringEventReportData   [6] SEQUENCE OF MonitoringEventReportData OPTIONAL,
-		recordExtensions                  [7] ManagementExtensions OPTIONAL
+		recordExtensions                  [7] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	--

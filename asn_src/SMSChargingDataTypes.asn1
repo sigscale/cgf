@@ -76,7 +76,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		uETimeZone                 [18] MSTimeZone OPTIONAL,
 		sMSResult                  [19] SMSResult OPTIONAL,
 		localSequenceNumber        [22] LocalSequenceNumber OPTIONAL,
-		recordExtensions           [23] ManagementExtensions OPTIONAL
+		recordExtensions           [23] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	SCSMOT4Record ::= SET
@@ -103,7 +104,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		sMSApplicationPortID       [21] INTEGER OPTIONAL,
 		externalIdentifier         [22] SubscriptionID OPTIONAL,
 		localSequenceNumber        [23] LocalSequenceNumber OPTIONAL,
-		recordExtensions           [24] ManagementExtensions OPTIONAL
+		recordExtensions           [24] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	SCSMTRecord ::= SET
@@ -134,7 +136,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		sMSResult                   [23] SMSResult OPTIONAL,
 		sMDeviceTriggerInformation  [25] SMDeviceTriggerInformation OPTIONAL,
 		localSequenceNumber         [26] LocalSequenceNumber OPTIONAL,
-		recordExtensions            [27] ManagementExtensions OPTIONAL
+		recordExtensions            [27] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	SCDVTT4Record ::= SET
@@ -148,7 +151,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		sMDeviceTriggerInformation  [6] SMDeviceTriggerInformation OPTIONAL,
 		sMSResult                   [7] SMSResult OPTIONAL,
 		localSequenceNumber         [9] LocalSequenceNumber OPTIONAL,
-		recordExtensions           [10] ManagementExtensions OPTIONAL
+		recordExtensions           [10] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	ISMSMORecord ::= SET
@@ -178,7 +182,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		numberPortabilityRouting   [22] NumberPortabilityRouting OPTIONAL,
 		carrierSelectRouting       [23] CarrierSelectRouting OPTIONAL,
 		localSequenceNumber        [24] LocalSequenceNumber OPTIONAL,
-		recordExtensions           [25] ManagementExtensions OPTIONAL
+		recordExtensions           [25] ManagementExtensions OPTIONAL,
+		...
 	}
 
 
@@ -213,7 +218,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		numberPortabilityRouting   [26] NumberPortabilityRouting OPTIONAL,
 		carrierSelectRouting       [27] CarrierSelectRouting OPTIONAL,
 		localSequenceNumber        [28] LocalSequenceNumber OPTIONAL,
-		recordExtensions           [29] ManagementExtensions OPTIONAL
+		recordExtensions           [29] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	--

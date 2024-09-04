@@ -68,7 +68,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		discovereeUEHPLMNIdentifier  [27] PLMN-Id OPTIONAL,
 		discovereeUEVPLMNIdentifier  [28] PLMN-Id OPTIONAL,
 		announcingPLMNID             [29] PLMN-Id OPTIONAL,
-		pc5RadioTechnology           [30] PC5RadioTechnology OPTIONAL
+		pc5RadioTechnology           [30] PC5RadioTechnology OPTIONAL,
+		...
 	}
 
 	PFEDRecord  ::= SET
@@ -102,7 +103,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		proximityCancellationTimestamp        [26] TimeStamp OPTIONAL,
 		reasonforCancellation                 [27] ReasonforCancellation OPTIONAL,
 		causeForRecClosing                    [28] ProSeCauseForRecClosing,
-		proximityRequestRenewalInfoBlockList  [29] SEQUENCE OF ProximityRequestRenewalInfoBlock OPTIONAL
+		proximityRequestRenewalInfoBlockList  [29] SEQUENCE OF ProximityRequestRenewalInfoBlock OPTIONAL,
+		...
 	}
 
 	PFDCRecord  ::= SET
@@ -138,8 +140,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		targetIPaddress               [26] IPAddress OPTIONAL,
 		relayIPaddress                [27] IPAddress OPTIONAL,
 		proSeUEtoNetworkRelayUEID     [28] OCTET STRING OPTIONAL,
-		proSeTargetLayerTwoID         [29] OCTET STRING OPTIONAL    
-		        
+		proSeTargetLayerTwoID         [29] OCTET STRING OPTIONAL,
+		...
 	}
 
 	--

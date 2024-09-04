@@ -74,7 +74,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		aPNRateControl             [22] APNRateControl OPTIONAL,
 		rATType                    [23] RATType OPTIONAL,
 		servingNodePLMNIdentifier  [24] PLMN-Id OPTIONAL,
-		servedIMEI                 [25] IMEI OPTIONAL
+		servedIMEI                 [25] IMEI OPTIONAL,
+		...
 	}
 
 	CPDTSNNRecord ::= SET
@@ -104,7 +105,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		aPNRateControl             [22] APNRateControl OPTIONAL,
 		rATType                    [23] RATType OPTIONAL,
 		servingNodePLMNIdentifier  [24] PLMN-Id OPTIONAL,
-		servedIMEI                 [25] IMEI OPTIONAL
+		servedIMEI                 [25] IMEI OPTIONAL,
+		...
 	}
 
 

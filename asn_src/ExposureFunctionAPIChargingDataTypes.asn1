@@ -52,8 +52,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		localRecordSequenceNumber  [18] LocalSequenceNumber OPTIONAL,
 		recordExtensions           [19] ManagementExtensions OPTIONAL,
 		startTime                  [20] TimeStamp OPTIONAL,
-		stopTime                   [21] TimeStamp OPTIONAL
-
+		stopTime                   [21] TimeStamp OPTIONAL,
+		...
 	}
 
 	--

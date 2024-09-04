@@ -197,7 +197,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		serviceChangeInitiator   [74] BOOLEAN OPTIONAL,
 		iCSI2ActiveFlag          [75] NULL OPTIONAL,
 		iMS-Charging-Identifier  [76] IMS-Charging-Identifier OPTIONAL,
-		privateUserID            [77] GraphicString OPTIONAL
+		privateUserID            [77] GraphicString OPTIONAL,
+		...
 	}
 
 	MTCallRecord ::= SET
@@ -263,7 +264,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		serviceChangeInitiator   [58] BOOLEAN OPTIONAL,
 		iCSI2ActiveFlag          [59] NULL OPTIONAL,
 		iMS-Charging-Identifier  [60] IMS-Charging-Identifier OPTIONAL,
-		privateUserID            [61] GraphicString OPTIONAL
+		privateUserID            [61] GraphicString OPTIONAL,
+		...
 	}
 
 	RoamingRecord ::= SET
@@ -298,7 +300,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		jIPPara               [27] JurisdictionInformationParameter OPTIONAL,
 		jIPSoInd              [28] JurisdictionInformationParameterSourceIndicator OPTIONAL,
 		jIPQuryStatus         [29] JurisdictionInformationParameterQueryStatus OPTIONAL,
-		partialRecordType     [30] PartialRecordType OPTIONAL
+		partialRecordType     [30] PartialRecordType OPTIONAL,
+		...
 	}
 
 	TermCAMELRecord ::= SET
@@ -345,7 +348,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		jIPPara                   [39] JurisdictionInformationParameter OPTIONAL,
 		jIPSoInd                  [40] JurisdictionInformationParameterSourceIndicator OPTIONAL,
 		jIPQuryStatus             [41] JurisdictionInformationParameterQueryStatus OPTIONAL,
-		partialRecordType         [42] PartialRecordType OPTIONAL
+		partialRecordType         [42] PartialRecordType OPTIONAL,
+		...
 	}
 
 	IncGatewayRecord ::= SET
@@ -373,7 +377,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		jIPSoInd                [20] JurisdictionInformationParameterSourceIndicator OPTIONAL,
 		jIPQuryStatus           [21] JurisdictionInformationParameterQueryStatus OPTIONAL,
 		reasonForServiceChange  [22] ReasonForServiceChange OPTIONAL,
-		serviceChangeInitiator  [23] BOOLEAN OPTIONAL
+		serviceChangeInitiator  [23] BOOLEAN OPTIONAL,
+		...
 	}
 
 	OutGatewayRecord ::= SET
@@ -401,7 +406,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		jIPSoInd                [20] JurisdictionInformationParameterSourceIndicator OPTIONAL,
 		jIPQuryStatus           [21] JurisdictionInformationParameterQueryStatus OPTIONAL,
 		reasonForServiceChange  [22] ReasonForServiceChange OPTIONAL,
-		serviceChangeInitiator  [23] BOOLEAN OPTIONAL
+		serviceChangeInitiator  [23] BOOLEAN OPTIONAL,
+		...
 	}
 
 	TransitCallRecord ::= SET
@@ -428,7 +434,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		lrnQuryStatus     [19] LocationRoutingNumberQueryStatus OPTIONAL,
 		jIPPara           [20] JurisdictionInformationParameter OPTIONAL,
 		jIPSoInd          [21] JurisdictionInformationParameterSourceIndicator OPTIONAL,
-		jIPQuryStatus     [22] JurisdictionInformationParameterQueryStatus OPTIONAL
+		jIPQuryStatus     [22] JurisdictionInformationParameterQueryStatus OPTIONAL,
+		...
 	}
 
 	MOSMSRecord ::= SET
@@ -448,7 +455,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		destinationNumber    [12] SmsTpDestinationNumber OPTIONAL,
 		cAMELSMSInformation  [13] CAMELSMSInformation OPTIONAL,
 		systemType           [14] SystemType OPTIONAL,
-		locationExtension    [15] LocationCellExtension OPTIONAL
+		locationExtension    [15] LocationCellExtension OPTIONAL,
+		...
 	}
 
 	MTSMSRecord ::= SET
@@ -466,7 +474,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		recordExtensions     [10] ManagementExtensions OPTIONAL,
 		systemType           [11] SystemType OPTIONAL,
 		cAMELSMSInformation  [12] CAMELSMSInformation OPTIONAL,
-		locationExtension    [13] LocationCellExtension OPTIONAL
+		locationExtension    [13] LocationCellExtension OPTIONAL,
+		...
 	}
 
 	MOSMSIWRecord ::= SET
@@ -477,7 +486,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		recordingEntity   [3] RecordingEntity,
 		eventTime         [4] TimeStamp,
 		smsResult         [5] SMSResult OPTIONAL,
-		recordExtensions  [6] ManagementExtensions OPTIONAL
+		recordExtensions  [6] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	MTSMSGWRecord ::= SET
@@ -489,7 +499,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		recordingEntity   [4] RecordingEntity,
 		eventTime         [5] TimeStamp,
 		smsResult         [6] SMSResult OPTIONAL,
-		recordExtensions  [7] ManagementExtensions OPTIONAL
+		recordExtensions  [7] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	SSActionRecord ::= SET
@@ -509,7 +520,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		ssActionResult    [12] SSActionResult OPTIONAL,
 		callReference     [13] CallReferenceNumber,
 		recordExtensions  [14] ManagementExtensions OPTIONAL,
-		systemType        [15] SystemType OPTIONAL
+		systemType        [15] SystemType OPTIONAL,
+		...
 	}
 
 	HLRIntRecord ::= SET
@@ -523,7 +535,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		interrogationTime    [6] TimeStamp,
 		numberOfForwarding   [7] NumberOfForwarding OPTIONAL,
 		interrogationResult  [8] HLRIntResult OPTIONAL,
-		recordExtensions     [9] ManagementExtensions OPTIONAL
+		recordExtensions     [9] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	LocUpdateHLRRecord ::= SET
@@ -535,7 +548,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		newLocation       [4] Visited-Location-info,
 		updateTime        [5] TimeStamp,
 		updateResult      [6] LocUpdResult OPTIONAL,
-		recordExtensions  [7] ManagementExtensions OPTIONAL
+		recordExtensions  [7] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	LocUpdateVLRRecord ::= SET
@@ -550,7 +564,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		updateTime         [7] TimeStamp,
 		updateResult       [8] LocUpdResult OPTIONAL,
 		recordExtensions   [9] ManagementExtensions OPTIONAL,
-		locationExtension  [10] LocationCellExtension OPTIONAL
+		locationExtension  [10] LocationCellExtension OPTIONAL,
+		...
 	}
 
 	CommonEquipRecord ::= SET
@@ -572,7 +587,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		recordExtensions  [14] ManagementExtensions OPTIONAL,
 		systemType        [15] SystemType OPTIONAL,
 		rateIndication    [16] RateIndication OPTIONAL,
-		fnur              [17] Fnur OPTIONAL
+		fnur              [17] Fnur OPTIONAL,
+		...
 	}
 
 	--

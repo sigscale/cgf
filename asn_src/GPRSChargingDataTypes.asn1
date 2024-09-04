@@ -160,7 +160,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		pDPPDNTypeExtension                [62] PDPPDNTypeExtension OPTIONAL,
 		mOExceptionDataCounter             [63] MOExceptionDataCounter OPTIONAL,
 		listOfRANSecondaryRATUsageReports  [64] SEQUENCE OF RANSecondaryRATUsageReport OPTIONAL,
-		pSCellInformation                  [65] PSCellInformation OPTIONAL
+		pSCellInformation                  [65] PSCellInformation OPTIONAL,
+		...
 
 	}
 
@@ -239,7 +240,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		chargingPerIPCANSessionIndicator   [70] ChargingPerIPCANSessionIndicator OPTIONAL,
 		threeGPPPSDataOffStatus            [71] ThreeGPPPSDataOffStatus OPTIONAL,
 		sCSASAddress                       [72] SCSASAddress OPTIONAL,
-		listOfRANSecondaryRATUsageReports  [73] SEQUENCE OF RANSecondaryRATUsageReport OPTIONAL
+		listOfRANSecondaryRATUsageReports  [73] SEQUENCE OF RANSecondaryRATUsageReport OPTIONAL,
+		...
 	}
 
 	TDFRecord ::= SET
@@ -291,7 +293,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		tDFPLMNIdentifier                 [55] PLMN-Id OPTIONAL,
 		servedFixedSubsID                 [56] FixedSubsID OPTIONAL,
 		accessLineIdentifier              [57] AccessLineIdentifier OPTIONAL,
-		fixedUserLocationInformation      [59] FixedUserLocationInformation OPTIONAL
+		fixedUserLocationInformation      [59] FixedUserLocationInformation OPTIONAL,
+		...
 	}
 
 	IPERecord ::= SET
@@ -329,7 +332,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		retransmission                [52] NULL OPTIONAL,
 		servedFixedSubsID             [55] FixedSubsID OPTIONAL,
 		accessLineIdentifier          [56] AccessLineIdentifier OPTIONAL,
-		fixedUserLocationInformation  [57] FixedUserLocationInformation OPTIONAL
+		fixedUserLocationInformation  [57] FixedUserLocationInformation OPTIONAL,
+		...
 	}
 
 	EPDGRecord ::= SET
@@ -372,7 +376,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		enhancedDiagnostics          [52] EnhancedDiagnostics OPTIONAL,
 		uWANUserLocationInformation  [53] UWANUserLocationInfo OPTIONAL,
 		userLocationInfoTime         [54] TimeStamp OPTIONAL,
-		iMSIunauthenticatedFlag      [55] NULL OPTIONAL
+		iMSIunauthenticatedFlag      [55] NULL OPTIONAL,
+		...
 	}
 
 	TWAGRecord ::= SET
@@ -413,7 +418,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		retransmission               [51] NULL OPTIONAL,
 		enhancedDiagnostics          [52] EnhancedDiagnostics OPTIONAL,
 		tWANUserLocationInformation  [53] TWANUserLocationInfo OPTIONAL,
-		iMSIunauthenticatedFlag      [54] NULL OPTIONAL
+		iMSIunauthenticatedFlag      [54] NULL OPTIONAL,
+		...
 	}
 
 	SGSNMMRecord ::= SET
@@ -443,7 +449,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		chChSelectionMode          [22] ChChSelectionMode OPTIONAL,
 		cellPLMNId                 [23] PLMN-Id OPTIONAL,
 		servingNodePLMNIdentifier  [24] PLMN-Id OPTIONAL,
-		cNOperatorSelectionEnt     [25] CNOperatorSelectionEntity OPTIONAL
+		cNOperatorSelectionEnt     [25] CNOperatorSelectionEntity OPTIONAL,
+		...
 	}
 
 	SGSNPDPRecord ::= SET
@@ -486,7 +493,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		servedPDPPDNAddressExt     [36] PDPAddress OPTIONAL,
 		lowPriorityIndicator       [37] NULL OPTIONAL,
 		servingNodePLMNIdentifier  [38] PLMN-Id OPTIONAL,
-		cNOperatorSelectionEnt     [39] CNOperatorSelectionEntity OPTIONAL
+		cNOperatorSelectionEnt     [39] CNOperatorSelectionEntity OPTIONAL,
+		...
 	}
 
 	SGSNSMORecord ::= SET
@@ -524,7 +532,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		retransmission             [27] NULL OPTIONAL,
 		servingNodePLMNIdentifier  [28] PLMN-Id OPTIONAL,
 		userLocationInfoTime       [29] TimeStamp OPTIONAL,
-		cNOperatorSelectionEnt     [30] CNOperatorSelectionEntity OPTIONAL
+		cNOperatorSelectionEnt     [30] CNOperatorSelectionEntity OPTIONAL,
+		...
 	}
 
 	SGSNSMTRecord ::= SET
@@ -561,7 +570,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		retransmission             [26] NULL OPTIONAL,
 		servingNodePLMNIdentifier  [27] PLMN-Id OPTIONAL,
 		userLocationInfoTime       [28] TimeStamp OPTIONAL,
-		cNOperatorSelectionEnt     [29] CNOperatorSelectionEntity OPTIONAL
+		cNOperatorSelectionEnt     [29] CNOperatorSelectionEntity OPTIONAL,
+		...
 	}
 
 	SGSNMTLCSRecord ::= SET
@@ -595,7 +605,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		recordExtensions           [26] ManagementExtensions OPTIONAL,
 		causeForRecClosing         [27] CauseForRecClosing,
 		servingNodePLMNIdentifier  [28] PLMN-Id OPTIONAL,
-		cNOperatorSelectionEnt     [29] CNOperatorSelectionEntity OPTIONAL
+		cNOperatorSelectionEnt     [29] CNOperatorSelectionEntity OPTIONAL,
+		...
 	}
 
 	SGSNMOLCSRecord ::= SET
@@ -627,7 +638,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		recordExtensions           [24] ManagementExtensions OPTIONAL,
 		causeForRecClosing         [25] CauseForRecClosing,
 		servingNodePLMNIdentifier  [26] PLMN-Id OPTIONAL,
-		cNOperatorSelectionEnt     [27] CNOperatorSelectionEntity OPTIONAL
+		cNOperatorSelectionEnt     [27] CNOperatorSelectionEntity OPTIONAL,
+		...
 	}
 
 	SGSNNILCSRecord ::= SET
@@ -659,7 +671,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		recordExtensions           [24] ManagementExtensions OPTIONAL,
 		causeForRecClosing         [25] CauseForRecClosing,
 		servingNodePLMNIdentifier  [26] PLMN-Id OPTIONAL,
-		cNOperatorSelectionEnt     [27] CNOperatorSelectionEntity OPTIONAL
+		cNOperatorSelectionEnt     [27] CNOperatorSelectionEntity OPTIONAL,
+		...
 	}
 
 	SGSNMBMSRecord ::= SET
@@ -681,7 +694,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		localSequenceNumber   [14] LocalSequenceNumber OPTIONAL,
 		sgsnPLMNIdentifier    [15] PLMN-Id OPTIONAL,
 		numberofReceivingUE   [16] INTEGER OPTIONAL,
-		mbmsInformation       [17] MBMSInformation OPTIONAL
+		mbmsInformation       [17] MBMSInformation OPTIONAL,
+		...
 	}
 
 	GGSNMBMSRecord ::= SET
@@ -701,7 +715,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		nodeID                 [12] NodeID OPTIONAL,
 		recordExtensions       [13] ManagementExtensions OPTIONAL,
 		localSequenceNumber    [14] LocalSequenceNumber OPTIONAL,
-		mbmsInformation        [15] MBMSInformation OPTIONAL
+		mbmsInformation        [15] MBMSInformation OPTIONAL,
+		...
 	}
 
 	GWMBMSRecord ::= SET
@@ -724,7 +739,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		localSequenceNumber       [15] LocalSequenceNumber OPTIONAL,
 		mbmsInformation           [16] MBMSInformation OPTIONAL,
 		commonTeid                [17] CTEID OPTIONAL,
-		iPMulticastSourceAddress  [18] PDPAddress OPTIONAL
+		iPMulticastSourceAddress  [18] PDPAddress OPTIONAL,
+		...
 	}
 
 	--

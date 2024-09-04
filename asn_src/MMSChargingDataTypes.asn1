@@ -102,7 +102,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		mscfInformation          [29] MSCFInformation OPTIONAL,
 		sGSNPLMNIdentifier       [30] PLMN-Id OPTIONAL,
 		rATType                  [31] RATType OPTIONAL,
-		mSTimeZone               [32] MSTimeZone OPTIONAL
+		mSTimeZone               [32] MSTimeZone OPTIONAL,
+		...
 	}
 
 	MMO4FRqRecord ::= SET
@@ -129,7 +130,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		forwardingAddress        [19] MMSAgentAddresses OPTIONAL,
 		recordTimeStamp          [20] TimeStamp,
 		localSequenceNumber      [21] LocalSequenceNumber OPTIONAL,
-		recordExtensions         [22] ManagementExtensions OPTIONAL
+		recordExtensions         [22] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	MMO4FRsRecord ::= SET
@@ -143,7 +145,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		statusText              [6] StatusTextType OPTIONAL,
 		recordTimeStamp         [7] TimeStamp OPTIONAL,
 		localSequenceNumber     [8] LocalSequenceNumber OPTIONAL,
-		recordExtensions        [9] ManagementExtensions OPTIONAL
+		recordExtensions        [9] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	MMO4DRecord ::= SET
@@ -161,7 +164,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		statusText             [10] StatusTextType OPTIONAL,
 		recordTimeStamp        [11] TimeStamp OPTIONAL,
 		localSequenceNumber    [12] LocalSequenceNumber OPTIONAL,
-		recordExtensions       [13] ManagementExtensions OPTIONAL
+		recordExtensions       [13] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	MMO1DRecord ::= SET
@@ -180,7 +184,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		recordExtensions       [11] ManagementExtensions OPTIONAL,
 		sGSNPLMNIdentifier     [12] PLMN-Id OPTIONAL,
 		rATType                [13] RATType OPTIONAL,
-		mSTimeZone             [14] MSTimeZone OPTIONAL
+		mSTimeZone             [14] MSTimeZone OPTIONAL,
+		...
 	}
 
 	MMO4RRecord ::= SET
@@ -198,7 +203,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		statusText             [10] StatusTextType OPTIONAL,
 		recordTimeStamp        [11] TimeStamp OPTIONAL,
 		localSequenceNumber    [12] LocalSequenceNumber OPTIONAL,
-		recordExtensions       [13] ManagementExtensions OPTIONAL
+		recordExtensions       [13] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	MMO1RRecord ::= SET
@@ -217,7 +223,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		recordExtensions       [11] ManagementExtensions OPTIONAL,
 		sGSNPLMNIdentifier     [12] PLMN-Id OPTIONAL,
 		rATType                [13] RATType OPTIONAL,
-		mSTimeZone             [14] MSTimeZone OPTIONAL
+		mSTimeZone             [14] MSTimeZone OPTIONAL,
+		...
 	}
 
 	MMOMDRecord ::= SET
@@ -231,7 +238,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		statusText              [6] StatusTextType OPTIONAL,
 		recordTimeStamp         [7] TimeStamp OPTIONAL,
 		localSequenceNumber     [8] LocalSequenceNumber OPTIONAL,
-		recordExtensions        [9] ManagementExtensions OPTIONAL
+		recordExtensions        [9] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	MMR4FRecord ::= SET
@@ -260,7 +268,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		forwardingAddress        [21] MMSAgentAddresses OPTIONAL,
 		recordTimeStamp          [22] TimeStamp,
 		localSequenceNumber      [23] LocalSequenceNumber OPTIONAL,
-		recordExtensions         [24] ManagementExtensions OPTIONAL
+		recordExtensions         [24] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	MMR1NRqRecord ::= SET
@@ -291,7 +300,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		vasID                    [23] OCTET STRING OPTIONAL,
 		sGSNPLMNIdentifier       [24] PLMN-Id OPTIONAL,
 		rATType                  [25] RATType OPTIONAL,
-		mSTimeZone               [26] MSTimeZone OPTIONAL
+		mSTimeZone               [26] MSTimeZone OPTIONAL,
+		...
 	}
 
 	MMR1NRsRecord ::= SET
@@ -309,7 +319,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		recordExtensions      [10] ManagementExtensions OPTIONAL,
 		sGSNPLMNIdentifier    [11] PLMN-Id OPTIONAL,
 		rATType               [12] RATType OPTIONAL,
-		mSTimeZone            [13] MSTimeZone OPTIONAL
+		mSTimeZone            [13] MSTimeZone OPTIONAL,
+		...
 	}
 
 	MMR1RtRecord ::= SET
@@ -343,7 +354,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		vasID                    [26] OCTET STRING OPTIONAL,
 		sGSNPLMNIdentifier       [27] PLMN-Id OPTIONAL,
 		rATType                  [28] RATType OPTIONAL,
-		mSTimeZone               [29] MSTimeZone OPTIONAL
+		mSTimeZone               [29] MSTimeZone OPTIONAL,
+		...
 	}
 
 	MMR1ARecord ::= SET
@@ -361,7 +373,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		recordExtensions      [10] ManagementExtensions OPTIONAL,
 		sGSNPLMNIdentifier    [11] PLMN-Id OPTIONAL,
 		rATType               [12] RATType OPTIONAL,
-		mSTimeZone            [13] MSTimeZone OPTIONAL
+		mSTimeZone            [13] MSTimeZone OPTIONAL,
+		...
 	}
 
 	MMR4DRqRecord ::= SET
@@ -379,7 +392,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		statusText             [10] StatusTextType OPTIONAL,
 		recordTimeStamp        [11] TimeStamp OPTIONAL,
 		localSequenceNumber    [12] LocalSequenceNumber OPTIONAL,
-		recordExtensions       [13] ManagementExtensions OPTIONAL
+		recordExtensions       [13] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	MMR4DRsRecord ::= SET
@@ -393,7 +407,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		statusText              [6] StatusTextType OPTIONAL,
 		recordTimeStamp         [7] TimeStamp OPTIONAL,
 		localSequenceNumber     [8] LocalSequenceNumber OPTIONAL,
-		recordExtensions        [9] ManagementExtensions OPTIONAL
+		recordExtensions        [9] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	MMR1RRRecord ::= SET
@@ -411,7 +426,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		recordExtensions      [10] ManagementExtensions OPTIONAL,
 		sGSNPLMNIdentifier    [11] PLMN-Id OPTIONAL,
 		rATType               [12] RATType OPTIONAL,
-		mSTimeZone            [13] MSTimeZone OPTIONAL
+		mSTimeZone            [13] MSTimeZone OPTIONAL,
+		...
 	}
 
 	MMR4RRqRecord ::= SET
@@ -429,7 +445,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		statusText             [10] StatusTextType OPTIONAL,
 		recordTimeStamp        [11] TimeStamp OPTIONAL,
 		localSequenceNumber    [12] LocalSequenceNumber OPTIONAL,
-		recordExtensions       [13] ManagementExtensions OPTIONAL
+		recordExtensions       [13] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	MMR4RRsRecord ::= SET
@@ -443,7 +460,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		statusText              [6] StatusTextType OPTIONAL,
 		recordTimeStamp         [7] TimeStamp OPTIONAL,
 		localSequenceNumber     [8] LocalSequenceNumber OPTIONAL,
-		recordExtensions        [9] ManagementExtensions OPTIONAL
+		recordExtensions        [9] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	MMRMDRecord ::= SET
@@ -457,7 +475,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		statusText              [6] StatusTextType OPTIONAL,
 		recordTimeStamp         [7] TimeStamp OPTIONAL,
 		localSequenceNumber     [8] LocalSequenceNumber OPTIONAL,
-		recordExtensions        [9] ManagementExtensions OPTIONAL
+		recordExtensions        [9] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	MMFRecord ::= SET
@@ -478,7 +497,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		recordTimeStamp          [13] TimeStamp OPTIONAL,
 		localSequenceNumber      [14] LocalSequenceNumber OPTIONAL,
 		recordExtensions         [15] ManagementExtensions OPTIONAL,
-		mMBoxstorageInformation  [16] MMBoxStorageInformation OPTIONAL
+		mMBoxstorageInformation  [16] MMBoxStorageInformation OPTIONAL,
+		...
 	}
 
 	MMBx1SRecord ::= SET
@@ -499,7 +519,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		recordExtensions    [13] ManagementExtensions OPTIONAL,
 		sGSNPLMNIdentifier  [14] PLMN-Id OPTIONAL,
 		rATType             [15] RATType OPTIONAL,
-		mSTimeZone          [16] MSTimeZone OPTIONAL
+		mSTimeZone          [16] MSTimeZone OPTIONAL,
+		...
 	}
 
 	MMBx1VRecord ::= SET
@@ -524,7 +545,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		recordExtensions    [17] ManagementExtensions OPTIONAL,
 		sGSNPLMNIdentifier  [18] PLMN-Id OPTIONAL,
 		rATType             [19] RATType OPTIONAL,
-		mSTimeZone          [20] MSTimeZone OPTIONAL
+		mSTimeZone          [20] MSTimeZone OPTIONAL,
+		...
 	}
 
 	MMBx1URecord ::= SET
@@ -551,7 +573,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		recordExtensions       [19] ManagementExtensions OPTIONAL,
 		sGSNPLMNIdentifier     [20] PLMN-Id OPTIONAL,
 		rATType                [21] RATType OPTIONAL,
-		mSTimeZone             [22] MSTimeZone OPTIONAL
+		mSTimeZone             [22] MSTimeZone OPTIONAL,
+		...
 	}
 
 	MMBx1DRecord ::= SET
@@ -568,7 +591,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		recordExtensions     [9] ManagementExtensions OPTIONAL,
 		sGSNPLMNIdentifier  [20] PLMN-Id OPTIONAL,
 		rATType             [21] RATType OPTIONAL,
-		mSTimeZone          [22] MSTimeZone OPTIONAL
+		mSTimeZone          [22] MSTimeZone OPTIONAL,
+		...
 	}
 
 	MM7SRecord ::= SET
@@ -602,7 +626,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		recordTimeStamp               [26] TimeStamp,
 		localSequenceNumber           [27] LocalSequenceNumber OPTIONAL,
 		recordExtensions              [28] ManagementExtensions OPTIONAL,
-		mscfInformation               [29] MSCFInformation OPTIONAL
+		mscfInformation               [29] MSCFInformation OPTIONAL,
+		...
 	}
 
 	MM7DRqRecord ::= SET
@@ -619,7 +644,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		priority               [9] PriorityType OPTIONAL,
 		recordTimeStamp        [10] TimeStamp OPTIONAL,     
 		localSequenceNumber    [11] LocalSequenceNumber OPTIONAL,
-		recordExtensions       [12] ManagementExtensions OPTIONAL
+		recordExtensions       [12] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	MM7DRsRecord ::= SET
@@ -633,7 +659,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		statusText             [6] StatusTextType OPTIONAL,
 		recordTimeStamp        [7] TimeStamp OPTIONAL,
 		localSequenceNumber    [8] LocalSequenceNumber OPTIONAL,
-		recordExtensions       [9] ManagementExtensions OPTIONAL
+		recordExtensions       [9] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	MM7CRecord ::= SET
@@ -649,7 +676,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		statusText              [8] StatusTextType OPTIONAL,
 		recordTimeStamp         [9] TimeStamp OPTIONAL,
 		localSequenceNumber    [10] LocalSequenceNumber OPTIONAL,
-		recordExtensions       [11] ManagementExtensions OPTIONAL
+		recordExtensions       [11] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	MM7RRecord ::= SET
@@ -669,7 +697,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		statusText              [12] StatusTextType OPTIONAL,
 		recordTimeStamp         [13] TimeStamp OPTIONAL,
 		localSequenceNumber     [14] LocalSequenceNumber OPTIONAL,
-		recordExtensions        [15] ManagementExtensions OPTIONAL
+		recordExtensions        [15] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	MM7DRRqRecord ::= SET
@@ -684,7 +713,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		mmStatusText           [7] StatusTextType OPTIONAL,
 		recordTimeStamp        [8] TimeStamp OPTIONAL,
 		localSequenceNumber    [9] LocalSequenceNumber OPTIONAL,
-		recordExtensions       [10] ManagementExtensions OPTIONAL
+		recordExtensions       [10] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	MM7DRRsRecord ::= SET
@@ -698,7 +728,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		statusText             [6] StatusTextType OPTIONAL,
 		recordTimeStamp        [7] TimeStamp OPTIONAL,
 		localSequenceNumber    [8] LocalSequenceNumber OPTIONAL,
-		recordExtensions       [9] ManagementExtensions OPTIONAL
+		recordExtensions       [9] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	MM7RRqRecord ::= SET
@@ -713,7 +744,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		mmStatusText           [7] StatusTextType OPTIONAL,
 		recordTimeStamp        [8] TimeStamp OPTIONAL,
 		localSequenceNumber    [9] LocalSequenceNumber OPTIONAL,
-		recordExtensions      [10] ManagementExtensions OPTIONAL
+		recordExtensions      [10] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	MM7RRsRecord ::= SET
@@ -727,7 +759,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		statusText             [6] StatusTextType OPTIONAL,
 		recordTimeStamp        [7] TimeStamp OPTIONAL,
 		localSequenceNumber    [8] LocalSequenceNumber OPTIONAL,
-		recordExtensions       [9] ManagementExtensions OPTIONAL
+		recordExtensions       [9] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	--

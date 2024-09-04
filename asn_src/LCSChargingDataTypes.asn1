@@ -58,7 +58,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		providerError        [10] ProviderError OPTIONAL,
 		recordTimeStamp      [11] TimeStamp,
 		localSequenceNumber  [12] LocalSequenceNumber OPTIONAL,
-		recordExtensions     [13] ManagementExtensions OPTIONAL
+		recordExtensions     [13] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	LCSRGMTRecord ::= SET
@@ -75,7 +76,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		recordTimeStamp       [9] TimeStamp,
 		localSequenceNumber  [10] LocalSequenceNumber OPTIONAL,
 		recordExtensions     [11] ManagementExtensions OPTIONAL,
-		homeGMLCIdentity     [12] IPAddress OPTIONAL
+		homeGMLCIdentity     [12] IPAddress OPTIONAL,
+		...
 	}
 
 	LCSHGMTRecord ::= SET
@@ -94,7 +96,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		recordExtensions        [11] ManagementExtensions OPTIONAL,
 		requestingGMLCIdentity  [12] IPAddress OPTIONAL,
 		visitedGMLCIdentity     [13] IPAddress OPTIONAL,
-		servingNetworkIdentity  [14] PLMN-Id OPTIONAL
+		servingNetworkIdentity  [14] PLMN-Id OPTIONAL,
+		...
 	}
 
 	LCSVGMTRecord ::= SET
@@ -111,7 +114,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		recordTimeStamp       [9] TimeStamp,
 		localSequenceNumber  [10] LocalSequenceNumber OPTIONAL,
 		recordExtensions     [11] ManagementExtensions OPTIONAL,
-		homeGMLCIdentity     [12] IPAddress OPTIONAL
+		homeGMLCIdentity     [12] IPAddress OPTIONAL,
+		...
 	}
 
 	LCSGNIRecord ::= SET
@@ -126,7 +130,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		resultCode            [7] ResultCodeType OPTIONAL,
 		recordTimeStamp       [8] TimeStamp,
 		localSequenceNumber   [9] LocalSequenceNumber OPTIONAL,
-		recordExtensions     [10] ManagementExtensions OPTIONAL
+		recordExtensions     [10] ManagementExtensions OPTIONAL,
+		...
 	}
 
 	--

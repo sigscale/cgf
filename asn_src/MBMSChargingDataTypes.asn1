@@ -60,7 +60,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		servedMSISDN              [14] MSISDN OPTIONAL,
 		bearerServiceDescription  [15] Media-Components-List OPTIONAL,
 		mbmsInformation           [16] MBMSInformation OPTIONAL,
-		serviceContextID          [17] ServiceContextID OPTIONAL
+		serviceContextID          [17] ServiceContextID OPTIONAL,
+		...
 	}
 
 	CONTENTBMSCRecord ::= SET
@@ -83,7 +84,8 @@ DEFINITIONS IMPLICIT TAGS  ::= BEGIN
 		bearerServiceDescription  [15] Media-Components-List OPTIONAL,
 		mbmsInformation           [16] MBMSInformation OPTIONAL,
 		serviceContextID          [17] ServiceContextID OPTIONAL,
-		servedpdpPDNType          [18] PDPType OPTIONAL
+		servedpdpPDNType          [18] PDPType OPTIONAL,
+		...
 	}
 
 	--
