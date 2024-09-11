@@ -523,9 +523,8 @@ sgsn_pdp_record10(#{dynamicAddressFlag
 sgsn_pdp_record10(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record11(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record11(#{ggsnAddressUsed
-		:= {_, {_, Address}}} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"ggsnAddressUsed">> => Address},
+sgsn_pdp_record11(#{ggsnAddressUsed := Address} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"ggsnAddressUsed">> => cgf_lib:ip_address(Address)},
 	sgsn_pdp_record12(SGSNPDPRecord, Acc1);
 sgsn_pdp_record11(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record12(SGSNPDPRecord, Acc).
@@ -552,9 +551,9 @@ sgsn_pdp_record14(#{locationAreaCode
 sgsn_pdp_record14(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record15(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record15(#{mSNetworkCapability
+sgsn_pdp_record15(#{msNetworkCapability
 		:= MSNetworkCapability} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"mSNetworkCapability">> =>
+	Acc1 = Acc#{<<"msNetworkCapability">> =>
 			cgf_lib:octet_string(MSNetworkCapability)},
 	sgsn_pdp_record16(SGSNPDPRecord, Acc1);
 sgsn_pdp_record15(SGSNPDPRecord, Acc) ->
@@ -604,58 +603,52 @@ sgsn_pdp_record21(SGSNPDPRecord, Acc) ->
 %% @hidden
 sgsn_pdp_record22(#{recordOpeningTime
 		:= RecordOpeningTime} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"recordOpeningTime">> => cgf_lib:bcd_dn(RecordOpeningTime)},
+	Acc1 = Acc#{<<"recordOpeningTime">> => cgf_lib:bcd_date_time(RecordOpeningTime)},
 	sgsn_pdp_record23(SGSNPDPRecord, Acc1);
 sgsn_pdp_record22(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record23(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record23(#{recordType
-		:= RecordType} = SGSNPDPRecord, Acc) ->
+sgsn_pdp_record23(#{recordType := RecordType} = SGSNPDPRecord, Acc) ->
 	Acc1 = Acc#{<<"recordType">> => RecordType},
 	sgsn_pdp_record24(SGSNPDPRecord, Acc1);
 sgsn_pdp_record23(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record24(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record24(#{routingArea
-		:= RoutingArea} = SGSNPDPRecord, Acc) ->
+sgsn_pdp_record24(#{routingArea := RoutingArea} = SGSNPDPRecord, Acc) ->
 	Acc1 = Acc#{<<"routingArea">> => cgf_lib:octet_string(RoutingArea)},
 	sgsn_pdp_record25(SGSNPDPRecord, Acc1);
 sgsn_pdp_record24(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record25(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record25(#{servedIMEI
-		:= IMEI} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"servedIMEI">> => cgf_lib:bcd_dn(IMEI)},
+sgsn_pdp_record25(#{servedIMEI := IMEI} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"servedIMEI">> => cgf_lib:tbcd(IMEI)},
 	sgsn_pdp_record26(SGSNPDPRecord, Acc1);
 sgsn_pdp_record25(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record26(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record26(#{servedIMSI
-		:= IMSI} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"servedIMSI">> => cgf_lib:bcd_dn(IMSI)},
+sgsn_pdp_record26(#{servedIMSI := IMSI} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"servedIMSI">> => cgf_lib:tbcd(IMSI)},
 	sgsn_pdp_record27(SGSNPDPRecord, Acc1);
 sgsn_pdp_record26(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record27(SGSNPDPRecord, Acc).
 %% @hidden
 sgsn_pdp_record27(#{servedMSISDN
 		:= MSISDN} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"servedMSISDN">> => cgf_lib:bcd_dn(MSISDN)},
+	Acc1 = Acc#{<<"servedMSISDN">> => cgf_lib:tbcd(MSISDN)},
 	sgsn_pdp_record28(SGSNPDPRecord, Acc1);
 sgsn_pdp_record27(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record28(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record28(#{servedPDPAddress := {iPAddress,
-		{_, {_, IPAddress}}}} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"servedPDPAddress">> => IPAddress},
+sgsn_pdp_record28(#{servedPDPAddress
+		:= {iPAddress, Address}} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"servedPDPAddress">> => cgf_lib:ip_address(Address)},
 	sgsn_pdp_record29(SGSNPDPRecord, Acc1);
 sgsn_pdp_record28(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record29(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record29(#{servedPDPPDNAddressExt := GSNAddressList}
-		= SGSNPDPRecord, Acc) ->
-	ParsedAddressList = [cgf_lib:octet_ip_address(GSNAddress)
-			|| {_,{iPBinV4Address ,GSNAddress}} <- GSNAddressList],
-	Acc1 = Acc#{<<"servedPDPPDNAddressExt">> => ParsedAddressList},
+sgsn_pdp_record29(#{servedPDPPDNAddressExt
+		:= {iPAddress, Address}} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"servedPDPPDNAddressExt">> => cgf_lib:ip_address(Address)},
 	sgsn_pdp_record30(SGSNPDPRecord, Acc1);
 sgsn_pdp_record29(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record30(SGSNPDPRecord, Acc).
@@ -667,11 +660,8 @@ sgsn_pdp_record30(#{servingNodePLMNIdentifier := Identifer}
 sgsn_pdp_record30(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record31(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record31(#{sgsnAddress := AddressList}
-		= SGSNPDPRecord, Acc) ->
-	ParsedAddressList = [cgf_lib:octet_ip_address(Address)
-			|| {_,{iPBinV4Address ,Address}} <- AddressList],
-	Acc1 = Acc#{<<"sgsnAddress">> => ParsedAddressList},
+sgsn_pdp_record31(#{sgsnAddress := Address} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"sgsnAddress">> => cgf_lib:ip_address(Address)},
 	sgsn_pdp_record32(SGSNPDPRecord, Acc1);
 sgsn_pdp_record31(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record32(SGSNPDPRecord, Acc).
@@ -704,16 +694,14 @@ traffic_volumes1(#{cPCIoTEPSOptimisationIndicator
 traffic_volumes1(TV, Acc) ->
 	traffic_volumes2(TV, Acc).
 %% @hidden
-traffic_volumes2(#{changeCondition
-		:= CC} = TV, Acc) ->
+traffic_volumes2(#{changeCondition := CC} = TV, Acc) ->
 	Acc1 = Acc#{<<"changeCondition">> => CC},
 	traffic_volumes3(TV, Acc1);
 traffic_volumes2(TV, Acc) ->
 	traffic_volumes3(TV, Acc).
 %% @hidden
-traffic_volumes3(#{changeTime
-		:= CT} = TV, Acc) ->
-	Acc1 = Acc#{<<"changeTime">> => cgf_lib:bcd_dn(CT)},
+traffic_volumes3(#{changeTime := CT} = TV, Acc) ->
+	Acc1 = Acc#{<<"changeTime">> => cgf_lib:bcd_date_time(CT)},
 	traffic_volumes4(TV, Acc1);
 traffic_volumes3(TV, Acc) ->
 	traffic_volumes4(TV, Acc).
@@ -926,8 +914,8 @@ pgw_record15(#{enhancedDiagnostics := EnhancedDiag} = PGWRecord, Acc) ->
 pgw_record15(PGWRecord, Acc) ->
 	pgw_record16(PGWRecord, Acc).
 %% @hidden
-pgw_record16(#{mSTimeZone := LastMSTZ} = PGWRecord, Acc) ->
-	Acc1 = Acc#{<<"lastMSTimeZone">> => cgf_lib:octet_string(LastMSTZ)},
+pgw_record16(#{mSTimeZone := MSTZ} = PGWRecord, Acc) ->
+	Acc1 = Acc#{<<"mSTimeZone">> => cgf_lib:octet_string(MSTZ)},
 	pgw_record17(PGWRecord, Acc1);
 pgw_record16(PGWRecord, Acc) ->
 	pgw_record17(PGWRecord, Acc).
@@ -970,8 +958,8 @@ pgw_record22(#{mOExceptionDataCounter := MOExceptionDataCounter} = PGWRecord, Ac
 pgw_record22(PGWRecord, Acc) ->
 	pgw_record23(PGWRecord, Acc).
 %% @hidden
-pgw_record23(#{mSTimeZone := MSTimeZone} = PGWRecord, Acc) ->
-	Acc1 = Acc#{<<"mSTimeZone">> => cgf_lib:octet_string(MSTimeZone)},
+pgw_record23(#{lastMSTimeZone := MSTZ} = PGWRecord, Acc) ->
+	Acc1 = Acc#{<<"lastMSTimeZone">> => cgf_lib:octet_string(MSTZ)},
 	pgw_record24(PGWRecord, Acc1);
 pgw_record23(PGWRecord, Acc) ->
 	pgw_record24(PGWRecord, Acc).
@@ -994,10 +982,8 @@ pgw_record26(#{nodeID := NodeID} = PGWRecord, Acc) ->
 pgw_record26(PGWRecord, Acc) ->
 	pgw_record27(PGWRecord, Acc).
 %% @hidden
-pgw_record27(#{'p-GWAddress' := AddressList} = PGWRecord, Acc) ->
-	ParsedAddressList = [cgf_lib:octet_ip_address(Address)
-			|| {_,{_, Address}} <- AddressList],
-	Acc1 = Acc#{<<"p-GWAddress">> => ParsedAddressList},
+pgw_record27(#{'p-GWAddress' := Address} = PGWRecord, Acc) ->
+	Acc1 = Acc#{<<"p-GWAddress">> => cgf_lib:ip_address(Address)},
 	pgw_record28(PGWRecord, Acc1);
 pgw_record27(PGWRecord, Acc) ->
 	pgw_record28(PGWRecord, Acc).
@@ -1008,10 +994,8 @@ pgw_record28(#{'p-GWPLMNIdentifier' := PGWPLMNIdentifier} = PGWRecord, Acc) ->
 pgw_record28(PGWRecord, Acc) ->
 	pgw_record29(PGWRecord, Acc).
 %% @hidden
-pgw_record29(#{'p-GWAddress' := AddressList} = PGWRecord, Acc) ->
-	ParsedAddressList = [cgf_lib:octet_ip_address(Address)
-			|| {_,{_, Address}} <- AddressList],
-	Acc1 = Acc#{<<"p-GWAddress">> => ParsedAddressList},
+pgw_record29(#{'p-GWiPv6AddressUsed' := Address} = PGWRecord, Acc) ->
+	Acc1 = Acc#{<<"p-GWiPv6AddressUsed">> => cgf_lib:ip_address(Address)},
 	pgw_record30(PGWRecord, Acc1);
 pgw_record29(PGWRecord, Acc) ->
 	pgw_record30(PGWRecord, Acc).
@@ -1059,7 +1043,7 @@ pgw_record36(PGWRecord, Acc) ->
 	pgw_record37(PGWRecord, Acc).
 %% @hidden
 pgw_record37(#{recordOpeningTime := RecordOpeningTime} = PGWRecord, Acc) ->
-	Acc1 = Acc#{<<"recordOpeningTime">> => cgf_lib:bcd_dn(RecordOpeningTime)},
+	Acc1 = Acc#{<<"recordOpeningTime">> => cgf_lib:bcd_date_time(RecordOpeningTime)},
 	pgw_record38(PGWRecord, Acc1);
 pgw_record37(PGWRecord, Acc) ->
 	pgw_record38(PGWRecord, Acc).
@@ -1113,135 +1097,123 @@ pgw_record45(PGWRecord, Acc) ->
 	pgw_record46(PGWRecord, Acc).
 %% @hidden
 pgw_record46(#{servedMSISDN := ServedMSISDN} = PGWRecord, Acc) ->
-	Acc1 = Acc#{<<"servedMSISDN">> => cgf_lib:octet_string(ServedMSISDN)},
+	Acc1 = Acc#{<<"servedMSISDN">> => cgf_lib:tbcd(ServedMSISDN)},
 	pgw_record47(PGWRecord, Acc1);
 pgw_record46(PGWRecord, Acc) ->
 	pgw_record47(PGWRecord, Acc).
 %% @hidden
-pgw_record47(#{servedPDPAddress := {iPAddress,
-		{_, {_, IPAddress}}}} = PGWRecord, Acc) ->
-	Acc1 = Acc#{<<"servedPDPAddress">> => IPAddress},
+pgw_record47(#{servedPDPAddress
+		:= {iPAddress, Address}} = PGWRecord, Acc) ->
+	Acc1 = Acc#{<<"servedPDPAddress">> => cgf_lib:ip_address(Address)},
 	pgw_record48(PGWRecord, Acc1);
 pgw_record47(PGWRecord, Acc) ->
 	pgw_record48(PGWRecord, Acc).
 %% @hidden
-pgw_record48(#{servedPDPPDNAddressExt := AddressList}
-		= PGWRecord, Acc) ->
-	ParsedAddressList = [cgf_lib:octet_ip_address(Address)
-			|| {_, {_, Address}} <- AddressList],
-	Acc1 = Acc#{<<"servedPDPPDNAddressExt">> => ParsedAddressList},
+pgw_record48(#{servedPDPPDNAddressExt
+		:= {iPAddress, Address}} = PGWRecord, Acc) ->
+	Acc1 = Acc#{<<"servedPDPPDNAddressExt">> => cgf_lib:ip_address(Address)},
 	pgw_record49(PGWRecord, Acc1);
 pgw_record48(PGWRecord, Acc) ->
 	pgw_record49(PGWRecord, Acc).
 %% @hidden
-pgw_record49(#{servedPDPPDNAddressExt := AddressList}
-		= PGWRecord, Acc) ->
-	ParsedAddressList = [cgf_lib:octet_ip_address(Address)
-			|| {_, {_, Address}} <- AddressList],
-	Acc1 = Acc#{<<"servedPDPPDNAddressExt">> => ParsedAddressList},
+pgw_record49(#{servedPDPPDNAddress
+		:= {iPAddress, Address}} = PGWRecord, Acc) ->
+	Acc1 = Acc#{<<"servedPDPPDNAddress">> => cgf_lib:ip_address(Address)},
 	pgw_record50(PGWRecord, Acc1);
 pgw_record49(PGWRecord, Acc) ->
 	pgw_record50(PGWRecord, Acc).
 %% @hidden
-pgw_record50(#{servedPDPPDNAddress := {iPAddress,
-		{_, {_, IPAddress}}}} = PGWRecord, Acc) ->
-	Acc1 = Acc#{<<"servedPDPPDNAddress">> => IPAddress},
+pgw_record50(#{servingNodeAddress := Addresses} = PGWRecord, Acc) ->
+	ParsedAddresses = [cgf_lib:ip_address(Address)
+			|| Address <- Addresses],
+	Acc1 = Acc#{<<"servingNodeAddress">> => ParsedAddresses},
 	pgw_record51(PGWRecord, Acc1);
 pgw_record50(PGWRecord, Acc) ->
 	pgw_record51(PGWRecord, Acc).
 %% @hidden
-pgw_record51(#{servingNodeAddress := AddressList} = PGWRecord, Acc) ->
-	ParsedAddressList = [cgf_lib:octet_ip_address(Address)
-			|| {_, {_, Address}} <- AddressList],
-	Acc1 = Acc#{<<"servingNodeAddress">> => ParsedAddressList},
+pgw_record51(#{servingNodePLMNIdentifier := ServingNodePLMNId} = PGWRecord, Acc) ->
+	Acc1 = Acc#{<<"servingNodePLMNIdentifier">> => cgf_lib:octet_string(ServingNodePLMNId)},
 	pgw_record52(PGWRecord, Acc1);
 pgw_record51(PGWRecord, Acc) ->
 	pgw_record52(PGWRecord, Acc).
 %% @hidden
-pgw_record52(#{servingNodePLMNIdentifier := ServingNodePLMNId} = PGWRecord, Acc) ->
-	Acc1 = Acc#{<<"servingNodePLMNIdentifier">> => cgf_lib:octet_string(ServingNodePLMNId)},
+pgw_record52(#{servingNodeType := ServingNodeType} = PGWRecord, Acc) ->
+	Acc1 = Acc#{<<"servingNodeType">> => ServingNodeType},
 	pgw_record53(PGWRecord, Acc1);
 pgw_record52(PGWRecord, Acc) ->
 	pgw_record53(PGWRecord, Acc).
 %% @hidden
-pgw_record53(#{servingNodeType := ServingNodeType} = PGWRecord, Acc) ->
-	Acc1 = Acc#{<<"servingNodeType">> => ServingNodeType},
+pgw_record53(#{servingNodeiPv6Address := Addresses} = PGWRecord, Acc) ->
+	ParsedAddresses = [cgf_lib:ip_address(Address)
+			|| Address <- Addresses],
+	Acc1 = Acc#{<<"servingNodeiPv6Address">> => ParsedAddresses},
 	pgw_record54(PGWRecord, Acc1);
 pgw_record53(PGWRecord, Acc) ->
 	pgw_record54(PGWRecord, Acc).
 %% @hidden
-pgw_record54(#{servingNodeiPv6Address := AddressList}
-		= PGWRecord, Acc) ->
-	ParsedAddressList = [cgf_lib:octet_ip_address(Address)
-			|| {_, {_, Address}} <- AddressList],
-	Acc1 = Acc#{<<"servingNodeiPv6Address">> => ParsedAddressList},
+pgw_record54(#{servingPLMNRateControl := ServingPLMNRateCtrl} = PGWRecord, Acc) ->
+	Acc1 = Acc#{<<"servingPLMNRateControl">> => ServingPLMNRateCtrl},
 	pgw_record55(PGWRecord, Acc1);
 pgw_record54(PGWRecord, Acc) ->
 	pgw_record55(PGWRecord, Acc).
 %% @hidden
-pgw_record55(#{servingPLMNRateControl := ServingPLMNRateCtrl} = PGWRecord, Acc) ->
-	Acc1 = Acc#{<<"servingPLMNRateControl">> => ServingPLMNRateCtrl},
+pgw_record55(#{startTime := StartTime} = PGWRecord, Acc) ->
+	Acc1 = Acc#{<<"startTime">> => cgf_lib:bcd_date_time(StartTime)},
 	pgw_record56(PGWRecord, Acc1);
 pgw_record55(PGWRecord, Acc) ->
 	pgw_record56(PGWRecord, Acc).
 %% @hidden
-pgw_record56(#{startTime := StartTime} = PGWRecord, Acc) ->
-	Acc1 = Acc#{<<"startTime">> => cgf_lib:octet_string(StartTime)},
+pgw_record56(#{stopTime := StopTime} = PGWRecord, Acc) ->
+	Acc1 = Acc#{<<"stopTime">> => cgf_lib:bcd_date_time(StopTime)},
 	pgw_record57(PGWRecord, Acc1);
 pgw_record56(PGWRecord, Acc) ->
 	pgw_record57(PGWRecord, Acc).
 %% @hidden
-pgw_record57(#{stopTime := StopTime} = PGWRecord, Acc) ->
-	Acc1 = Acc#{<<"stopTime">> => cgf_lib:octet_string(StopTime)},
+pgw_record57(#{tWANUserLocationInformation := TWANUserLocInfo} = PGWRecord, Acc) ->
+	Acc1 = Acc#{<<"tWANUserLocationInformation">> => TWANUserLocInfo},
 	pgw_record58(PGWRecord, Acc1);
 pgw_record57(PGWRecord, Acc) ->
 	pgw_record58(PGWRecord, Acc).
 %% @hidden
-pgw_record58(#{tWANUserLocationInformation := TWANUserLocInfo} = PGWRecord, Acc) ->
-	Acc1 = Acc#{<<"tWANUserLocationInformation">> => TWANUserLocInfo},
+pgw_record58(#{threeGPP2UserLocationInformation := ThreeGPP2UserLocInfo} = PGWRecord, Acc) ->
+	Acc1 = Acc#{<<"threeGPP2UserLocationInformation">> => ThreeGPP2UserLocInfo},
 	pgw_record59(PGWRecord, Acc1);
 pgw_record58(PGWRecord, Acc) ->
 	pgw_record59(PGWRecord, Acc).
 %% @hidden
-pgw_record59(#{threeGPP2UserLocationInformation := ThreeGPP2UserLocInfo} = PGWRecord, Acc) ->
-	Acc1 = Acc#{<<"threeGPP2UserLocationInformation">> => ThreeGPP2UserLocInfo},
+pgw_record59(#{threeGPPPSDataOffStatus := ThreeGPPPSDataOffStatus} = PGWRecord, Acc) ->
+	Acc1 = Acc#{<<"threeGPPPSDataOffStatus">> => ThreeGPPPSDataOffStatus},
 	pgw_record60(PGWRecord, Acc1);
 pgw_record59(PGWRecord, Acc) ->
 	pgw_record60(PGWRecord, Acc).
 %% @hidden
-pgw_record60(#{threeGPPPSDataOffStatus := ThreeGPPPSDataOffStatus} = PGWRecord, Acc) ->
-	Acc1 = Acc#{<<"threeGPPPSDataOffStatus">> => ThreeGPPPSDataOffStatus},
+pgw_record60(#{uNIPDUCPOnlyFlag := UNIPDUCPOnlyFlag} = PGWRecord, Acc) ->
+	Acc1 = Acc#{<<"uNIPDUCPOnlyFlag">> => UNIPDUCPOnlyFlag},
 	pgw_record61(PGWRecord, Acc1);
 pgw_record60(PGWRecord, Acc) ->
 	pgw_record61(PGWRecord, Acc).
 %% @hidden
-pgw_record61(#{uNIPDUCPOnlyFlag := UNIPDUCPOnlyFlag} = PGWRecord, Acc) ->
-	Acc1 = Acc#{<<"uNIPDUCPOnlyFlag">> => UNIPDUCPOnlyFlag},
+pgw_record61(#{uWANUserLocationInformation := UWANUserLocInfo} = PGWRecord, Acc) ->
+	Acc1 = Acc#{<<"uWANUserLocationInformation">> => UWANUserLocInfo},
 	pgw_record62(PGWRecord, Acc1);
 pgw_record61(PGWRecord, Acc) ->
 	pgw_record62(PGWRecord, Acc).
 %% @hidden
-pgw_record62(#{uWANUserLocationInformation := UWANUserLocInfo} = PGWRecord, Acc) ->
-	Acc1 = Acc#{<<"uWANUserLocationInformation">> => UWANUserLocInfo},
+pgw_record62(#{userCSGInformation := UserCSGInfo} = PGWRecord, Acc) ->
+	Acc1 = Acc#{<<"userCSGInformation">> => UserCSGInfo},
 	pgw_record63(PGWRecord, Acc1);
 pgw_record62(PGWRecord, Acc) ->
 	pgw_record63(PGWRecord, Acc).
 %% @hidden
-pgw_record63(#{userCSGInformation := UserCSGInfo} = PGWRecord, Acc) ->
-	Acc1 = Acc#{<<"userCSGInformation">> => UserCSGInfo},
+pgw_record63(#{userLocationInfoTime := UserLocInfoTime} = PGWRecord, Acc) ->
+	Acc1 = Acc#{<<"userLocationInfoTime">> => cgf_lib:bcd_date_time(UserLocInfoTime)},
 	pgw_record64(PGWRecord, Acc1);
 pgw_record63(PGWRecord, Acc) ->
 	pgw_record64(PGWRecord, Acc).
 %% @hidden
-pgw_record64(#{userLocationInfoTime := UserLocInfoTime} = PGWRecord, Acc) ->
-	Acc1 = Acc#{<<"userLocationInfoTime">> => cgf_lib:octet_string(UserLocInfoTime)},
-	pgw_record65(PGWRecord, Acc1);
-pgw_record64(PGWRecord, Acc) ->
-	pgw_record65(PGWRecord, Acc).
-%% @hidden
-pgw_record65(#{userLocationInformation := UserLocInfo} = _PGWRecord, Acc) ->
+pgw_record64(#{userLocationInformation := UserLocInfo} = _PGWRecord, Acc) ->
 	Acc#{<<"userLocationInformation">> => cgf_lib:octet_string(UserLocInfo)};
-pgw_record65(_PGWRecord, Acc) ->
+pgw_record64(_PGWRecord, Acc) ->
 	Acc.
 
 %% @hidden
@@ -1365,13 +1337,13 @@ ran_usage2(Record, Acc) ->
 	ran_usage3(Record, Acc).
 %% @hidden
 ran_usage3(#{rANEndTime := RANEndTime} = Record, Acc) ->
-	Acc1 = Acc#{<<"rANEndTime">> => cgf_lib:octet_string(RANEndTime)},
+	Acc1 = Acc#{<<"rANEndTime">> => cgf_lib:bcd_date_time(RANEndTime)},
 	ran_usage4(Record, Acc1);
 ran_usage3(Record, Acc) ->
 	ran_usage4(Record, Acc).
 %% @hidden
 ran_usage4(#{rANStartTime := RANStartTime} = Record, Acc) ->
-	Acc1 = Acc#{<<"rANStartTime">> => cgf_lib:octet_string(RANStartTime)},
+	Acc1 = Acc#{<<"rANStartTime">> => cgf_lib:bcd_date_time(RANStartTime)},
 	ran_usage5(Record, Acc1);
 ran_usage4(Record, Acc) ->
 	ran_usage5(Record, Acc).
@@ -1515,10 +1487,10 @@ service_data20(#{serviceSpecificInfo := ServiceSpecificInfo} = ServiceData, Acc)
 service_data20(ServiceData, Acc) ->
 	service_data21(ServiceData, Acc).
 %% @hidden
-service_data21(#{servingNodeAddress := AddressList} = ServiceData, Acc) ->
-	ParsedAddressList = [cgf_lib:octet_ip_address(Address)
-			|| {_, {_, Address}} <- AddressList],
-	Acc1 = Acc#{<<"servingNodeAddress">> => ParsedAddressList},
+service_data21(#{servingNodeAddress := Addresses} = ServiceData, Acc) ->
+	ParsedAddresses = [cgf_lib:ip_address(Address)
+			|| Address <- Addresses],
+	Acc1 = Acc#{<<"servingNodeAddress">> => ParsedAddresses},
 	service_data22(ServiceData, Acc1);
 service_data21(ServiceData, Acc) ->
 	service_data22(ServiceData, Acc).
@@ -1554,19 +1526,19 @@ service_data26(ServiceData, Acc) ->
 	service_data27(ServiceData, Acc).
 %% @hidden
 service_data27(#{timeOfFirstUsage := TimeOfFirstUsage} = ServiceData, Acc) ->
-	Acc1 = Acc#{<<"timeOfFirstUsage">> => cgf_lib:octet_string(TimeOfFirstUsage)},
+	Acc1 = Acc#{<<"timeOfFirstUsage">> => cgf_lib:bcd_date_time(TimeOfFirstUsage)},
 	service_data28(ServiceData, Acc1);
 service_data27(ServiceData, Acc) ->
 	service_data28(ServiceData, Acc).
 %% @hidden
 service_data28(#{timeOfLastUsage := TimeOfLastUsage} = ServiceData, Acc) ->
-	Acc1 = Acc#{<<"timeOfLastUsage">> => cgf_lib:octet_string(TimeOfLastUsage)},
+	Acc1 = Acc#{<<"timeOfLastUsage">> => cgf_lib:bcd_date_time(TimeOfLastUsage)},
 	service_data29(ServiceData, Acc1);
 service_data28(ServiceData, Acc) ->
 	service_data29(ServiceData, Acc).
 %% @hidden
 service_data29(#{timeOfReport := TimeOfReport} = ServiceData, Acc) ->
-	Acc1 = Acc#{<<"timeOfReport">> => cgf_lib:octet_string(TimeOfReport)},
+	Acc1 = Acc#{<<"timeOfReport">> => cgf_lib:bcd_date_time(TimeOfReport)},
 	service_data30(ServiceData, Acc1);
 service_data29(ServiceData, Acc) ->
 	service_data30(ServiceData, Acc).
@@ -1621,7 +1593,7 @@ service_data37(_ServiceData, Acc) ->
 
 %% @hidden
 mo_exception(#{counterTimestamp := CounterTimestamp} = MOExceptionDataCounter) ->
-	Acc = #{<<"counterTimestamp">> => cgf_lib:octet_string(CounterTimestamp)},
+	Acc = #{<<"counterTimestamp">> => cgf_lib:bcd_date_time(CounterTimestamp)},
 	mo_exception1(MOExceptionDataCounter, Acc);
 mo_exception(MOExceptionDataCounter) ->
 	mo_exception1(MOExceptionDataCounter, #{}).
@@ -1633,19 +1605,19 @@ mo_exception1(_MOExceptionDataCounter, Acc) ->
 
 %% @hidden
 scsas(#{sCSRealm := SCSRealm} = SCSAS) ->
-	Acc = #{<<"sCSRealm">> => SCSRealm},
+	Acc = #{<<"sCSRealm">> => binary_to_list(SCSRealm)},
 	scsas1(SCSAS, Acc);
 scsas(SCSAS) ->
 	scsas1(SCSAS, #{}).
 %% @hidden
-scsas1(#{sCSAddress := {iPAddress, {_, {_, IPAddress}}}} = _SCSAS, Acc) ->
-	Acc#{<<"sCSRealm">> => cgf_lib:octet_string(IPAddress)};
+scsas1(#{sCSAddress := Address} = _SCSAS, Acc) ->
+	Acc#{<<"sCSAddress">> => cgf_lib:ip_address(Address)};
 scsas1(_SCSAS, Acc) ->
 	Acc.
 
 %% @hidden
 event_charging_info(#{eventTimeStamps := EventTimeStamps} = Info) ->
-	ParsedTime = [cgf_lib:octet_ip_address(TimeStamp) ||
+	ParsedTime = [cgf_lib:bcd_date_time(TimeStamp) ||
 			{_, {_, TimeStamp}} <- EventTimeStamps],
 	Acc = #{<<"eventTimeStamps">> => ParsedTime},
 	event_charging_info1(Info, Acc);
@@ -1729,8 +1701,10 @@ sgsn_mmr11(#{locationAreaCode := LocationAreaCode} = SGSNMMRRecord, Acc) ->
 sgsn_mmr11(SGSNMMRRecord, Acc) ->
 	sgsn_mmr12(SGSNMMRRecord, Acc).
 %% @hidden
-sgsn_mmr12(#{msNetworkCapability := MSNetworkCapability} = SGSNMMRRecord, Acc) ->
-	Acc1 = Acc#{<<"msNetworkCapability">> => MSNetworkCapability},
+sgsn_mmr12(#{msNetworkCapability
+		:= MSNetworkCapability} = SGSNMMRRecord, Acc) ->
+	Acc1 = Acc#{<<"msNetworkCapability">>
+			=> cgf_lib:octet_string(MSNetworkCapability)},
 	sgsn_mmr13(SGSNMMRRecord, Acc1);
 sgsn_mmr12(SGSNMMRRecord, Acc) ->
 	sgsn_mmr13(SGSNMMRRecord, Acc).
@@ -1747,26 +1721,26 @@ sgsn_mmr14(#{rATType := RATType} = SGSNMMRRecord, Acc) ->
 sgsn_mmr14(SGSNMMRRecord, Acc) ->
 	sgsn_mmr15(SGSNMMRRecord, Acc).
 %% @hidden
-sgsn_mmr15(#{recordExtensions := SGSNMMRRecordExtensions} = SGSNMMRRecord, Acc) ->
-	Acc1 = Acc#{<<"recordExtensions">> => SGSNMMRRecordExtensions},
+sgsn_mmr15(#{recordExtensions := RecordExtensions} = SGSNMMRRecord, Acc) ->
+	Acc1 = Acc#{<<"recordExtensions">> => RecordExtensions},
 	sgsn_mmr16(SGSNMMRRecord, Acc1);
 sgsn_mmr15(SGSNMMRRecord, Acc) ->
 	sgsn_mmr16(SGSNMMRRecord, Acc).
 %% @hidden
-sgsn_mmr16(#{recordOpeningTime := SGSNMMRRecordOpeningTime} = SGSNMMRRecord, Acc) ->
-	Acc1 = Acc#{<<"recordOpeningTime">> => cgf_lib:bcd_dn(SGSNMMRRecordOpeningTime)},
+sgsn_mmr16(#{recordOpeningTime := RecordOpeningTime} = SGSNMMRRecord, Acc) ->
+	Acc1 = Acc#{<<"recordOpeningTime">> => cgf_lib:bcd_date_time(RecordOpeningTime)},
 	sgsn_mmr17(SGSNMMRRecord, Acc1);
 sgsn_mmr16(SGSNMMRRecord, Acc) ->
 	sgsn_mmr17(SGSNMMRRecord, Acc).
 %% @hidden
-sgsn_mmr17(#{recordSequenceNumber := SGSNMMRRecordSequenceNumber} = SGSNMMRRecord, Acc) ->
-	Acc1 = Acc#{<<"recordSequenceNumber">> => SGSNMMRRecordSequenceNumber},
+sgsn_mmr17(#{recordSequenceNumber := RecordSequenceNumber} = SGSNMMRRecord, Acc) ->
+	Acc1 = Acc#{<<"recordSequenceNumber">> => RecordSequenceNumber},
 	sgsn_mmr18(SGSNMMRRecord, Acc1);
 sgsn_mmr17(SGSNMMRRecord, Acc) ->
 	sgsn_mmr18(SGSNMMRRecord, Acc).
 %% @hidden
-sgsn_mmr18(#{recordType := SGSNMMRRecordType} = SGSNMMRRecord, Acc) ->
-	Acc1 = Acc#{<<"recordType">> => SGSNMMRRecordType},
+sgsn_mmr18(#{recordType := RecordType} = SGSNMMRRecord, Acc) ->
+	Acc1 = Acc#{<<"recordType">> => RecordType},
 	sgsn_mmr19(SGSNMMRRecord, Acc1);
 sgsn_mmr18(SGSNMMRRecord, Acc) ->
 	sgsn_mmr19(SGSNMMRRecord, Acc).
@@ -1778,19 +1752,19 @@ sgsn_mmr19(SGSNMMRRecord, Acc) ->
 	sgsn_mmr20(SGSNMMRRecord, Acc).
 %% @hidden
 sgsn_mmr20(#{servedIMEI := ServedIMEI} = SGSNMMRRecord, Acc) ->
-	Acc1 = Acc#{<<"servedIMEI">> => cgf_lib:bcd_dn(ServedIMEI)},
+	Acc1 = Acc#{<<"servedIMEI">> => cgf_lib:tbcd(ServedIMEI)},
 	sgsn_mmr21(SGSNMMRRecord, Acc1);
 sgsn_mmr20(SGSNMMRRecord, Acc) ->
 	sgsn_mmr21(SGSNMMRRecord, Acc).
 %% @hidden
 sgsn_mmr21(#{servedIMSI := ServedIMSI} = SGSNMMRRecord, Acc) ->
-	Acc1 = Acc#{<<"servedIMSI">> => cgf_lib:bcd_dn(ServedIMSI)},
+	Acc1 = Acc#{<<"servedIMSI">> => cgf_lib:tbcd(ServedIMSI)},
 	sgsn_mmr22(SGSNMMRRecord, Acc1);
 sgsn_mmr21(SGSNMMRRecord, Acc) ->
 	sgsn_mmr22(SGSNMMRRecord, Acc).
 %% @hidden
 sgsn_mmr22(#{servedMSISDN := ServedMSISDN} = SGSNMMRRecord, Acc) ->
-	Acc1 = Acc#{<<"servedMSISDN">> => cgf_lib:bcd_dn(ServedMSISDN)},
+	Acc1 = Acc#{<<"servedMSISDN">> => cgf_lib:tbcd(ServedMSISDN)},
 	sgsn_mmr23(SGSNMMRRecord, Acc1);
 sgsn_mmr22(SGSNMMRRecord, Acc) ->
 	sgsn_mmr23(SGSNMMRRecord, Acc).
@@ -1801,11 +1775,8 @@ sgsn_mmr23(#{servingNodePLMNIdentifier := Identifer} = SGSNMMRRecord, Acc) ->
 sgsn_mmr23(SGSNMMRRecord, Acc) ->
 	sgsn_mmr24(SGSNMMRRecord, Acc).
 %% @hidden
-sgsn_mmr24(#{sgsnAddress := AddressList}
-		= SGSNMMRRecord, Acc) ->
-	ParsedAddressList = [cgf_lib:octet_ip_address(Address)
-			|| {_,{_, Address}} <- AddressList],
-	Acc1 = Acc#{<<"sgsnAddress">> => ParsedAddressList},
+sgsn_mmr24(#{sgsnAddress := Address} = SGSNMMRRecord, Acc) ->
+	Acc1 = Acc#{<<"sgsnAddress">> => cgf_lib:ip_address(Address)},
 	sgsn_mmr25(SGSNMMRRecord, Acc1);
 sgsn_mmr24(SGSNMMRRecord, Acc) ->
 	sgsn_mmr25(SGSNMMRRecord, Acc).
@@ -1823,7 +1794,7 @@ change_location(ChangeLocation) ->
 	change_location1(ChangeLocation, #{}).
 %% @hidden
 change_location1(#{changeTime := ChangeTime} = ChangeLocation, Acc) ->
-	Acc1 = Acc#{<<"changeTime">> => cgf_lib:octet_string(ChangeTime)},
+	Acc1 = Acc#{<<"changeTime">> => cgf_lib:bcd_date_time(ChangeTime)},
 	change_location2(ChangeLocation, Acc1);
 change_location1(ChangeLocation, Acc) ->
 	change_location2(ChangeLocation, Acc).
