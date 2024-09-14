@@ -141,8 +141,10 @@ parse(Log, Metadata, {mtSMSGWRecord, MTSMSGWRecord}) ->
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a CDR event detail for an MO Call Record.
-parse_mo_call(_Log, _Metadata, _MOCallRecord) ->
-	{error, not_implemented}.
+parse_mo_call(Log, Metadata, MOCallRecord) ->
+	Call = mo_call_record(MOCallRecord),
+	CDR = [{mo_call, Call} | Metadata],
+	cgf_log:blog(Log, CDR).
 
 -spec parse_mt_call(Log, Metadata, MTCallRecord) -> Result
 	when
@@ -183,3 +185,470 @@ parse_mo_sms(_Log, _Metadata, _MOSMSRecord) ->
 parse_mt_smsgw(_Log, _Metadata, _MTSMSGWRecord) ->
 	{error, not_implemented}.
 
+%% @hidden
+mo_call_record(#{servedIMSI := ServedIMSI} = MOCallRecord) ->
+	Acc = #{<<"servedIMSI">> => cgf_lib:bcd_dn(ServedIMSI)},
+	mo_call_record1(MOCallRecord, Acc);
+mo_call_record(MOCallRecord) ->
+	mo_call_record1(MOCallRecord, #{}).
+%% @hidden
+mo_call_record1(#{servedIMEI := ServedIMEI} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"servedIMEI">> => cgf_lib:bcd_dn(ServedIMEI)},
+	mo_call_record2(MOCallRecord, Acc1);
+mo_call_record1(MOCallRecord, Acc) ->
+	mo_call_record2(MOCallRecord, Acc).
+%% @hidden
+mo_call_record2(#{servedMSISDN := ServedMSISDN} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"servedMSISDN">> => cgf_lib:bcd_dn(ServedMSISDN)},
+	mo_call_record3(MOCallRecord, Acc1);
+mo_call_record2(MOCallRecord, Acc) ->
+	mo_call_record3(MOCallRecord, Acc).
+%% @hidden
+mo_call_record3(#{callingNumber := CallingNumber} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"callingNumber">> => cgf_lib:bcd_dn(CallingNumber)},
+	mo_call_record4(MOCallRecord, Acc1);
+mo_call_record3(MOCallRecord, Acc) ->
+	mo_call_record4(MOCallRecord, Acc).
+%% @hidden
+mo_call_record4(#{calledNumber := CalledNumber} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"calledNumber">> => cgf_lib:bcd_dn(CalledNumber)},
+	mo_call_record5(MOCallRecord, Acc1);
+mo_call_record4(MOCallRecord, Acc) ->
+	mo_call_record5(MOCallRecord, Acc).
+%% @hidden
+mo_call_record5(#{translatedNumber := TranslatedNumber} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"translatedNumber">> => cgf_lib:bcd_dn(TranslatedNumber)},
+	mo_call_record6(MOCallRecord, Acc1);
+mo_call_record5(MOCallRecord, Acc) ->
+	mo_call_record6(MOCallRecord, Acc).
+%% @hidden
+mo_call_record6(#{connectedNumber := ConnectedNumber} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"connectedNumber">> => cgf_lib:bcd_dn(ConnectedNumber)},
+	mo_call_record7(MOCallRecord, Acc1);
+mo_call_record6(MOCallRecord, Acc) ->
+	mo_call_record7(MOCallRecord, Acc).
+%% @hidden
+mo_call_record7(#{roamingNumber := RoamingNumber} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"roamingNumber">> => cgf_lib:bcd_dn(RoamingNumber)},
+	mo_call_record8(MOCallRecord, Acc1);
+mo_call_record7(MOCallRecord, Acc) ->
+	mo_call_record8(MOCallRecord, Acc).
+%% @hidden
+mo_call_record8(#{recordingEntity := MOCallRecordingEntity} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"recordingEntity">> => MOCallRecordingEntity},
+	mo_call_record9(MOCallRecord, Acc1);
+mo_call_record8(MOCallRecord, Acc) ->
+	mo_call_record9(MOCallRecord, Acc).
+%% @hidden
+mo_call_record9(#{mscIncomingTKGP := MscIncomingTKGP} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"mscIncomingTKGP">> => MscIncomingTKGP},
+	mo_call_record10(MOCallRecord, Acc1);
+mo_call_record9(MOCallRecord, Acc) ->
+mo_call_record10(MOCallRecord, Acc).
+%% @hidden
+mo_call_record10(#{mscOutgoingTKGP := MscOutgoingTKGP} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"mscOutgoingTKGP">> => MscOutgoingTKGP},
+	mo_call_record11(MOCallRecord, Acc1);
+mo_call_record10(MOCallRecord, Acc) ->
+	mo_call_record11(MOCallRecord, Acc).
+%% @hidden
+mo_call_record11(#{location := Location} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"location">> => cgf_lib:octet_string(Location)},
+	mo_call_record12(MOCallRecord, Acc1);
+mo_call_record11(MOCallRecord, Acc) ->
+	mo_call_record12(MOCallRecord, Acc).
+%% @hidden
+mo_call_record12(#{changeOfLocation := ChangeOfLocation} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"changeOfLocation">> =>  cgf_lib:octet_string(ChangeOfLocation)},
+	mo_call_record13(MOCallRecord, Acc1);
+mo_call_record12(MOCallRecord, Acc) ->
+	mo_call_record13(MOCallRecord, Acc).
+%%             %% @hidden
+mo_call_record13(#{basicService := BasicService} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"basicService">> => BasicService},
+	mo_call_record14(MOCallRecord, Acc1);
+mo_call_record13(MOCallRecord, Acc) ->
+	mo_call_record14(MOCallRecord, Acc).
+%% @hidden
+mo_call_record14(#{transparencyIndicator := TransparencyIndicator} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"transparencyIndicator">> => TransparencyIndicator},
+	mo_call_record15(MOCallRecord, Acc1);
+mo_call_record14(MOCallRecord, Acc) ->
+	mo_call_record15(MOCallRecord, Acc).
+%% @hidden
+mo_call_record15(#{changeOfService := ChangeOfService} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"changeOfService">> => change_of_service(ChangeOfService)},
+	mo_call_record16(MOCallRecord, Acc1);
+mo_call_record15(MOCallRecord, Acc) ->
+	mo_call_record16(MOCallRecord, Acc).
+%% @hidden
+mo_call_record16(#{supplServicesUsed := SupplServicesUsed} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"supplServicesUsed">> => supply_service_used(SupplServicesUsed)},
+	mo_call_record17(MOCallRecord, Acc1);
+mo_call_record16(MOCallRecord, Acc) ->
+	mo_call_record17(MOCallRecord, Acc).
+%% @hidden
+mo_call_record17(#{aocParameters := AOCParameters} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"aocParameters">> => AOCParameters},
+	mo_call_record18(MOCallRecord, Acc1);
+mo_call_record17(MOCallRecord, Acc) ->
+	mo_call_record18(MOCallRecord, Acc).
+%% @hidden
+mo_call_record18(#{changeOfAOCParms := ChangeOfAOCParms} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"changeOfAOCParms">> => ChangeOfAOCParms},
+	mo_call_record19(MOCallRecord, Acc1);
+mo_call_record18(MOCallRecord, Acc) ->
+	mo_call_record19(MOCallRecord, Acc).
+%% @hidden
+mo_call_record19(#{msClassmark := MSClassmark} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"msClassmark">> => MSClassmark},
+	mo_call_record20(MOCallRecord, Acc1);
+mo_call_record19(MOCallRecord, Acc) ->
+	mo_call_record20(MOCallRecord, Acc).
+%% @hidden
+mo_call_record20(#{changeOfClassmark := ChangeOfClassmark} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"changeOfClassmark">> => ChangeOfClassmark},
+	mo_call_record21(MOCallRecord, Acc1);
+mo_call_record20(MOCallRecord, Acc) ->
+	mo_call_record21(MOCallRecord, Acc).
+%% @hidden
+mo_call_record21(#{seizureTime := SeizureTime} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"seizureTime">> => cgf_lib:octet_string(SeizureTime)},
+	mo_call_record22(MOCallRecord, Acc1);
+mo_call_record21(MOCallRecord, Acc) ->
+	mo_call_record22(MOCallRecord, Acc).
+%% @hidden
+mo_call_record22(#{answerTime := AnswerTime} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"answerTime">> => cgf_lib:octet_string(AnswerTime)},
+	mo_call_record23(MOCallRecord, Acc1);
+mo_call_record22(MOCallRecord, Acc) ->
+	mo_call_record23(MOCallRecord, Acc).
+%% @hidden
+mo_call_record23(#{releaseTime := ReleaseTime} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"releaseTime">> => cgf_lib:octet_string(ReleaseTime)},
+	mo_call_record24(MOCallRecord, Acc1);
+mo_call_record23(MOCallRecord, Acc) ->
+	mo_call_record24(MOCallRecord, Acc).
+%% @hidden
+mo_call_record24(#{callDuration := CallDuration} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"callDuration">> => cgf_lib:octet_string(CallDuration)},
+	mo_call_record25(MOCallRecord, Acc1);
+mo_call_record24(MOCallRecord, Acc) ->
+	mo_call_record25(MOCallRecord, Acc).
+%% @hidden
+mo_call_record25(#{dataVolume := DataVolume} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"dataVolume">> => DataVolume},
+	mo_call_record26(MOCallRecord, Acc1);
+mo_call_record25(MOCallRecord, Acc) ->
+	mo_call_record26(MOCallRecord, Acc).
+%% @hidden
+mo_call_record26(#{radioChanRequested := RadioChanRequested} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"radioChanRequested">> => RadioChanRequested},
+	mo_call_record27(MOCallRecord, Acc1);
+mo_call_record26(MOCallRecord, Acc) ->
+	mo_call_record27(MOCallRecord, Acc).
+%% @hidden
+mo_call_record27(#{radioChanUsed := RadioChanUsed} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"radioChanUsed">> => RadioChanUsed},
+	mo_call_record28(MOCallRecord, Acc1);
+mo_call_record27(MOCallRecord, Acc) ->
+	mo_call_record28(MOCallRecord, Acc).
+%% @hidden
+mo_call_record28(#{changeOfRadioChan := ChangeOfRadioChan} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"changeOfRadioChan">> => ChangeOfRadioChan},
+	mo_call_record29(MOCallRecord, Acc1);
+mo_call_record28(MOCallRecord, Acc) ->
+	mo_call_record29(MOCallRecord, Acc).
+%% @hidden
+mo_call_record29(#{causeForTerm := CauseForTerm} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"causeForTerm">> => CauseForTerm},
+	mo_call_record30(MOCallRecord, Acc1);
+mo_call_record29(MOCallRecord, Acc) ->
+	mo_call_record30(MOCallRecord, Acc).
+%% @hidden
+mo_call_record30(#{diagnostics := Diagnostics} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"diagnostics">> => Diagnostics},
+	mo_call_record31(MOCallRecord, Acc1);
+mo_call_record30(MOCallRecord, Acc) ->
+	mo_call_record31(MOCallRecord, Acc).
+%% @hidden
+mo_call_record31(#{callReference := CallReference} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"callReference">> => CallReference},
+	mo_call_record32(MOCallRecord, Acc1);
+mo_call_record31(MOCallRecord, Acc) ->
+	mo_call_record32(MOCallRecord, Acc).
+%% @hidden
+mo_call_record32(#{sequenceNumber := SequenceNumber} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"sequenceNumber">> => SequenceNumber},
+	mo_call_record33(MOCallRecord, Acc1);
+mo_call_record32(MOCallRecord, Acc) ->
+	mo_call_record33(MOCallRecord, Acc).
+%% @hidden
+mo_call_record33(#{additionalChgInfo := AdditionalChgInfo} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"additionalChgInfo">> => AdditionalChgInfo},
+	mo_call_record34(MOCallRecord, Acc1);
+mo_call_record33(MOCallRecord, Acc) ->
+	mo_call_record34(MOCallRecord, Acc).
+%% @hidden
+mo_call_record34(#{recordExtensions := MOCallRecordExtensions} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"recordExtensions">> => MOCallRecordExtensions},
+	mo_call_record35(MOCallRecord, Acc1);
+mo_call_record34(MOCallRecord, Acc) ->
+	mo_call_record35(MOCallRecord, Acc).
+%% @hidden
+mo_call_record35(#{'gsm-SCFAddress' := GsmSCFAddress} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"gsm-SCFAddress">> => cgf_lib:bcd_dn(GsmSCFAddress)},
+	mo_call_record36(MOCallRecord, Acc1);
+mo_call_record35(MOCallRecord, Acc) ->
+	mo_call_record36(MOCallRecord, Acc).
+%% @hidden
+mo_call_record36(#{serviceKey := ServiceKey} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"serviceKey">> => ServiceKey},
+	mo_call_record37(MOCallRecord, Acc1);
+mo_call_record36(MOCallRecord, Acc) ->
+	mo_call_record37(MOCallRecord, Acc).
+%% @hidden
+mo_call_record37(#{networkCallReference := NetworkCallReference} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"networkCallReference">> => NetworkCallReference},
+	mo_call_record38(MOCallRecord, Acc1);
+mo_call_record37(MOCallRecord, Acc) ->
+	mo_call_record38(MOCallRecord, Acc).
+%% @hidden
+mo_call_record38(#{mSCAddress := MSCAddress} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"mSCAddress">> => cgf_lib:bcd_dn(MSCAddress)},
+	mo_call_record39(MOCallRecord, Acc1);
+mo_call_record38(MOCallRecord, Acc) ->
+	mo_call_record39(MOCallRecord, Acc).
+%% @hidden
+mo_call_record39(#{cAMELInitCFIndicator := CAMELInitCFIndicator} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"cAMELInitCFIndicator">> => CAMELInitCFIndicator},
+	mo_call_record40(MOCallRecord, Acc1);
+mo_call_record39(MOCallRecord, Acc) ->
+	mo_call_record40(MOCallRecord, Acc).
+%% @hidden
+mo_call_record40(#{defaultCallHandling := DefaultCallHandling} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"defaultCallHandling">> => DefaultCallHandling},
+	mo_call_record41(MOCallRecord, Acc1);
+mo_call_record40(MOCallRecord, Acc) ->
+	mo_call_record41(MOCallRecord, Acc).
+%% @hidden
+mo_call_record41(#{hSCSDChanRequested := HSCSDChanRequested} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"hSCSDChanRequested">> => HSCSDChanRequested},
+	mo_call_record42(MOCallRecord, Acc1);
+mo_call_record41(MOCallRecord, Acc) ->
+	mo_call_record42(MOCallRecord, Acc).
+%% @hidden
+mo_call_record42(#{hSCSDChanAllocated := HSCSDChanAllocated} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"hSCSDChanAllocated">> => HSCSDChanAllocated},
+	mo_call_record43(MOCallRecord, Acc1);
+mo_call_record42(MOCallRecord, Acc) ->
+	mo_call_record43(MOCallRecord, Acc).
+%% @hidden
+mo_call_record43(#{changeOfHSCSDParms := ChangeOfHSCSDParms} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"changeOfHSCSDParms">> => ChangeOfHSCSDParms},
+	mo_call_record44(MOCallRecord, Acc1);
+mo_call_record43(MOCallRecord, Acc) ->
+	mo_call_record44(MOCallRecord, Acc).
+%% @hidden
+mo_call_record44(#{fnur := FNUR} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"fnur">> => FNUR},
+	mo_call_record45(MOCallRecord, Acc1);
+mo_call_record44(MOCallRecord, Acc) ->
+	mo_call_record45(MOCallRecord, Acc).
+%% @hidden
+mo_call_record45(#{aiurRequested := AIURRequested} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"aiurRequested">> => AIURRequested},
+	mo_call_record46(MOCallRecord, Acc1);
+mo_call_record45(MOCallRecord, Acc) ->
+	mo_call_record46(MOCallRecord, Acc).
+%% @hidden
+mo_call_record46(#{chanCodingsAcceptable := ChanCodingsAcceptable} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"chanCodingsAcceptable">> => ChanCodingsAcceptable},
+	mo_call_record47(MOCallRecord, Acc1);
+mo_call_record46(MOCallRecord, Acc) ->
+	mo_call_record47(MOCallRecord, Acc).
+%% @hidden
+mo_call_record47(#{chanCodingUsed := ChanCodingUsed} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"chanCodingUsed">> => ChanCodingUsed},
+	mo_call_record48(MOCallRecord, Acc1);
+mo_call_record47(MOCallRecord, Acc) ->
+	mo_call_record48(MOCallRecord, Acc).
+%% @hidden
+mo_call_record48(#{speechVersionSupported := SpeechVersionSupported} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"speechVersionSupported">> => SpeechVersionSupported},
+	mo_call_record49(MOCallRecord, Acc1);
+mo_call_record48(MOCallRecord, Acc) ->
+	mo_call_record49(MOCallRecord, Acc).
+%% @hidden
+mo_call_record49(#{speechVersionUsed := SpeechVersionUsed} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"speechVersionUsed">> => SpeechVersionUsed},
+	mo_call_record50(MOCallRecord, Acc1);
+mo_call_record49(MOCallRecord, Acc) ->
+	mo_call_record50(MOCallRecord, Acc).
+%% @hidden
+mo_call_record50(#{numberOfDPEncountered := NumberOfDPEncountered} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"numberOfDPEncountered">> => NumberOfDPEncountered},
+	mo_call_record51(MOCallRecord, Acc1);
+mo_call_record50(MOCallRecord, Acc) ->
+	mo_call_record51(MOCallRecord, Acc).
+%% @hidden
+mo_call_record51(#{levelOfCAMELService := LevelOfCAMELService} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"levelOfCAMELService">> => LevelOfCAMELService},
+	mo_call_record52(MOCallRecord, Acc1);
+mo_call_record51(MOCallRecord, Acc) ->
+	mo_call_record52(MOCallRecord, Acc).
+%% @hidden
+mo_call_record52(#{freeFormatData := FreeFormatData} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"freeFormatData">> => FreeFormatData},
+	mo_call_record53(MOCallRecord, Acc1);
+mo_call_record52(MOCallRecord, Acc) ->
+	mo_call_record53(MOCallRecord, Acc).
+%% @hidden
+mo_call_record53(#{cAMELCallLegInformation := CAMELCallLegInformation} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"cAMELCallLegInformation">> => CAMELCallLegInformation},
+	mo_call_record54(MOCallRecord, Acc1);
+mo_call_record53(MOCallRecord, Acc) ->
+	mo_call_record54(MOCallRecord, Acc).
+%% @hidden
+mo_call_record54(#{freeFormatDataAppend := FreeFormatDataAppend} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"freeFormatDataAppend">> => FreeFormatDataAppend},
+	mo_call_record55(MOCallRecord, Acc1);
+mo_call_record54(MOCallRecord, Acc) ->
+	mo_call_record55(MOCallRecord, Acc).
+%% @hidden
+mo_call_record55(#{defaultCallHandling2 := DefaultCallHandling2} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"defaultCallHandling-2">> => DefaultCallHandling2},
+	mo_call_record56(MOCallRecord, Acc1);
+mo_call_record55(MOCallRecord, Acc) ->
+	mo_call_record56(MOCallRecord, Acc).
+%% @hidden
+mo_call_record56(#{'gsm-SCFAddress2' := GsmSCFAddress2} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"gsm-SCFAddressa-2">> => GsmSCFAddress2},
+	mo_call_record57(MOCallRecord, Acc1);
+mo_call_record56(MOCallRecord, Acc) ->
+	mo_call_record57(MOCallRecord, Acc).
+%% @hidden
+mo_call_record57(#{serviceKey2 := ServiceKey2} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"serviceKey-2">> => ServiceKey2},
+	mo_call_record58(MOCallRecord, Acc1);
+mo_call_record57(MOCallRecord, Acc) ->
+	mo_call_record58(MOCallRecord, Acc).
+%% @hidden
+mo_call_record58(#{freeFormatData2 := FreeFormatData2} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"freeFormatData-2">> => FreeFormatData2},
+	mo_call_record59(MOCallRecord, Acc1);
+mo_call_record58(MOCallRecord, Acc) ->
+	mo_call_record59(MOCallRecord, Acc).
+%% @hidden
+mo_call_record59(#{freeFormatDataAppend2 := FreeFormatDataAppend2} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"freeFormatDataAppend-2">> => FreeFormatDataAppend2},
+	mo_call_record60(MOCallRecord, Acc1);
+mo_call_record59(MOCallRecord, Acc) ->
+	mo_call_record60(MOCallRecord, Acc).
+%% @hidden
+mo_call_record60(#{systemType := SystemType} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"systemType">> => SystemType},
+	mo_call_record61(MOCallRecord, Acc1);
+mo_call_record60(MOCallRecord, Acc) ->
+	mo_call_record61(MOCallRecord, Acc).
+%% @hidden
+mo_call_record61(#{rateIndication := RateIndication} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"rateIndication">> => RateIndication},
+	mo_call_record62(MOCallRecord, Acc1);
+mo_call_record61(MOCallRecord, Acc) ->
+	mo_call_record62(MOCallRecord, Acc).
+%% @hidden
+mo_call_record62(#{locationRoutNum := LocationRoutNum} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"locationRoutNum">> => LocationRoutNum},
+	mo_call_record63(MOCallRecord, Acc1);
+mo_call_record62(MOCallRecord, Acc) ->
+	mo_call_record63(MOCallRecord, Acc).
+%% @hidden
+mo_call_record63(#{lrnSoInd := LrnSoInd} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"lrnSoInd">> => LrnSoInd},
+	mo_call_record64(MOCallRecord, Acc1);
+mo_call_record63(MOCallRecord, Acc) ->
+	mo_call_record64(MOCallRecord, Acc).
+%% @hidden
+mo_call_record64(#{lrnQuryStatus := LrnQuryStatus} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"lrnQuryStatus">> => LrnQuryStatus},
+	mo_call_record65(MOCallRecord, Acc1);
+mo_call_record64(MOCallRecord, Acc) ->
+	mo_call_record65(MOCallRecord, Acc).
+%% @hidden
+mo_call_record65(#{jIPPara := JIPPara} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"jIPPara">> => JIPPara},
+	mo_call_record66(MOCallRecord, Acc1);
+mo_call_record65(MOCallRecord, Acc) ->
+	mo_call_record66(MOCallRecord, Acc).
+%% @hidden
+mo_call_record66(#{jIPSoInd := JIPSoInd} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"jIPSoInd">> => JIPSoInd},
+	mo_call_record67(MOCallRecord, Acc1);
+mo_call_record66(MOCallRecord, Acc) ->
+	mo_call_record67(MOCallRecord, Acc).
+%% @hidden
+mo_call_record67(#{jIPQuryStatus := JIPQuryStatus} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"jIPQuryStatus">> => JIPQuryStatus},
+	mo_call_record68(MOCallRecord, Acc1);
+mo_call_record67(MOCallRecord, Acc) ->
+	mo_call_record68(MOCallRecord, Acc).
+%% @hidden
+mo_call_record68(#{partialMOCallRecordType := PartialMOCallRecordType} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"partialMOCallRecordType">> => PartialMOCallRecordType},
+	mo_call_record69(MOCallRecord, Acc1);
+mo_call_record68(MOCallRecord, Acc) ->
+	mo_call_record69(MOCallRecord, Acc).
+%% @hidden
+mo_call_record69(#{guaranteedBitRate := GuaranteedBitRate} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"guaranteedBitRate">> => GuaranteedBitRate},
+	mo_call_record70(MOCallRecord, Acc1);
+mo_call_record69(MOCallRecord, Acc) ->
+	mo_call_record70(MOCallRecord, Acc).
+%% @hidden
+mo_call_record70(#{maximumBitRate := MaximumBitRate} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"maximumBitRate">> => MaximumBitRate},
+	mo_call_record71(MOCallRecord, Acc1);
+mo_call_record70(MOCallRecord, Acc) ->
+	mo_call_record71(MOCallRecord, Acc).
+%% @hidden
+mo_call_record71(#{redial := Redial} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"redial">> => Redial},
+	mo_call_record72(MOCallRecord, Acc1);
+mo_call_record71(MOCallRecord, Acc) ->
+	mo_call_record72(MOCallRecord, Acc).
+%% @hidden
+mo_call_record72(#{reasonForServiceChange := ReasonForServiceChange} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"reasonForServiceChange">> => ReasonForServiceChange},
+	mo_call_record73(MOCallRecord, Acc1);
+mo_call_record72(MOCallRecord, Acc) ->
+	mo_call_record73(MOCallRecord, Acc).
+%% @hidden
+mo_call_record73(#{serviceChangeInitiator := ServiceChangeInitiator} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"serviceChangeInitiator">> => ServiceChangeInitiator},
+	mo_call_record74(MOCallRecord, Acc1);
+mo_call_record73(MOCallRecord, Acc) ->
+	mo_call_record74(MOCallRecord, Acc).
+%% @hidden
+mo_call_record74(#{iCSI2ActiveFlag := ICSI2ActiveFlag} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"iCSI2ActiveFlag">> => ICSI2ActiveFlag},
+	mo_call_record75(MOCallRecord, Acc1);
+mo_call_record74(MOCallRecord, Acc) ->
+	mo_call_record75(MOCallRecord, Acc).
+%% @hidden
+mo_call_record75(#{'iMS-Charging-Identifier' := IMSChargingIdentifier} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"iMS-Charging-Identifier">> => IMSChargingIdentifier},
+	mo_call_record76(MOCallRecord, Acc1);
+mo_call_record75(MOCallRecord, Acc) ->
+	mo_call_record76(MOCallRecord, Acc).
+%% @hidden
+mo_call_record76(#{privateUserID := PrivateUserID} = _MOCallRecord, Acc) ->
+	Acc#{<<"privateUserID">> => PrivateUserID};
+mo_call_record76(_MOCallRecord, Acc) ->
+	Acc.
+
+change_of_service(_ChangeOfService) ->
+	{error, not_implemented}.
+
+supply_service_used(_SupplServicesUsed) ->
+	{error, not_implemented}.
