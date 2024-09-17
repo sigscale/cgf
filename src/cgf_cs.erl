@@ -143,7 +143,7 @@ parse(Log, Metadata, {mtSMSGWRecord, MTSMSGWRecord}) ->
 %% @doc Parse a CDR event detail for an MO Call Record.
 parse_mo_call(Log, Metadata, MOCallRecord) ->
 	Call = mo_call_record(MOCallRecord),
-	CDR = [{mo_call, Call} | Metadata],
+	CDR = [{moCall, Call} | Metadata],
 	cgf_log:blog(Log, CDR).
 
 -spec parse_mt_call(Log, Metadata, MTCallRecord) -> Result
