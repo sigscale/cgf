@@ -611,10 +611,22 @@ ecs_url(URL) when is_map(URL) ->
 imsi(#{<<"servedIMSI">> := ServedIMSI} = _Parameters)
 		when byte_size(ServedIMSI) > 0 ->
 	"imsi-" ++ binary_to_list(ServedIMSI);
+imsi(#{<<"servedIMSI">> := ServedIMSI} = _Parameters)
+		when length(ServedIMSI) > 0 ->
+	"imsi-" ++ ServedIMSI;
+imsi(#{<<"basicCallInformation">> := #{<<"chargeableSubscriber">>
+		:= #{<<"simChargeableSubscriber">> := #{<<"imsi">> := IMSI}}}})
+		when byte_size(IMSI) > 0 ->
+	"imsi-" ++ binary_to_list(IMSI);
 imsi(#{<<"basicCallInformation">> := #{<<"chargeableSubscriber">>
 		:= #{<<"simChargeableSubscriber">> := #{<<"imsi">> := IMSI}}}})
 		when length(IMSI) > 0 ->
 	"imsi-" ++ IMSI;
+imsi(#{<<"gprsBasicCallInformation">> := #{<<"gprsChargeableSubscriber">>
+		:= #{<<"chargeableSubscriber">> := #{<<"simChargeableSubscriber">>
+		:= #{<<"imsi">> := IMSI}}}}})
+		when byte_size(IMSI) > 0 ->
+	"imsi-" ++ binary_to_list(IMSI);
 imsi(#{<<"gprsBasicCallInformation">> := #{<<"gprsChargeableSubscriber">>
 		:= #{<<"chargeableSubscriber">> := #{<<"simChargeableSubscriber">>
 		:= #{<<"imsi">> := IMSI}}}}})
@@ -631,13 +643,28 @@ imsi(_Parameters) ->
 msisdn(#{<<"servedMSISDN">> := ServedMSISDN} = _Parameters)
 		when byte_size(ServedMSISDN) > 0 ->
 	"msisdn-" ++ binary_to_list(ServedMSISDN);
+msisdn(#{<<"servedMSISDN">> := ServedMSISDN} = _Parameters)
+		when length(ServedMSISDN) > 0 ->
+	"msisdn-" ++ ServedMSISDN;
 msisdn(#{<<"chargingParty">> := ChargingParty} = _Parameters)
 		when byte_size(ChargingParty) > 0 ->
 	"msisdn-" ++ binary_to_list(ChargingParty);
+msisdn(#{<<"chargingParty">> := ChargingParty} = _Parameters)
+		when length(ChargingParty) > 0 ->
+	"msisdn-" ++ ChargingParty;
+msisdn(#{<<"basicCallInformation">> := #{<<"chargeableSubscriber">>
+		:= #{<<"simChargeableSubscriber">> := #{<<"msisdn">> := MSISDN}}}})
+		when byte_size(MSISDN) > 0 ->
+	"msisdn-" ++ binary_to_list(MSISDN);
 msisdn(#{<<"basicCallInformation">> := #{<<"chargeableSubscriber">>
 		:= #{<<"simChargeableSubscriber">> := #{<<"msisdn">> := MSISDN}}}})
 		when length(MSISDN) > 0 ->
 	"msisdn-" ++ MSISDN;
+msisdn(#{<<"gprsBasicCallInformation">> := #{<<"gprsChargeableSubscriber">>
+		:= #{<<"chargeableSubscriber">> := #{<<"simChargeableSubscriber">>
+		:= #{<<"msisdn">> := MSISDN}}}}})
+		when byte_size(MSISDN) > 0 ->
+	"msisdn-" ++ binary_to_list(MSISDN);
 msisdn(#{<<"gprsBasicCallInformation">> := #{<<"gprsChargeableSubscriber">>
 		:= #{<<"chargeableSubscriber">> := #{<<"simChargeableSubscriber">>
 		:= #{<<"msisdn">> := MSISDN}}}}})
