@@ -38,9 +38,10 @@
 		CDR :: [{RecordType, Parameters}],
 		RecordType :: moCall | mtCall
 				| moSMS | mtSMS | scSMO | scSMT
-				| sgw | vas | rated | abmf
+				| sgsnPDP | sgw 
 				| roam_batchControlInfo | roam_accountingInfo
 				| roam_moCall | roam_mtCall | roam_gprs
+				| vas | rated | abmf
 				| string(),
 		Parameters :: #{_Name := binary(), _Value := term()}.
 %% @doc Bx interface CODEC for Elastic Stack logs.
@@ -89,6 +90,24 @@ bx([{moSMS = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_event(Timestamp, [], [],
 					"event", "session", ["connection"], Outcome), $,,
 			$", "Bx_moSMS", $", $:, zj:encode(Parameters)]);
+bx([{sgsnPDP = _RecordType, Parameters} | T] = _CDR) ->
+	IMSI = imsi(Parameters),
+	MSISDN = msisdn(Parameters),
+	{StartTime, StopTime, Duration} = session_duration(Parameters),
+	Timestamp = case {StartTime, StopTime} of
+		{[], StopTime} ->
+			StopTime;
+		{StartTime, _} ->
+			StartTime
+	end,
+	Outcome = session_outcome(Parameters),
+	bx1(T, [${,
+			ecs_base(Timestamp), $,,
+			ecs_service("bx", "cgf"), $,,
+			ecs_user(MSISDN, IMSI, []), $,,
+			ecs_event(Timestamp, StopTime, Duration,
+					"event", "session", ["connection"], Outcome), $,,
+			$", "Bx_sgsnPDP", $", $:, zj:encode(Parameters)]);
 bx([{sgw = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
 	MSISDN = msisdn(Parameters),
@@ -99,7 +118,7 @@ bx([{sgw = _RecordType, Parameters} | T] = _CDR) ->
 		{StartTime, _} ->
 			StartTime
 	end,
-	Outcome = call_outcome(Parameters),
+	Outcome = session_outcome(Parameters),
 	bx1(T, [${,
 			ecs_base(Timestamp), $,,
 			ecs_service("bx", "cgf"), $,,
@@ -762,7 +781,7 @@ call_outcome(Parameters) ->
 		{ok, "abnormalRelease"} ->
 			"failure";
 		{ok, "cAMELInitCallRelease"} ->
-			"unknown";
+			"success";
 		{ok, "unauthorizedRequestingNetwork"} ->
 			"failure";
 		{ok, "unauthorizedLCSClient"} ->
@@ -771,6 +790,59 @@ call_outcome(Parameters) ->
 			"failure";
 		{ok, "unknownOrUnreachableLCSClient"} ->
 			"failure";
+		_ ->
+			"unknown"
+	end.
+
+-spec session_outcome(Parameters) -> Outcome
+	when
+		Parameters :: #{_Name := binary(), _Value := term()},
+		Outcome :: string(). % "success" | "failure" | |unknown"
+%% @hidden
+session_outcome(Parameters) ->
+	case maps:find(<<"causeForRecClosing">>, Parameters) of
+		{ok, "normalRelease"} ->
+			"success";
+		{ok, "partialRecord"} ->
+			"unknown";
+		{ok, "abnormalRelease"} ->
+			"failure";
+		{ok, "cAMELInitCallRelease"} ->
+			"success";
+		{ok, "volumeLimit"} ->
+			"success";
+		{ok, "timeLimit"} ->
+			"success";
+		{ok, "servingNodeChange"} ->
+			"success";
+		{ok, "maxChangeCond"} ->
+			"unknown";
+		{ok, "managementIntervention"} ->
+			"unknown";
+		{ok, "intraSGSNIntersystemChange"} ->
+			"success";
+		{ok, "rATChange"} ->
+			"success";
+		{ok, "mSTimeZoneChange"} ->
+			"success";
+		{ok, "sGSNPLMNIDChange"} ->
+			"unknown";
+		{ok, "sGWChange"} ->
+			"success";
+		{ok, "aPNAMBRChange"} ->
+			"success";
+		{ok, "mOExceptionDataCounterReceipt"} ->
+			"failure";
+		{ok, "unauthorizedRequestingNetwork"} ->
+			"failure";
+		{ok, "unauthorizedLCSClient"} ->
+			"failure";
+		{ok, "positionMethodFailure"} ->
+			"failure";
+		{ok, "unknownOrUnreachableLCSClient"} ->
+			"failure";
+		{ok, "listofDownstreamNodeChange"} ->
+			"unknown";
 		_ ->
 			"unknown"
 	end.

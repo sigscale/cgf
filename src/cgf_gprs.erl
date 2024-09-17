@@ -243,7 +243,7 @@ parse(Log, Metadata, {tWAGRecord, TWAGRecord}) ->
 %% @doc Parse a CDR event detail for an SGSN PDP.
 parse_sgsn_pdp(Log, Metadata, SGSNPDPRecord) ->
 	Call = sgsn_pdp_record(SGSNPDPRecord),
-	CDR = [{sgsn_pdp, Call} | Metadata],
+	CDR = [{sgsnPDP, Call} | Metadata],
 	cgf_log:blog(Log, CDR).
 
 -spec parse_sgsn_mmr(Log, Metadata, SGSNMMRecord) -> Result
@@ -258,7 +258,7 @@ parse_sgsn_pdp(Log, Metadata, SGSNPDPRecord) ->
 %% @doc Parse a CDR event detail for an SGSN MMR.
 parse_sgsn_mmr(Log, Metadata, SGSNMMRecord) ->
 	Call = sgsn_mmr(SGSNMMRecord),
-	CDR = [{sgsn_mrr, Call} | Metadata],
+	CDR = [{sgsnMM, Call} | Metadata],
 	cgf_log:blog(Log, CDR).
 
 -spec parse_sgsn_smo(Log, Metadata, SGSNSMORecord) -> Result
