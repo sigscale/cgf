@@ -137,8 +137,122 @@
 			"description": "Packet switched (PS) serving GPRS support node (SGSN) packet data protocol (PDP) charging data record (CDR).",
 			"type": "object",
 			"properties": {
+				"accessPointNameNI": {
+					"$ref": "#/$defs/AccessPointNameNI"
+				},
+				"accessPointNameOI": {
+					"$ref": "#/$defs/AccessPointNameOI"
+				},
+				"apnSelectionMode": {
+					"$ref": "#/$defs/APNSelectionMode"
+				},
+				"causeForRecClosing": {
+					"$ref": "#/$defs/CauseForRecClosing"
+				},
+				"cellIdentifier": {
+					"$ref": "#/$defs/CellId"
+				},
+				"chChSelectionMode": {
+					"$ref": "#/$defs/ChChSelectionMode"
+				},
+				"chargingCharacteristics": {
+					"$ref": "#/$defs/ChargingCharacteristics"
+				},
+				"chargingID": {
+					"$ref": "#/$defs/ChargingID"
+				},
+				"diagnostics": {
+					"$ref": "#/$defs/Diagnostics"
+				},
+				"duration": {
+					"type": "integer"
+				},
+				"dynamicAddressFlag": {
+					"$ref": "#/$defs/DynamicAddressFlag"
+				},
+				"ggsnAddressUsed": {
+					"$ref": "#/$defs/GSNAddress"
+				},
+				"listOfTrafficVolumes": {
+					"items": {
+						"$ref": "#/$defs/ChangeOfCharCondition"
+					},
+					"type": "array"
+				},
+				"localSequenceNumber": {
+					"$ref": "#/$defs/LocalSequenceNumber"
+				},
+				"locationAreaCode": {
+					"$ref": "#/$defs/LocationAreaCode"
+				},
+				"lowPriorityIndicator": {
+					"type": "null"
+				},
+				"msNetworkCapability": {
+					"$ref": "#/$defs/MSNetworkCapability"
+				},
+				"networkInitiation": {
+					"type": "boolean"
+				},
+				"nodeID": {
+					"$ref": "#/$defs/NodeID"
+				},
+				"pdpType": {
+					"$ref": "#/$defs/PDPType"
+				},
+				"rATType": {
+					"$ref": "#/$defs/RATType"
+				},
+				"rNCUnsentDownlinkVolume": {
+					"type": "integer"
+				},
+				"recordExtensions": {
+				},
+				"recordOpeningTime": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"recordSequenceNumber": {
+					"type": "integer"
+				},
+				"routingArea": {
+					"$ref": "#/$defs/RoutingAreaCode"
+				},
+				"servedIMEI": {
+					"$ref": "#/$defs/IMEI"
+				},
+				"servedIMSI": {
+					"$ref": "#/$defs/IMSI"
+				},
+				"servedMSISDN": {
+					"$ref": "#/$defs/MSISDN"
+				},
+				"servedPDPAddress": {
+					"$ref": "#/$defs/PDPAddress"
+				},
+				"servedPDPPDNAddressExt": {
+					"$ref": "#/$defs/PDPAddress"
+				},
+				"servingNodePLMNIdentifier": {
+					"$ref": "#/$defs/PLMN-Id"
+				},
+				"sgsnAddress": {
+					"$ref": "#/$defs/GSNAddress"
+				},
+				"sgsnChange": {
+					"type": "boolean"
+				},
+				"userCSGInformation": {
+					"$ref": "#/$defs/UserCSGInformation"
+				}
 			},
 			"required": [
+				"chargingID",
+				"ggsnAddressUsed",
+				"recordOpeningTime",
+				"duration",
+				"causeForRecClosing",
+				"chargingCharacteristics"
 			],
 			"examples": [
 			]
@@ -549,6 +663,10 @@
 			"type": "string",
 			"pattern": "^[\\x00-\\x7F]{1,63}$"
 		},
+		"AccessPointNameOI": {
+			"pattern": "^[\\x00-\\x7F]{1,37}$",
+			"type": "string"
+		},
 		"AdditionalExceptionReports": {
 			"type": "string",
 			"enum": [
@@ -621,6 +739,10 @@
 				"unknownOrUnreachableLCSClient",
 				"listofDownstreamNodeChange"
 			]
+		},
+		"CellId": {
+			"type": "string",
+			"pattern": "^[0-9a-f]{4}$"
 		},
 		"ChangeCondition": {
 			"type": "string",
@@ -775,6 +897,70 @@
 				"fixedDefault"
 			]
 		},
+		"Diagnostics": {
+			"oneOf": [
+				{
+					"type": "object",
+					"properties": {
+						"gsm0408Cause": {
+							"type": "integer"
+						}
+					}
+				},
+				{
+					"type": "object",
+					"properties": {
+						"gsm0902MapErrorValue": {
+							"type": "integer"
+						}
+					}
+				},
+				{
+					"type": "object",
+					"properties": {
+						"itu-tQ767Cause": {
+							"type": "integer"
+						}
+					}
+				},
+				{
+					"type": "object",
+					"properties": {
+						"networkSpecificCause": {
+						}
+					}
+				},
+				{
+					"type": "object",
+					"properties": {
+						"manufacturerSpecificCause": {
+						}
+					}
+				},
+				{
+					"type": "object",
+					"properties": {
+						"positionMethodFailureCause": {
+						}
+					}
+				},
+				{
+					"type": "object",
+					"properties": {
+						"unauthorizedLCSClientCause": {
+						}
+					}
+				},
+				{
+					"type": "object",
+					"properties": {
+						"diameterResultCodeAndExperimentalResult": {
+							"type": "integer"
+						}
+					}
+				}
+			]
+		},
 		"DynamicAddressFlag": {
 			"description": "Indicates that PDN address has been dynamically allocated for a particular IP-CAN bearer.",
 			"type": "boolean"
@@ -859,10 +1045,26 @@
 				}
 			}
 		},
-		"RecordOpeningTime": {
-			"description": "Time stamp at the start of the charging data record (CDR).",
+		"GSNAddress": {
+			"description": "The PDP address of the served IMSI.",
+			"oneOf": [
+				{
+					"$ref": "#/$defs/IPv4Address"
+				},
+				{
+					"$ref": "#/$defs/IPv6Address"
+				}
+			]
+		},
+		"IMEI": {
+			"description": "The international mobile equipment identity (IMEI) of the equipment served.",
 			"type": "string",
-			"format": "date-time"
+			"pattern": "^[0-9]{14,15}$"
+		},
+		"IMSI": {
+			"description": "The international mobile subscriber identity (IMSI) of the served party.",
+			"type": "string",
+			"pattern": "^[0-9]{5,15}$"
 		},
 		"IPv4Address": {
 			"description": "IPv4 address.",
@@ -879,6 +1081,15 @@
 			"type": "integer",
 			"minimum": 0,
 			"maximum": 4294967295
+		},
+		"LocationAreaCode": {
+			"type": "string",
+			"pattern": "^[0-9a-f]{4}$"
+		},
+		"MSISDN": {
+			"description": "The mobile station ISDN number (MSISDN) of the served party.",
+			"type": "string",
+			"pattern": "^[0-9]{5,15}$"
 		},
 		"Ncgi": {
 			"description": "NR Cell Global Identification (CGI).",
@@ -917,6 +1128,10 @@
 			"type": "string",
 			"pattern": "^[\\x00-\\x7F]{1,20}$"
 		},
+		"MSNetworkCapability": {
+			"type": "string",
+			"pattern": "^[0-9a-f]{2,16}$"
+		},
 		"PDPAddress": {
 			"description": "The PDP address of the served IMSI.",
 			"oneOf": [
@@ -932,6 +1147,10 @@
 			"description": "Defines the PDP type (e.g. IP, PPP) as per TS 29.060.",
 			"type": "string",
 			"pattern": "^[0-9a-f]{4}$"
+		},
+		"PLMN-Id": {
+			"type": "string",
+			"pattern": "^[0-9a-f]{6}$"
 		},
 		"PresenceReportingAreaInfo": {
 			"description": "Presence Reporting Area Information includes area identifier(s) and indication on inside/outside the area (TS 29.274).", 
@@ -999,6 +1218,11 @@
 			"minimum": 0,
 			"maximum": 255
 		},
+		"RecordOpeningTime": {
+			"description": "Time stamp at the start of the charging data record (CDR).",
+			"type": "string",
+			"format": "date-time"
+		},
 		"RecordSequenceNumber": {
 			"description": "A running sequence number linking the partial records generated in the SGSN/SGW/PGW.",
 			"type": "integer"
@@ -1031,6 +1255,10 @@
 					"type": "string"
 				}
 			}
+		},
+		"RoutingAreaCode": {
+			"type": "string",
+			"pattern": "^[0-9a-f]{2}$"
 		},
 		"ServingNodeType": {
 			"description": "Serving node types in control plane of S-GW or P-GW, which have been connected during the record.",
