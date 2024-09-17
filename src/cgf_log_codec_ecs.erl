@@ -163,7 +163,7 @@ bx([{roam_moCall = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
 	MSISDN = msisdn(Parameters),
 	{StartTime, Duration} = roam_duration(Parameters),
-	Outcome = call_outcome(Parameters),
+	Outcome = roam_outcome(Parameters),
 	bx1(T, [${,
 			ecs_base(StartTime), $,,
 			ecs_service("bx", "cgf"), $,,
@@ -175,7 +175,7 @@ bx([{roam_mtCall = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
 	MSISDN = msisdn(Parameters),
 	{StartTime, Duration} = roam_duration(Parameters),
-	Outcome = call_outcome(Parameters),
+	Outcome = roam_outcome(Parameters),
 	bx1(T, [${,
 			ecs_base(StartTime), $,,
 			ecs_service("bx", "cgf"), $,,
@@ -187,7 +187,7 @@ bx([{roam_gprs = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
 	MSISDN = msisdn(Parameters),
 	{StartTime, Duration} = roam_duration(Parameters),
-	Outcome = call_outcome(Parameters),
+	Outcome = roam_outcome(Parameters),
 	bx1(T, [${,
 			ecs_base(StartTime), $,,
 			ecs_service("bx", "cgf"), $,,
@@ -781,7 +781,7 @@ call_outcome(Parameters) ->
 		{ok, "abnormalRelease"} ->
 			"failure";
 		{ok, "cAMELInitCallRelease"} ->
-			"success";
+			"unknown";
 		{ok, "unauthorizedRequestingNetwork"} ->
 			"failure";
 		{ok, "unauthorizedLCSClient"} ->
@@ -808,7 +808,7 @@ session_outcome(Parameters) ->
 		{ok, "abnormalRelease"} ->
 			"failure";
 		{ok, "cAMELInitCallRelease"} ->
-			"success";
+			"unknown";
 		{ok, "volumeLimit"} ->
 			"success";
 		{ok, "timeLimit"} ->
@@ -846,4 +846,42 @@ session_outcome(Parameters) ->
 		_ ->
 			"unknown"
 	end.
+
+-spec roam_outcome(Parameters) -> Outcome
+	when
+		Parameters :: #{_Name := binary(), _Value := term()},
+		Outcome :: string(). % "success" | "failure" | |unknown"
+%% @doc GSMA TD.57 Annex C
+%% @hidden
+roam_outcome(#{<<"gprsBasicCallInformation">>
+		:= #{<<"causeForTerm">> := Cause}} = _Parameters) ->
+	roam_outcome1(Cause);
+roam_outcome(#{<<"basicCallInformation">>
+		:= #{<<"causeForTerm">> := Cause}} = _Parameters) ->
+	roam_outcome1(Cause);
+roam_outcome(_Parameters) ->
+	"unknown".
+%% @hidden
+roam_outcome1(0 = _Cause) ->
+	"success";
+roam_outcome1(3 = _Cause) ->
+	"failure";
+roam_outcome1(4 = _Cause) ->
+	"failure";
+roam_outcome1(16 = _Cause) ->
+	"success";
+roam_outcome1(17 = _Cause) ->
+	"success";
+roam_outcome1(18 = _Cause) ->
+	"success";
+roam_outcome1(21 = _Cause) ->
+	"success";
+roam_outcome1(22 = _Cause) ->
+	"success";
+roam_outcome1(23 = _Cause) ->
+	"success";
+roam_outcome1(24 = _Cause) ->
+	"success";
+roam_outcome1(_Cause) ->
+	"unknown".
 
