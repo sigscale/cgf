@@ -86,6 +86,11 @@ get_symbols([#'Externaltypereference'{module = Module,
 	Ref = lists:flatten([?BASE_PATH, atom_to_list(Module),
 			"#/$defs/", atom_to_list(Type)]),
 	get_symbols(T, Acc#{Type => Ref});
+get_symbols([#'Externalvaluereference'{module = Module,
+		value = Value} | T], Acc) ->
+	Ref = lists:flatten([?BASE_PATH, atom_to_list(Module),
+			"#/$defs/", atom_to_list(Value)]),
+	get_symbols(T, Acc#{Value => Ref});
 get_symbols([], Acc) ->
 	Acc.
 
@@ -100,6 +105,15 @@ get_typedefs([#typedef{name = Name, typespec = TypeSpec} = H | T],
 			get_typedefs(T, Refs, [H | Pending], Acc)
 	end;
 get_typedefs([#ptypedef{name = Name, typespec = TypeSpec} = H | T],
+		Refs, Pending, Acc) ->
+	case get_type(TypeSpec, Refs) of
+		Type when is_map(Type) ->
+			Ref = lists:flatten(["#/$defs/", atom_to_list(Name)]),
+			get_typedefs(T, Refs#{Name => Ref}, Pending, Acc#{Name => Type});
+		undefined ->
+			get_typedefs(T, Refs, [H | Pending], Acc)
+	end;
+get_typedefs([#classdef{name = Name, typespec = TypeSpec} = H | T],
 		Refs, Pending, Acc) ->
 	case get_type(TypeSpec, Refs) of
 		Type when is_map(Type) ->

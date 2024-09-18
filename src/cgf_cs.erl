@@ -169,8 +169,10 @@ parse_mt_call(_Log, _Metadata, _MTCallRecord) ->
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a CDR event detail for an MO SMS Record.
-parse_mo_sms(_Log, _Metadata, _MOSMSRecord) ->
-	{error, not_implemented}.
+parse_mo_sms(Log, Metadata, MOSMSRecord) ->
+	Call = mo_sms_record(MOSMSRecord),
+	CDR = [{mo_sms, Call} | Metadata],
+	cgf_log:blog(Log, CDR).
 
 -spec parse_mt_smsgw(Log, Metadata, MTSMSGWRecord) -> Result
 	when
@@ -259,11 +261,11 @@ mo_call_record11(MOCallRecord, Acc) ->
 	mo_call_record12(MOCallRecord, Acc).
 %% @hidden
 mo_call_record12(#{changeOfLocation := ChangeOfLocation} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"changeOfLocation">> =>  cgf_lib:octet_string(ChangeOfLocation)},
+	Acc1 = Acc#{<<"changeOfLocation">> => cgf_lib:octet_string(ChangeOfLocation)},
 	mo_call_record13(MOCallRecord, Acc1);
 mo_call_record12(MOCallRecord, Acc) ->
 	mo_call_record13(MOCallRecord, Acc).
-%%             %% @hidden
+%% @hidden
 mo_call_record13(#{basicService := BasicService} = MOCallRecord, Acc) ->
 	Acc1 = Acc#{<<"basicService">> => BasicService},
 	mo_call_record14(MOCallRecord, Acc1);
@@ -652,3 +654,94 @@ change_of_service(_ChangeOfService) ->
 
 supply_service_used(_SupplServicesUsed) ->
 	{error, not_implemented}.
+
+%% @hidden
+mo_sms_record(#{servedIMSI := ServedIMSI} = Record) ->
+	Acc = #{<<"servedIMSI">> => cgf_lib:bcd_dn(ServedIMSI)},
+	mo_sms_record1(Record, Acc);
+mo_sms_record(Record) ->
+	mo_sms_record1(Record, #{}).
+%% @hidden
+mo_sms_record1(#{servedIMEI := ServedIMEI} = Record, Acc) ->
+	Acc1 = Acc#{<<"servedIMEI">> => cgf_lib:bcd_dn(ServedIMEI)},
+	mo_sms_record2(Record, Acc1);
+mo_sms_record1(Record, Acc) ->
+	mo_sms_record2(Record, Acc).
+%% @hidden
+mo_sms_record2(#{servedMSISDN := ServedMSISDN} = Record, Acc) ->
+	Acc1 = Acc#{<<"servedMSISDN">> => cgf_lib:bcd_dn(ServedMSISDN)},
+	mo_sms_record3(Record, Acc1);
+mo_sms_record2(Record, Acc) ->
+	mo_sms_record3(Record, Acc).
+%% @hidden
+mo_sms_record3(#{msClassmark := MSClassmark} = Record, Acc) ->
+	Acc1 = Acc#{<<"msClassmark">> => cgf_lib:octet_string(MSClassmark)},
+	mo_sms_record4(Record, Acc1);
+mo_sms_record3(Record, Acc) ->
+	mo_sms_record4(Record, Acc).
+%% @hidden
+mo_sms_record4(#{serviceCentre := ServiceCentre} = Record, Acc) ->
+	Acc1 = Acc#{<<"serviceCentre">> => cgf_lib:bcd_dn(ServiceCentre)},
+	mo_sms_record5(Record, Acc1);
+mo_sms_record4(Record, Acc) ->
+	mo_sms_record5(Record, Acc).
+%% @hidden
+mo_sms_record5(#{recordingEntity := RecordingEntity} = Record, Acc) ->
+	Acc1 = Acc#{<<"recordingEntity">> => RecordingEntity},
+	mo_sms_record6(Record, Acc1);
+mo_sms_record5(Record, Acc) ->
+	mo_sms_record6(Record, Acc).
+%% @hidden
+mo_sms_record6(#{location := Location} = Record, Acc) ->
+	Acc1 = Acc#{<<"location">> => cgf_lib:octet_string(Location)},
+	mo_sms_record7(Record, Acc1);
+mo_sms_record6(Record, Acc) ->
+	mo_sms_record7(Record, Acc).
+%% @hidden
+mo_sms_record7(#{messageReference := MessageReference} = Record, Acc) ->
+	Acc1 = Acc#{<<"messageReference">> => MessageReference},
+	mo_sms_record8(Record, Acc1);
+mo_sms_record7(Record, Acc) ->
+	mo_sms_record8(Record, Acc).
+%% @hidden
+mo_sms_record8(#{originationTime := OriginationTime} = Record, Acc) ->
+	Acc1 = Acc#{<<"originationTime">> => cgf_lib:octet_string(OriginationTime)},
+	mo_sms_record9(Record, Acc1);
+mo_sms_record8(Record, Acc) ->
+	mo_sms_record9(Record, Acc).
+%% @hidden
+mo_sms_record9(#{smsResult := SMSResult} = Record, Acc) ->
+	Acc1 = Acc#{<<"smsResult">> => SMSResult},
+	mo_sms_record10(Record, Acc1);
+mo_sms_record9(Record, Acc) ->
+	mo_sms_record10(Record, Acc).
+%% @hidden
+mo_sms_record10(#{recordExtensions := RecordExtensions} = Record, Acc) ->
+	Acc1 = Acc#{<<"recordExtensions">> => RecordExtensions},
+	mo_sms_record11(Record, Acc1);
+mo_sms_record10(Record, Acc) ->
+	mo_sms_record11(Record, Acc).
+%% @hidden
+mo_sms_record11(#{destinationNumber := DestinationNumber} = Record, Acc) ->
+	Acc1 = Acc#{<<"destinationNumber">> => cgf_lib:octet_string(DestinationNumber)},
+	mo_sms_record12(Record, Acc1);
+mo_sms_record11(Record, Acc) ->
+	mo_sms_record12(Record, Acc).
+%% @hidden
+mo_sms_record12(#{cAMELSMSInformation := CAMELSMSInformation} = Record, Acc) ->
+	Acc1 = Acc#{<<"cAMELSMSInformation">> => CAMELSMSInformation},
+	mo_sms_record13(Record, Acc1);
+mo_sms_record12(Record, Acc) ->
+	mo_sms_record13(Record, Acc).
+%% @hidden
+mo_sms_record13(#{systemType := SystemType} = Record, Acc) ->
+	Acc1 = Acc#{<<"systemType">> => SystemType},
+	mo_sms_record14(Record, Acc1);
+mo_sms_record13(Record, Acc) ->
+	mo_sms_record14(Record, Acc).
+%% @hidden
+mo_sms_record14(#{locationExtension := LocationExtension} = _Record, Acc) ->
+	Acc#{<<"locationExtension">> => LocationExtension};
+mo_sms_record14(_Record, Acc) ->
+	Acc.
+
