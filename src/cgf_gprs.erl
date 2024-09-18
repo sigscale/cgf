@@ -560,8 +560,8 @@ sgsn_pdp_record15(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record16(SGSNPDPRecord, Acc).
 %% @hidden
 sgsn_pdp_record16(#{lowPriorityIndicator
-		:= LowPriorityIndicator} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"lowPriorityIndicator">> => LowPriorityIndicator},
+		:= _LowPriorityIndicator} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"lowPriorityIndicator">> => undefined},
 	sgsn_pdp_record17(SGSNPDPRecord, Acc1);
 sgsn_pdp_record16(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record17(SGSNPDPRecord, Acc).
