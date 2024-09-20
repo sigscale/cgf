@@ -307,7 +307,7 @@ mo_call_record18(MOCallRecord, Acc) ->
 	mo_call_record19(MOCallRecord, Acc).
 %% @hidden
 mo_call_record19(#{msClassmark := MSClassmark} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"msClassmark">> => MSClassmark},
+	Acc1 = Acc#{<<"msClassmark">> => cgf_lib:octet_string(MSClassmark)},
 	mo_call_record20(MOCallRecord, Acc1);
 mo_call_record19(MOCallRecord, Acc) ->
 	mo_call_record20(MOCallRecord, Acc).
@@ -1017,7 +1017,7 @@ mt_call_record43(Record, Acc) ->
 	mt_call_record44(Record, Acc).
 %% @hidden
 mt_call_record44(#{msClassmark := MSClassmark} = Record, Acc) ->
-	Acc1 = Acc#{<<"msClassmark">> => MSClassmark},
+	Acc1 = Acc#{<<"msClassmark">> => cgf_lib:octet_string(MSClassmark)},
 	mt_call_record45(Record, Acc1);
 mt_call_record44(Record, Acc) ->
 	mt_call_record45(Record, Acc).
@@ -1128,4 +1128,88 @@ aoc_params(_Params) ->
 
 change_of_params(_ChangeOfHSCSDParms) ->
 	{error, not_implemented}.
+
+%% @hidden
+mt_sms_record(#{systemType := SystemType} = Record) ->
+	Acc = #{<<"systemType">> => SystemType},
+	mt_sms_record1(Record, Acc);
+mt_sms_record(Record) ->
+	mt_sms_record1(Record, #{}).
+%% @hidden
+mt_sms_record1(#{smsResult := SMSResult} = Record, Acc) ->
+	Acc1 = Acc#{<<"smsResult">> => SMSResult},
+	mt_sms_record2(Record, Acc1);
+mt_sms_record1(Record, Acc) ->
+	mt_sms_record2(Record, Acc).
+%% @hidden
+mt_sms_record2(#{serviceCentre := ServiceCentre} = Record, Acc) ->
+	Acc1 = Acc#{<<"serviceCentre">> => ServiceCentre},
+	mt_sms_record3(Record, Acc1);
+mt_sms_record2(Record, Acc) ->
+	mt_sms_record3(Record, Acc).
+%% @hidden
+mt_sms_record3(#{servedMSISDN := ServedMSISDN} = Record, Acc) ->
+	Acc1 = Acc#{<<"servedMSISDN">> => cgf_lib:bcd_dn(ServedMSISDN)},
+	mt_sms_record4(Record, Acc1);
+mt_sms_record3(Record, Acc) ->
+	mt_sms_record4(Record, Acc).
+%% @hidden
+mt_sms_record4(#{servedIMSI := ServedIMSI} = Record, Acc) ->
+	Acc1 = Acc#{<<"servedIMSI">> => cgf_lib:bcd_dn(ServedIMSI)},
+	mt_sms_record5(Record, Acc1);
+mt_sms_record4(Record, Acc) ->
+	mt_sms_record5(Record, Acc).
+%% @hidden
+mt_sms_record5(#{servedIMEI := ServedIMEI} = Record, Acc) ->
+	Acc1 = Acc#{<<"servedIMEI">> => cgf_lib:bcd_dn(ServedIMEI)},
+	mt_sms_record6(Record, Acc1);
+mt_sms_record5(Record, Acc) ->
+	mt_sms_record6(Record, Acc).
+%% @hidden
+mt_sms_record6(#{recordingEntity := RecordingEntity} = Record, Acc) ->
+	Acc1 = Acc#{<<"recordingEntity">> => RecordingEntity},
+	mt_sms_record7(Record, Acc1);
+mt_sms_record6(Record, Acc) ->
+	mt_sms_record7(Record, Acc).
+%% @hidden
+mt_sms_record7(#{recordType := RecordType} = Record, Acc) ->
+	Acc1 = Acc#{<<"recordType">> => RecordType},
+	mt_sms_record8(Record, Acc1);
+mt_sms_record7(Record, Acc) ->
+	mt_sms_record8(Record, Acc).
+%% @hidden
+mt_sms_record8(#{recordExtensions := RecordExtensions} = Record, Acc) ->
+	Acc1 = Acc#{<<"recordExtensions">> => RecordExtensions},
+	mt_sms_record9(Record, Acc1);
+mt_sms_record8(Record, Acc) ->
+	mt_sms_record9(Record, Acc).
+%% @hidden
+mt_sms_record9(#{msClassmark := MSClassmark} = Record, Acc) ->
+	Acc1 = Acc#{<<"msClassmark">> => cgf_lib:octet_string(MSClassmark)},
+	mt_sms_record10(Record, Acc1);
+mt_sms_record9(Record, Acc) ->
+	mt_sms_record10(Record, Acc).
+%% @hidden
+mt_sms_record10(#{locationExtension := LocationExtension} = Record, Acc) ->
+	Acc1 = Acc#{<<"locationExtension">> => LocationExtension},
+	mt_sms_record11(Record, Acc1);
+mt_sms_record10(Record, Acc) ->
+	mt_sms_record11(Record, Acc).
+%% @hidden
+mt_sms_record11(#{location := Location} = Record, Acc) ->
+	Acc1 = Acc#{<<"location">> => cgf_lib:octet_string(Location)},
+	mt_sms_record12(Record, Acc1);
+mt_sms_record11(Record, Acc) ->
+	mt_sms_record12(Record, Acc).
+%% @hidden
+mt_sms_record12(#{deliveryTime := DeliveryTime} = Record, Acc) ->
+	Acc1 = Acc#{<<"deliveryTime">> => cgf_lib:octet_string(DeliveryTime)},
+	mt_sms_record13(Record, Acc1);
+mt_sms_record12(Record, Acc) ->
+	mt_sms_record13(Record, Acc).
+%% @hidden
+mt_sms_record13(#{cAMELSMSInformation := CAMELSMSInformation} = _Record, Acc) ->
+	Acc#{<<"cAMELSMSInformation">> => CAMELSMSInformation};
+mt_sms_record13(_Record, Acc) ->
+	Acc.
 
