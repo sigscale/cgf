@@ -39,7 +39,8 @@ beam_DATA = cgf.beam \
 		TAP-0312.beam \
 		cgf_tap.beam \
 		cgf_gprs.beam \
-		cgf_sftpd.beam
+		cgf_sftpd.beam \
+		cgf_ims.beam
 
 %.beam:$(top_builddir)/src/%.erl
 	$(ERLC) $(ERLCFLAGS) -I $(top_builddir)/src $<
