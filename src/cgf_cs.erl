@@ -92,7 +92,7 @@ import2(_Log, _Metadata, {error, Reason}) ->
 		AttributeValue :: term(),
 		CDR :: {RecordType, Record},
 		RecordType :: moCallRecord | mtCallRecord | moSMSRecord
-				| mtSMSGWRecord,
+				| mtSMSRecord,
 		Record :: map(),
 		Result :: ok | {error, Reason},
 		Reason :: term().
@@ -122,12 +122,12 @@ parse(Log, Metadata, {moSMSRecord, MOSMSRecord}) ->
 			?LOG_ERROR([{?MODULE, parse_mo_sms},
 					{error, Reason}])
 	end;
-parse(Log, Metadata, {mtSMSGWRecord, MTSMSGWRecord}) ->
-	case parse_mt_smsgw(Log, Metadata, MTSMSGWRecord) of
+parse(Log, Metadata, {mtSMSRecord, MTSMSRecord}) ->
+	case parse_mt_sms(Log, Metadata, MTSMSRecord) of
 		ok ->
 			ok;
 		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_mt_smsgw},
+			?LOG_ERROR([{?MODULE, parse_mt_sms},
 					{error, Reason}])
 	end.
 
@@ -176,7 +176,7 @@ parse_mo_sms(Log, Metadata, MOSMSRecord) ->
 	CDR = [{moSMS, Call} | Metadata],
 	cgf_log:blog(Log, CDR).
 
--spec parse_mt_smsgw(Log, Metadata, MTSMSGWRecord) -> Result
+-spec parse_mt_sms(Log, Metadata, MTSMSGWRecord) -> Result
 	when
 		Log :: disk_log:log(),
 		Metadata :: [{AttributeName, AttributeValue}],
@@ -186,8 +186,10 @@ parse_mo_sms(Log, Metadata, MOSMSRecord) ->
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a CDR event detail for an MT SMSGW Record.
-parse_mt_smsgw(_Log, _Metadata, _MTSMSGWRecord) ->
-	{error, not_implemented}.
+parse_mt_sms(Log, Metadata, MTSMSRecord) ->
+	Call = mt_sms_record(MTSMSRecord),
+	CDR = [{mtSMS, Call} | Metadata],
+	cgf_log:blog(Log, CDR).
 
 %% @hidden
 mo_call_record(#{servedIMSI := ServedIMSI} = MOCallRecord) ->
@@ -1125,5 +1127,5 @@ aoc_params(_Params) ->
 	{error, not_implemented}.
 
 change_of_params(_ChangeOfHSCSDParms) ->
-{error, not_implemented}.
+	{error, not_implemented}.
 
