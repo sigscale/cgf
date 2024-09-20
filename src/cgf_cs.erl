@@ -158,7 +158,7 @@ parse_mo_call(Log, Metadata, MOCallRecord) ->
 %% @doc Parse a CDR event detail for an MT Call Record.
 parse_mt_call(Log, Metadata, MTCallRecord) ->
 	Call = mt_call_record(MTCallRecord),
-	CDR = [{mt_call, Call} | Metadata],
+	CDR = [{mtCall, Call} | Metadata],
 	cgf_log:blog(Log, CDR).
 
 -spec parse_mo_sms(Log, Metadata, MOSMSRecord) -> Result
@@ -173,7 +173,7 @@ parse_mt_call(Log, Metadata, MTCallRecord) ->
 %% @doc Parse a CDR event detail for an MO SMS Record.
 parse_mo_sms(Log, Metadata, MOSMSRecord) ->
 	Call = mo_sms_record(MOSMSRecord),
-	CDR = [{mo_sms, Call} | Metadata],
+	CDR = [{moSMS, Call} | Metadata],
 	cgf_log:blog(Log, CDR).
 
 -spec parse_mt_smsgw(Log, Metadata, MTSMSGWRecord) -> Result
