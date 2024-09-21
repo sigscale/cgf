@@ -289,7 +289,8 @@ mo_call_record15(MOCallRecord, Acc) ->
 	mo_call_record16(MOCallRecord, Acc).
 %% @hidden
 mo_call_record16(#{supplServicesUsed := SupplServicesUsed} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"supplServicesUsed">> => supply_service_used(SupplServicesUsed)},
+	SSU = [supply_service_used(Service) || Service <- SupplServicesUsed],
+	Acc1 = Acc#{<<"supplServicesUsed">> => SSU},
 	mo_call_record17(MOCallRecord, Acc1);
 mo_call_record16(MOCallRecord, Acc) ->
 	mo_call_record17(MOCallRecord, Acc).
@@ -654,15 +655,15 @@ mo_call_record76(_MOCallRecord, Acc) ->
 	Acc.
 
 change_of_service(#{transparencyInd := TransparencyInd} = ChangeOfService) ->
-	Acc#{<<"transparencyInd">> => TransparencyInd},
-	change_of_service1(ChangeOfService, Acc1);
+	Acc = #{<<"transparencyInd">> => TransparencyInd},
+	change_of_service1(ChangeOfService, Acc);
 change_of_service(ChangeOfService) ->
 	change_of_service1(ChangeOfService, #{}).
 %% @hidden
 change_of_service1(#{rateIndication := RateIndication} = ChangeOfService, Acc) ->
 	Acc1 = Acc#{<<"rateIndication">> => RateIndication},
 	change_of_service2(ChangeOfService, Acc1);
-change_of_service(ChangeOfService, Acc) ->
+change_of_service1(ChangeOfService, Acc) ->
 	change_of_service2(ChangeOfService, Acc).
 %% @hidden
 change_of_service2(#{fnur := Fnur} = ChangeOfService, Acc) ->
@@ -672,7 +673,7 @@ change_of_servic2(ChangeOfService, Acc) ->
 	change_of_service3(ChangeOfService, Acc).
 %% @hidden
 change_of_service3(#{changeTime := ChangeTime} = ChangeOfService, Acc) ->
-	Acc1 = Acc#{<<"changeTime">> => cgf_lib:octet_string(changeTime)},
+	Acc1 = Acc#{<<"changeTime">> => cgf_lib:octet_string(ChangeTime)},
 	change_of_service4(ChangeOfService, Acc1);
 change_of_servic3(ChangeOfService, Acc) ->
 	change_of_service4(ChangeOfService, Acc).
@@ -682,8 +683,16 @@ change_of_service4(#{basicService := BasicService} = _ChangeOfService, Acc) ->
 change_of_servic4(ChangeOfService, Acc) ->
 	Acc.
 
-supply_service_used(_SupplServicesUsed) ->
-	{error, not_implemented}.
+supply_service_used(#{ssTime := SSTime} = SupplServicesUsed) ->
+	Acc = #{<<"ssTime">> => cgf_lib:octet_string(SSTime)},
+	supply_service_used1(SupplServicesUsed, Acc);
+supply_service_used(SupplServicesUsed) ->
+	supply_service_used1(SupplServicesUsed, #{}).
+%% @hidden
+supply_service_used1(#{ssCode := SSCode} = SupplServicesUsed, Acc) ->
+	Acc#{<<"ssCode">> => SSCode};
+supply_service_used1(_SupplServicesUsed, Acc) ->
+	Acc.
 
 %% @hidden
 mo_sms_record(#{servedIMSI := ServedIMSI} = Record) ->
