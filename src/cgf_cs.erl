@@ -866,7 +866,8 @@ mt_call_record12(Record, Acc) ->
 	mt_call_record13(Record, Acc).
 %% @hidden
 mt_call_record13(#{changeOfHSCSDParms := ChangeOfHSCSDParms} = Record, Acc) ->
-	Acc1 = Acc#{<<"changeOfHSCSDParms">> => change_of_params(ChangeOfHSCSDParms)},
+	NewParams = [change_of_params(Param) || Param <- ChangeOfHSCSDParms],
+	Acc1 = Acc#{<<"changeOfHSCSDParms">> => NewParams},
 	mt_call_record14(Record, Acc1);
 mt_call_record13(Record, Acc) ->
 	mt_call_record14(Record, Acc).
@@ -1169,8 +1170,45 @@ aoc_params1(#{changeTime := ChangeTime} = _Params, Acc) ->
 aoc_params1(_Params, Acc) ->
 	Acc.
 
-change_of_params(_ChangeOfHSCSDParms) ->
-	{error, not_implemented}.
+change_of_params(#{initiatingParty := InitiatingParty} = ChangeOfHSCSDParms) ->
+	Acc = #{<<"initiatingParty">> => InitiatingParty},
+	change_of_params1(ChangeOfHSCSDParms, Acc);
+change_of_params(ChangeOfHSCSDParms) ->
+	change_of_params1(ChangeOfHSCSDParms, #{}).
+%% @hidden
+change_of_params1(#{hSCSDChanRequested := HSCSDChanRequested} =
+		ChangeOfHSCSDParms, Acc) ->
+	Acc1 = Acc#{<<"hSCSDChanRequested">> => HSCSDChanRequested},
+	change_of_params2(ChangeOfHSCSDParms, Acc1);
+change_of_params1(ChangeOfHSCSDParms, Acc) ->
+	change_of_params2(ChangeOfHSCSDParms, Acc).
+%% @hidden
+change_of_params2(#{hSCSDChanAllocated := HSCSDChanAllocated} =
+		ChangeOfHSCSDParms, Acc) ->
+	Acc1 = Acc#{<<"hSCSDChanAllocated">> => HSCSDChanAllocated},
+	change_of_params3(ChangeOfHSCSDParms, Acc1);
+change_of_params2(ChangeOfHSCSDParms, Acc) ->
+	change_of_params3(ChangeOfHSCSDParms, Acc).
+%% @hidden
+change_of_params3(#{changeTime := ChangeTime} =
+		ChangeOfHSCSDParms, Acc) ->
+	Acc1 = Acc#{<<"changeTime">> => ChangeTime},
+	change_of_params4(ChangeOfHSCSDParms, Acc1);
+change_of_params3(ChangeOfHSCSDParms, Acc) ->
+	change_of_params4(ChangeOfHSCSDParms, Acc).
+%% @hidden
+change_of_params4(#{chanCodingUsed := ChanCodingUsed} =
+		ChangeOfHSCSDParms, Acc) ->
+	Acc1 = Acc#{<<"chanCodingUsed">> => ChanCodingUsed},
+	change_of_params5(ChangeOfHSCSDParms, Acc1);
+change_of_params4(ChangeOfHSCSDParms, Acc) ->
+	change_of_params5(ChangeOfHSCSDParms, Acc).
+%% @hidden
+change_of_params5(#{aiurRequested := AiurRequested} =
+		_ChangeOfHSCSDParms, Acc) ->
+	Acc#{<<"aiurRequested">> => AiurRequested};
+change_of_params5(_ChangeOfHSCSDParms, Acc) ->
+	Acc.
 
 %% @hidden
 mt_sms_record(#{systemType := SystemType} = Record) ->
