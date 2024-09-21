@@ -669,18 +669,18 @@ change_of_service1(ChangeOfService, Acc) ->
 change_of_service2(#{fnur := Fnur} = ChangeOfService, Acc) ->
 	Acc1 = Acc#{<<"fnur">> => Fnur},
 	change_of_service3(ChangeOfService, Acc1);
-change_of_servic2(ChangeOfService, Acc) ->
+change_of_service2(ChangeOfService, Acc) ->
 	change_of_service3(ChangeOfService, Acc).
 %% @hidden
 change_of_service3(#{changeTime := ChangeTime} = ChangeOfService, Acc) ->
 	Acc1 = Acc#{<<"changeTime">> => cgf_lib:octet_string(ChangeTime)},
 	change_of_service4(ChangeOfService, Acc1);
-change_of_servic3(ChangeOfService, Acc) ->
+change_of_service3(ChangeOfService, Acc) ->
 	change_of_service4(ChangeOfService, Acc).
 %% @hidden
 change_of_service4(#{basicService := BasicService} = _ChangeOfService, Acc) ->
-	Acc#{<<"basicService">> => BasicService},
-change_of_servic4(ChangeOfService, Acc) ->
+	Acc#{<<"basicService">> => BasicService};
+change_of_service4(_ChangeOfService, Acc) ->
 	Acc.
 
 supply_service_used(#{ssTime := SSTime} = SupplServicesUsed) ->
@@ -1158,8 +1158,16 @@ Acc#{<<"changeOfRadioChan">> => ChangeOfRadioChan};
 mt_call_record61(_Record, Acc) ->
 Acc.
 
-aoc_params(_Params) ->
-	{error, not_implemented}.
+aoc_params(#{newParameters := NewParameters} = Params) ->
+	Acc = #{<<"newParameters">> => NewParameters},
+	aoc_params1(Params, Acc);
+aoc_params(Params) ->
+	aoc_params1(Params, #{}).
+%% @hidden
+aoc_params1(#{changeTime := ChangeTime} = _Params, Acc) ->
+	Acc#{<<"changeTime">> => cgf_lib:octet_string(ChangeTime)};
+aoc_params1(_Params, Acc) ->
+	Acc.
 
 change_of_params(_ChangeOfHSCSDParms) ->
 	{error, not_implemented}.
