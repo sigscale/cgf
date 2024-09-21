@@ -18,7 +18,8 @@ modhtml = cgf.html \
 		cgf_tools.html \
 		cgf_tap.html \
 		cgf_gprs.html \
-		cgf_sftpd.html
+		cgf_sftpd.html \
+		cgf_ims.html
 
 doc_DATA = overview.edoc $(modhtml) \
 		modules-frame.html overview-summary.html \
