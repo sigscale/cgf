@@ -653,8 +653,34 @@ mo_call_record76(#{privateUserID := PrivateUserID} = _MOCallRecord, Acc) ->
 mo_call_record76(_MOCallRecord, Acc) ->
 	Acc.
 
-change_of_service(_ChangeOfService) ->
-	{error, not_implemented}.
+change_of_service(#{transparencyInd := TransparencyInd} = ChangeOfService) ->
+	Acc#{<<"transparencyInd">> => TransparencyInd},
+	change_of_service1(ChangeOfService, Acc1);
+change_of_service(ChangeOfService) ->
+	change_of_service1(ChangeOfService, #{}).
+%% @hidden
+change_of_service1(#{rateIndication := RateIndication} = ChangeOfService, Acc) ->
+	Acc1 = Acc#{<<"rateIndication">> => RateIndication},
+	change_of_service2(ChangeOfService, Acc1);
+change_of_service(ChangeOfService, Acc) ->
+	change_of_service2(ChangeOfService, Acc).
+%% @hidden
+change_of_service2(#{fnur := Fnur} = ChangeOfService, Acc) ->
+	Acc1 = Acc#{<<"fnur">> => Fnur},
+	change_of_service3(ChangeOfService, Acc1);
+change_of_servic2(ChangeOfService, Acc) ->
+	change_of_service3(ChangeOfService, Acc).
+%% @hidden
+change_of_service3(#{changeTime := ChangeTime} = ChangeOfService, Acc) ->
+	Acc1 = Acc#{<<"changeTime">> => cgf_lib:octet_string(changeTime)},
+	change_of_service4(ChangeOfService, Acc1);
+change_of_servic3(ChangeOfService, Acc) ->
+	change_of_service4(ChangeOfService, Acc).
+%% @hidden
+change_of_service4(#{basicService := BasicService} = _ChangeOfService, Acc) ->
+	Acc#{<<"basicService">> => BasicService},
+change_of_servic4(ChangeOfService, Acc) ->
+	Acc.
 
 supply_service_used(_SupplServicesUsed) ->
 	{error, not_implemented}.
