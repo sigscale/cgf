@@ -289,7 +289,8 @@ mo_call_record15(MOCallRecord, Acc) ->
 	mo_call_record16(MOCallRecord, Acc).
 %% @hidden
 mo_call_record16(#{supplServicesUsed := SupplServicesUsed} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"supplServicesUsed">> => supply_service_used(SupplServicesUsed)},
+	SSU = [supply_service_used(Service) || Service <- SupplServicesUsed],
+	Acc1 = Acc#{<<"supplServicesUsed">> => SSU},
 	mo_call_record17(MOCallRecord, Acc1);
 mo_call_record16(MOCallRecord, Acc) ->
 	mo_call_record17(MOCallRecord, Acc).
@@ -653,11 +654,45 @@ mo_call_record76(#{privateUserID := PrivateUserID} = _MOCallRecord, Acc) ->
 mo_call_record76(_MOCallRecord, Acc) ->
 	Acc.
 
-change_of_service(_ChangeOfService) ->
-	{error, not_implemented}.
+change_of_service(#{transparencyInd := TransparencyInd} = ChangeOfService) ->
+	Acc = #{<<"transparencyInd">> => TransparencyInd},
+	change_of_service1(ChangeOfService, Acc);
+change_of_service(ChangeOfService) ->
+	change_of_service1(ChangeOfService, #{}).
+%% @hidden
+change_of_service1(#{rateIndication := RateIndication} = ChangeOfService, Acc) ->
+	Acc1 = Acc#{<<"rateIndication">> => RateIndication},
+	change_of_service2(ChangeOfService, Acc1);
+change_of_service1(ChangeOfService, Acc) ->
+	change_of_service2(ChangeOfService, Acc).
+%% @hidden
+change_of_service2(#{fnur := Fnur} = ChangeOfService, Acc) ->
+	Acc1 = Acc#{<<"fnur">> => Fnur},
+	change_of_service3(ChangeOfService, Acc1);
+change_of_service2(ChangeOfService, Acc) ->
+	change_of_service3(ChangeOfService, Acc).
+%% @hidden
+change_of_service3(#{changeTime := ChangeTime} = ChangeOfService, Acc) ->
+	Acc1 = Acc#{<<"changeTime">> => cgf_lib:octet_string(ChangeTime)},
+	change_of_service4(ChangeOfService, Acc1);
+change_of_service3(ChangeOfService, Acc) ->
+	change_of_service4(ChangeOfService, Acc).
+%% @hidden
+change_of_service4(#{basicService := BasicService} = _ChangeOfService, Acc) ->
+	Acc#{<<"basicService">> => BasicService};
+change_of_service4(_ChangeOfService, Acc) ->
+	Acc.
 
-supply_service_used(_SupplServicesUsed) ->
-	{error, not_implemented}.
+supply_service_used(#{ssTime := SSTime} = SupplServicesUsed) ->
+	Acc = #{<<"ssTime">> => cgf_lib:octet_string(SSTime)},
+	supply_service_used1(SupplServicesUsed, Acc);
+supply_service_used(SupplServicesUsed) ->
+	supply_service_used1(SupplServicesUsed, #{}).
+%% @hidden
+supply_service_used1(#{ssCode := SSCode} = SupplServicesUsed, Acc) ->
+	Acc#{<<"ssCode">> => SSCode};
+supply_service_used1(_SupplServicesUsed, Acc) ->
+	Acc.
 
 %% @hidden
 mo_sms_record(#{servedIMSI := ServedIMSI} = Record) ->
@@ -831,7 +866,8 @@ mt_call_record12(Record, Acc) ->
 	mt_call_record13(Record, Acc).
 %% @hidden
 mt_call_record13(#{changeOfHSCSDParms := ChangeOfHSCSDParms} = Record, Acc) ->
-	Acc1 = Acc#{<<"changeOfHSCSDParms">> => change_of_params(ChangeOfHSCSDParms)},
+	NewParams = [change_of_params(Param) || Param <- ChangeOfHSCSDParms],
+	Acc1 = Acc#{<<"changeOfHSCSDParms">> => NewParams},
 	mt_call_record14(Record, Acc1);
 mt_call_record13(Record, Acc) ->
 	mt_call_record14(Record, Acc).
@@ -1123,11 +1159,56 @@ Acc#{<<"changeOfRadioChan">> => ChangeOfRadioChan};
 mt_call_record61(_Record, Acc) ->
 Acc.
 
-aoc_params(_Params) ->
-	{error, not_implemented}.
+aoc_params(#{newParameters := NewParameters} = Params) ->
+	Acc = #{<<"newParameters">> => NewParameters},
+	aoc_params1(Params, Acc);
+aoc_params(Params) ->
+	aoc_params1(Params, #{}).
+%% @hidden
+aoc_params1(#{changeTime := ChangeTime} = _Params, Acc) ->
+	Acc#{<<"changeTime">> => cgf_lib:octet_string(ChangeTime)};
+aoc_params1(_Params, Acc) ->
+	Acc.
 
-change_of_params(_ChangeOfHSCSDParms) ->
-	{error, not_implemented}.
+change_of_params(#{initiatingParty := InitiatingParty} = ChangeOfHSCSDParms) ->
+	Acc = #{<<"initiatingParty">> => InitiatingParty},
+	change_of_params1(ChangeOfHSCSDParms, Acc);
+change_of_params(ChangeOfHSCSDParms) ->
+	change_of_params1(ChangeOfHSCSDParms, #{}).
+%% @hidden
+change_of_params1(#{hSCSDChanRequested := HSCSDChanRequested} =
+		ChangeOfHSCSDParms, Acc) ->
+	Acc1 = Acc#{<<"hSCSDChanRequested">> => HSCSDChanRequested},
+	change_of_params2(ChangeOfHSCSDParms, Acc1);
+change_of_params1(ChangeOfHSCSDParms, Acc) ->
+	change_of_params2(ChangeOfHSCSDParms, Acc).
+%% @hidden
+change_of_params2(#{hSCSDChanAllocated := HSCSDChanAllocated} =
+		ChangeOfHSCSDParms, Acc) ->
+	Acc1 = Acc#{<<"hSCSDChanAllocated">> => HSCSDChanAllocated},
+	change_of_params3(ChangeOfHSCSDParms, Acc1);
+change_of_params2(ChangeOfHSCSDParms, Acc) ->
+	change_of_params3(ChangeOfHSCSDParms, Acc).
+%% @hidden
+change_of_params3(#{changeTime := ChangeTime} =
+		ChangeOfHSCSDParms, Acc) ->
+	Acc1 = Acc#{<<"changeTime">> => ChangeTime},
+	change_of_params4(ChangeOfHSCSDParms, Acc1);
+change_of_params3(ChangeOfHSCSDParms, Acc) ->
+	change_of_params4(ChangeOfHSCSDParms, Acc).
+%% @hidden
+change_of_params4(#{chanCodingUsed := ChanCodingUsed} =
+		ChangeOfHSCSDParms, Acc) ->
+	Acc1 = Acc#{<<"chanCodingUsed">> => ChanCodingUsed},
+	change_of_params5(ChangeOfHSCSDParms, Acc1);
+change_of_params4(ChangeOfHSCSDParms, Acc) ->
+	change_of_params5(ChangeOfHSCSDParms, Acc).
+%% @hidden
+change_of_params5(#{aiurRequested := AiurRequested} =
+		_ChangeOfHSCSDParms, Acc) ->
+	Acc#{<<"aiurRequested">> => AiurRequested};
+change_of_params5(_ChangeOfHSCSDParms, Acc) ->
+	Acc.
 
 %% @hidden
 mt_sms_record(#{systemType := SystemType} = Record) ->
