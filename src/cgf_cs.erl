@@ -717,7 +717,7 @@ mo_sms_record1(Record, Acc) ->
 	mo_sms_record2(Record, Acc).
 %% @hidden
 mo_sms_record2(#{servedMSISDN := ServedMSISDN} = Record, Acc) ->
-	#{<<"address">> := MSISDN} = cgf_lib:tbcd(ServedMSISDN),
+	#{<<"address">> := MSISDN} = cgf_lib:bcd_dn(ServedMSISDN),
 	Acc1 = Acc#{<<"servedMSISDN">> => MSISDN},
 	mo_sms_record3(Record, Acc1);
 mo_sms_record2(Record, Acc) ->
