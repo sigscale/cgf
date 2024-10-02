@@ -12,6 +12,7 @@ beam_DATA = cgf.beam \
 		cgf_app.beam \
 		cgf_sup.beam \
 		cgf_server.beam \
+		cgf_sftpd.beam \
 		cgf_event.beam \
 		cgf_log_sup.beam \
 		cgf_log_server_sup.beam \
@@ -39,7 +40,7 @@ beam_DATA = cgf.beam \
 		TAP-0312.beam \
 		cgf_tap.beam \
 		cgf_gprs.beam \
-		cgf_sftpd.beam \
+		cgf_cs.beam \
 		cgf_ims.beam
 
 %.beam:$(top_builddir)/src/%.erl

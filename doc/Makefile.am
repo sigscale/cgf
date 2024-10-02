@@ -7,6 +7,7 @@ modhtml = cgf.html \
 		cgf_app.html \
 		cgf_sup.html \
 		cgf_server.html \
+		cgf_sftpd.html
 		cgf_event.html \
 		cgf_log_sup.html \
 		cgf_log_server_sup.html \
@@ -18,7 +19,7 @@ modhtml = cgf.html \
 		cgf_tools.html \
 		cgf_tap.html \
 		cgf_gprs.html \
-		cgf_sftpd.html \
+		cgf_cs.html \
 		cgf_ims.html
 
 doc_DATA = overview.edoc $(modhtml) \
