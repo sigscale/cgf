@@ -822,6 +822,7 @@
 						"subscriber",
 						"national",
 						"international",
+						"network specific",
 						"spare",
 						"reserved"
 					]

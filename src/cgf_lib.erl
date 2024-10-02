@@ -93,7 +93,7 @@ tbcd([], Acc) ->
 %% 	The encoding is as for the information elements Connected Number
 %% 	and Called Party BCD Number in 3GPP TS 24.008.
 %%
-bcd_dn(<<1:1, TON:3, NPI:4, Rest/binary>> = _BCD) ->
+bcd_dn(<<_Ext:1, TON:3, NPI:4, Rest/binary>> = _BCD) ->
 	PA = #{<<"natureOfAddress">> => type_of_number(TON),
 			<<"numberingPlan">> => numbering_plan(NPI),
 			<<"address">> => <<>>},
@@ -191,6 +191,12 @@ type_of_number(1) ->
 	<<"international">>;
 type_of_number(2) ->
 	<<"national">>;
+type_of_number(3) ->
+	<<"network specific">>;
+type_of_number(4) ->
+	<<"subscriber">>;
+type_of_number(6) ->
+	<<"abbreviated">>;
 type_of_number(_) ->
 	<<"reserved">>.
 
@@ -199,8 +205,16 @@ numbering_plan(0) ->
 	<<"unknown">>;
 numbering_plan(1) ->
 	<<"e164">>;
+numbering_plan(2) ->
+	<<"spare">>;
 numbering_plan(3) ->
 	<<"x121">>;
+numbering_plan(5) ->
+	<<"spare">>;
+numbering_plan(6) ->
+	<<"e212">>;
+numbering_plan(7) ->
+	<<"spare">>;
 numbering_plan(8) ->
 	<<"national">>;
 numbering_plan(9) ->
