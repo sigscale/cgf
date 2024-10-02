@@ -30,7 +30,11 @@
 -copyright('Copyright (c) 2024 SigScale Global Inc.').
 -author('Vance Shipley <vances@sigscale.org>').
 
+%% export the public API
 -export([import/2, import/3]).
+
+%% export the private API
+-export([parse/3]).
 
 -include_lib("kernel/include/logger.hrl").
 
@@ -132,7 +136,7 @@ import5(_Log, _Metadata, _State, _TransferBatch) ->
 	{reason, empty}.
 
 %%----------------------------------------------------------------------
-%%  Internal functions
+%%  The cgf_cs public API
 %%----------------------------------------------------------------------
 
 -spec parse(Log, Metadata, State, CDRs) -> Result
@@ -239,6 +243,10 @@ parse(Log, Metadata, State,
 	end;
 parse(_Log, _Metadata, _State, []) ->
 	ok.
+
+%%----------------------------------------------------------------------
+%%  Internal functions
+%%----------------------------------------------------------------------
 
 -spec parse_mo_call(Log, Metadata, State, MOC) -> Result
 	when
