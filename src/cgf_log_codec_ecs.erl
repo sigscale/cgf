@@ -73,6 +73,24 @@ bx([{moCall = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_event(StartTime, StopTime, Duration,
 					"event", "session", ["connection"], Outcome), $,,
 			$", "Bx_moCall", $", $:, zj:encode(Parameters)]);
+bx([{mtCall = _RecordType, Parameters} | T] = _CDR) ->
+	IMSI = imsi(Parameters),
+	MSISDN = msisdn(Parameters),
+	{StartTime, StopTime, Duration} = call_duration(Parameters),
+	Timestamp = case {StartTime, StopTime} of
+		{[], StopTime} ->
+			StopTime;
+		{StartTime, _} ->
+			StartTime
+	end,
+	Outcome = call_outcome(Parameters),
+	bx1(T, [${,
+			ecs_base(Timestamp), $,,
+			ecs_service("bx", "cgf"), $,,
+			ecs_user(MSISDN, IMSI, []), $,,
+			ecs_event(StartTime, StopTime, Duration,
+					"event", "session", ["connection"], Outcome), $,,
+			$", "Bx_mtCall", $", $:, zj:encode(Parameters)]);
 bx([{moSMS = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
 	MSISDN = msisdn(Parameters),
@@ -90,6 +108,23 @@ bx([{moSMS = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_event(Timestamp, [], [],
 					"event", "session", ["connection"], Outcome), $,,
 			$", "Bx_moSMS", $", $:, zj:encode(Parameters)]);
+bx([{mtSMS = _RecordType, Parameters} | T] = _CDR) ->
+	IMSI = imsi(Parameters),
+	MSISDN = msisdn(Parameters),
+	Timestamp = case maps:find(<<"eventtimestamp">>, Parameters) of
+		{ok, Ts} ->
+			Ts;
+		error ->
+			cgf_log:iso8601(erlang:system_time(millisecond))
+	end,
+	Outcome = call_outcome(Parameters),
+	bx1(T, [${,
+			ecs_base(Timestamp), $,,
+			ecs_service("bx", "cgf"), $,,
+			ecs_user(MSISDN, IMSI, []), $,,
+			ecs_event(Timestamp, [], [],
+					"event", "session", ["connection"], Outcome), $,,
+			$", "Bx_mtSMS", $", $:, zj:encode(Parameters)]);
 bx([{sgsnPDP = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
 	MSISDN = msisdn(Parameters),
