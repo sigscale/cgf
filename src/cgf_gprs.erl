@@ -26,7 +26,11 @@
 -copyright('Copyright (c) 2024 SigScale Global Inc.').
 -author('Vance Shipley <vances@sigscale.org>').
 
--export([import/2, import/3, parse/3]).
+%% export the public API
+-export([import/2, import/3]).
+
+%% export the private API
+-export([parse/3]).
 
 -include_lib("kernel/include/logger.hrl").
 
@@ -82,7 +86,7 @@ import2(_Log, _Metadata, {error, Reason}) ->
 	{error, Reason}.
 
 %%----------------------------------------------------------------------
-%%  Internal functions
+%%  The cgf_gprs public API
 %%----------------------------------------------------------------------
 
 -spec parse(Log, Metadata, CDR) -> Result
@@ -230,6 +234,10 @@ parse(Log, Metadata, {tWAGRecord, TWAGRecord}) ->
 			?LOG_ERROR([{?MODULE, parse_twag},
 					{error, Reason}])
 	end.
+
+%%----------------------------------------------------------------------
+%%  Internal functions
+%%----------------------------------------------------------------------
 
 -spec parse_sgsn_pdp(Log, Metadata, SGSNPDPRecord) -> Result
 	when

@@ -25,7 +25,11 @@
 -module(cgf_ims).
 -copyright('Copyright (c) 2024 SigScale Global Inc.').
 
--export([import/2, import/3, parse/3]).
+%% export the public API
+-export([import/2, import/3]).
+
+%% export the private API
+-export([parse/3]).
 
 -include_lib("kernel/include/logger.hrl").
 
@@ -81,7 +85,7 @@ import2(_Log, _Metadata, {error, Reason}) ->
 	{error, Reason}.
 
 %%----------------------------------------------------------------------
-%%  Internal functions
+%%  The cgf_ims public API
 %%----------------------------------------------------------------------
 
 -spec parse(Log, Metadata, CDR) -> Result
@@ -196,6 +200,10 @@ parse(Log, Metadata, {aTCFRecord, ATCFRecord}) ->
 			?LOG_ERROR([{?MODULE, parse_atcf},
 					{error, Reason}])
 	end.
+
+%%----------------------------------------------------------------------
+%%  Internal functions
+%%----------------------------------------------------------------------
 
 -spec parse_scscf(Log, Metadata, SCSCFRecord) -> Result
 	when
