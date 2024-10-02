@@ -201,19 +201,20 @@ parse_mt_sms(Log, Metadata, MTSMSRecord) ->
 
 %% @hidden
 mo_call_record(#{servedIMSI := ServedIMSI} = MOCallRecord) ->
-	Acc = #{<<"servedIMSI">> => cgf_lib:bcd_dn(ServedIMSI)},
+	Acc = #{<<"servedIMSI">> => cgf_lib:tbcd(ServedIMSI)},
 	mo_call_record1(MOCallRecord, Acc);
 mo_call_record(MOCallRecord) ->
 	mo_call_record1(MOCallRecord, #{}).
 %% @hidden
 mo_call_record1(#{servedIMEI := ServedIMEI} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"servedIMEI">> => cgf_lib:bcd_dn(ServedIMEI)},
+	Acc1 = Acc#{<<"servedIMEI">> => cgf_lib:tbcd(ServedIMEI)},
 	mo_call_record2(MOCallRecord, Acc1);
 mo_call_record1(MOCallRecord, Acc) ->
 	mo_call_record2(MOCallRecord, Acc).
 %% @hidden
 mo_call_record2(#{servedMSISDN := ServedMSISDN} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"servedMSISDN">> => cgf_lib:bcd_dn(ServedMSISDN)},
+	#{<<"address">> := MSISDN} = cgf_lib:bcd_dn(ServedMSISDN),
+	Acc1 = Acc#{<<"servedMSISDN">> => MSISDN},
 	mo_call_record3(MOCallRecord, Acc1);
 mo_call_record2(MOCallRecord, Acc) ->
 	mo_call_record3(MOCallRecord, Acc).
@@ -704,19 +705,20 @@ supply_service_used1(_SupplServicesUsed, Acc) ->
 
 %% @hidden
 mo_sms_record(#{servedIMSI := ServedIMSI} = Record) ->
-	Acc = #{<<"servedIMSI">> => cgf_lib:bcd_dn(ServedIMSI)},
+	Acc = #{<<"servedIMSI">> => cgf_lib:tbcd(ServedIMSI)},
 	mo_sms_record1(Record, Acc);
 mo_sms_record(Record) ->
 	mo_sms_record1(Record, #{}).
 %% @hidden
 mo_sms_record1(#{servedIMEI := ServedIMEI} = Record, Acc) ->
-	Acc1 = Acc#{<<"servedIMEI">> => cgf_lib:bcd_dn(ServedIMEI)},
+	Acc1 = Acc#{<<"servedIMEI">> => cgf_lib:tbcd(ServedIMEI)},
 	mo_sms_record2(Record, Acc1);
 mo_sms_record1(Record, Acc) ->
 	mo_sms_record2(Record, Acc).
 %% @hidden
 mo_sms_record2(#{servedMSISDN := ServedMSISDN} = Record, Acc) ->
-	Acc1 = Acc#{<<"servedMSISDN">> => cgf_lib:bcd_dn(ServedMSISDN)},
+	#{<<"address">> := MSISDN} = cgf_lib:tbcd(ServedMSISDN),
+	Acc1 = Acc#{<<"servedMSISDN">> => MSISDN},
 	mo_sms_record3(Record, Acc1);
 mo_sms_record2(Record, Acc) ->
 	mo_sms_record3(Record, Acc).
@@ -868,7 +870,8 @@ mt_call_record11(Record, Acc) ->
 	mt_call_record12(Record, Acc).
 %% @hidden
 mt_call_record12(#{servedMSISDN := ServedMSISDN} = Record, Acc) ->
-	Acc1 = Acc#{<<"servedMSISDN">> => cgf_lib:bcd_dn(ServedMSISDN)},
+	#{<<"address">> := MSISDN} = cgf_lib:bcd_dn(ServedMSISDN),
+	Acc1 = Acc#{<<"servedMSISDN">> => MSISDN},
 	mt_call_record13(Record, Acc1);
 mt_call_record12(Record, Acc) ->
 	mt_call_record13(Record, Acc).
@@ -941,7 +944,7 @@ mt_call_record23(Record, Acc) ->
 	mt_call_record24(Record, Acc).
 %% @hidden
 mt_call_record24(#{servedIMSI := ServedIMSI} = Record, Acc) ->
-	Acc1 = Acc#{<<"servedIMSI">> => cgf_lib:bcd_dn(ServedIMSI)},
+	Acc1 = Acc#{<<"servedIMSI">> => cgf_lib:tbcd(ServedIMSI)},
 	mt_call_record25(Record, Acc1);
 mt_call_record24(Record, Acc) ->
 	mt_call_record25(Record, Acc).
@@ -1121,7 +1124,7 @@ mt_call_record53(Record, Acc) ->
 	mt_call_record54(Record, Acc).
 %% @hidden
 mt_call_record54(#{servedIMEI := ServedIMEI} = Record, Acc) ->
-	Acc1 = Acc#{<<"servedIMEI">> => cgf_lib:bcd_dn(ServedIMEI)},
+	Acc1 = Acc#{<<"servedIMEI">> => cgf_lib:tbcd(ServedIMEI)},
 	mt_call_record55(Record, Acc1);
 mt_call_record54(Record, Acc) ->
 	mt_call_record55(Record, Acc).
@@ -1238,19 +1241,20 @@ mt_sms_record2(Record, Acc) ->
 	mt_sms_record3(Record, Acc).
 %% @hidden
 mt_sms_record3(#{servedMSISDN := ServedMSISDN} = Record, Acc) ->
-	Acc1 = Acc#{<<"servedMSISDN">> => cgf_lib:bcd_dn(ServedMSISDN)},
+	#{<<"address">> := MSISDN} = cgf_lib:bcd_dn(ServedMSISDN),
+	Acc1 = Acc#{<<"servedMSISDN">> => MSISDN},
 	mt_sms_record4(Record, Acc1);
 mt_sms_record3(Record, Acc) ->
 	mt_sms_record4(Record, Acc).
 %% @hidden
 mt_sms_record4(#{servedIMSI := ServedIMSI} = Record, Acc) ->
-	Acc1 = Acc#{<<"servedIMSI">> => cgf_lib:bcd_dn(ServedIMSI)},
+	Acc1 = Acc#{<<"servedIMSI">> => cgf_lib:tbcd(ServedIMSI)},
 	mt_sms_record5(Record, Acc1);
 mt_sms_record4(Record, Acc) ->
 	mt_sms_record5(Record, Acc).
 %% @hidden
 mt_sms_record5(#{servedIMEI := ServedIMEI} = Record, Acc) ->
-	Acc1 = Acc#{<<"servedIMEI">> => cgf_lib:bcd_dn(ServedIMEI)},
+	Acc1 = Acc#{<<"servedIMEI">> => cgf_lib:tbcd(ServedIMEI)},
 	mt_sms_record6(Record, Acc1);
 mt_sms_record5(Record, Acc) ->
 	mt_sms_record6(Record, Acc).

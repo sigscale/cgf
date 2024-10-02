@@ -640,9 +640,9 @@ sgsn_pdp_record26(#{servedIMSI := IMSI} = SGSNPDPRecord, Acc) ->
 sgsn_pdp_record26(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record27(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record27(#{servedMSISDN
-		:= MSISDN} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"servedMSISDN">> => cgf_lib:tbcd(MSISDN)},
+sgsn_pdp_record27(#{servedMSISDN := ServedMSISDN} = SGSNPDPRecord, Acc) ->
+	#{<<"address">> := MSISDN} = cgf_lib:bcd_dn(ServedMSISDN),
+	Acc1 = Acc#{<<"servedMSISDN">> => MSISDN},
 	sgsn_pdp_record28(SGSNPDPRecord, Acc1);
 sgsn_pdp_record27(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record28(SGSNPDPRecord, Acc).
@@ -1111,7 +1111,8 @@ pgw_record46(PGWRecord, Acc) ->
 	pgw_record47(PGWRecord, Acc).
 %% @hidden
 pgw_record47(#{servedMSISDN := ServedMSISDN} = PGWRecord, Acc) ->
-	Acc1 = Acc#{<<"servedMSISDN">> => cgf_lib:tbcd(ServedMSISDN)},
+	#{<<"address">> := MSISDN} = cgf_lib:bcd_dn(ServedMSISDN),
+	Acc1 = Acc#{<<"servedMSISDN">> => MSISDN},
 	pgw_record48(PGWRecord, Acc1);
 pgw_record47(PGWRecord, Acc) ->
 	pgw_record48(PGWRecord, Acc).
