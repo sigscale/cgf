@@ -34,7 +34,7 @@
 -export([import/2, import/3]).
 
 %% export the private API
--export([parse/3]).
+-export([parse/4]).
 
 -include_lib("kernel/include/logger.hrl").
 
@@ -136,7 +136,7 @@ import5(_Log, _Metadata, _State, _TransferBatch) ->
 	{reason, empty}.
 
 %%----------------------------------------------------------------------
-%%  The cgf_cs public API
+%%  The cgf_tap public API
 %%----------------------------------------------------------------------
 
 -spec parse(Log, Metadata, State, CDRs) -> Result
