@@ -180,8 +180,8 @@ parse_mt_call(Log, Metadata, MTCallRecord) ->
 		Reason :: term().
 %% @doc Parse a CDR event detail for an MO SMS Record.
 parse_mo_sms(Log, Metadata, MOSMSRecord) ->
-	Call = mo_sms_record(MOSMSRecord),
-	CDR = [{moSMS, Call} | Metadata],
+	SMS = mo_sms_record(MOSMSRecord),
+	CDR = [{moSMS, SMS} | Metadata],
 	cgf_log:blog(Log, CDR).
 
 -spec parse_mt_sms(Log, Metadata, MTSMSGWRecord) -> Result
@@ -195,8 +195,8 @@ parse_mo_sms(Log, Metadata, MOSMSRecord) ->
 		Reason :: term().
 %% @doc Parse a CDR event detail for an MT SMSGW Record.
 parse_mt_sms(Log, Metadata, MTSMSRecord) ->
-	Call = mt_sms_record(MTSMSRecord),
-	CDR = [{mtSMS, Call} | Metadata],
+	SMS = mt_sms_record(MTSMSRecord),
+	CDR = [{mtSMS, SMS} | Metadata],
 	cgf_log:blog(Log, CDR).
 
 %% @hidden
@@ -268,7 +268,7 @@ mo_call_record10(MOCallRecord, Acc) ->
 	mo_call_record11(MOCallRecord, Acc).
 %% @hidden
 mo_call_record11(#{location := LocationAreaAndCell} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"location">> => LocationAreaAndCell},
+	Acc1 = Acc#{<<"location">> => location_area_and_cell(LocationAreaAndCell)},
 	mo_call_record12(MOCallRecord, Acc1);
 mo_call_record11(MOCallRecord, Acc) ->
 	mo_call_record12(MOCallRecord, Acc).
@@ -742,7 +742,7 @@ mo_sms_record5(Record, Acc) ->
 	mo_sms_record6(Record, Acc).
 %% @hidden
 mo_sms_record6(#{location := LocationAreaAndCell} = Record, Acc) ->
-	Acc1 = Acc#{<<"location">> => LocationAreaAndCell},
+	Acc1 = Acc#{<<"location">> => location_area_and_cell(LocationAreaAndCell)},
 	mo_sms_record7(Record, Acc1);
 mo_sms_record6(Record, Acc) ->
 	mo_sms_record7(Record, Acc).
@@ -796,7 +796,7 @@ mo_sms_record14(_Record, Acc) ->
 
 %% @hidden
 mt_call_record(#{location := LocationAreaAndCell} = Record) ->
-	Acc = #{<<"location">> => LocationAreaAndCell},
+	Acc = #{<<"location">> => location_area_and_cell(LocationAreaAndCell)},
 	mt_call_record1(Record, Acc);
 mt_call_record(Record) ->
 	mt_call_record1(Record, #{}).
@@ -1290,7 +1290,7 @@ mt_sms_record10(Record, Acc) ->
 	mt_sms_record11(Record, Acc).
 %% @hidden
 mt_sms_record11(#{location := LocationAreaAndCell} = Record, Acc) ->
-	Acc1 = Acc#{<<"location">> => LocationAreaAndCell},
+	Acc1 = Acc#{<<"location">> => location_area_and_cell(LocationAreaAndCell)},
 	mt_sms_record12(Record, Acc1);
 mt_sms_record11(Record, Acc) ->
 	mt_sms_record12(Record, Acc).
@@ -1304,5 +1304,26 @@ mt_sms_record12(Record, Acc) ->
 mt_sms_record13(#{cAMELSMSInformation := CAMELSMSInformation} = _Record, Acc) ->
 	Acc#{<<"cAMELSMSInformation">> => CAMELSMSInformation};
 mt_sms_record13(_Record, Acc) ->
+	Acc.
+
+%% @hidden
+location_area_and_cell(#{locationAreaCode
+		:= <<LAC:16>>} = LocationAreaAndCell) ->
+	Acc = #{<<"locationAreaCode">> => LAC},
+	location_area_and_cell1(LocationAreaAndCell, Acc);
+location_area_and_cell(LocationAreaAndCell) ->
+	location_area_and_cell1(LocationAreaAndCell, #{}).
+%% @hidden
+location_area_and_cell1(#{cellId
+		:= <<CID:16>>} = LocationAreaAndCell, Acc) ->
+	Acc1 = Acc#{<<"cellId">> => CID},
+	location_area_and_cell2(LocationAreaAndCell, Acc1);
+location_area_and_cell1(LocationAreaAndCell, Acc) ->
+	location_area_and_cell2(LocationAreaAndCell, Acc).
+%% @hidden
+location_area_and_cell2(#{'mCC-MNC'
+		:= MccMnc} = LocationAreaAndCell, Acc) ->
+	Acc#{<<"cellId">> => cgf_lib:octet_string(MccMnc)};
+location_area_and_cell2(LocationAreaAndCell, Acc) ->
 	Acc.
 
