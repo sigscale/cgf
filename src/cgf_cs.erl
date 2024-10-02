@@ -267,8 +267,8 @@ mo_call_record10(#{mscOutgoingTKGP := MscOutgoingTKGP} = MOCallRecord, Acc) ->
 mo_call_record10(MOCallRecord, Acc) ->
 	mo_call_record11(MOCallRecord, Acc).
 %% @hidden
-mo_call_record11(#{location := Location} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"location">> => cgf_lib:octet_string(Location)},
+mo_call_record11(#{location := LocationAreaAndCell} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"location">> => LocationAreaAndCell},
 	mo_call_record12(MOCallRecord, Acc1);
 mo_call_record11(MOCallRecord, Acc) ->
 	mo_call_record12(MOCallRecord, Acc).
@@ -741,8 +741,8 @@ mo_sms_record5(#{recordingEntity := RecordingEntity} = Record, Acc) ->
 mo_sms_record5(Record, Acc) ->
 	mo_sms_record6(Record, Acc).
 %% @hidden
-mo_sms_record6(#{location := Location} = Record, Acc) ->
-	Acc1 = Acc#{<<"location">> => cgf_lib:octet_string(Location)},
+mo_sms_record6(#{location := LocationAreaAndCell} = Record, Acc) ->
+	Acc1 = Acc#{<<"location">> => LocationAreaAndCell},
 	mo_sms_record7(Record, Acc1);
 mo_sms_record6(Record, Acc) ->
 	mo_sms_record7(Record, Acc).
@@ -795,8 +795,8 @@ mo_sms_record14(_Record, Acc) ->
 	Acc.
 
 %% @hidden
-mt_call_record(#{location := Location} = Record) ->
-	Acc = #{<<"location">> => cgf_lib:octet_string(Location)},
+mt_call_record(#{location := LocationAreaAndCell} = Record) ->
+	Acc = #{<<"location">> => LocationAreaAndCell},
 	mt_call_record1(Record, Acc);
 mt_call_record(Record) ->
 	mt_call_record1(Record, #{}).
@@ -1289,8 +1289,8 @@ mt_sms_record10(#{locationExtension := LocationExtension} = Record, Acc) ->
 mt_sms_record10(Record, Acc) ->
 	mt_sms_record11(Record, Acc).
 %% @hidden
-mt_sms_record11(#{location := Location} = Record, Acc) ->
-	Acc1 = Acc#{<<"location">> => cgf_lib:octet_string(Location)},
+mt_sms_record11(#{location := LocationAreaAndCell} = Record, Acc) ->
+	Acc1 = Acc#{<<"location">> => LocationAreaAndCell},
 	mt_sms_record12(Record, Acc1);
 mt_sms_record11(Record, Acc) ->
 	mt_sms_record12(Record, Acc).
