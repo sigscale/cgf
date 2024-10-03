@@ -139,7 +139,23 @@ parse(Log, Metadata, {ssActionRecord, SSActionRecord}) ->
 		ok ->
 			ok;
 		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_mt_sms},
+			?LOG_ERROR([{?MODULE, parse_ss_action},
+					{error, Reason}])
+	end;
+parse(Log, Metadata, {incGatewayRecord, IncGatewayRecord}) ->
+	case parse_inc_gateway(Log, Metadata, IncGatewayRecord) of
+		ok ->
+			ok;
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, parse_inc_gateway},
+					{error, Reason}])
+	end;
+parse(Log, Metadata, {outGatewayRecord, OutGatewayRecord}) ->
+	case parse_out_gateway(Log, Metadata, OutGatewayRecord) of
+		ok ->
+			ok;
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, parse_out_gateway},
 					{error, Reason}])
 	end.
 
@@ -220,6 +236,36 @@ parse_mt_sms(Log, Metadata, MTSMSRecord) ->
 parse_ss_action(Log, Metadata, SSActionRecord) ->
 	SSA = ss_action_record(SSActionRecord),
 	CDR = [{ssAction, SSA} | Metadata],
+	cgf_log:blog(Log, CDR).
+
+-spec parse_inc_gateway(Log, Metadata, IncGatewayRecord) -> Result
+	when
+		Log :: disk_log:log(),
+		Metadata :: [{AttributeName, AttributeValue}],
+		AttributeName :: string(),
+		AttributeValue :: term(),
+		IncGatewayRecord :: map(),
+		Result :: ok | {error, Reason},
+		Reason :: term().
+%% @doc Parse a CDR event detail for an Inc Gateway Record.
+parse_inc_gateway(Log, Metadata, IncGatewayRecord) ->
+	Inc = inc_gateway_record(IncGatewayRecord),
+	CDR = [{incGateway, Inc} | Metadata],
+	cgf_log:blog(Log, CDR).
+
+-spec parse_out_gateway(Log, Metadata, OutGatewayRecord) -> Result
+	when
+		Log :: disk_log:log(),
+		Metadata :: [{AttributeName, AttributeValue}],
+		AttributeName :: string(),
+		AttributeValue :: term(),
+		OutGatewayRecord :: map(),
+		Result :: ok | {error, Reason},
+		Reason :: term().
+%% @doc Parse a CDR event detail for an Out Gateway Record.
+parse_out_gateway(Log, Metadata, OutGatewayRecord) ->
+	Out = out_gateway_record(OutGatewayRecord),
+	CDR = [{outGateway, Out} | Metadata],
 	cgf_log:blog(Log, CDR).
 
 %% @hidden
@@ -592,7 +638,7 @@ mo_call_record60(MOCallRecord, Acc) ->
 	mo_call_record61(MOCallRecord, Acc).
 %% @hidden
 mo_call_record61(#{locationRoutNum := LocationRoutNum} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"locationRoutNum">> => LocationRoutNum},
+	Acc1 = Acc#{<<"locationRoutNum">> => cgf_lib:tbcd(LocationRoutNum)},
 	mo_call_record62(MOCallRecord, Acc1);
 mo_call_record61(MOCallRecord, Acc) ->
 	mo_call_record62(MOCallRecord, Acc).
@@ -1051,7 +1097,7 @@ mt_call_record40(Record, Acc) ->
 	mt_call_record41(Record, Acc).
 %% @hidden
 mt_call_record41(#{locationRoutNum := LocationRoutNum} = Record, Acc) ->
-	Acc1 = Acc#{<<"locationRoutNum">> => LocationRoutNum},
+	Acc1 = Acc#{<<"locationRoutNum">> => cgf_lib:tbcd(LocationRoutNum)},
 	mt_call_record42(Record, Acc1);
 mt_call_record41(Record, Acc) ->
 	mt_call_record42(Record, Acc).
@@ -1389,5 +1435,269 @@ location_area_and_cell1(LocationAreaAndCell, Acc) ->
 location_area_and_cell2(#{'mCC-MNC' := MccMnc}, Acc) ->
 	Acc#{<<"cellId">> => cgf_lib:octet_string(MccMnc)};
 location_area_and_cell2(_LocationAreaAndCell, Acc) ->
+	Acc.
+
+%% @hidden
+inc_gateway_record(#{callingNumber := Number} = Record) ->
+	Acc = #{<<"callingNumber">> => cgf_lib:bcd_dn(Number)},
+	inc_gateway_record1(Record, Acc);
+inc_gateway_record(Record) ->
+	inc_gateway_record1(Record, #{}).
+%% @hidden
+inc_gateway_record1(#{calledNumber := Number} = Record, Acc) ->
+	Acc1 = Acc#{<<"calledNumber">> => cgf_lib:bcd_dn(Number)},
+	inc_gateway_record2(Record, Acc1);
+inc_gateway_record1(Record, Acc) ->
+	inc_gateway_record2(Record, Acc).
+%% @hidden
+inc_gateway_record2(#{recordingEntity := Number} = Record, Acc) ->
+	Acc1 = Acc#{<<"recordingEntity">> => cgf_lib:bcd_dn(Number)},
+	inc_gateway_record3(Record, Acc1);
+inc_gateway_record2(Record, Acc) ->
+	inc_gateway_record3(Record, Acc).
+%% @hidden
+inc_gateway_record3(#{mscIncomingTKGP := TrunkGroup} = Record, Acc) ->
+	Acc1 = Acc#{<<"mscIncomingTKGP">> => TrunkGroup},
+	inc_gateway_record4(Record, Acc1);
+inc_gateway_record3(Record, Acc) ->
+	inc_gateway_record4(Record, Acc).
+%% @hidden
+inc_gateway_record4(#{mscOutgoingTKGP := TrunkGroup} = Record, Acc) ->
+	Acc1 = Acc#{<<"mscOutgoingTKGP">> => TrunkGroup},
+	inc_gateway_record5(Record, Acc1);
+inc_gateway_record4(Record, Acc) ->
+	inc_gateway_record5(Record, Acc).
+%% @hidden
+inc_gateway_record5(#{seizureTime := Time} = Record, Acc) ->
+	Acc1 = Acc#{<<"seizureTime">> => cgf_lib:bcd_date_time(Time)},
+	inc_gateway_record6(Record, Acc1);
+inc_gateway_record5(Record, Acc) ->
+	inc_gateway_record6(Record, Acc).
+%% @hidden
+inc_gateway_record6(#{answerTime := Time} = Record, Acc) ->
+	Acc1 = Acc#{<<"answerTime">> => cgf_lib:bcd_date_time(Time)},
+	inc_gateway_record7(Record, Acc1);
+inc_gateway_record6(Record, Acc) ->
+	inc_gateway_record7(Record, Acc).
+%% @hidden
+inc_gateway_record7(#{releaseTime := Time} = Record, Acc) ->
+	Acc1 = Acc#{<<"releaseTime">> => cgf_lib:bcd_date_time(Time)},
+	inc_gateway_record8(Record, Acc1);
+inc_gateway_record7(Record, Acc) ->
+	inc_gateway_record8(Record, Acc).
+%% @hidden
+inc_gateway_record8(#{callDuration := Duration} = Record, Acc) ->
+	Acc1 = Acc#{<<"callDuration">> => Duration},
+	inc_gateway_record9(Record, Acc1);
+inc_gateway_record8(Record, Acc) ->
+	inc_gateway_record9(Record, Acc).
+%% @hidden
+inc_gateway_record9(#{dataVolume := Volume} = Record, Acc) ->
+	Acc1 = Acc#{<<"dataVolume">> => Volume},
+	inc_gateway_record10(Record, Acc1);
+inc_gateway_record9(Record, Acc) ->
+	inc_gateway_record10(Record, Acc).
+%% @hidden
+inc_gateway_record10(#{causeForTerm := Cause} = Record, Acc) ->
+	Acc1 = Acc#{<<"causeForTerm">> => Cause},
+	inc_gateway_record11(Record, Acc1);
+inc_gateway_record10(Record, Acc) ->
+	inc_gateway_record11(Record, Acc).
+%% @hidden
+inc_gateway_record11(#{diagnostics := Diagnostics} = Record, Acc) ->
+	Acc1 = Acc#{<<"diagnostics">> => cgf_lib:diagnostics(Diagnostics)},
+	inc_gateway_record12(Record, Acc1);
+inc_gateway_record11(Record, Acc) ->
+	inc_gateway_record12(Record, Acc).
+%% @hidden
+inc_gateway_record12(#{callReference := Reference} = Record, Acc) ->
+	Acc1 = Acc#{<<"callReference">> => cgf_lib:octet_string(Reference)},
+	inc_gateway_record13(Record, Acc1);
+inc_gateway_record12(Record, Acc) ->
+	inc_gateway_record13(Record, Acc).
+%% @hidden
+inc_gateway_record13(#{sequenceNumber := Number} = Record, Acc) ->
+	Acc1 = Acc#{<<"sequenceNumber">> => Number},
+	inc_gateway_record14(Record, Acc1);
+inc_gateway_record13(Record, Acc) ->
+	inc_gateway_record14(Record, Acc).
+%% @hidden
+inc_gateway_record14(#{locationRoutNum := Number} = Record, Acc) ->
+	Acc1 = Acc#{<<"locationRoutNum">> => cgf_lib:tbcd(Number)},
+	inc_gateway_record15(Record, Acc1);
+inc_gateway_record14(Record, Acc) ->
+	inc_gateway_record15(Record, Acc).
+%% @hidden
+inc_gateway_record15(#{lrnSoInd := Indicator} = Record, Acc) ->
+	Acc1 = Acc#{<<"lrnSoInd">> => Indicator},
+	inc_gateway_record16(Record, Acc1);
+inc_gateway_record15(Record, Acc) ->
+	inc_gateway_record16(Record, Acc).
+%% @hidden
+inc_gateway_record16(#{lrnQuryStatus := Status} = Record, Acc) ->
+	Acc1 = Acc#{<<"lrnQuryStatus">> => Status},
+	inc_gateway_record17(Record, Acc1);
+inc_gateway_record16(Record, Acc) ->
+	inc_gateway_record17(Record, Acc).
+%% @hidden
+inc_gateway_record17(#{jIPPara := Parameter} = Record, Acc) ->
+	Acc1 = Acc#{<<"jIPPara">> => Parameter},
+	inc_gateway_record18(Record, Acc1);
+inc_gateway_record17(Record, Acc) ->
+	inc_gateway_record18(Record, Acc).
+%% @hidden
+inc_gateway_record18(#{jIPSoInd := Indicator} = Record, Acc) ->
+	Acc1 = Acc#{<<"jIPSoInd">> => Indicator},
+	inc_gateway_record19(Record, Acc1);
+inc_gateway_record18(Record, Acc) ->
+	inc_gateway_record19(Record, Acc).
+%% @hidden
+inc_gateway_record19(#{jIPQuryStatus := Status} = Record, Acc) ->
+	Acc1 = Acc#{<<"jIPQuryStatus">> => Status},
+	inc_gateway_record20(Record, Acc1);
+inc_gateway_record19(Record, Acc) ->
+	inc_gateway_record20(Record, Acc).
+%% @hidden
+inc_gateway_record20(#{reasonForServiceChange := Reason} = Record, Acc) ->
+	Acc1 = Acc#{<<"reasonForServiceChange">> => Reason},
+	inc_gateway_record21(Record, Acc1);
+inc_gateway_record20(Record, Acc) ->
+	inc_gateway_record21(Record, Acc).
+%% @hidden
+inc_gateway_record21(#{serviceChangeInitiator := Boolean}, Acc) ->
+	Acc#{<<"reasonForServiceChange">> => Boolean};
+inc_gateway_record21(_Record, Acc) ->
+	Acc.
+
+%% @hidden
+out_gateway_record(#{callingNumber := Number} = Record) ->
+	Acc = #{<<"callingNumber">> => cgf_lib:bcd_dn(Number)},
+	out_gateway_record1(Record, Acc);
+out_gateway_record(Record) ->
+	out_gateway_record1(Record, #{}).
+%% @hidden
+out_gateway_record1(#{calledNumber := Number} = Record, Acc) ->
+	Acc1 = Acc#{<<"calledNumber">> => cgf_lib:bcd_dn(Number)},
+	out_gateway_record2(Record, Acc1);
+out_gateway_record1(Record, Acc) ->
+	out_gateway_record2(Record, Acc).
+%% @hidden
+out_gateway_record2(#{recordingEntity := Number} = Record, Acc) ->
+	Acc1 = Acc#{<<"recordingEntity">> => cgf_lib:bcd_dn(Number)},
+	out_gateway_record3(Record, Acc1);
+out_gateway_record2(Record, Acc) ->
+	out_gateway_record3(Record, Acc).
+%% @hidden
+out_gateway_record3(#{mscIncomingTKGP := TrunkGroup} = Record, Acc) ->
+	Acc1 = Acc#{<<"mscIncomingTKGP">> => TrunkGroup},
+	out_gateway_record4(Record, Acc1);
+out_gateway_record3(Record, Acc) ->
+	out_gateway_record4(Record, Acc).
+%% @hidden
+out_gateway_record4(#{mscOutgoingTKGP := TrunkGroup} = Record, Acc) ->
+	Acc1 = Acc#{<<"mscOutgoingTKGP">> => TrunkGroup},
+	out_gateway_record5(Record, Acc1);
+out_gateway_record4(Record, Acc) ->
+	out_gateway_record5(Record, Acc).
+%% @hidden
+out_gateway_record5(#{seizureTime := Time} = Record, Acc) ->
+	Acc1 = Acc#{<<"seizureTime">> => cgf_lib:bcd_date_time(Time)},
+	out_gateway_record6(Record, Acc1);
+out_gateway_record5(Record, Acc) ->
+	out_gateway_record6(Record, Acc).
+%% @hidden
+out_gateway_record6(#{answerTime := Time} = Record, Acc) ->
+	Acc1 = Acc#{<<"answerTime">> => cgf_lib:bcd_date_time(Time)},
+	out_gateway_record7(Record, Acc1);
+out_gateway_record6(Record, Acc) ->
+	out_gateway_record7(Record, Acc).
+%% @hidden
+out_gateway_record7(#{releaseTime := Time} = Record, Acc) ->
+	Acc1 = Acc#{<<"releaseTime">> => cgf_lib:bcd_date_time(Time)},
+	out_gateway_record8(Record, Acc1);
+out_gateway_record7(Record, Acc) ->
+	out_gateway_record8(Record, Acc).
+%% @hidden
+out_gateway_record8(#{callDuration := Duration} = Record, Acc) ->
+	Acc1 = Acc#{<<"callDuration">> => Duration},
+	out_gateway_record9(Record, Acc1);
+out_gateway_record8(Record, Acc) ->
+	out_gateway_record9(Record, Acc).
+%% @hidden
+out_gateway_record9(#{dataVolume := Volume} = Record, Acc) ->
+	Acc1 = Acc#{<<"dataVolume">> => Volume},
+	out_gateway_record10(Record, Acc1);
+out_gateway_record9(Record, Acc) ->
+	out_gateway_record10(Record, Acc).
+%% @hidden
+out_gateway_record10(#{causeForTerm := Cause} = Record, Acc) ->
+	Acc1 = Acc#{<<"causeForTerm">> => Cause},
+	out_gateway_record11(Record, Acc1);
+out_gateway_record10(Record, Acc) ->
+	out_gateway_record11(Record, Acc).
+%% @hidden
+out_gateway_record11(#{diagnostics := Diagnostics} = Record, Acc) ->
+	Acc1 = Acc#{<<"diagnostics">> => cgf_lib:diagnostics(Diagnostics)},
+	out_gateway_record12(Record, Acc1);
+out_gateway_record11(Record, Acc) ->
+	out_gateway_record12(Record, Acc).
+%% @hidden
+out_gateway_record12(#{callReference := Reference} = Record, Acc) ->
+	Acc1 = Acc#{<<"callReference">> => cgf_lib:octet_string(Reference)},
+	out_gateway_record13(Record, Acc1);
+out_gateway_record12(Record, Acc) ->
+	out_gateway_record13(Record, Acc).
+%% @hidden
+out_gateway_record13(#{sequenceNumber := Number} = Record, Acc) ->
+	Acc1 = Acc#{<<"sequenceNumber">> => Number},
+	out_gateway_record14(Record, Acc1);
+out_gateway_record13(Record, Acc) ->
+	out_gateway_record14(Record, Acc).
+%% @hidden
+out_gateway_record14(#{locationRoutNum := Number} = Record, Acc) ->
+	Acc1 = Acc#{<<"locationRoutNum">> => cgf_lib:tbcd(Number)},
+	out_gateway_record15(Record, Acc1);
+out_gateway_record14(Record, Acc) ->
+	out_gateway_record15(Record, Acc).
+%% @hidden
+out_gateway_record15(#{lrnSoInd := Indicator} = Record, Acc) ->
+	Acc1 = Acc#{<<"lrnSoInd">> => Indicator},
+	out_gateway_record16(Record, Acc1);
+out_gateway_record15(Record, Acc) ->
+	out_gateway_record16(Record, Acc).
+%% @hidden
+out_gateway_record16(#{lrnQuryStatus := Status} = Record, Acc) ->
+	Acc1 = Acc#{<<"lrnQuryStatus">> => Status},
+	out_gateway_record17(Record, Acc1);
+out_gateway_record16(Record, Acc) ->
+	out_gateway_record17(Record, Acc).
+%% @hidden
+out_gateway_record17(#{jIPPara := Parameter} = Record, Acc) ->
+	Acc1 = Acc#{<<"jIPPara">> => Parameter},
+	out_gateway_record18(Record, Acc1);
+out_gateway_record17(Record, Acc) ->
+	out_gateway_record18(Record, Acc).
+%% @hidden
+out_gateway_record18(#{jIPSoInd := Indicator} = Record, Acc) ->
+	Acc1 = Acc#{<<"jIPSoInd">> => Indicator},
+	out_gateway_record19(Record, Acc1);
+out_gateway_record18(Record, Acc) ->
+	out_gateway_record19(Record, Acc).
+%% @hidden
+out_gateway_record19(#{jIPQuryStatus := Status} = Record, Acc) ->
+	Acc1 = Acc#{<<"jIPQuryStatus">> => Status},
+	out_gateway_record20(Record, Acc1);
+out_gateway_record19(Record, Acc) ->
+	out_gateway_record20(Record, Acc).
+%% @hidden
+out_gateway_record20(#{reasonForServiceChange := Reason} = Record, Acc) ->
+	Acc1 = Acc#{<<"reasonForServiceChange">> => Reason},
+	out_gateway_record21(Record, Acc1);
+out_gateway_record20(Record, Acc) ->
+	out_gateway_record21(Record, Acc).
+%% @hidden
+out_gateway_record21(#{serviceChangeInitiator := Boolean}, Acc) ->
+	Acc#{<<"reasonForServiceChange">> => Boolean};
+out_gateway_record21(_Record, Acc) ->
 	Acc.
 

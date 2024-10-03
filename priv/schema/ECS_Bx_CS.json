@@ -37,9 +37,25 @@
 		},
 		{
 			"type": "object",
-			"properties" : {
-				"Bx_ssAction" : {
-					"$ref" : "#/$defs/SSActionRecord"
+			"properties": {
+				"Bx_ssAction": {
+					"$ref": "#/$defs/SSActionRecord"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_incGateway": {
+					"$ref": "#/$defs/IncGateway"
+				}
+			}
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_outGateway": {
+					"$ref": "#/$defs/OutGateway"
 				}
 			}
 		}
@@ -65,7 +81,7 @@
 					"pattern": "^[0-9]{5,15}$"
 				},
 				"callingNumber": {
-					"description": "The number received from the network on mobile terminated call set- up.",
+					"description": "The number received from the network on mobile terminated call set-up.",
 					"$ref": "#/$defs/PartyAddress"
 				},
 				"calledNumber": {
@@ -280,16 +296,22 @@
 				"rateIndication": {
 				},
 				"locationRoutNum": {
+					"$ref": "#/$defs/LocationRoutingNumber"
 				},
 				"lrnSoInd": {
+					"$ref": "#/$defs/LocationRoutingNumberSourceIndicator"
 				},
 				"lrnQuryStatus": {
+					"$ref": "#/$defs/LocationRoutingNumberQueryStatus"
 				},
 				"jIPPara": {
+					"$ref": "#/$defs/JurisdictionInformationParameter"
 				},
 				"jIPSoInd": {
+					"$ref": "#/$defs/JurisdictionInformationParameterSourceIndicator"
 				},
 				"jIPQuryStatus": {
+					"$ref": "#/$defs/JurisdictionInformationParameterQueryStatus"
 				},
 				"partialRecordType": {
 				},
@@ -300,6 +322,7 @@
 				"redial": {
 				},
 				"reasonForServiceChange": {
+					"$ref": "#/$defs/ReasonForServiceChange"
 				},
 				"serviceChangeInitiator": {
 				},
@@ -377,7 +400,7 @@
 					"pattern": "^[0-9]{5,15}$"
 				},
 				"callingNumber": {
-					"description": "The number received from the network on mobile terminated call set- up.",
+					"description": "The number received from the network on mobile terminated call set-up.",
 					"$ref": "#/$defs/PartyAddress"
 				},
 				"connectedNumber": {
@@ -548,16 +571,22 @@
 				"rateIndication": {
 				},
 				"locationRoutNum": {
+					"$ref": "#/$defs/LocationRoutingNumber"
 				},
 				"lrnSoInd": {
+					"$ref": "#/$defs/LocationRoutingNumberSourceIndicator"
 				},
 				"lrnQuryStatus": {
+					"$ref": "#/$defs/LocationRoutingNumberQueryStatus"
 				},
 				"jIPPara": {
+					"$ref": "#/$defs/JurisdictionInformationParameter"
 				},
 				"jIPSoInd": {
+					"$ref": "#/$defs/JurisdictionInformationParameterSourceIndicator"
 				},
 				"jIPQuryStatus": {
+					"$ref": "#/$defs/JurisdictionInformationParameterQueryStatus"
 				},
 				"partialRecordType": {
 				},
@@ -566,6 +595,7 @@
 				"maximumBitRate": {
 				},
 				"reasonForServiceChange": {
+					"$ref": "#/$defs/ReasonForServiceChange"
 				},
 				"serviceChangeInitiator": {
 				},
@@ -718,7 +748,7 @@
 					"description": "The location of the cell in which the served party is currently located.",
 					"$ref": "#/$defs/LocationAreaAndCell"
 				},
-				"deliveryTime" : {
+				"deliveryTime": {
 					"type": "string",
 					"format": "date-time"
 				},
@@ -783,17 +813,17 @@
 				"supplService": {
 					"$ref": "#/$defs/SS-Code"
 				},
-				"ssAction" : {
+				"ssAction": {
 					"$ref": "#/$defs/SSActionType"
 				},
-				"ssActionTime" : {
+				"ssActionTime": {
 					"type": "string",
 					"format": "date-time"
 				},
-				"ssParameters" : {
-					"$ref" : "#/$defs/SSParameters"
+				"ssParameters": {
+					"$ref": "#/$defs/SSParameters"
 				},
-				"ssActionResult" : {
+				"ssActionResult": {
 					"$ref": "#/$defs/Diagnostics"
 				},
 				"callReference": {
@@ -810,6 +840,198 @@
 				"msClassmark",
 				"recordingEntity",
 				"ssActionTime",
+				"callReference"
+			],
+			"examples": []
+		},
+		"IncGatewayRecord": {
+			"type": "object",
+			"properties": {
+				"callingNumber": {
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"calledNumber": {
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"recordingEntity": {
+					"description": "The E.164 number assigned to the entity (MSC, VLR, HLR etc.) that produced the record.",
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"mscIncomingTKGP": {
+					"description": "Describes the trunk on which the call originates as seen from the MSC.",
+					"$ref": "#/$defs/TrunkGroup"
+				},
+				"mscOutgoingTKGP": {
+					"description": "Describes the trunk on which the call leaves the MSC.",
+					"$ref": "#/$defs/TrunkGroup"
+				},
+				"seizureTime": {
+					"description": "The time at which the traffic channel is allocated.",
+					"type": "string",
+					"format": "date-time"
+				},
+				"answerTime": {
+					"description": "The time at which the call was answered or at which charging commences.",
+					"type": "string",
+					"format": "date-time"
+				},
+				"releaseTime": {
+					"description": "The time at which the connection is released by either party.",
+					"type": "string",
+					"format": "date-time"
+				},
+				"callDuration": {
+					"description": "The relevant call duration in seconds. For incomplete calls (call attempts) the relevant duration is the call holding time from the seizure to the release of the traffic channel. For complete (answered) calls this is the chargeable duration from answer to release of the traffic channel. For partial records this is the duration of the individual partial record and not the cumulative duration of the call.",
+					"type": "integer"
+				},
+				"dataVolume": {
+					"description": "The number of 64 octet segments transmitted during the use of data services, if known",
+					"type": "integer"
+				},
+				"causeForTerm": {
+					"description": "Provides a generalised reason for the release of the connection.",
+					"$ref": "#/$defs/CauseForTerm"
+				},
+				"diagnostics": {
+					"description": "Indicates a more detailed technical reason for the release of the connection.",
+					"$ref": "#/$defs/Diagnostics"
+				},
+				"callReference": {
+					"description": "Uniquely identifies a call or transaction.",
+					"$ref": "#/$defs/CallReferenceNumber"
+				},
+				"sequenceNumber": {
+					"description": "Indicates the sequence of a partial records within a connection.",
+					"type": "integer"
+				},
+				"recordExtensions": {
+				},
+				"locationRoutNum": {
+					"$ref": "#/$defs/LocationRoutingNumber"
+				},
+				"lrnSoInd": {
+					"$ref": "#/$defs/LocationRoutingNumberSourceIndicator"
+				},
+				"lrnQuryStatus": {
+					"$ref": "#/$defs/LocationRoutingNumberQueryStatus"
+				},
+				"jIPPara": {
+					"$ref": "#/$defs/JurisdictionInformationParameter"
+				},
+				"jIPQuryStatus": {
+					"$ref": "#/$defs/JurisdictionInformationParameterQueryStatus"
+				},
+				"jIPSoInd": {
+					"$ref": "#/$defs/JurisdictionInformationParameterSourceIndicator"
+				},
+				"reasonForServiceChange": {
+					"$ref": "#/$defs/ReasonForServiceChange"
+				},
+				"serviceChangeInitiator": {
+					"type": "boolean"
+				}
+			}.
+			"required": [
+				"calledNumber",
+				"recordingEntity",
+				"callDuration",
+				"causeForTerm",
+				"callReference"
+			],
+			"examples": []
+		},
+		"OutGatewayRecord": {
+			"type": "object",
+			"properties": {
+				"callingNumber": {
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"calledNumber": {
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"recordingEntity": {
+					"description": "The E.164 number assigned to the entity (MSC, VLR, HLR etc.) that produced the record.",
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"mscIncomingTKGP": {
+					"description": "Describes the trunk on which the call originates as seen from the MSC.",
+					"$ref": "#/$defs/TrunkGroup"
+				},
+				"mscOutgoingTKGP": {
+					"description": "Describes the trunk on which the call leaves the MSC.",
+					"$ref": "#/$defs/TrunkGroup"
+				},
+				"seizureTime": {
+					"description": "The time at which the traffic channel is allocated.",
+					"type": "string",
+					"format": "date-time"
+				},
+				"answerTime": {
+					"description": "The time at which the call was answered or at which charging commences.",
+					"type": "string",
+					"format": "date-time"
+				},
+				"releaseTime": {
+					"description": "The time at which the connection is released by either party.",
+					"type": "string",
+					"format": "date-time"
+				},
+				"callDuration": {
+					"description": "The relevant call duration in seconds. For incomplete calls (call attempts) the relevant duration is the call holding time from the seizure to the release of the traffic channel. For complete (answered) calls this is the chargeable duration from answer to release of the traffic channel. For partial records this is the duration of the individual partial record and not the cumulative duration of the call.",
+					"type": "integer"
+				},
+				"dataVolume": {
+					"description": "The number of 64 octet segments transmitted during the use of data services, if known",
+					"type": "integer"
+				},
+				"causeForTerm": {
+					"description": "Provides a generalised reason for the release of the connection.",
+					"$ref": "#/$defs/CauseForTerm"
+				},
+				"diagnostics": {
+					"description": "Indicates a more detailed technical reason for the release of the connection.",
+					"$ref": "#/$defs/Diagnostics"
+				},
+				"callReference": {
+					"description": "Uniquely identifies a call or transaction.",
+					"$ref": "#/$defs/CallReferenceNumber"
+				},
+				"sequenceNumber": {
+					"description": "Indicates the sequence of a partial records within a connection.",
+					"type": "integer"
+				},
+				"recordExtensions": {
+				},
+				"locationRoutNum": {
+					"$ref": "#/$defs/LocationRoutingNumber"
+				},
+				"lrnSoInd": {
+					"$ref": "#/$defs/LocationRoutingNumberSourceIndicator"
+				},
+				"lrnQuryStatus": {
+					"$ref": "#/$defs/LocationRoutingNumberQueryStatus"
+				},
+				"jIPPara": {
+					"$ref": "#/$defs/JurisdictionInformationParameter"
+				},
+				"jIPQuryStatus": {
+					"$ref": "#/$defs/JurisdictionInformationParameterQueryStatus"
+				},
+				"jIPSoInd": {
+					"$ref": "#/$defs/JurisdictionInformationParameterSourceIndicator"
+				},
+				"reasonForServiceChange": {
+					"$ref": "#/$defs/ReasonForServiceChange"
+				},
+				"serviceChangeInitiator": {
+					"type": "boolean"
+				}
+			}.
+			"required": [
+				"calledNumber",
+				"recordingEntity",
+				"callDuration",
+				"causeForTerm",
 				"callReference"
 			],
 			"examples": []
@@ -905,10 +1127,10 @@
 				}
 			]
 		},
-		"BasicServices" : {
-			"type" : "array",
-			"items" : {
-				"$ref" : "#/$defs/BasicServiceCode"
+		"BasicServices": {
+			"type": "array",
+			"items": {
+				"$ref": "#/$defs/BasicServiceCode"
 			}
 		},
 		"BearerServiceCode": {
@@ -1161,6 +1383,31 @@
 				"onlineCharging"
 			]
 		},
+		"JurisdictionInformationParameter": {
+			"type": "string",
+			"pattern": "^([0-9a-f]{2}){5}$"
+		},
+		"JurisdictionInformationParameterQueryStatus": {
+			"type": "string",
+			"enum": [
+				"successfulQuery",
+				"noQueryResponseMsg",
+				"queryProtocolErr",
+				"queryResponseDataErr",
+				"queryRejected",
+				"queryNotPerformed",
+				"queryUnsuccessful"
+			]
+		},
+		"JurisdictionInformationParameterSourceIndicator": {
+			"type": "string",
+			"enum": [
+				"lRN-NP-Database",
+				"switchingSystemData",
+				"incomingsignaling",
+				"unknown"
+			]
+		},
 		"LocationAreaAndCell": {
 			"description": "The location of a mobile subscriber",
 			"type": "object",
@@ -1211,6 +1458,31 @@
 					}
 				}
 			}
+		},
+		"LocationRoutingNumber": {
+			"type": "string",
+			"pattern": "^[0-9]{10}$"
+		},
+		"LocationRoutingNumberQueryStatus": {
+			"type": "string",
+			"enum": [
+				"successfulQuery",
+				"noQueryResponseMsg",
+				"queryProtocolErr",
+				"queryResponseDataErr",
+				"queryRejected",
+				"queryNotPerformed",
+				"queryUnsuccessful"
+			]
+		},
+		"LocationRoutingNumberSourceIndicator": {
+			"type" : "string",
+			"enum": [
+				"lRN-NP-Database",
+				"switchingSystemData",
+				"incomingsignaling",
+				"unknown"
+			]
 		},
 		"MessageReference": {
 			"description": "Unique number allocated by the Mobile Station (MS) when transmitting a short message to the SC.",
@@ -1280,6 +1552,15 @@
 			"minimum": 0,
 			"maximum": 11
 		},
+		"ReasonForServiceChange": {
+			"type" : "string",
+			"enum": [
+				"msubInitiated",
+				"mscInitiated",
+				"callSetupFallBack",
+				"callSetupChangeOrder"
+			]
+		},
 		"ServiceKey": {
 			"description": " Service key is defined in HLR as part of CAMEL subscription information.",
 			"type": "integer",
@@ -1298,9 +1579,9 @@
 			"minimum": 0,
 			"maximum": 255
 		},
-		"SSActionType" : {
-			"type" : "string",
-			"enum" : [
+		"SSActionType": {
+			"type": "string",
+			"enum": [
 				"registration",
 				"erasure",
 				"activation",
@@ -1310,22 +1591,22 @@
 				"passwordRegistration"
 			]
 		},
-		"SSParameters" : {
-			"oneOf" : [
+		"SSParameters": {
+			"oneOf": [
 				{
-					"type" : "object",
-					"properties" : {
-						"forwardedToNumber" : {
-							"$ref" : "#/$defs/PartyAddress"
+					"type": "object",
+					"properties": {
+						"forwardedToNumber": {
+							"$ref": "#/$defs/PartyAddress"
 						}
 					}
 				},
 				{
-					"type" : "object",
-					"properties" : {
-						"unstructuredData" : {
-							"type" : "string",
-							"pattern" : "^([0-9a-f]{2})*$"
+					"type": "object",
+					"properties": {
+						"unstructuredData": {
+							"type": "string",
+							"pattern": "^([0-9a-f]{2})*$"
 						}
 					}
 				}
