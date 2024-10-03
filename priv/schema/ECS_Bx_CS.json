@@ -47,7 +47,7 @@
 			"type": "object",
 			"properties": {
 				"Bx_incGateway": {
-					"$ref": "#/$defs/IncGateway"
+					"$ref": "#/$defs/IncGatewayRecord"
 				}
 			}
 		},
@@ -55,7 +55,7 @@
 			"type": "object",
 			"properties": {
 				"Bx_outGateway": {
-					"$ref": "#/$defs/OutGateway"
+					"$ref": "#/$defs/OutGatewayRecord"
 				}
 			}
 		}
@@ -930,7 +930,7 @@
 				"serviceChangeInitiator": {
 					"type": "boolean"
 				}
-			}.
+			},
 			"required": [
 				"calledNumber",
 				"recordingEntity",
@@ -1026,7 +1026,7 @@
 				"serviceChangeInitiator": {
 					"type": "boolean"
 				}
-			}.
+			},
 			"required": [
 				"calledNumber",
 				"recordingEntity",
