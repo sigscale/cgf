@@ -519,6 +519,7 @@
 				"lastMSTimeZone": {
 				},
 				"enhancedDiagnostics": {
+					"$ref": "#/$defs/EnhancedDiagnostics"
 				},
 				"cPCIoTEPSOptimisationIndicator": {
 				},
@@ -832,6 +833,7 @@
 					"$ref": "#/$defs/EPCQoSInformation"
 				},
 				"enhancedDiagnostics": {
+					"$ref": "#/$defs/EnhancedDiagnostics"
 				},
 				"listOfPresenceReportingAreaInformation": {
 					"description": "Contains the list of Presence Reporting Area Information.",
@@ -996,6 +998,18 @@
 					"plmnId": "001001"
 				}
 			]
+		},
+		"EnhancedDiagnostics": {
+			"type": "object",
+			"properties": {
+				"rANNASCause": {
+					"type": "array",
+					"items": {
+						"type": "string",
+						"pattern": "^([0-9a-f]{2})*$"
+					}
+				}
+			}
 		},
 		"EPCQoSInformation": {
 			"description": "Indicates the APN-AMBR for the IP-CAN session.",
