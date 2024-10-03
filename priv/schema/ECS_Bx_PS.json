@@ -449,8 +449,8 @@
 				},
 				"userLocationInformation": {
 					"description": "Contains the User Location Information (TS 29.060).",
-					"pattern": "^([0-9a-f]{2})*$",
-					"type": "string"
+					"type": "string",
+					"pattern": "^([0-9a-f]{2})*$"
 				},
 				"sGWChange": {
 				},

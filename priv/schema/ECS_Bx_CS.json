@@ -193,7 +193,7 @@
 				},
 				"recordExtensions": {
 				},
-				"'gsm-SCFAddress'": {
+				"gsm-SCFAddress": {
 					"description": "Identifies the CAMEL server serving the subscriber",
 					"$ref": "#/$defs/Gsm-SCFAddres"
 				},
@@ -353,6 +353,222 @@
 			"description": "Circuit switched (CS) mobile terminated (MT) call charging data record (CDR).",
 			"type": "object",
 			"properties": {
+				"servedIMSI": {
+					"description": "The international mobile subscriber identity (IMSI) of the served party.",
+					"type": "string",
+					"pattern": "^[0-9]{5,15}$"
+				},
+				"servedIMEI": {
+					"description": "The international mobile equipment identity (IMEI) of the equipment served.",
+					"type": "string",
+					"pattern": "^[0-9]{14,15}$"
+				},
+				"servedMSISDN": {
+					"description": "The mobile station ISDN number (MSISDN) of the served party.",
+					"type": "string",
+					"pattern": "^[0-9]{5,15}$"
+				},
+				"callingNumber": {
+					"description": "The number received from the network on mobile terminated call set- up.",
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"connectedNumber": {
+					"description": "The connected number is the number of the actual party reached.",
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"recordingEntity": {
+					"description": "The E.164 number assigned to the entity (MSC, VLR, HLR etc.) that produced the record.",
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"mscIncomingTKGP": {
+					"description": "Describes the trunk on which the call originates as seen from the MSC.",
+					"$ref": "#/$defs/TrunkGroup"
+				},
+				"mscOutgoingTKGP": {
+					"description": "Describes the trunk on which the call leaves the MSC.",
+					"$ref": "#/$defs/TrunkGroup"
+				},
+				"location": {
+					"description": "The location of the cell in which the served party is currently located.",
+					"$ref": "#/$defs/LocationAreaAndCell"
+				},
+				"changeOfLocation": {
+					"description": "Indicates a change of location.",
+					"$ref": "#/$defs/LocationChange"
+				},
+				"basicService": {
+					"description": "Contains the code of the basic service employed on call set-up.",
+					"$ref": "#/$defs/BasicServiceCode"
+				},
+				"transparencyIndicator": {
+					"$ref": "#/$defs/TransparencyInd"
+				},
+				"changeOfService": {
+					"description": "Indicates an alteration to the basic service during the connection",
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/ChangeOfService"
+					}
+				},
+				"supplServicesUsed": {
+					"description": "The supplementary services invoked as a result of, or during, a connection.",
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/SuppServiceUsed"
+					}
+				},
+				"aocParameters": {
+					"description": "Charge advice (AoC) parameters sent to the MS on call set-up.",
+					"$ref": "#/$defs/AOCParameters"
+				},
+				"changeOfAOCParms": {
+					"description": "AoC parameters sent during the call, for example on tariff switch-over.",
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/AOCParmChange"
+					}
+				},
+				"msClassmark": {
+					"description": "The mobile station classmark employed by the served MS on call set-up.",
+					"$ref": "#/$defs/Classmark"
+				},
+				"changeOfClassmark": {
+					"description": "Indicates mobile station classmark change.",
+					"$ref": "#/$defs/ChangeOfClassmark"
+				},
+				"seizureTime": {
+					"description": "The time at which the traffic channel is allocated.",
+					"type": "string",
+					"format": "date-time"
+				},
+				"answerTime": {
+					"description": "The time at which the call was answered or at which charging commences.",
+					"type": "string",
+					"format": "date-time"
+				},
+				"releaseTime": {
+					"description": "The time at which the connection is released by either party.",
+					"type": "string",
+					"format": "date-time"
+				},
+				"callDuration": {
+					"description": "The relevant call duration in seconds. For incomplete calls (call attempts) the relevant duration is the call holding time from the seizure to the release of the traffic channel. For complete (answered) calls this is the chargeable duration from answer to release of the traffic channel. For partial records this is the duration of the individual partial record and not the cumulative duration of the call.",
+					"type": "integer"
+				},
+				"dataVolume": {
+					"description": "The number of 64 octet segments transmitted during the use of data services, if known",
+					"type": "integer"
+				},
+				"radioChanRequested": {
+					"description": "Indicates the type of channel requested by the user.",
+					"$ref": "#/$defs/RadioChanRequested"
+				},
+				"radioChanUsed": {
+					"description": "Indicates the type of traffic channel actually employed for the connection.",
+					"$ref": "#/$defs/TrafficChannel"
+				},
+				"changeOfRadioChan": {
+					"description": "Indicates a change in the type of radio channel used.",
+					"$ref": "#/$defs/ChangeOfRadioChannel"
+				},
+				"causeForTerm": {
+					"description": "Provides a generalised reason for the release of the connection.",
+					"$ref": "#/$defs/CauseForTerm"
+				},
+				"diagnostics": {
+					"description": "Indicates a more detailed technical reason for the release of the connection.",
+					"$ref": "#/$defs/Diagnostics"
+				},
+				"callReference": {
+					"description": "Uniquely identifies a call or transaction.",
+					"$ref": "#/$defs/CallReferenceNumber"
+				},
+				"sequenceNumber": {
+					"description": "Indicates the sequence of a partial records within a connection.",
+					"type": "integer"
+				},
+				"additionalChgInfo": {
+					"description": "Additional charging information.",
+					"$ref": "#/$defs/AdditionalChgInfo"
+				},
+				"recordExtensions": {
+				},
+				"networkCallReference": {
+					"description": "When CAMEL is applied, correlats call records from MSCs and gsmSCF.",
+					"$ref": "#/$defs/CallReferenceNumber"
+				},
+				"mSCAddress": {
+					"description": "E.164 number assigned to the MSC that produced the record.",
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"hSCSDChanRequested": {
+				},
+				"hSCSDChanAllocated": {
+				},
+				"changeOfHSCSDParms": {
+				},
+				"fnur": {
+					"description": "Fixed Network User Rate (FNUR).",
+					"$ref": "#/$defs/Fnur"
+				},
+				"aiurRequested": {
+				},
+				"chanCodingsAcceptable": {
+				},
+				"chanCodingUsed": {
+				},
+				"speechVersionSupported": {
+					"description": "Indicates the speech codec version supported by the MS with the highest priority.",
+					"$ref": "#/$defs/SpeechVersionIdentifier"
+				},
+				"speechVersionUsed": {
+					"description": "Indicates the speech codec version assigned for that call.",
+					"$ref": "#/$defs/SpeechVersionIdentifier"
+				},
+				"gsm-SCFAddress": {
+					"description": "Identifies the CAMEL server serving the subscriber",
+					"$ref": "#/$defs/Gsm-SCFAddres"
+				},
+				"serviceKey": {
+					"description": "Identifies identifies the CAMEL service logic applied.",
+					"$ref": "#/$defs/ServiceKey"
+				},
+				"systemType": {
+					"description": "Indicates the radio access network type used (GERAN, UTRAN).",
+					"$ref": "#/$defs/SystemType"
+				},
+				"rateIndication": {
+				},
+				"locationRoutNum": {
+				},
+				"lrnSoInd": {
+				},
+				"lrnQuryStatus": {
+				},
+				"jIPPara": {
+				},
+				"jIPSoInd": {
+				},
+				"jIPQuryStatus": {
+				},
+				"partialRecordType": {
+				},
+				"guaranteedBitRate": {
+				},
+				"maximumBitRate": {
+				},
+				"reasonForServiceChange": {
+				},
+				"serviceChangeInitiator": {
+				},
+				"iCSI2ActiveFlag": {
+				},
+				"iMS-Charging-Identifier": {
+					"description": "Provides an IMS charging identifier (ICID)",
+					"type": "string"
+				},
+				"privateUserID": {
+				}
 			},
 			"required": [
 			],
@@ -394,16 +610,14 @@
 					"$ref": "#/$defs/LocationAreaAndCell"
 				},
 				"messageReference": {
-					"description": "Unique number allocated by the Mobile Station (MS) when transmitting a short message to the SC.",
-					"type": "integer",
-					"minimum": 0,
-					"maximum": 255
+					"$ref": "#/$defs/MessageReference"
 				},
 				"originationTime": {
 					"type": "string",
 					"format": "date-time"
 				},
 				"smsResult": {
+					"$ref": "#/$defs/SMSResult"
 				},
 				"recordExtensions": {
 				},
@@ -457,7 +671,7 @@
 					},
 					"msClassmark": [125, 87],
 					"originationTime": "2024-03-28T09:13:00.123Z",
-					"messageReference": 810273349,
+					"messageReference": "a034bd03",
 					"systemType": "gERAN"
 				}
 			]
@@ -466,8 +680,59 @@
 			"description": "Circuit switched (CS) mobile terminated (MT) short message service (SMS) charging data record (CDR).",
 			"type": "object",
 			"properties": {
+				"serviceCentre": {
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"servedIMSI": {
+					"description": "The international mobile subscriber identity (IMSI) of the served party.",
+					"type": "string",
+					"pattern": "^[0-9]{5,15}$"
+				},
+				"servedIMEI": {
+					"description": "The international mobile equipment identity (IMEI) of the equipment served.",
+					"type": "string",
+					"pattern": "^[0-9]{14,15}$"
+				},
+				"servedMSISDN": {
+					"description": "The mobile station ISDN number (MSISDN) of the served party.",
+					"type": "string",
+					"pattern": "^[0-9]{5,15}$"
+				},
+				"msClassmark": {
+					"description": "The mobile station classmark employed by the served MS on call set-up.",
+					"$ref": "#/$defs/Classmark"
+				},
+				"recordingEntity": {
+					"description": "The E.164 number assigned to the entity (MSC, VLR, HLR etc.) that produced the record.",
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"location": {
+					"description": "The location of the cell in which the served party is currently located.",
+					"$ref": "#/$defs/LocationAreaAndCell"
+				},
+            "deliveryTime" : {
+					"type": "string",
+					"format": "date-time"
+            },
+				"smsResult": {
+				},
+				"recordExtensions": {
+				},
+				"systemType": {
+					"$ref": "#/$defs/SystemType"
+				},
+				"cAMELSMSInformation": {
+					"$ref": "#/$defs/CAMELSMSInformation"
+				},
+				"locationExtension": {
+				}
 			},
 			"required": [
+				"serviceCentre",
+				"servedIMSI",
+				"msClassmark",
+				"recordingEntity",
+            "deliveryTime"
 			],
 			"examples": [
 			]
@@ -486,13 +751,8 @@
 				},
 				"chargeParameters": {
 					"description": "Non-standard charge parameters from IN, VAS, etc..",
-					"type": "array",
-					"items": {
-						"description": "Octet",
-						"type": "integer",
-						"minimum": 0,
-						"maximum": 255
-					}
+					"type": "string",
+					"pattern": "^([0-9a-f]{2})*$"
 				}
 			}
 		},
@@ -692,14 +952,9 @@
 			}
 		},
 		"Classmark": {
-			"description": "Octets of mobile station classmark 2/3",
-			"type": "array",
-			"items": {
-				"description": "Octet",
-				"type": "integer",
-				"minimum": 0,
-				"maximum": 255
-			}
+			"description": "Mobile station classmark 2/3",
+			"type": "string",
+			"pattern": "^([0-9a-f]{2})*$"
 		},
 		"DefaultCallHandling": {
 			"description": "Indicates CAMEL default call hyandling handling applied.",
@@ -807,13 +1062,8 @@
 		},
 		"FreeFormatData": {
 			"description": "Charging information sent by gsmSCF in the Furnish Charging Information (FCI) message",
-			"type": "array",
-			"items": {
-				"description": "Octet",
-				"type": "integer",
-				"minimum": 0,
-				"maximum": 255
-			}
+			"type": "string",
+			"pattern": "^([0-9a-f]{2})*$"
 		},
 		"Gsm-SCFAddres": {
 			"description": "The CAMEL server serving the subscriber is defined in HLR as part of CAMEL subscription information.",
@@ -878,6 +1128,11 @@
 					}
 				}
 			}
+		},
+		"MessageReference": {
+			"description": "Unique number allocated by the Mobile Station (MS) when transmitting a short message to the SC.",
+			"type": "string",
+			"pattern": "^([0-9a-f]{2})*$"
 		},
 		"PartyAddress": {
 			"description": "Circuit Switched (CS) calling/called/translated number",
