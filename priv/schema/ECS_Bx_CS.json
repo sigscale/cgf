@@ -34,6 +34,14 @@
 					"$ref": "#/$defs/MTSMSRecord"
 				}
 			}
+		},
+		{
+			"type": "object",
+			"properties" : {
+				"Bx_ssAction" : {
+					"$ref" : "#/$defs/SSActionRecord"
+				}
+			}
 		}
 	],
 	"$defs": {
@@ -617,7 +625,7 @@
 					"format": "date-time"
 				},
 				"smsResult": {
-					"$ref": "#/$defs/SMSResult"
+					"$ref": "#/$defs/Diagnostics"
 				},
 				"recordExtensions": {
 				},
@@ -710,11 +718,12 @@
 					"description": "The location of the cell in which the served party is currently located.",
 					"$ref": "#/$defs/LocationAreaAndCell"
 				},
-            "deliveryTime" : {
+				"deliveryTime" : {
 					"type": "string",
 					"format": "date-time"
-            },
+				},
 				"smsResult": {
+					"$ref": "#/$defs/Diagnostics"
 				},
 				"recordExtensions": {
 				},
@@ -732,10 +741,78 @@
 				"servedIMSI",
 				"msClassmark",
 				"recordingEntity",
-            "deliveryTime"
+				"deliveryTime"
 			],
 			"examples": [
 			]
+		},
+		"SSActionRecord": {
+			"description": "Circuit switched (CS) supplementary service call charging data record (CDR).",
+			"type": "object",
+			"properties": {
+				"servedIMSI": {
+					"description": "The international mobile subscriber identity (IMSI) of the served party.",
+					"type": "string",
+					"pattern": "^[0-9]{5,15}$"
+				},
+				"servedIMEI": {
+					"description": "The international mobile equipment identity (IMEI) of the equipment served.",
+					"type": "string",
+					"pattern": "^[0-9]{14,15}$"
+				},
+				"servedMSISDN": {
+					"description": "The mobile station ISDN number (MSISDN) of the served party.",
+					"type": "string",
+					"pattern": "^[0-9]{5,15}$"
+				},
+				"msClassmark": {
+					"description": "The mobile station classmark employed by the served MS on call set-up.",
+					"$ref": "#/$defs/Classmark"
+				},
+				"recordingEntity": {
+					"description": "The E.164 number assigned to the entity (MSC, VLR, HLR etc.) that produced the record.",
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"location": {
+					"description": "The location of the cell in which the served party is currently located.",
+					"$ref": "#/$defs/LocationAreaAndCell"
+				},
+				"basicServices": {
+					"$ref": "#/$defs/BasicServices"
+				},
+				"supplService": {
+					"$ref": "#/$defs/SS-Code"
+				},
+				"ssAction" : {
+					"$ref": "#/$defs/SSActionType"
+				},
+				"ssActionTime" : {
+					"type": "string",
+					"format": "date-time"
+				},
+				"ssParameters" : {
+					"$ref" : "#/$defs/SSParameters"
+				},
+				"ssActionResult" : {
+					"$ref": "#/$defs/Diagnostics"
+				},
+				"callReference": {
+					"$ref": "#/$defs/CallReferenceNumber"
+				},
+				"recordExtensions": {
+				},
+				"systemType": {
+					"$ref": "#/$defs/SystemType"
+				}
+			},
+			"required": [
+				"servedIMSI",
+				"msClassmark",
+				"recordingEntity",
+				"ssActionTime",
+				"callReference"
+			],
+			"examples": []
 		},
 		"AdditionalChgInfo": {
 			"description": "Provides additional charging information.",
@@ -827,6 +904,12 @@
 					"teleservice": 22
 				}
 			]
+		},
+		"BasicServices" : {
+			"type" : "array",
+			"items" : {
+				"$ref" : "#/$defs/BasicServiceCode"
+			}
 		},
 		"BearerServiceCode": {
 			"description": "Provides a bearer service code.",
@@ -1214,6 +1297,39 @@
 			"type": "integer",
 			"minimum": 0,
 			"maximum": 255
+		},
+		"SSActionType" : {
+			"type" : "string",
+			"enum" : [
+				"registration",
+				"erasure",
+				"activation",
+				"deactivation",
+				"interrogation",
+				"invocation",
+				"passwordRegistration"
+			]
+		},
+		"SSParameters" : {
+			"oneOf" : [
+				{
+					"type" : "object",
+					"properties" : {
+						"forwardedToNumber" : {
+							"$ref" : "#/$defs/PartyAddress"
+						}
+					}
+				},
+				{
+					"type" : "object",
+					"properties" : {
+						"unstructuredData" : {
+							"type" : "string",
+							"pattern" : "^([0-9a-f]{2})*$"
+						}
+					}
+				}
+			]
 		},
 		"SuppServiceUsed": {
 			"description": "Describes a supplementary service use.",

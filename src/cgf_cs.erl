@@ -133,6 +133,14 @@ parse(Log, Metadata, {mtSMSRecord, MTSMSRecord}) ->
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, parse_mt_sms},
 					{error, Reason}])
+	end;
+parse(Log, Metadata, {ssActionRecord, SSActionRecord}) ->
+	case parse_ss_action(Log, Metadata, SSActionRecord) of
+		ok ->
+			ok;
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, parse_mt_sms},
+					{error, Reason}])
 	end.
 
 %%----------------------------------------------------------------------
@@ -197,6 +205,21 @@ parse_mo_sms(Log, Metadata, MOSMSRecord) ->
 parse_mt_sms(Log, Metadata, MTSMSRecord) ->
 	SMS = mt_sms_record(MTSMSRecord),
 	CDR = [{mtSMS, SMS} | Metadata],
+	cgf_log:blog(Log, CDR).
+
+-spec parse_ss_action(Log, Metadata, SSActionRecord) -> Result
+	when
+		Log :: disk_log:log(),
+		Metadata :: [{AttributeName, AttributeValue}],
+		AttributeName :: string(),
+		AttributeValue :: term(),
+		SSActionRecord :: map(),
+		Result :: ok | {error, Reason},
+		Reason :: term().
+%% @doc Parse a CDR event detail for an SS Action Record.
+parse_ss_action(Log, Metadata, SSActionRecord) ->
+	SSA = ss_action_record(SSActionRecord),
+	CDR = [{ssAction, SSA} | Metadata],
 	cgf_log:blog(Log, CDR).
 
 %% @hidden
@@ -298,7 +321,7 @@ mo_call_record15(MOCallRecord, Acc) ->
 	mo_call_record16(MOCallRecord, Acc).
 %% @hidden
 mo_call_record16(#{supplServicesUsed := SupplServicesUsed} = MOCallRecord, Acc) ->
-	SSU = [supply_service_used(Service) || Service <- SupplServicesUsed],
+	SSU = [suppl_service_used(Service) || Service <- SupplServicesUsed],
 	Acc1 = Acc#{<<"supplServicesUsed">> => SSU},
 	mo_call_record17(MOCallRecord, Acc1);
 mo_call_record16(MOCallRecord, Acc) ->
@@ -383,13 +406,13 @@ mo_call_record29(MOCallRecord, Acc) ->
 	mo_call_record30(MOCallRecord, Acc).
 %% @hidden
 mo_call_record30(#{diagnostics := Diagnostics} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"diagnostics">> => Diagnostics},
+	Acc1 = Acc#{<<"diagnostics">> => cgf_lib:diagnostics(Diagnostics)},
 	mo_call_record31(MOCallRecord, Acc1);
 mo_call_record30(MOCallRecord, Acc) ->
 	mo_call_record31(MOCallRecord, Acc).
 %% @hidden
 mo_call_record31(#{callReference := CallReference} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"callReference">> => CallReference},
+	Acc1 = Acc#{<<"callReference">> => cgf_lib:octet_string(CallReference)},
 	mo_call_record32(MOCallRecord, Acc1);
 mo_call_record31(MOCallRecord, Acc) ->
 	mo_call_record32(MOCallRecord, Acc).
@@ -686,15 +709,15 @@ change_of_service4(#{basicService := BasicService} = _ChangeOfService, Acc) ->
 change_of_service4(_ChangeOfService, Acc) ->
 	Acc.
 
-supply_service_used(#{ssTime := SSTime} = SupplServicesUsed) ->
+suppl_service_used(#{ssTime := SSTime} = SupplServicesUsed) ->
 	Acc = #{<<"ssTime">> => cgf_lib:bcd_date_time(SSTime)},
-	supply_service_used1(SupplServicesUsed, Acc);
-supply_service_used(SupplServicesUsed) ->
-	supply_service_used1(SupplServicesUsed, #{}).
+	suppl_service_used1(SupplServicesUsed, Acc);
+suppl_service_used(SupplServicesUsed) ->
+	suppl_service_used1(SupplServicesUsed, #{}).
 %% @hidden
-supply_service_used1(#{ssCode := SSCode} = _SupplServicesUsed, Acc) ->
+suppl_service_used1(#{ssCode := <<SSCode:8>>}, Acc) ->
 	Acc#{<<"ssCode">> => SSCode};
-supply_service_used1(_SupplServicesUsed, Acc) ->
+suppl_service_used1(_SupplServicesUsed, Acc) ->
 	Acc.
 
 %% @hidden
@@ -753,8 +776,8 @@ mo_sms_record8(#{originationTime := OriginationTime} = Record, Acc) ->
 mo_sms_record8(Record, Acc) ->
 	mo_sms_record9(Record, Acc).
 %% @hidden
-mo_sms_record9(#{smsResult := SMSResult} = Record, Acc) ->
-	Acc1 = Acc#{<<"smsResult">> => SMSResult},
+mo_sms_record9(#{smsResult := Diagnostics} = Record, Acc) ->
+	Acc1 = Acc#{<<"smsResult">> => Diagnostics},
 	mo_sms_record10(Record, Acc1);
 mo_sms_record9(Record, Acc) ->
 	mo_sms_record10(Record, Acc).
@@ -784,7 +807,7 @@ mt_call_record(Record) ->
 	mt_call_record1(Record, #{}).
 %% @hidden
 mt_call_record1(#{supplServicesUsed := SupplServicesUsed} = Record, Acc) ->
-	SSU = [supply_service_used(Service) || Service <- SupplServicesUsed],
+	SSU = [suppl_service_used(Service) || Service <- SupplServicesUsed],
 	Acc1 = Acc#{<<"supplServicesUsed">> => SSU},
 	mt_call_record2(Record, Acc1);
 mt_call_record1(Record, Acc) ->
@@ -1100,7 +1123,7 @@ mt_call_record52(Record, Acc) ->
 	mt_call_record53(Record, Acc).
 %% @hidden
 mt_call_record53(#{diagnostics := Diagnostics} = Record, Acc) ->
-	Acc1 = Acc#{<<"diagnostics">> => Diagnostics},
+	Acc1 = Acc#{<<"diagnostics">> => cgf_lib:diagnostics(Diagnostics)},
 	mt_call_record54(Record, Acc1);
 mt_call_record53(Record, Acc) ->
 	mt_call_record54(Record, Acc).
@@ -1118,7 +1141,7 @@ mt_call_record55(Record, Acc) ->
 	mt_call_record56(Record, Acc).
 %% @hidden
 mt_call_record56(#{callReference := CallReference} = Record, Acc) ->
-	Acc1 = Acc#{<<"callReference">> => CallReference},
+	Acc1 = Acc#{<<"callReference">> => cgf_lib:octet_string(CallReference)},
 	mt_call_record57(Record, Acc1);
 mt_call_record56(Record, Acc) ->
 	mt_call_record57(Record, Acc).
@@ -1197,8 +1220,8 @@ mt_sms_record(#{systemType := SystemType} = Record) ->
 mt_sms_record(Record) ->
 	mt_sms_record1(Record, #{}).
 %% @hidden
-mt_sms_record1(#{smsResult := SMSResult} = Record, Acc) ->
-	Acc1 = Acc#{<<"smsResult">> => SMSResult},
+mt_sms_record1(#{smsResult := Diagnostics} = Record, Acc) ->
+	Acc1 = Acc#{<<"smsResult">> => Diagnostics},
 	mt_sms_record2(Record, Acc1);
 mt_sms_record1(Record, Acc) ->
 	mt_sms_record2(Record, Acc).
@@ -1256,6 +1279,97 @@ mt_sms_record10(#{cAMELSMSInformation := CAMELSMSInformation} = _Record, Acc) ->
 	Acc#{<<"cAMELSMSInformation">> => CAMELSMSInformation};
 mt_sms_record10(_Record, Acc) ->
 	Acc.
+
+%% @hidden
+ss_action_record(#{servedIMSI := ServedIMSI} = Record) ->
+	Acc = #{<<"servedIMSI">> => cgf_lib:tbcd(ServedIMSI)},
+	ss_action_record1(Record, Acc);
+ss_action_record(Record) ->
+	ss_action_record1(Record, #{}).
+%% @hidden
+ss_action_record1(#{servedIMEI := ServedIMEI} = Record, Acc) ->
+	Acc1 = Acc#{<<"servedIMEI">> => cgf_lib:tbcd(ServedIMEI)},
+	ss_action_record2(Record, Acc1);
+ss_action_record1(Record, Acc) ->
+	ss_action_record2(Record, Acc).
+%% @hidden
+ss_action_record2(#{servedMSISDN := ServedMSISDN} = Record, Acc) ->
+	#{<<"address">> := MSISDN} = cgf_lib:bcd_dn(ServedMSISDN),
+	Acc1 = Acc#{<<"servedMSISDN">> => MSISDN},
+	ss_action_record3(Record, Acc1);
+ss_action_record2(Record, Acc) ->
+	ss_action_record3(Record, Acc).
+%% @hidden
+ss_action_record3(#{msClassmark := MSClassmark} = Record, Acc) ->
+	Acc1 = Acc#{<<"msClassmark">> => cgf_lib:octet_string(MSClassmark)},
+	ss_action_record4(Record, Acc1);
+ss_action_record3(Record, Acc) ->
+	ss_action_record4(Record, Acc).
+%% @hidden
+ss_action_record4(#{recordingEntity:= RecordingEntity} = Record, Acc) ->
+	Acc1 = Acc#{<<"recordingEntity">> => cgf_lib:bcd_dn(RecordingEntity)},
+	ss_action_record5(Record, Acc1);
+ss_action_record4(Record, Acc) ->
+	ss_action_record5(Record, Acc).
+%% @hidden
+ss_action_record5(#{location := LocationAreaAndCell} = Record, Acc) ->
+	Acc1 = Acc#{<<"location">> => location_area_and_cell(LocationAreaAndCell)},
+	ss_action_record6(Record, Acc1);
+ss_action_record5(Record, Acc) ->
+	ss_action_record6(Record, Acc).
+%% @hidden
+ss_action_record6(#{basicServices := BasicServices} = Record, Acc) ->
+	Acc1 = Acc#{<<"basicServices">> => BasicServices},
+	ss_action_record7(Record, Acc1);
+ss_action_record6(Record, Acc) ->
+	ss_action_record7(Record, Acc).
+%% @hidden
+ss_action_record7(#{supplService := <<SSCode:8>>} = Record, Acc) ->
+	Acc1 = Acc#{<<"supplService">> => SSCode},
+	ss_action_record8(Record, Acc1);
+ss_action_record7(Record, Acc) ->
+	ss_action_record8(Record, Acc).
+%% @hidden
+ss_action_record8(#{ssAction := ActionType} = Record, Acc) ->
+	Acc1 = Acc#{<<"ssAction">> => ActionType},
+	ss_action_record8(Record, Acc1);
+ss_action_record8(Record, Acc) ->
+	ss_action_record9(Record, Acc).
+%% @hidden
+ss_action_record9(#{ssActionTime := Time} = Record, Acc) ->
+	Acc1 = Acc#{<<"ssActionTime">> => cgf_lib:bcd_date_time(Time)},
+	ss_action_record10(Record, Acc1);
+ss_action_record9(Record, Acc) ->
+	ss_action_record10(Record, Acc).
+%% @hidden
+ss_action_record10(#{ssParameters := Parameters} = Record, Acc) ->
+	Acc1 = Acc#{<<"ssParameters">> => ss_parameters(Parameters)},
+	ss_action_record11(Record, Acc1);
+ss_action_record10(Record, Acc) ->
+	ss_action_record11(Record, Acc).
+%% @hidden
+ss_action_record11(#{ssActionResult := Diagnostics} = Record, Acc) ->
+	Acc1 = Acc#{<<"ssActionResult">> => cgf_lib:diagnostics(Diagnostics)},
+	ss_action_record12(Record, Acc1);
+ss_action_record11(Record, Acc) ->
+	ss_action_record12(Record, Acc).
+%% @hidden
+ss_action_record12(#{callReference := CallReference} = Record, Acc) ->
+	Acc1 = Acc#{<<"callReference">> => cgf_lib:octet_string(CallReference)},
+	ss_action_record13(Record, Acc1);
+ss_action_record12(Record, Acc) ->
+	ss_action_record13(Record, Acc).
+%% @hidden
+ss_action_record13(#{systemType := SystemType}, Acc) ->
+	Acc#{<<"systemType">> => atom_to_binary(SystemType)};
+ss_action_record13(_Record, Acc) ->
+	Acc.
+
+%% @hidden
+ss_parameters({forwardedToNumber, Number}) ->
+	#{<<"forwardedToNumber">> => cgf_lib:bcd_dn(Number)};
+ss_parameters({unstructuredData, Data}) ->
+	#{<<"unstructuredData">> => cgf_lib:octet_string(Data)}.
 
 %% @hidden
 location_area_and_cell(#{locationAreaCode
