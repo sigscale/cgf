@@ -510,9 +510,8 @@ sgsn_pdp_record7(#{chargingID
 sgsn_pdp_record7(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record8(SGSNPDPRecord, Acc).
 %% @hidden
-sgsn_pdp_record8(#{diagnostics
-		:= Dia} = SGSNPDPRecord, Acc) ->
-	Acc1 = Acc#{<<"diagnostics">> => Dia},
+sgsn_pdp_record8(#{diagnostics := Diagnostics} = SGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"diagnostics">> => cgf_lib:diagnostics(Diagnostics)},
 	sgsn_pdp_record9(SGSNPDPRecord, Acc1);
 sgsn_pdp_record8(SGSNPDPRecord, Acc) ->
 	sgsn_pdp_record9(SGSNPDPRecord, Acc).
@@ -735,94 +734,85 @@ traffic_volumes6(#{dataVolumeGPRSUplink
 traffic_volumes6(TV, Acc) ->
 	traffic_volumes7(TV, Acc).
 %% @hidden
-traffic_volumes7(#{diagnostics
-		:= DIA} = TV, Acc) ->
-	Acc1 = Acc#{<<"diagnostics">> => DIA},
+traffic_volumes7(#{diagnostics := Diagnostics} = TV, Acc) ->
+	Acc1 = Acc#{<<"diagnostics">> => cgf_lib:diagnostics(Diagnostics)},
 	traffic_volumes8(TV, Acc1);
 traffic_volumes7(TV, Acc) ->
 	traffic_volumes8(TV, Acc).
 %% @hidden
-traffic_volumes8(#{diagnostics
-		:= DIA} = TV, Acc) ->
-	Acc1 = Acc#{<<"diagnostics">> => DIA},
+traffic_volumes8(#{ePCQoSInformation
+		:= EPCQoSInformation} = TV, Acc) ->
+	Acc1 = Acc#{<<"ePCQoSInformation">> => EPCQoSInformation},
 	traffic_volumes9(TV, Acc1);
 traffic_volumes8(TV, Acc) ->
 	traffic_volumes9(TV, Acc).
 %% @hidden
-traffic_volumes9(#{ePCQoSInformation
-		:= EPCQoSInformation} = TV, Acc) ->
-	Acc1 = Acc#{<<"ePCQoSInformation">> => EPCQoSInformation},
+traffic_volumes9(#{enhancedDiagnostics := Diagnostics} = TV, Acc) ->
+	Acc1 = Acc#{<<"enhancedDiagnostics">> => enhanced_dianostics(Diagnostics)},
 	traffic_volumes10(TV, Acc1);
 traffic_volumes9(TV, Acc) ->
 	traffic_volumes10(TV, Acc).
 %% @hidden
-traffic_volumes10(#{enhancedDiagnostics
-		:= EnhancedDiagnostics} = TV, Acc) ->
-	Acc1 = Acc#{<<"enhancedDiagnostics">> => EnhancedDiagnostics},
+traffic_volumes10(#{listOfPresenceReportingAreaInformation
+		:= ListOfPRA} = TV, Acc) ->
+	Acc1 = Acc#{<<"listOfPresenceReportingAreaInformation">> => ListOfPRA},
 	traffic_volumes11(TV, Acc1);
 traffic_volumes10(TV, Acc) ->
 	traffic_volumes11(TV, Acc).
 %% @hidden
-traffic_volumes11(#{listOfPresenceReportingAreaInformation
-		:= ListOfPRA} = TV, Acc) ->
-	Acc1 = Acc#{<<"listOfPresenceReportingAreaInformation">> => ListOfPRA},
+traffic_volumes11(#{qosNegotiated
+		:= QOSNegotiated} = TV, Acc) ->
+	Acc1 = Acc#{<<"qosNegotiated">> => cgf_lib:octet_string(QOSNegotiated)},
 	traffic_volumes12(TV, Acc1);
 traffic_volumes11(TV, Acc) ->
 	traffic_volumes12(TV, Acc).
 %% @hidden
-traffic_volumes12(#{qosNegotiated
-		:= QOSNegotiated} = TV, Acc) ->
-	Acc1 = Acc#{<<"qosNegotiated">> => cgf_lib:octet_string(QOSNegotiated)},
+traffic_volumes12(#{qosRequested
+		:= QOSRequested} = TV, Acc) ->
+	Acc1 = Acc#{<<"qosRequested">> => cgf_lib:octet_string(QOSRequested)},
 	traffic_volumes13(TV, Acc1);
 traffic_volumes12(TV, Acc) ->
 	traffic_volumes13(TV, Acc).
 %% @hidden
-traffic_volumes13(#{qosRequested
-		:= QOSRequested} = TV, Acc) ->
-	Acc1 = Acc#{<<"qosRequested">> => cgf_lib:octet_string(QOSRequested)},
+traffic_volumes13(#{relatedChangeOfCharCondition
+		:= ChangeOfCharCon} = TV, Acc) ->
+	Acc1 = Acc#{<<"relatedChangeOfCharCondition">> => ChangeOfCharCon},
 	traffic_volumes14(TV, Acc1);
 traffic_volumes13(TV, Acc) ->
 	traffic_volumes14(TV, Acc).
 %% @hidden
-traffic_volumes14(#{relatedChangeOfCharCondition
-		:= ChangeOfCharCon} = TV, Acc) ->
-	Acc1 = Acc#{<<"relatedChangeOfCharCondition">> => ChangeOfCharCon},
+traffic_volumes14(#{servingPLMNRateControl
+		:= RateControl} = TV, Acc) ->
+	Acc1 = Acc#{<<"servingPLMNRateControl">> => RateControl},
 	traffic_volumes15(TV, Acc1);
 traffic_volumes14(TV, Acc) ->
 	traffic_volumes15(TV, Acc).
 %% @hidden
-traffic_volumes15(#{servingPLMNRateControl
-		:= RateControl} = TV, Acc) ->
-	Acc1 = Acc#{<<"servingPLMNRateControl">> => RateControl},
+traffic_volumes15(#{threeGPPPSDataOffStatus
+		:= DataOffStatus} = TV, Acc) ->
+	Acc1 = Acc#{<<"threeGPPPSDataOffStatus">> => DataOffStatus},
 	traffic_volumes16(TV, Acc1);
 traffic_volumes15(TV, Acc) ->
 	traffic_volumes16(TV, Acc).
 %% @hidden
-traffic_volumes16(#{threeGPPPSDataOffStatus
-		:= DataOffStatus} = TV, Acc) ->
-	Acc1 = Acc#{<<"threeGPPPSDataOffStatus">> => DataOffStatus},
+traffic_volumes16(#{uWANUserLocationInformation
+		:= WanUserLocInfo} = TV, Acc) ->
+	Acc1 = Acc#{<<"uWANUserLocationInformation">> => WanUserLocInfo},
 	traffic_volumes17(TV, Acc1);
 traffic_volumes16(TV, Acc) ->
 	traffic_volumes17(TV, Acc).
 %% @hidden
-traffic_volumes17(#{uWANUserLocationInformation
-		:= WanUserLocInfo} = TV, Acc) ->
-	Acc1 = Acc#{<<"uWANUserLocationInformation">> => WanUserLocInfo},
+traffic_volumes17(#{userCSGInformation
+		:= CSGInfo} = TV, Acc) ->
+	Acc1 = Acc#{<<"userCSGInformation">> => CSGInfo},
 	traffic_volumes18(TV, Acc1);
 traffic_volumes17(TV, Acc) ->
 	traffic_volumes18(TV, Acc).
 %% @hidden
-traffic_volumes18(#{userCSGInformation
-		:= CSGInfo} = TV, Acc) ->
-	Acc1 = Acc#{<<"userCSGInformation">> => CSGInfo},
-	traffic_volumes19(TV, Acc1);
-traffic_volumes18(TV, Acc) ->
-	traffic_volumes19(TV, Acc).
-%% @hidden
-traffic_volumes19(#{userLocationInformation
+traffic_volumes18(#{userLocationInformation
 		:= UserLocInfo} = _TV, Acc) ->
 	Acc#{<<"userLocationInformation">> => UserLocInfo};
-traffic_volumes19(_TV, Acc) ->
+traffic_volumes18(_TV, Acc) ->
 	Acc.
 
 %% @hidden
@@ -887,7 +877,7 @@ pgw_record9(PGWRecord, Acc) ->
 	pgw_record10(PGWRecord, Acc).
 %% @hidden
 pgw_record10(#{diagnostics := Diagnostics} = PGWRecord, Acc) ->
-	Acc1 = Acc#{<<"diagnostics">> => Diagnostics},
+	Acc1 = Acc#{<<"diagnostics">> => cgf_lib:diagnostics(Diagnostics)},
 	pgw_record11(PGWRecord, Acc1);
 pgw_record10(PGWRecord, Acc) ->
 	pgw_record11(PGWRecord, Acc).
@@ -916,8 +906,8 @@ pgw_record14(#{ePCQoSInformation := EPCQoSInfo} = PGWRecord, Acc) ->
 pgw_record14(PGWRecord, Acc) ->
 	pgw_record15(PGWRecord, Acc).
 %% @hidden
-pgw_record15(#{enhancedDiagnostics := EnhancedDiag} = PGWRecord, Acc) ->
-	Acc1 = Acc#{<<"enhancedDiagnostics">> => EnhancedDiag},
+pgw_record15(#{enhancedDiagnostics := Diagnostics} = PGWRecord, Acc) ->
+	Acc1 = Acc#{<<"enhancedDiagnostics">> => enhanced_dianostics(Diagnostics)},
 	pgw_record16(PGWRecord, Acc1);
 pgw_record15(PGWRecord, Acc) ->
 	pgw_record16(PGWRecord, Acc).
@@ -1693,7 +1683,7 @@ sgsn_mmr7(SGSNMMRRecord, Acc) ->
 	sgsn_mmr8(SGSNMMRRecord, Acc).
 %% @hidden
 sgsn_mmr8(#{diagnostics := Diagnostics} = SGSNMMRRecord, Acc) ->
-	Acc1 = Acc#{<<"diagnostics">> => Diagnostics},
+	Acc1 = Acc#{<<"diagnostics">> => cgf_lib:diagnostics(Diagnostics)},
 	sgsn_mmr9(SGSNMMRRecord, Acc1);
 sgsn_mmr8(SGSNMMRRecord, Acc) ->
 	sgsn_mmr9(SGSNMMRRecord, Acc).
@@ -1830,4 +1820,9 @@ change_location4(#{routingAreaCode := RoutingAreaCode} = _ChangeLocation, Acc) -
 	Acc#{<<"routingAreaCode">> => RoutingAreaCode};
 change_location4(_ChangeLocation, Acc) ->
 	Acc.
+
+%% @hidden
+enhanced_dianostics(#{rANNASCause := RanNasCause}) ->
+	Causes = [cgf_lig:octet_string(Cause) || Cause <- RanNasCause],
+	#{<<"rANNASCause">> => Causes}.
 

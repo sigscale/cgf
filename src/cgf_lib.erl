@@ -23,7 +23,8 @@
 -author('Vance Shipley <vances@sigscale.org>').
 
 -export([octet_string/1, tbcd/1, bcd_dn/1,
-		octet_ip_address/1, ip_address/1, bcd_date_time/1]).
+		octet_ip_address/1, ip_address/1, bcd_date_time/1,
+		diagnostics/1]).
 
 %%----------------------------------------------------------------------
 %%  The cgf_lib public API
@@ -179,6 +180,33 @@ bcd_date_time(<<Year2:4, Year1:4, Month2:4, Month1:4, Day2:4, Day1:4,
 			[Year2, Year1, Month2, Month1, Day2, Day1,
       Hour2, Hour1, Minute2, Minute1, Second2, Second1,
       Sign, TzHour2, TzHour1, TzMinute2, TzMinute1]).
+
+-spec diagnostics(Diagnostics) -> Result
+	when
+		Diagnostics :: {Type, Value},
+		Type :: gsm0408Cause | gsm0902MapErrorValue | 'itu-tQ767Cause'
+				| networkSpecificCause | manufacturerSpecificCause
+				| positionMethodFailureCause | unauthorizedLCSClientCause
+				| diameterResultCodeAndExperimentalResult,
+		Value :: binary(),
+		Result :: map().
+%% @doc Convert `Diagnostics' to JSON.
+diagnostics({gsm0408Cause, Cause} = _Diagnostics) ->
+	#{<<"gsm0408Cause">> => Cause};
+diagnostics({gsm0902MapErrorValue, Error}) ->
+	#{<<"gsm0902MapErrorValue">> => Error};
+diagnostics({'itu-tQ767Cause', Cause}) ->
+	#{<<"itu-tQ767Cause">> => Cause};
+diagnostics({networkSpecificCause, Cause}) ->
+	#{<<"networkSpecificCause">> => Cause};
+diagnostics({manufacturerSpecificCause, Cause}) ->
+	#{<<"manufacturerSpecificCause">> => Cause};
+diagnostics({positionMethodFailureCause, Cause}) ->
+	#{<<"positionMethodFailureCause">> => Cause};
+diagnostics({unauthorizedLCSClientCause, Cause}) ->
+	#{<<"unauthorizedLCSClientCause">> => Cause};
+diagnostics({diameterResultCodeAndExperimentalResult, Result}) ->
+	#{<<"diameterResultCodeAndExperimentalResult">> => Result}.
 
 %%----------------------------------------------------------------------
 %%  Internal functions
