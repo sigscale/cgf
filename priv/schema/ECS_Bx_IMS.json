@@ -9,7 +9,8 @@
 				"Bx_sSCF": {
 					"$ref": "#/$defs/SCSCFRecord"
 				}
-			}
+			},
+			"required": ["Bx_sSCF"]
 		},
 		{
 			"type": "object",
@@ -17,7 +18,8 @@
 				"Bx_pCSCF": {
 					"$ref": "#/$defs/PCSCFRecord"
 				}
-			}
+			},
+			"required": ["Bx_pCSCF"]
 		},
 		{
 			"type": "object",
@@ -25,7 +27,8 @@
 				"Bx_iCSCF": {
 					"$ref": "#/$defs/ICSCFRecord"
 				}
-			}
+			},
+			"required": ["Bx_iCSCF"]
 		},
 		{
 			"type": "object",
@@ -33,7 +36,8 @@
 				"Bx_mrfc": {
 					"$ref": "#/$defs/MRFCRecord"
 				}
-			}
+			},
+			"required": ["Bx_mrfc"]
 		},
 		{
 			"type": "object",
@@ -41,7 +45,8 @@
 				"Bx_mgcf": {
 					"$ref": "#/$defs/MGCFRecord"
 				}
-			}
+			},
+			"required": ["Bx_mgcf"]
 		},
 		{
 			"type": "object",
@@ -49,7 +54,8 @@
 				"Bx_bgcf": {
 					"$ref": "#/$defs/BGCFRecord"
 				}
-			}
+			},
+			"required": ["Bx_bgcf"]
 		},
 		{
 			"type": "object",
@@ -57,7 +63,8 @@
 				"Bx_as": {
 					"$ref": "#/$defs/ASRecord"
 				}
-			}
+			},
+			"required": ["Bx_as"]
 		},
 		{
 			"type": "object",
@@ -65,7 +72,8 @@
 				"Bx_eCSCF": {
 					"$ref": "#/$defs/ECSCFRecord"
 				}
-			}
+			},
+			"required": ["Bx_eCSCF"]
 		},
 		{
 			"type": "object",
@@ -73,7 +81,8 @@
 				"Bx_ibcf": {
 					"$ref": "#/$defs/IBCFRecord"
 				}
-			}
+			},
+			"required": ["Bx_ibcf"]
 		},
 		{
 			"type": "object",
@@ -81,7 +90,8 @@
 				"Bx_trf": {
 					"$ref": "#/$defs/TRFRecord"
 				}
-			}
+			},
+			"required": ["Bx_trf"]
 		},
 		{
 			"type": "object",
@@ -89,7 +99,8 @@
 				"Bx_tf": {
 					"$ref": "#/$defs/TFRecord"
 				}
-			}
+			},
+			"required": ["Bx_tf"]
 		},
 		{
 			"type": "object",
@@ -97,7 +108,8 @@
 				"Bx_atcf": {
 					"$ref": "#/$defs/ATCFRecord"
 				}
-			}
+			},
+			"required": ["Bx_atcf"]
 		}
 	],
 	"$defs": {

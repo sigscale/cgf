@@ -115,5 +115,9 @@
 				"success"
 			]
 		}
-	}
+	},
+	"required": [
+		"kind",
+		"category"
+	]
 }

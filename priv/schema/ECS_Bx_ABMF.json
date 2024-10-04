@@ -9,7 +9,8 @@
 				"Bx_balance": {
 					"$ref": "#/$defs/BalanceRecord"
 				}
-			}
+			},
+			"required": ["Bx_balance"]
 		}
 	],
 	"$defs": {

@@ -9,7 +9,8 @@
 				"Bx_sgsnPDP": {
 					"$ref": "#/$defs/SGSNPDPRecord"
 				}
-			}
+			},
+			"required": ["Bx_sgsnPDP"]
 		},
 		{
 			"type": "object",
@@ -17,7 +18,8 @@
 				"Bx_sgsnMM": {
 					"$ref": "#/$defs/SGSNMMRecord"
 				}
-			}
+			},
+			"required": ["Bx_sgsnMM"]
 		},
 		{
 			"type": "object",
@@ -25,7 +27,8 @@
 				"Bx_sgsnSMO": {
 					"$ref": "#/$defs/SGSNSMORecord"
 				}
-			}
+			},
+			"required": ["Bx_sgsnSMO"]
 		},
 		{
 			"type": "object",
@@ -33,7 +36,8 @@
 				"Bx_sgsnSMT": {
 					"$ref": "#/$defs/SGSNSMTRecord"
 				}
-			}
+			},
+			"required": ["Bx_sgsnSMT"]
 		},
 		{
 			"type": "object",
@@ -41,7 +45,8 @@
 				"Bx_sgsnMTLCS": {
 					"$ref": "#/$defs/SGSNMTLCSRecord"
 				}
-			}
+			},
+			"required": ["Bx_sgsnMTLCS"]
 		},
 		{
 			"type": "object",
@@ -49,7 +54,8 @@
 				"Bx_sgsnMOLCS": {
 					"$ref": "#/$defs/SGSNMOLCSRecord"
 				}
-			}
+			},
+			"required": ["Bx_sgsnMOLCS"]
 		},
 		{
 			"type": "object",
@@ -57,7 +63,8 @@
 				"Bx_sgsnNILCS": {
 					"$ref": "#/$defs/SGSNNILCSRecord"
 				}
-			}
+			},
+			"required": ["Bx_sgsnNILCS"]
 		},
 		{
 			"type": "object",
@@ -65,7 +72,8 @@
 				"Bx_sgsnMBMSR": {
 					"$ref": "#/$defs/SGSNMBMSRecord"
 				}
-			}
+			},
+			"required": ["Bx_sgsnMBMSR"]
 		},
 		{
 			"type": "object",
@@ -73,7 +81,8 @@
 				"Bx_ggsnMBMSR": {
 					"$ref": "#/$defs/GGSNMBMSRecord"
 				}
-			}
+			},
+			"required": ["Bx_ggsnMBMSR"]
 		},
 		{
 			"type": "object",
@@ -81,7 +90,8 @@
 				"Bx_sgw": {
 					"$ref": "#/$defs/SGWRecord"
 				}
-			}
+			},
+			"required": ["Bx_sgw"]
 		},
 		{
 			"type": "object",
@@ -89,7 +99,8 @@
 				"Bx_pgw": {
 					"$ref": "#/$defs/PGWRecord"
 				}
-			}
+			},
+			"required": ["Bx_pgw"]
 		},
 		{
 			"type": "object",
@@ -97,7 +108,8 @@
 				"Bx_gwMBMS": {
 					"$ref": "#/$defs/GWMBMSRecord"
 				}
-			} 
+			},
+			"required": ["Bx_gwMBMS"]
 		},
 		{
 			"type": "object",
@@ -105,7 +117,8 @@
 				"Bx_tdf": {
 					"$ref": "#/$defs/TDFRecord"
 				}
-			} 
+			},
+			"required": ["Bx_tdf"]
 		},
 		{
 			"type": "object",
@@ -113,7 +126,8 @@
 				"Bx_ipe": {
 					"$ref": "#/$defs/IPERecord"
 				}
-			} 
+			},
+			"required": ["Bx_ipe"]
 		},
 		{
 			"type": "object",
@@ -121,7 +135,8 @@
 				"Bx_epdg": {
 					"$ref": "#/$defs/EPDGRecord"
 				}
-			} 
+			},
+			"required": ["Bx_epdg"]
 		},
 		{
 			"type": "object",
@@ -129,7 +144,8 @@
 				"Bx_twag": {
 					"$ref": "#/$defs/TWAGRecord"
 				}
-			} 
+			}, 
+			"required": ["Bx_twag"]
 		}
 	],
 	"$defs": {

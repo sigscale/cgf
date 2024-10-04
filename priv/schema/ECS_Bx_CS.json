@@ -9,7 +9,8 @@
 				"Bx_moCall": {
 					"$ref": "#/$defs/MOCallRecord"
 				}
-			}
+			},
+			"required": ["Bx_moCall"]
 		},
 		{
 			"type": "object",
@@ -17,7 +18,8 @@
 				"Bx_mtCall": {
 					"$ref": "#/$defs/MTCallRecord"
 				}
-			}
+			},
+			"required": ["Bx_mtCall"]
 		},
 		{
 			"type": "object",
@@ -25,7 +27,8 @@
 				"Bx_moSMS": {
 					"$ref": "#/$defs/MOSMSRecord"
 				}
-			}
+			},
+			"required": ["Bx_moSMS"]
 		},
 		{
 			"type": "object",
@@ -33,7 +36,8 @@
 				"Bx_mtSMS": {
 					"$ref": "#/$defs/MTSMSRecord"
 				}
-			}
+			},
+			"required": ["Bx_mtSMS"]
 		},
 		{
 			"type": "object",
@@ -41,7 +45,8 @@
 				"Bx_ssAction": {
 					"$ref": "#/$defs/SSActionRecord"
 				}
-			}
+			},
+			"required": ["Bx_ssAction"]
 		},
 		{
 			"type": "object",
@@ -49,7 +54,8 @@
 				"Bx_incGateway": {
 					"$ref": "#/$defs/IncGatewayRecord"
 				}
-			}
+			},
+			"required": ["Bx_incGateway"]
 		},
 		{
 			"type": "object",
@@ -57,7 +63,8 @@
 				"Bx_outGateway": {
 					"$ref": "#/$defs/OutGatewayRecord"
 				}
-			}
+			},
+			"required": ["Bx_outGateway"]
 		}
 	],
 	"$defs": {

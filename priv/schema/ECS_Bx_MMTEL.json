@@ -9,7 +9,8 @@
 				"Bx_mmtel": {
 					"$ref": "#/$defs/MMTelRecord"
 				}
-			}
+			},
+			"required": ["Bx_mmtel"]
 		}
 	],
 	"$defs": {

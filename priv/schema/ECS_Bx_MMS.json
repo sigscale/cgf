@@ -9,7 +9,8 @@
 				"Bx_mmO1S": {
 					"$ref": "#/$defs/MMO1SRecord"
 				}
-			}
+			},
+			"required": ["Bx_mmO1S"]
 		},
 		{
 			"type": "object",
@@ -17,7 +18,8 @@
 				"Bx_mmO4FRq": {
 					"$ref": "#/$defs/MMO4FRqRecord"
 				}
-			}
+			},
+			"required": ["Bx_mmO4FRq"]
 		},
 		{
 			"type": "object",
@@ -25,7 +27,8 @@
 				"Bx_mmO4FRs": {
 					"$ref": "#/$defs/MMO4FRsRecord"
 				}
-			}
+			},
+			"required": ["Bx_mmO4FRs"]
 		},
 		{
 			"type": "object",
@@ -33,7 +36,8 @@
 				"Bx_mmO4D": {
 					"$ref": "#/$defs/MMO4DRecord"
 				}
-			}
+			},
+			"required": ["Bx_mmO4D"]
 		},
 		{
 			"type": "object",
@@ -41,7 +45,8 @@
 				"Bx_mmO1D": {
 					"$ref": "#/$defs/MMO1DRecord"
 				}
-			}
+			},
+			"required": ["Bx_mmO1D"]
 		},
 		{
 			"type": "object",
@@ -49,7 +54,8 @@
 				"Bx_mmO4R": {
 					"$ref": "#/$defs/MMO4RRecord"
 				}
-			}
+			},
+			"required": ["Bx_mmO4R"]
 		},
 		{
 			"type": "object",
@@ -57,7 +63,8 @@
 				"Bx_mmO1R": {
 					"$ref": "#/$defs/MMO1RRecord"
 				}
-			}
+			},
+			"required": ["Bx_Bx_mmO1R"]
 		},
 		{
 			"type": "object",
@@ -65,7 +72,8 @@
 				"Bx_mmOMD": {
 					"$ref": "#/$defs/MMOMDRecord"
 				}
-			}
+			},
+			"required": ["Bx_Bx_mmOMD"]
 		},
 		{
 			"type": "object",
@@ -73,7 +81,8 @@
 				"Bx_mmR4F": {
 					"$ref": "#/$defs/MMR4FRecord"
 				}
-			}
+			},
+			"required": ["Bx_mmR4F"]
 		},
 		{
 			"type": "object",
@@ -81,7 +90,8 @@
 				"Bx_mmR1NRq": {
 					"$ref": "#/$defs/MMR1NRqRecord"
 				}
-			}
+			},
+			"required": ["Bx_mmR1NRq"]
 		},
 		{
 			"type": "object",
@@ -89,7 +99,8 @@
 				"Bx_mmR1NRs": {
 					"$ref": "#/$defs/MMR1NRsRecord"
 				}
-			}
+			},
+			"required": ["Bx_mmR1NRs"]
 		},
 		{
 			"type": "object",
@@ -97,7 +108,8 @@
 				"Bx_mmR1NRt": {
 					"$ref": "#/$defs/MMR1RtRecord"
 				}
-			}
+			},
+			"required": ["Bx_mmR1NRt"]
 		},
 		{
 			"type": "object",
@@ -105,7 +117,8 @@
 				"Bx_mmR1A": {
 					"$ref": "#/$defs/MMR1ARecord"
 				}
-			}
+			},
+			"required": ["Bx_mmR1A"]
 		},
 		{
 			"type": "object",
@@ -113,7 +126,8 @@
 				"Bx_mmR4DRq": {
 					"$ref": "#/$defs/MMR4DRqRecord"
 				}
-			}
+			},
+			"required": ["Bx_mmR4DRq"]
 		},
 		{
 			"type": "object",
@@ -121,7 +135,8 @@
 				"Bx_mmR4DRs": {
 					"$ref": "#/$defs/MMR4DRsRecord"
 				}
-			}
+			},
+			"required": ["Bx_mmR4DRs"]
 		},
 		{
 			"type": "object",
@@ -129,7 +144,8 @@
 				"Bx_mmR1RR": {
 					"$ref": "#/$defs/MMR1RRRecord"
 				}
-			}
+			},
+			"required": ["Bx_mmR1RR"]
 		},
 		{
 			"type": "object",
@@ -137,7 +153,8 @@
 				"Bx_mmR4RRq": {
 					"$ref": "#/$defs/MMR4RRqRecord"
 				}
-			}
+			},
+			"required": ["Bx_mmR4RRq"]
 		},
 		{
 			"type": "object",
@@ -145,7 +162,8 @@
 				"Bx_mmR4RRs": {
 					"$ref": "#/$defs/MMR4RRsRecord"
 				}
-			}
+			},
+			"required": ["Bx_mmR4RRs"]
 		},
 		{
 			"type": "object",
@@ -153,7 +171,8 @@
 				"Bx_mmRMD": {
 					"$ref": "#/$defs/MMRMDRecord"
 				}
-			}
+			},
+			"required": ["Bx_mmRMD"]
 		},
 		{
 			"type": "object",
@@ -161,7 +180,8 @@
 				"Bx_mmF": {
 					"$ref": "#/$defs/MMFRecord"
 				}
-			}
+			},
+			"required": ["Bx_mmF"]
 		},
 		{
 			"type": "object",
@@ -169,7 +189,8 @@
 				"Bx_mmBx1S": {
 					"$ref": "#/$defs/MMBx1SRecord"
 				}
-			}
+			},
+			"required": ["Bx_mmBx1S"]
 		},
 		{
 			"type": "object",
@@ -177,7 +198,8 @@
 				"Bx_mmBx1V": {
 					"$ref": "#/$defs/MMBx1VRecord"
 				}
-			}
+			},
+			"required": ["Bx_mmBx1V"]
 		},
 		{
 			"type": "object",
@@ -185,7 +207,8 @@
 				"Bx_mmBx1U": {
 					"$ref": "#/$defs/MMBx1URecord"
 				}
-			}
+			},
+			"required": ["Bx_mmBx1U"]
 		},
 		{
 			"type": "object",
@@ -193,7 +216,8 @@
 				"Bx_mmBx1D": {
 					"$ref": "#/$defs/MMBx1DRecord"
 				}
-			}
+			},
+			"required": ["Bx_mmBx1D"]
 		},
 		{
 			"type": "object",
@@ -201,7 +225,8 @@
 				"Bx_mm7S": {
 					"$ref": "#/$defs/MM7SRecord"
 				}
-			}
+			},
+			"required": ["Bx_mm7S"]
 		},
 		{
 			"type": "object",
@@ -209,7 +234,8 @@
 				"Bx_mm7DRq": {
 					"$ref": "#/$defs/MM7DRqRecord"
 				}
-			}
+			},
+			"required": ["Bx_mm7DRq"]
 		},
 		{
 			"type": "object",
@@ -217,7 +243,8 @@
 				"Bx_mm7DRs": {
 					"$ref": "#/$defs/MM7DRsRecord"
 				}
-			}
+			},
+			"required": ["Bx_mm7DRs"]
 		},
 		{
 			"type": "object",
@@ -225,7 +252,8 @@
 				"Bx_mm7C": {
 					"$ref": "#/$defs/MM7CRecord"
 				}
-			}
+			},
+			"required": ["Bx_mm7C"]
 		},
 		{
 			"type": "object",
@@ -233,7 +261,8 @@
 				"Bx_mm7R": {
 					"$ref": "#/$defs/MM7RRecord"
 				}
-			}
+			},
+			"required": ["Bx_mm7R"]
 		},
 		{
 			"type": "object",
@@ -241,7 +270,8 @@
 				"Bx_mm7DRRq": {
 					"$ref": "#/$defs/MM7DRRqRecord"
 				}
-			}
+			},
+			"required": ["Bx_mm7DRRq"]
 		},
 		{
 			"type": "object",
@@ -249,7 +279,8 @@
 				"Bx_mm7DRRs": {
 					"$ref": "#/$defs/MM7DRRsRecord"
 				}
-			}
+			},
+			"required": ["Bx_mm7DRRs"]
 		},
 		{
 			"type": "object",
@@ -257,7 +288,8 @@
 				"Bx_mm7RRq": {
 					"$ref": "#/$defs/MM7RRqRecord"
 				}
-			}
+			},
+			"required": ["Bx_mm7RRq"]
 		}
 	],
 	"$defs": {

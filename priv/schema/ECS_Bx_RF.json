@@ -9,7 +9,8 @@
 				"Bx_rated": {
 					"$ref": "#/$defs/Rated"
 				}
-			}
+	 		},
+			"required": ["Bx_rated"]
 		}
 	],
 	"$defs": {

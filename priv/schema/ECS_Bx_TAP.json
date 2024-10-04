@@ -11,7 +11,8 @@
 						"Bx_roam_moCall": {
 							"$ref": "#/$defs/MobileOriginatedCall"
 						}
-					}
+					},
+					"required": ["Bx_roam_moCall"]
 				},
 				{
 					"type": "object",
@@ -19,7 +20,8 @@
 						"Bx_roam_mtCall": {
 							"$ref": "#/$defs/MobileTerminatedCall"
 						}
-					}
+					},
+					"required": ["Bx_roam_mtCall"]
 				},
 				{
 					"type": "object",
@@ -27,7 +29,8 @@
 						"Bx_roam_supplService": {
 							"$ref": "#/$defs/SupplServiceEvent"
 						}
-					}
+					},
+					"required": ["Bx_roam_supplService"]
 				},
 				{
 					"type": "object",
@@ -35,7 +38,8 @@
 						"Bx_roam_serviceCenter": {
 							"$ref": "#/$defs/ServiceCentreUsage"
 						}
-					}
+					},
+					"required": ["Bx_roam_serviceCenter"]
 				},
 				{
 					"type": "object",
@@ -43,7 +47,8 @@
 						"Bx_roam_gprsCall": {
 							"$ref": "#/$defs/GprsCall"
 						}
-					}
+					},
+					"required": ["Bx_roam_gprsCall"]
 				},
 				{
 					"type": "object",
@@ -51,7 +56,8 @@
 						"Bx_roam_contentTransaction": {
 							"$ref": "#/$defs/ContentTransaction"
 						}
-					}
+					},
+					"required": ["Bx_roam_contentTransaction"]
 				},
 				{
 					"type": "object",
@@ -59,7 +65,8 @@
 						"Bx_roam_locationService": {
 							"$ref": "#/$defs/LocationService"
 						}
-					}
+					},
+					"required": ["Bx_roam_locationService"]
 				},
 				{
 					"type": "object",
@@ -67,7 +74,8 @@
 						"Bx_roam_messagingEvent": {
 							"$ref": "#/$defs/MessagingEvent"
 						}
-					}
+					},
+					"required": ["Bx_roam_messagingEvent"]
 				},
 				{
 					"type": "object",
@@ -75,7 +83,8 @@
 						"Bx_roam_mobileSession": {
 							"$ref": "#/$defs/MobileSession"
 						}
-					}
+					},
+					"required": ["Bx_roam_mobileSession"]
 				}
 			]
 		},

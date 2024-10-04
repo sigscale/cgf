@@ -36,5 +36,8 @@
 				"example.net"
 			]
 		}
-	}
+	},
+	"required": [
+		"name"
+	]
 }

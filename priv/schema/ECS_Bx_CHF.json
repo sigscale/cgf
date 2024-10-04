@@ -9,7 +9,8 @@
 				"Bx_chf": {
 					"$ref": "#/$defs/ChargingRecord"
 				}
-			}
+			},
+			"required": ["Bx_chf"]
 		}
 	],
 	"$defs": {

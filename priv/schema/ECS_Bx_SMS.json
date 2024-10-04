@@ -9,7 +9,8 @@
 				"Bx_scSMO": {
 					"$ref": "#/$defs/SCSMORecord"
 				}
-			}
+			},
+			"required": ["Bx_scSMO"]
 		},
 		{
 			"type": "object",
@@ -17,7 +18,8 @@
 				"Bx_scSMT": {
 					"$ref": "#/$defs/SCSMTRecord"
 				}
-			}
+			},
+			"required": ["Bx_scSMT"]
 		},
 		{
 			"type": "object",
@@ -25,7 +27,8 @@
 				"Bx_scDVTT4": {
 					"$ref": "#/$defs/SCDVTT4Record"
 				}
-			}
+			},
+			"required": ["Bx_scDVTT4"]
 		},
 		{
 			"type": "object",
@@ -33,7 +36,8 @@
 				"Bx_scSMOT4": {
 					"$ref": "#/$defs/SCSMTRecord"
 				}
-			}
+			},
+			"required": ["Bx_scSMOT4"]
 		},
 		{
 			"type": "object",
@@ -41,7 +45,8 @@
 				"Bx_ismSMO": {
 					"$ref": "#/$defs/ISMSMORecord"
 				}
-			}
+			},
+			"required": ["Bx_ismSMO"]
 		},
 		{
 			"type": "object",
@@ -49,7 +54,8 @@
 				"Bx_ismSMT": {
 					"$ref": "#/$defs/ISMSMTRecord"
 				}
-			}
+			},
+			"required": ["Bx_ismSMT"]
 		}
 	],
 	"$defs": {
