@@ -342,18 +342,6 @@
 				"privateUserID": {
 				}
 			},
-			"required": [
-				"servedIMSI",
-				"calledNumber",
-				"recordingEntity",
-				"location",
-				"basicService",
-				"msClassmark",
-				"callDuration",
-				"causeForTerm",
-				"callReference",
-				"systemType"
-			],
 			"examples": [
 				{
 					"servedIMSI": "001001012345678",
@@ -615,8 +603,6 @@
 				"privateUserID": {
 				}
 			},
-			"required": [
-			],
 			"examples": [
 			]
 		},
@@ -679,14 +665,6 @@
 				"locationExtension": {
 				}
 			},
-			"required": [
-				"servedIMSI",
-				"msClassmark",
-				"serviceCentre",
-				"recordingEntity",
-				"messageReference",
-				"originationTime"
-			],
 			"examples": [
 				{
 					"servedIMSI": "001001012345678",
@@ -773,13 +751,6 @@
 				"locationExtension": {
 				}
 			},
-			"required": [
-				"serviceCentre",
-				"servedIMSI",
-				"msClassmark",
-				"recordingEntity",
-				"deliveryTime"
-			],
 			"examples": [
 			]
 		},
@@ -842,13 +813,6 @@
 					"$ref": "#/$defs/SystemType"
 				}
 			},
-			"required": [
-				"servedIMSI",
-				"msClassmark",
-				"recordingEntity",
-				"ssActionTime",
-				"callReference"
-			],
 			"examples": []
 		},
 		"IncGatewayRecord": {
@@ -938,13 +902,6 @@
 					"type": "boolean"
 				}
 			},
-			"required": [
-				"calledNumber",
-				"recordingEntity",
-				"callDuration",
-				"causeForTerm",
-				"callReference"
-			],
 			"examples": []
 		},
 		"OutGatewayRecord": {
@@ -1034,13 +991,6 @@
 					"type": "boolean"
 				}
 			},
-			"required": [
-				"calledNumber",
-				"recordingEntity",
-				"callDuration",
-				"causeForTerm",
-				"callReference"
-			],
 			"examples": []
 		},
 		"AdditionalChgInfo": {

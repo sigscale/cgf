@@ -19,8 +19,6 @@
 			"type": "object",
 			"properties": {
 			},
-			"required": [
-			],
 			"examples": [
 			]
 		}

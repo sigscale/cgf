@@ -146,10 +146,6 @@
 				"recordExtensions": {
 				}
 			},
-			"required": [
-				"sMSNodeAddress",
-				"eventtimestamp"
-			],
 			"examples": [
 			]
 		},
@@ -158,8 +154,6 @@
 			"type": "object",
 			"properties": {
 			},
-			"required": [
-			],
 			"examples": [
 			]
 		},
@@ -168,8 +162,6 @@
 			"type": "object",
 			"properties": {
 			},
-			"required": [
-			],
 			"examples": [
 			]
 		},
@@ -178,8 +170,6 @@
 			"type": "object",
 			"properties": {
 			},
-			"required": [
-			],
 			"examples": [
 			]
 		},
@@ -188,8 +178,6 @@
 			"type": "object",
 			"properties": {
 			},
-			"required": [
-			],
 			"examples": [
 			]
 		},

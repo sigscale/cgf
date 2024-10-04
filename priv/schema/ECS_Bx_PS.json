@@ -262,14 +262,6 @@
 					"$ref": "#/$defs/UserCSGInformation"
 				}
 			},
-			"required": [
-				"chargingID",
-				"ggsnAddressUsed",
-				"recordOpeningTime",
-				"duration",
-				"causeForRecClosing",
-				"chargingCharacteristics"
-			],
 			"examples": [
 			]
 		},
@@ -278,8 +270,6 @@
 			"type": "object",
 			"properties": {
 			},
-			"required": [
-			],
 			"examples": [
 			]
 		},
@@ -288,8 +278,6 @@
 			"type": "object",
 			"properties": {
 			},
-			"required": [
-			],
 			"examples": [
 			]
 		},
@@ -298,8 +286,6 @@
 			"type": "object",
 			"properties": {
 			},
-			"required": [
-			],
 			"examples": [
 			]
 		},
@@ -308,8 +294,6 @@
 			"type": "object",
 			"properties": {
 			},
-			"required": [
-			],
 			"examples": [
 			]
 		},
@@ -318,8 +302,6 @@
 			"type": "object",
 			"properties": {
 			},
-			"required": [
-			],
 			"examples": [
 			]
 		},
@@ -328,8 +310,6 @@
 			"type": "object",
 			"properties": {
 			},
-			"required": [
-			],
 			"examples": [
 			]
 		},
@@ -338,8 +318,6 @@
 			"type": "object",
 			"properties": {
 			},
-			"required": [
-			],
 			"examples": [
 			]
 		},
@@ -348,8 +326,6 @@
 			"type": "object",
 			"properties": {
 			},
-			"required": [
-			],
 			"examples": [
 			]
 		},
@@ -553,16 +529,6 @@
 					"$ref": "#/$defs/PSCellInformation"
 				}
 			},
-			"required": [
-				"s-GWAddress",
-				"chargingID",
-				"servingNodeType",
-				"servingNodeAddress",
-				"recordOpeningTime",
-				"duration",
-				"chargingCharacteristics",
-				"causeForRecClosing"
-			],
 			"examples": [
 				{
 					"servedIMSI": "001001555123456",
@@ -620,8 +586,6 @@
 			"type": "object",
 			"properties": {
 			},
-			"required": [
-			],
 			"examples": [
 			]
 		},
@@ -630,8 +594,6 @@
 			"type": "object",
 			"properties": {
 			},
-			"required": [
-			],
 			"examples": [
 			]
 		},
@@ -640,8 +602,6 @@
 			"type": "object",
 			"properties": {
 			},
-			"required": [
-			],
 			"examples": [
 			]
 		},
@@ -650,8 +610,6 @@
 			"type": "object",
 			"properties": {
 			},
-			"required": [
-			],
 			"examples": [
 			]
 		},
@@ -660,8 +618,6 @@
 			"type": "object",
 			"properties": {
 			},
-			"required": [
-			],
 			"examples": [
 			]
 		},
@@ -670,8 +626,6 @@
 			"type": "object",
 			"properties": {
 			},
-			"required": [
-			],
 			"examples": [
 			]
 		},
