@@ -6,22 +6,26 @@
 	"type": "object",
 	"allOf": [
 		{
-			"$ref": "/schema/cgf/ECS_base"
-		},
-		{
-			"$ref": "/schema/cgf/ECS_ecs"
-		},
-		{
-			"$ref": "/schema/cgf/ECS_service"
+			"allOf": [
+				{
+					"$ref": "/schema/cgf/ECS_base"
+				},
+				{
+					"$ref": "/schema/cgf/ECS_ecs"
+				},
+				{
+					"$ref": "/schema/cgf/ECS_service"
+				},
+				{
+					"$ref": "/schema/cgf/ECS_event"
+				}
+			]
 		},
 		{
 			"$ref": "/schema/cgf/ECS_network"
 		},
 		{
 			"$ref": "/schema/cgf/ECS_user"
-		},
-		{
-			"$ref": "/schema/cgf/ECS_event"
 		},
 		{
 			"$ref": "/schema/cgf/ECS_data_stream"

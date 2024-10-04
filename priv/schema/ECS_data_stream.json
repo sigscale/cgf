@@ -57,8 +57,5 @@
 				}
 			]
 		}
-	},
-	"required": [
-		"data_stream"
-	]
+	}
 }
