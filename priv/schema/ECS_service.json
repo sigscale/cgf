@@ -5,40 +5,42 @@
 	"description": "The Service fields describe the service for or from which the data was collected.",
 	"type": "object",
 	"properties": {
-		"name": {
-			"description": "Name of the service data is collected from.",
-			"type": "string",
-			"examples": [
-				"sigscale-cgf",
-				"sigscale-cdf"
-			]
-		},
-		"type": {
-			"description": "The type of the service data is collected from.",
-			"type": "string",
-			"examples": [
-				"cgf",
-				"cdf"
-			]
-		},
-		"node": {
-			"description": "This allows for two nodes of the same service running on the same host to be differentiated.",
+		"service": {
 			"type": "object",
 			"properties": {
 				"name": {
-					"description": "The `service.node.name` should typically be unique across nodes of a given service.",
-					"type": "string"
+					"description": "Name of the service data is collected from.",
+					"type": "string",
+					"examples": [
+						"sigscale-cgf",
+						"sigscale-cdf"
+					]
+				},
+				"type": {
+					"description": "The type of the service data is collected from.",
+					"type": "string",
+					"examples": [
+						"cgf",
+						"cdf"
+					]
+				},
+				"node": {
+					"description": "This allows for two nodes of the same service running on the same host to be differentiated.",
+					"type": "object",
+					"properties": {
+						"name": {
+							"description": "The `service.node.name` should typically be unique across nodes of a given service.",
+							"type": "string"
+						}
+					},
+					"examples": [
+						{
+							"name": "cgf@host.example.net"
+						}
+					]
 				}
-			},
-			"examples": [
-				{
-					"name": "cgf@host.example.net"
-				}
-			]
+			}
 		}
 	},
-	"required": [
-		"name",
-		"type"
-	]
+	"required": ["service"]
 }

@@ -5,24 +5,27 @@
 	"description": "The network is defined as the communication path over which a host or network event happens.",
 	"type": "object",
 	"properties": {
-		"application": {
-			"description": "Application level name.",
-			"type": "string",
-			"examples": [
-				"rf",
-				"ga"
-			]
-		},
-		"protocol": {
-			"description": "Application protocol name.",
-			"type": "string",
-			"examples": [
-				"diameter",
-				"gtp'"
-			]
+		"network": {
+			"type": "object",
+			"properties": {
+				"application": {
+					"description": "Application level name.",
+					"type": "string",
+					"examples": [
+						"rf",
+						"ga"
+					]
+				},
+				"protocol": {
+					"description": "Application protocol name.",
+					"type": "string",
+					"examples": [
+						"diameter",
+						"gtp'"
+					]
+				}
+			}
 		}
 	},
-	"required": [
-		"application"
-	]
+	"required": ["network"]
 }
