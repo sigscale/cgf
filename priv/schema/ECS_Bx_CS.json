@@ -321,6 +321,7 @@
 					"$ref": "#/$defs/JurisdictionInformationParameterQueryStatus"
 				},
 				"partialRecordType": {
+					"$ref": "#/$defs/PartialRecordType"
 				},
 				"guaranteedBitRate": {
 				},
@@ -584,6 +585,7 @@
 					"$ref": "#/$defs/JurisdictionInformationParameterQueryStatus"
 				},
 				"partialRecordType": {
+					"$ref": "#/$defs/PartialRecordType"
 				},
 				"guaranteedBitRate": {
 				},
@@ -1444,6 +1446,19 @@
 			"description": "Unique number allocated by the Mobile Station (MS) when transmitting a short message to the SC.",
 			"type": "string",
 			"pattern": "^([0-9a-f]{2})*$"
+		},
+		"PartialRecordType": {
+			"type": "string",
+			"enum": [
+				"timeLimit",
+				"serviceChange",
+				"locationChange",
+				"classmarkChange",
+				"aocParmChange",
+				"radioChannelChange",
+				"hSCSDParmChange",
+				"changeOfCAMELDestination"
+			]
 		},
 		"PartyAddress": {
 			"description": "Circuit Switched (CS) calling/called/translated number",
