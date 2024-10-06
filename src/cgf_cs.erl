@@ -324,14 +324,14 @@ mo_call_record8(#{recordingEntity := RecordingEntity} = MOCallRecord, Acc) ->
 mo_call_record8(MOCallRecord, Acc) ->
 	mo_call_record9(MOCallRecord, Acc).
 %% @hidden
-mo_call_record9(#{mscIncomingTKGP := MscIncomingTKGP} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"mscIncomingTKGP">> => MscIncomingTKGP},
+mo_call_record9(#{mscIncomingTKGP := TrunkGroup} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"mscIncomingTKGP">> => trunk_group(TrunkGroup)},
 	mo_call_record10(MOCallRecord, Acc1);
 mo_call_record9(MOCallRecord, Acc) ->
 mo_call_record10(MOCallRecord, Acc).
 %% @hidden
-mo_call_record10(#{mscOutgoingTKGP := MscOutgoingTKGP} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"mscOutgoingTKGP">> => MscOutgoingTKGP},
+mo_call_record10(#{mscOutgoingTKGP := TrunkGroup} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"mscOutgoingTKGP">> => trunk_group(TrunkGroup)},
 	mo_call_record11(MOCallRecord, Acc1);
 mo_call_record10(MOCallRecord, Acc) ->
 	mo_call_record11(MOCallRecord, Acc).
@@ -727,6 +727,12 @@ mo_call_record75(_MOCallRecord, Acc) ->
 	Acc.
 
 %% @hidden
+trunk_group({tkgpNumber, Number}) ->
+	#{<<"tkgpNumber">> => Number};
+trunk_group({tkgpName, Name}) ->
+	#{<<"tkgpName">> => Name}.
+
+%% @hidden
 basic_service_code({bearerService, Code}) ->
 	#{<<"bearerService">> => cgf_lib:octet_string(Code)};
 basic_service_code({teleservice, Code}) ->
@@ -1086,8 +1092,8 @@ mt_call_record37(#{'gsm-SCFAddress' := GsmSCFAddress} = Record, Acc) ->
 mt_call_record37(Record, Acc) ->
 	mt_call_record38(Record, Acc).
 %% @hidden
-mt_call_record38(#{mscOutgoingTKGP := MSCOutgoingTKGP} = Record, Acc) ->
-	Acc1 = Acc#{<<"mscOutgoingTKGP">> => MSCOutgoingTKGP},
+mt_call_record38(#{mscOutgoingTKGP := TrunkGroup} = Record, Acc) ->
+	Acc1 = Acc#{<<"mscOutgoingTKGP">> => trunk_group(TrunkGroup)},
 	mt_call_record39(Record, Acc1);
 mt_call_record38(Record, Acc) ->
 	mt_call_record39(Record, Acc).
@@ -1188,8 +1194,8 @@ mt_call_record54(#{transparencyIndicator := TransparencyIndicator} = Record, Acc
 mt_call_record54(Record, Acc) ->
 	mt_call_record55(Record, Acc).
 %% @hidden
-mt_call_record55(#{mscIncomingTKGP := MSCIncomingTKGP} = Record, Acc) ->
-	Acc1 = Acc#{<<"mscIncomingTKGP">> => MSCIncomingTKGP},
+mt_call_record55(#{mscIncomingTKGP := TrunkGroup} = Record, Acc) ->
+	Acc1 = Acc#{<<"mscIncomingTKGP">> => trunk_group(TrunkGroup)},
 	mt_call_record56(Record, Acc1);
 mt_call_record55(Record, Acc) ->
 	mt_call_record56(Record, Acc).
@@ -1466,13 +1472,13 @@ inc_gateway_record2(Record, Acc) ->
 	inc_gateway_record3(Record, Acc).
 %% @hidden
 inc_gateway_record3(#{mscIncomingTKGP := TrunkGroup} = Record, Acc) ->
-	Acc1 = Acc#{<<"mscIncomingTKGP">> => TrunkGroup},
+	Acc1 = Acc#{<<"mscIncomingTKGP">> => trunk_group(TrunkGroup)},
 	inc_gateway_record4(Record, Acc1);
 inc_gateway_record3(Record, Acc) ->
 	inc_gateway_record4(Record, Acc).
 %% @hidden
 inc_gateway_record4(#{mscOutgoingTKGP := TrunkGroup} = Record, Acc) ->
-	Acc1 = Acc#{<<"mscOutgoingTKGP">> => TrunkGroup},
+	Acc1 = Acc#{<<"mscOutgoingTKGP">> => trunk_group(TrunkGroup)},
 	inc_gateway_record5(Record, Acc1);
 inc_gateway_record4(Record, Acc) ->
 	inc_gateway_record5(Record, Acc).
@@ -1598,13 +1604,13 @@ out_gateway_record2(Record, Acc) ->
 	out_gateway_record3(Record, Acc).
 %% @hidden
 out_gateway_record3(#{mscIncomingTKGP := TrunkGroup} = Record, Acc) ->
-	Acc1 = Acc#{<<"mscIncomingTKGP">> => TrunkGroup},
+	Acc1 = Acc#{<<"mscIncomingTKGP">> => trunk_group(TrunkGroup)},
 	out_gateway_record4(Record, Acc1);
 out_gateway_record3(Record, Acc) ->
 	out_gateway_record4(Record, Acc).
 %% @hidden
 out_gateway_record4(#{mscOutgoingTKGP := TrunkGroup} = Record, Acc) ->
-	Acc1 = Acc#{<<"mscOutgoingTKGP">> => TrunkGroup},
+	Acc1 = Acc#{<<"mscOutgoingTKGP">> => trunk_group(TrunkGroup)},
 	out_gateway_record5(Record, Acc1);
 out_gateway_record4(Record, Acc) ->
 	out_gateway_record5(Record, Acc).
