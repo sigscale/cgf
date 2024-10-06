@@ -65,6 +65,15 @@
 				}
 			},
 			"required": ["Bx_outGateway"]
+		},
+		{
+			"type": "object",
+			"properties": {
+				"Bx_roaming": {
+					"$ref": "#/$defs/RoamingRecord"
+				}
+			},
+			"required": ["Bx_roaming"]
 		}
 	],
 	"$defs": {
@@ -994,6 +1003,135 @@
 				}
 			},
 			"examples": []
+		},
+		"RoamingRecord": {
+			"description": "Circuit switched (CS) mobile roaming call charging data record (CDR).",
+			"type": "object",
+			"properties": {
+				"servedIMSI": {
+					"description": "The international mobile subscriber identity (IMSI) of the served party.",
+					"type": "string",
+					"pattern": "^[0-9]{5,15}$"
+				},
+				"servedMSISDN": {
+					"description": "The mobile station ISDN number (MSISDN) of the served party.",
+					"type": "string",
+					"pattern": "^[0-9]{5,15}$"
+				},
+				"callingNumber": {
+					"description": "The number received from the network on mobile terminated call set-up.",
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"roamingNumber": {
+					"description": "The mobile station roaming number (MSRN) is used to route calls directed to an MS.",
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"recordingEntity": {
+					"description": "The E.164 number assigned to the entity (MSC, VLR, HLR etc.) that produced the record.",
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"mscIncomingTKGP": {
+					"description": "Describes the trunk on which the call originates as seen from the MSC.",
+					"$ref": "#/$defs/TrunkGroup"
+				},
+				"mscOutgoingTKGP": {
+					"description": "Describes the trunk on which the call leaves the MSC.",
+					"$ref": "#/$defs/TrunkGroup"
+				},
+				"basicService": {
+					"description": "Contains the code of the basic service employed on call set-up.",
+					"$ref": "#/$defs/BasicServiceCode"
+				},
+				"transparencyIndicator": {
+					"$ref": "#/$defs/TransparencyInd"
+				},
+				"changeOfService": {
+					"description": "Indicates an alteration to the basic service during the connection",
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/ChangeOfService"
+					}
+				},
+				"supplServicesUsed": {
+					"description": "The supplementary services invoked as a result of, or during, a connection.",
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/SuppServiceUsed"
+					}
+				},
+				"seizureTime": {
+					"description": "The time at which the traffic channel is allocated.",
+					"type": "string",
+					"format": "date-time"
+				},
+				"answerTime": {
+					"description": "The time at which the call was answered or at which charging commences.",
+					"type": "string",
+					"format": "date-time"
+				},
+				"releaseTime": {
+					"description": "The time at which the connection is released by either party.",
+					"type": "string",
+					"format": "date-time"
+				},
+				"callDuration": {
+					"description": "The relevant call duration in seconds. For incomplete calls (call attempts) the relevant duration is the call holding time from the seizure to the release of the traffic channel. For complete (answered) calls this is the chargeable duration from answer to release of the traffic channel. For partial records this is the duration of the individual partial record and not the cumulative duration of the call.",
+					"type": "integer"
+				},
+				"dataVolume": {
+					"description": "The number of 64 octet segments transmitted during the use of data services, if known",
+					"type": "integer"
+				},
+				"causeForTerm": {
+					"description": "Provides a generalised reason for the release of the connection.",
+					"$ref": "#/$defs/CauseForTerm"
+				},
+				"diagnostics": {
+					"description": "Indicates a more detailed technical reason for the release of the connection.",
+					"$ref": "#/$defs/Diagnostics"
+				},
+				"callReference": {
+					"description": "Uniquely identifies a call or transaction.",
+					"$ref": "#/$defs/CallReferenceNumber"
+				},
+				"sequenceNumber": {
+					"description": "Indicates the sequence of a partial records within a connection.",
+					"type": "integer"
+				},
+				"recordExtensions": {
+				},
+				"networkCallReference": {
+					"description": "When CAMEL is applied, correlats call records from MSCs and gsmSCF.",
+					"$ref": "#/$defs/CallReferenceNumber"
+				},
+				"mSCAddress": {
+					"description": "E.164 number assigned to the MSC that produced the record.",
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"locationRoutNum": {
+					"$ref": "#/$defs/LocationRoutingNumber"
+				},
+				"lrnSoInd": {
+					"$ref": "#/$defs/LocationRoutingNumberSourceIndicator"
+				},
+				"lrnQuryStatus": {
+					"$ref": "#/$defs/LocationRoutingNumberQueryStatus"
+				},
+				"jIPPara": {
+					"$ref": "#/$defs/JurisdictionInformationParameter"
+				},
+				"jIPSoInd": {
+					"$ref": "#/$defs/JurisdictionInformationParameterSourceIndicator"
+				},
+				"jIPQuryStatus": {
+					"$ref": "#/$defs/JurisdictionInformationParameterQueryStatus"
+				},
+				"partialRecordType": {
+					"$ref": "#/$defs/PartialRecordType"
+				}
+			},
+			"examples": [
+			]
 		},
 		"AdditionalChgInfo": {
 			"description": "Provides additional charging information.",

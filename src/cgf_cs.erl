@@ -95,8 +95,11 @@ import2(_Log, _Metadata, {error, Reason}) ->
 		AttributeName :: string(),
 		AttributeValue :: term(),
 		CDR :: {RecordType, Record},
-		RecordType :: moCallRecord | mtCallRecord | moSMSRecord
-				| mtSMSRecord,
+		RecordType :: moCallRecord | mtCallRecord
+				| moSMSRecord | mtSMSRecord
+				| ssActionRecord
+				| incGatewayRecord | outGatewayRecord
+				| roamingRecord,
 		Record :: map(),
 		Result :: ok | {error, Reason},
 		Reason :: term().
@@ -156,6 +159,14 @@ parse(Log, Metadata, {outGatewayRecord, OutGatewayRecord}) ->
 			ok;
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, parse_out_gateway},
+					{error, Reason}])
+	end;
+parse(Log, Metadata, {roamingRecord, RoamingRecord}) ->
+	case parse_roaming(Log, Metadata, RoamingRecord) of
+		ok ->
+			ok;
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, parse_roaming},
 					{error, Reason}])
 	end.
 
@@ -266,6 +277,21 @@ parse_inc_gateway(Log, Metadata, IncGatewayRecord) ->
 parse_out_gateway(Log, Metadata, OutGatewayRecord) ->
 	Out = out_gateway_record(OutGatewayRecord),
 	CDR = [{outGateway, Out} | Metadata],
+	cgf_log:blog(Log, CDR).
+
+-spec parse_roaming(Log, Metadata, RoamingRecord) -> Result
+	when
+		Log :: disk_log:log(),
+		Metadata :: [{AttributeName, AttributeValue}],
+		AttributeName :: string(),
+		AttributeValue :: term(),
+		RoamingRecord :: map(),
+		Result :: ok | {error, Reason},
+		Reason :: term().
+%% @doc Parse a CDR event detail for a Roaming Record.
+parse_roaming(Log, Metadata, RoamingRecord) ->
+	Roam = roaming_record(RoamingRecord),
+	CDR = [{roaming, Roam} | Metadata],
 	cgf_log:blog(Log, CDR).
 
 %% @hidden
@@ -775,8 +801,8 @@ suppl_service_used(#{ssTime := SSTime} = SupplServicesUsed) ->
 suppl_service_used(SupplServicesUsed) ->
 	suppl_service_used1(SupplServicesUsed, #{}).
 %% @hidden
-suppl_service_used1(#{ssCode := <<SSCode:8>>}, Acc) ->
-	Acc#{<<"ssCode">> => SSCode};
+suppl_service_used1(#{ssCode := Code}, Acc) ->
+	Acc#{<<"ssCode">> => cgf_lib:octet_string(Code)};
 suppl_service_used1(_SupplServicesUsed, Acc) ->
 	Acc.
 
@@ -1385,8 +1411,8 @@ ss_action_record6(#{basicServices := BasicServices} = Record, Acc) ->
 ss_action_record6(Record, Acc) ->
 	ss_action_record7(Record, Acc).
 %% @hidden
-ss_action_record7(#{supplService := <<SSCode:8>>} = Record, Acc) ->
-	Acc1 = Acc#{<<"supplService">> => SSCode},
+ss_action_record7(#{supplService := Code} = Record, Acc) ->
+	Acc1 = Acc#{<<"supplService">> => cgf_lib:octet_string(Code)},
 	ss_action_record8(Record, Acc1);
 ss_action_record7(Record, Acc) ->
 	ss_action_record8(Record, Acc).
@@ -1714,5 +1740,181 @@ out_gateway_record20(Record, Acc) ->
 out_gateway_record21(#{serviceChangeInitiator := Boolean}, Acc) ->
 	Acc#{<<"reasonForServiceChange">> => Boolean};
 out_gateway_record21(_Record, Acc) ->
+	Acc.
+
+%% @hidden
+roaming_record(#{servedIMSI := ServedIMSI} = Record) ->
+	Acc = #{<<"servedIMSI">> => cgf_lib:tbcd(ServedIMSI)},
+	roaming_record1(Record, Acc);
+roaming_record(Record) ->
+	roaming_record1(Record, #{}).
+%% @hidden
+roaming_record1(#{servedMSISDN := ServedMSISDN} = Record, Acc) ->
+	#{<<"address">> := MSISDN} = cgf_lib:bcd_dn(ServedMSISDN),
+	Acc1 = Acc#{<<"servedMSISDN">> => MSISDN},
+	roaming_record2(Record, Acc1);
+roaming_record1(Record, Acc) ->
+	roaming_record2(Record, Acc).
+%% @hidden
+roaming_record2(#{callingNumber := CallingNumber} = Record, Acc) ->
+	Acc1 = Acc#{<<"callingNumber">> => cgf_lib:bcd_dn(CallingNumber)},
+	roaming_record3(Record, Acc1);
+roaming_record2(Record, Acc) ->
+	roaming_record3(Record, Acc).
+%% @hidden
+roaming_record3(#{roamingNumber := RoamingNumber} = Record, Acc) ->
+	Acc1 = Acc#{<<"roamingNumber">> => cgf_lib:bcd_dn(RoamingNumber)},
+	roaming_record4(Record, Acc1);
+roaming_record3(Record, Acc) ->
+	roaming_record4(Record, Acc).
+%% @hidden
+roaming_record4(#{recordingEntity := RecordingEntity} = Record, Acc) ->
+	Acc1 = Acc#{<<"recordingEntity">> => cgf_lib:bcd_dn(RecordingEntity)},
+	roaming_record5(Record, Acc1);
+roaming_record4(Record, Acc) ->
+	roaming_record5(Record, Acc).
+%% @hidden
+roaming_record5(#{mscIncomingTKGP := TrunkGroup} = Record, Acc) ->
+	Acc1 = Acc#{<<"mscIncomingTKGP">> => trunk_group(TrunkGroup)},
+	roaming_record6(Record, Acc1);
+roaming_record5(Record, Acc) ->
+	roaming_record6(Record, Acc).
+%% @hidden
+roaming_record6(#{mscOutgoingTKGP := TrunkGroup} = Record, Acc) ->
+	Acc1 = Acc#{<<"mscOutgoingTKGP">> => trunk_group(TrunkGroup)},
+	roaming_record7(Record, Acc1);
+roaming_record6(Record, Acc) ->
+	roaming_record7(Record, Acc).
+%% @hidden
+roaming_record7(#{basicService := BasicService} = Record, Acc) ->
+	Acc1 = Acc#{<<"basicService">> => basic_service_code(BasicService)},
+	roaming_record8(Record, Acc1);
+roaming_record7(Record, Acc) ->
+	roaming_record8(Record, Acc).
+%% @hidden
+roaming_record8(#{transparencyIndicator := TransparencyIndicator} = Record, Acc) ->
+	Acc1 = Acc#{<<"transparencyIndicator">> => TransparencyIndicator},
+	roaming_record9(Record, Acc1);
+roaming_record8(Record, Acc) ->
+	roaming_record9(Record, Acc).
+%% @hidden
+roaming_record9(#{changeOfService := ChangeOfService} = Record, Acc) ->
+	Acc1 = Acc#{<<"changeOfService">> => change_of_service(ChangeOfService)},
+	roaming_record10(Record, Acc1);
+roaming_record9(Record, Acc) ->
+	roaming_record10(Record, Acc).
+%% @hidden
+roaming_record10(#{supplServicesUsed := SupplServicesUsed} = Record, Acc) ->
+	SSU = [suppl_service_used(Service) || Service <- SupplServicesUsed],
+	Acc1 = Acc#{<<"supplServicesUsed">> => SSU},
+	roaming_record11(Record, Acc1);
+roaming_record10(Record, Acc) ->
+	roaming_record11(Record, Acc).
+%% @hidden
+roaming_record11(#{seizureTime := SeizureTime} = Record, Acc) ->
+	Acc1 = Acc#{<<"seizureTime">> => cgf_lib:bcd_date_time(SeizureTime)},
+	roaming_record12(Record, Acc1);
+roaming_record11(Record, Acc) ->
+	roaming_record12(Record, Acc).
+%% @hidden
+roaming_record12(#{answerTime := AnswerTime} = Record, Acc) ->
+	Acc1 = Acc#{<<"answerTime">> => cgf_lib:bcd_date_time(AnswerTime)},
+	roaming_record13(Record, Acc1);
+roaming_record12(Record, Acc) ->
+	roaming_record13(Record, Acc).
+%% @hidden
+roaming_record13(#{releaseTime := ReleaseTime} = Record, Acc) ->
+	Acc1 = Acc#{<<"releaseTime">> => cgf_lib:bcd_date_time(ReleaseTime)},
+	roaming_record14(Record, Acc1);
+roaming_record13(Record, Acc) ->
+	roaming_record14(Record, Acc).
+%% @hidden
+roaming_record14(#{callDuration := Duration} = Record, Acc) ->
+	Acc1 = Acc#{<<"callDuration">> => Duration},
+	roaming_record15(Record, Acc1);
+roaming_record14(Record, Acc) ->
+	roaming_record15(Record, Acc).
+%% @hidden
+roaming_record15(#{dataVolume := DataVolume} = Record, Acc) ->
+	Acc1 = Acc#{<<"dataVolume">> => DataVolume},
+	roaming_record16(Record, Acc1);
+roaming_record15(Record, Acc) ->
+	roaming_record16(Record, Acc).
+%% @hidden
+roaming_record16(#{causeForTerm := CauseForTerm} = Record, Acc) ->
+	Acc1 = Acc#{<<"causeForTerm">> => CauseForTerm},
+	roaming_record17(Record, Acc1);
+roaming_record16(Record, Acc) ->
+	roaming_record17(Record, Acc).
+%% @hidden
+roaming_record17(#{diagnostics := Diagnostics} = Record, Acc) ->
+	Acc1 = Acc#{<<"diagnostics">> => cgf_lib:diagnostics(Diagnostics)},
+	roaming_record18(Record, Acc1);
+roaming_record17(Record, Acc) ->
+	roaming_record18(Record, Acc).
+%% @hidden
+roaming_record18(#{callReference := Reference} = Record, Acc) ->
+	Acc1 = Acc#{<<"callReference">> => cgf_lib:octet_string(Reference)},
+	roaming_record19(Record, Acc1);
+roaming_record18(Record, Acc) ->
+	roaming_record19(Record, Acc).
+%% @hidden
+roaming_record19(#{sequenceNumber := SequenceNumber} = Record, Acc) ->
+	Acc1 = Acc#{<<"sequenceNumber">> => SequenceNumber},
+	roaming_record20(Record, Acc1);
+roaming_record19(Record, Acc) ->
+	roaming_record20(Record, Acc).
+%% @hidden
+roaming_record20(#{networkCallReference := Reference} = Record, Acc) ->
+	Acc1 = Acc#{<<"networkCallReference">> => cgf_lib:octet_string(Reference)},
+	roaming_record21(Record, Acc1);
+roaming_record20(Record, Acc) ->
+	roaming_record21(Record, Acc).
+%% @hidden
+roaming_record21(#{mSCAddress := MSCAddress} = Record, Acc) ->
+	Acc1 = Acc#{<<"mSCAddress">> => cgf_lib:bcd_dn(MSCAddress)},
+	roaming_record22(Record, Acc1);
+roaming_record21(Record, Acc) ->
+	roaming_record22(Record, Acc).
+%% @hidden
+roaming_record22(#{locationRoutNum := LocationRoutNum} = Record, Acc) ->
+	Acc1 = Acc#{<<"locationRoutNum">> => cgf_lib:tbcd(LocationRoutNum)},
+	roaming_record23(Record, Acc1);
+roaming_record22(Record, Acc) ->
+	roaming_record23(Record, Acc).
+%% @hidden
+roaming_record23(#{lrnSoInd := LrnSoInd} = Record, Acc) ->
+	Acc1 = Acc#{<<"lrnSoInd">> => LrnSoInd},
+	roaming_record24(Record, Acc1);
+roaming_record23(Record, Acc) ->
+	roaming_record24(Record, Acc).
+%% @hidden
+roaming_record24(#{lrnQuryStatus := LrnQuryStatus} = Record, Acc) ->
+	Acc1 = Acc#{<<"lrnQuryStatus">> => LrnQuryStatus},
+	roaming_record25(Record, Acc1);
+roaming_record24(Record, Acc) ->
+	roaming_record25(Record, Acc).
+%% @hidden
+roaming_record25(#{jIPPara := JIPPara} = Record, Acc) ->
+	Acc1 = Acc#{<<"jIPPara">> => JIPPara},
+	roaming_record26(Record, Acc1);
+roaming_record25(Record, Acc) ->
+	roaming_record26(Record, Acc).
+%% @hidden
+roaming_record26(#{jIPSoInd := JIPSoInd} = Record, Acc) ->
+	Acc1 = Acc#{<<"jIPSoInd">> => JIPSoInd},
+	roaming_record27(Record, Acc1);
+roaming_record26(Record, Acc) ->
+	roaming_record27(Record, Acc).
+%% @hidden
+roaming_record27(#{jIPQuryStatus := JIPQuryStatus} = Record, Acc) ->
+	Acc1 = Acc#{<<"jIPQuryStatus">> => JIPQuryStatus},
+	roaming_record28(Record, Acc1);
+roaming_record27(Record, Acc) ->
+	roaming_record28(Record, Acc).
+%% @hidden
+roaming_record28(#{partialRecordType := PartialRecordType}, Acc) ->
+	Acc#{<<"partialRecordType">> => PartialRecordType};
+roaming_record28(_Record, Acc) ->
 	Acc.
 
