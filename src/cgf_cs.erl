@@ -673,8 +673,8 @@ mo_call_record66(#{jIPQuryStatus := JIPQuryStatus} = MOCallRecord, Acc) ->
 mo_call_record66(MOCallRecord, Acc) ->
 	mo_call_record67(MOCallRecord, Acc).
 %% @hidden
-mo_call_record67(#{partialMOCallRecordType := PartialMOCallRecordType} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"partialMOCallRecordType">> => PartialMOCallRecordType},
+mo_call_record67(#{partialRecordType := PartialRecordType} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"partialRecordType">> => PartialRecordType},
 	mo_call_record68(MOCallRecord, Acc1);
 mo_call_record67(MOCallRecord, Acc) ->
 	mo_call_record68(MOCallRecord, Acc).
