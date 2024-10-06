@@ -171,7 +171,7 @@ get_type(#type{def = {'BIT STRING', []}, constraint = [{element_set,
 	#{"type" => "string", "pattern" => Pattern};
 get_type(#type{def = {'BIT STRING', NamedNumbers}, constraint = []}, _Refs) ->
 	Enum = [atom_to_list(Name) || {'NamedNumber', Name, _N} <- NamedNumbers],
-	#{"type" => "string", "enum" => Enum};
+	#{"type" => "array", "items" => #{"type" => "string", "enum" => Enum}};
 get_type(#type{def = 'UTF8String', constraint = Constraints}, _Refs) ->
 	get_constraint(Constraints, #{"type" => "string"});
 get_type(#type{def = 'IA5String', constraint = Constraints}, _Refs) ->

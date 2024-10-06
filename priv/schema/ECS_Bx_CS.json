@@ -1472,12 +1472,15 @@
 		},
 		"LevelOfCAMELService": {
 			"description": "Describes briefly the complexity of CAMEL invocation",
-			"type": "string",
-			"enum": [
-				"basic",
-				"callDurationSupervision",
-				"onlineCharging"
-			]
+			"type": "array",
+			"items": {
+				"type": "string",
+				"enum": [
+					"basic",
+					"callDurationSupervision",
+					"onlineCharging"
+				]
+			}
 		},
 		"JurisdictionInformationParameter": {
 			"type": "string",
