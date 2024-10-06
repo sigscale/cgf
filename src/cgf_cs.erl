@@ -348,8 +348,8 @@ mo_call_record12(#{changeOfLocation := ChangeOfLocation} = MOCallRecord, Acc) ->
 mo_call_record12(MOCallRecord, Acc) ->
 	mo_call_record13(MOCallRecord, Acc).
 %% @hidden
-mo_call_record13(#{basicService := Code} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"basicService">> => cgf_lib:octet_string(Code)},
+mo_call_record13(#{basicService := BasicService} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"basicService">> => basic_service_code(BasicService)},
 	mo_call_record14(MOCallRecord, Acc1);
 mo_call_record13(MOCallRecord, Acc) ->
 	mo_call_record14(MOCallRecord, Acc).
@@ -726,6 +726,13 @@ mo_call_record75(#{privateUserID := PrivateUserID} = _MOCallRecord, Acc) ->
 mo_call_record75(_MOCallRecord, Acc) ->
 	Acc.
 
+%% @hidden
+basic_service_code({bearerService, Code}) ->
+	#{<<"bearerService">> => cgf_lib:octet_string(Code)};
+basic_service_code({teleservice, Code}) ->
+	#{<<"teleservice">> => cgf_lib:octet_string(Code)}.
+
+%% @hidden
 change_of_service(#{transparencyInd := TransparencyInd} = ChangeOfService) ->
 	Acc = #{<<"transparencyInd">> => TransparencyInd},
 	change_of_service1(ChangeOfService, Acc);
@@ -750,11 +757,12 @@ change_of_service3(#{changeTime := ChangeTime} = ChangeOfService, Acc) ->
 change_of_service3(ChangeOfService, Acc) ->
 	change_of_service4(ChangeOfService, Acc).
 %% @hidden
-change_of_service4(#{basicService := Code} = _ChangeOfService, Acc) ->
-	Acc#{<<"basicService">> => cgf_lib:octet_string(Code)};
+change_of_service4(#{basicService := BasicService} = _ChangeOfService, Acc) ->
+	Acc#{<<"basicService">> => basic_service_code(BasicService)};
 change_of_service4(_ChangeOfService, Acc) ->
 	Acc.
 
+%% @hidden
 suppl_service_used(#{ssTime := SSTime} = SupplServicesUsed) ->
 	Acc = #{<<"ssTime">> => cgf_lib:bcd_date_time(SSTime)},
 	suppl_service_used1(SupplServicesUsed, Acc);
@@ -1138,8 +1146,8 @@ mt_call_record47(#{radioChanRequested := RadioChanRequested} = Record, Acc) ->
 mt_call_record47(Record, Acc) ->
 	mt_call_record48(Record, Acc).
 %% @hidden
-mt_call_record48(#{basicService := Code} = Record, Acc) ->
-	Acc1 = Acc#{<<"basicService">> => cgf_lib:octet_string(Code)},
+mt_call_record48(#{basicService := BasicService} = Record, Acc) ->
+	Acc1 = Acc#{<<"basicService">> => basic_service_code(BasicService)},
 	mt_call_record49(Record, Acc1);
 mt_call_record48(Record, Acc) ->
 	mt_call_record49(Record, Acc).
@@ -1365,8 +1373,8 @@ ss_action_record5(Record, Acc) ->
 	ss_action_record6(Record, Acc).
 %% @hidden
 ss_action_record6(#{basicServices := BasicServices} = Record, Acc) ->
-	Codes = [cgf_lib:octet_string(Code) || Code <- BasicServices],
-	Acc1 = Acc#{<<"basicService">> => Codes},
+	Codes = [basic_service_code(BS) || BS <- BasicServices],
+	Acc1 = Acc#{<<"basicServices">> => Codes},
 	ss_action_record7(Record, Acc1);
 ss_action_record6(Record, Acc) ->
 	ss_action_record7(Record, Acc).
