@@ -1092,9 +1092,8 @@
 		},
 		"BearerServiceCode": {
 			"description": "Provides a bearer service code.",
-			"type": "integer",
-			"minimum": 0,
-			"maximum": 255
+			"type": "string",
+			"pattern": "^[0-9a-f]{2}$"
 		},
 		"CallReferenceNumber": {
 			"description": "Uniquely identifies a call or transaction on one side of the interface (i.e. 'A' or 'B' side).",
@@ -1532,9 +1531,8 @@
 		},
 		"SS-Code": {
 			"description": "Identifies one or more supplementary services.",
-			"type": "integer",
-			"minimum": 0,
-			"maximum": 255
+			"type": "string",
+			"pattern": "^[0-9a-f]{2}$"
 		},
 		"SSActionType": {
 			"type": "string",
@@ -1594,9 +1592,8 @@
 		},
 		"TeleserviceCode": {
 			"description": "Provides a teleservice code.",
-			"type": "integer",
-			"minimum": 0,
-			"maximum": 255
+			"type": "string",
+			"pattern": "^[0-9a-f]{2}$"
 		},
 		"TrafficChannel": {
 			"description": "Describes the type of traffic channel actually employed for the connection.",
