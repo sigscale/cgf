@@ -1434,7 +1434,7 @@
 			]
 		},
 		"LocationRoutingNumberSourceIndicator": {
-			"type" : "string",
+			"type": "string",
 			"enum": [
 				"lRN-NP-Database",
 				"switchingSystemData",
@@ -1524,7 +1524,7 @@
 			"maximum": 11
 		},
 		"ReasonForServiceChange": {
-			"type" : "string",
+			"type": "string",
 			"enum": [
 				"msubInitiated",
 				"mscInitiated",

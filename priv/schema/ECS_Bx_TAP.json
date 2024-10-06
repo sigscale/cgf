@@ -237,29 +237,29 @@
 		},
 		"AccountingInfo": {
 			"type": "object",
-			"properties" : {
-				"currencyConversionInfo" : {
-					"type" : "array",
-					"items" : {
-						"$ref" : "#/$defs/CurrencyConversion"
+			"properties": {
+				"currencyConversionInfo": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/CurrencyConversion"
 					}
 				},
-				"discounting" : {
+				"discounting": {
 					"type": "array",
 					"items": {
 						"$ref": "#/$defs/Discounting"
 					}
 				},
-				"localCurrency" : {
-					"$ref" : "#/$defs/Currency"
+				"localCurrency": {
+					"$ref": "#/$defs/Currency"
 				},
-				"tapCurrency" : {
-					"$ref" : "#/$defs/Currency"
+				"tapCurrency": {
+					"$ref": "#/$defs/Currency"
 				},
-				"tapDecimalPlaces" : {
-					"type" : "integer"
+				"tapDecimalPlaces": {
+					"type": "integer"
 				},
-				"taxation" : {
+				"taxation": {
 					"type": "array",
 					"items": {
 						"$ref": "#/$defs/Taxation"
@@ -336,7 +336,7 @@
 		},
 		"BatchControlInfo": {
 			"type": "object",
-			"properties" : {
+			"properties": {
 				"sender": {
 					"$ref": "#/$defs/PlmnId"
 				},
@@ -533,20 +533,20 @@
 			"type": "string",
 			"format": "date-time"
 		},
-		"Currency" : {
-			"pattern" : "^([0-9a-fA-F]{2})*$",
-			"type" : "string"
+		"Currency": {
+			"pattern": "^([0-9a-fA-F]{2})*$",
+			"type": "string"
 		},
-		"CurrencyConversion" : {
-			"type" : "object",
-			"properties" : {
-				"exchangeRate" : {
-					"type" : "integer"
-				},
-				"exchangeRateCode" : {
+		"CurrencyConversion": {
+			"type": "object",
+			"properties": {
+				"exchangeRate": {
 					"type": "integer"
 				},
-				"numberOfDecimalPlaces" : {
+				"exchangeRateCode": {
+					"type": "integer"
+				},
+				"numberOfDecimalPlaces": {
 					"type": "integer"
 				}
 			}
@@ -695,10 +695,10 @@
 					"$ref": "#/$defs/PDPContextStartTimestamp"
 				},
 				"networkInitPDPContext": {
-					"type" : "integer"
+					"type": "integer"
 				},
 				"chargingId": {
-					"type" : "integer"
+					"type": "integer"
 				}
 			}
 		},
