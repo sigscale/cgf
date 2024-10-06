@@ -487,8 +487,8 @@ mo_call_record35(#{serviceKey := ServiceKey} = MOCallRecord, Acc) ->
 mo_call_record35(MOCallRecord, Acc) ->
 	mo_call_record36(MOCallRecord, Acc).
 %% @hidden
-mo_call_record36(#{networkCallReference := NetworkCallReference} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"networkCallReference">> => NetworkCallReference},
+mo_call_record36(#{networkCallReference := Reference} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"networkCallReference">> => cgf_lib:octet_string(Reference)},
 	mo_call_record38(MOCallRecord, Acc1);
 mo_call_record36(MOCallRecord, Acc) ->
 	mo_call_record37(MOCallRecord, Acc).
@@ -1128,8 +1128,8 @@ mt_call_record43(#{jIPSoInd := JIPSoInd} = Record, Acc) ->
 mt_call_record43(Record, Acc) ->
 	mt_call_record44(Record, Acc).
 %% @hidden
-mt_call_record44(#{networkCallReference := NetworkCallReference} = Record, Acc) ->
-	Acc1 = Acc#{<<"networkCallReference">> => NetworkCallReference},
+mt_call_record44(#{networkCallReference := Reference} = Record, Acc) ->
+	Acc1 = Acc#{<<"networkCallReference">> => cgf_lib:octet_string(Reference)},
 	mt_call_record45(Record, Acc1);
 mt_call_record44(Record, Acc) ->
 	mt_call_record45(Record, Acc).
