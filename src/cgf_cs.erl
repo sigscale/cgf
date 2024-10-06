@@ -415,8 +415,8 @@ mo_call_record23(#{releaseTime := ReleaseTime} = MOCallRecord, Acc) ->
 mo_call_record23(MOCallRecord, Acc) ->
 	mo_call_record24(MOCallRecord, Acc).
 %% @hidden
-mo_call_record24(#{callDuration := CallDuration} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"callDuration">> => cgf_lib:octet_string(CallDuration)},
+mo_call_record24(#{callDuration := Duration} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"callDuration">> => Duration},
 	mo_call_record25(MOCallRecord, Acc1);
 mo_call_record24(MOCallRecord, Acc) ->
 	mo_call_record25(MOCallRecord, Acc).
@@ -964,8 +964,8 @@ mt_call_record18(#{aocParameters := AOCParameters} = Record, Acc) ->
 mt_call_record18(Record, Acc) ->
 	mt_call_record19(Record, Acc).
 %% @hidden
-mt_call_record19(#{callDuration := CallDuration} = Record, Acc) ->
-	Acc1 = Acc#{<<"callDuration">> => cgf_lib:octet_string(CallDuration)},
+mt_call_record19(#{callDuration := Duration} = Record, Acc) ->
+	Acc1 = Acc#{<<"callDuration">> => Duration},
 	mt_call_record20(Record, Acc1);
 mt_call_record19(Record, Acc) ->
 	mt_call_record20(Record, Acc).
