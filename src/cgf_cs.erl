@@ -579,14 +579,14 @@ mo_call_record46(#{chanCodingUsed := ChanCodingUsed} = MOCallRecord, Acc) ->
 mo_call_record46(MOCallRecord, Acc) ->
 	mo_call_record47(MOCallRecord, Acc).
 %% @hidden
-mo_call_record47(#{speechVersionSupported := SpeechVersionSupported} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"speechVersionSupported">> => SpeechVersionSupported},
+mo_call_record47(#{speechVersionSupported := Identifier} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"speechVersionSupported">> => cgf_lib:octet_string(Identifier)},
 	mo_call_record48(MOCallRecord, Acc1);
 mo_call_record47(MOCallRecord, Acc) ->
 	mo_call_record48(MOCallRecord, Acc).
 %% @hidden
-mo_call_record48(#{speechVersionUsed := SpeechVersionUsed} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"speechVersionUsed">> => SpeechVersionUsed},
+mo_call_record48(#{speechVersionUsed := Identifier} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"speechVersionUsed">> => cgf_lib:octet_string(Identifier)},
 	mo_call_record49(MOCallRecord, Acc1);
 mo_call_record48(MOCallRecord, Acc) ->
 	mo_call_record49(MOCallRecord, Acc).
@@ -597,8 +597,8 @@ mo_call_record49(#{numberOfDPEncountered := NumberOfDPEncountered} = MOCallRecor
 mo_call_record49(MOCallRecord, Acc) ->
 	mo_call_record50(MOCallRecord, Acc).
 %% @hidden
-mo_call_record50(#{levelOfCAMELService := LevelOfCAMELService} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"levelOfCAMELService">> => LevelOfCAMELService},
+mo_call_record50(#{levelOfCAMELService := Level} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"levelOfCAMELService">> => level_camel_service(Level)},
 	mo_call_record51(MOCallRecord, Acc1);
 mo_call_record50(MOCallRecord, Acc) ->
 	mo_call_record51(MOCallRecord, Acc).
@@ -807,6 +807,15 @@ suppl_service_used1(_SupplServicesUsed, Acc) ->
 	Acc.
 
 %% @hidden
+level_camel_service(Level) ->
+	level_camel_service(Level, []).
+%% @hidden
+level_camel_service([H | T], Acc) ->
+	level_camel_service(T, [atom_to_list(H) | Acc]);
+level_camel_service([], Acc) ->
+	lists:reverse(Acc).
+
+%% @hidden
 mo_sms_record(#{servedIMSI := ServedIMSI} = Record) ->
 	Acc = #{<<"servedIMSI">> => cgf_lib:tbcd(ServedIMSI)},
 	mo_sms_record1(Record, Acc);
@@ -942,298 +951,298 @@ mt_call_record8(#{causeForTerm := CauseForTerm} = Record, Acc) ->
 mt_call_record8(Record, Acc) ->
 	mt_call_record9(Record, Acc).
 %% @hidden
-mt_call_record9(#{speechVersionSupported := SpeechVersionSupported} = Record, Acc) ->
-	Acc1 = Acc#{<<"speechVersionSupported">> => SpeechVersionSupported},
+mt_call_record9(#{speechVersionSupported := Identifier} = Record, Acc) ->
+	Acc1 = Acc#{<<"speechVersionSupported">> => cgf_lib:octet_string(Identifier)},
 	mt_call_record10(Record, Acc1);
 mt_call_record9(Record, Acc) ->
 	mt_call_record10(Record, Acc).
 %% @hidden
-mt_call_record10(#{changeOfService := ChangeOfService} = Record, Acc) ->
-	Acc1 = Acc#{<<"changeOfService">> => change_of_service(ChangeOfService)},
+mt_call_record10(#{speechVersionUsed := Identifier} = Record, Acc) ->
+	Acc1 = Acc#{<<"speechVersionUsed">> => cgf_lib:octet_string(Identifier)},
 	mt_call_record11(Record, Acc1);
 mt_call_record10(Record, Acc) ->
 	mt_call_record11(Record, Acc).
 %% @hidden
-mt_call_record11(#{answerTime := AnswerTime} = Record, Acc) ->
-	Acc1 = Acc#{<<"answerTime">> => cgf_lib:bcd_date_time(AnswerTime)},
+mt_call_record11(#{changeOfService := ChangeOfService} = Record, Acc) ->
+	Acc1 = Acc#{<<"changeOfService">> => change_of_service(ChangeOfService)},
 	mt_call_record12(Record, Acc1);
 mt_call_record11(Record, Acc) ->
 	mt_call_record12(Record, Acc).
 %% @hidden
-mt_call_record12(#{servedMSISDN := ServedMSISDN} = Record, Acc) ->
-	#{<<"address">> := MSISDN} = cgf_lib:bcd_dn(ServedMSISDN),
-	Acc1 = Acc#{<<"servedMSISDN">> => MSISDN},
+mt_call_record12(#{answerTime := AnswerTime} = Record, Acc) ->
+	Acc1 = Acc#{<<"answerTime">> => cgf_lib:bcd_date_time(AnswerTime)},
 	mt_call_record13(Record, Acc1);
 mt_call_record12(Record, Acc) ->
 	mt_call_record13(Record, Acc).
 %% @hidden
-mt_call_record13(#{changeOfHSCSDParms := ChangeOfHSCSDParms} = Record, Acc) ->
-	NewParams = [change_of_params(Param) || Param <- ChangeOfHSCSDParms],
-	Acc1 = Acc#{<<"changeOfHSCSDParms">> => NewParams},
+mt_call_record13(#{servedMSISDN := ServedMSISDN} = Record, Acc) ->
+	#{<<"address">> := MSISDN} = cgf_lib:bcd_dn(ServedMSISDN),
+	Acc1 = Acc#{<<"servedMSISDN">> => MSISDN},
 	mt_call_record14(Record, Acc1);
 mt_call_record13(Record, Acc) ->
 	mt_call_record14(Record, Acc).
 %% @hidden
-mt_call_record14(#{jIPQuryStatus := JIPQuryStatus} = Record, Acc) ->
-	Acc1 = Acc#{<<"jIPQuryStatus">> => JIPQuryStatus},
+mt_call_record14(#{changeOfHSCSDParms := ChangeOfHSCSDParms} = Record, Acc) ->
+	NewParams = [change_of_params(Param) || Param <- ChangeOfHSCSDParms],
+	Acc1 = Acc#{<<"changeOfHSCSDParms">> => NewParams},
 	mt_call_record15(Record, Acc1);
 mt_call_record14(Record, Acc) ->
 	mt_call_record15(Record, Acc).
 %% @hidden
-mt_call_record15(#{aiurRequested := AIURRequested} = Record, Acc) ->
-	Acc1 = Acc#{<<"aiurRequested">> => AIURRequested},
+mt_call_record15(#{jIPQuryStatus := JIPQuryStatus} = Record, Acc) ->
+	Acc1 = Acc#{<<"jIPQuryStatus">> => JIPQuryStatus},
 	mt_call_record16(Record, Acc1);
 mt_call_record15(Record, Acc) ->
 	mt_call_record16(Record, Acc).
 %% @hidden
-mt_call_record16(#{callingNumber := CallingNumber} = Record, Acc) ->
-	Acc1 = Acc#{<<"callingNumber">> => cgf_lib:bcd_dn(CallingNumber)},
+mt_call_record16(#{aiurRequested := AIURRequested} = Record, Acc) ->
+	Acc1 = Acc#{<<"aiurRequested">> => AIURRequested},
 	mt_call_record17(Record, Acc1);
 mt_call_record16(Record, Acc) ->
 	mt_call_record17(Record, Acc).
 %% @hidden
-mt_call_record17(#{lrnQuryStatus := LrnQuryStatus} = Record, Acc) ->
-	Acc1 = Acc#{<<"lrnQuryStatus">> => LrnQuryStatus},
+mt_call_record17(#{callingNumber := CallingNumber} = Record, Acc) ->
+	Acc1 = Acc#{<<"callingNumber">> => cgf_lib:bcd_dn(CallingNumber)},
 	mt_call_record18(Record, Acc1);
 mt_call_record17(Record, Acc) ->
 	mt_call_record18(Record, Acc).
 %% @hidden
-mt_call_record18(#{aocParameters := AOCParameters} = Record, Acc) ->
-	Acc1 = Acc#{<<"aocParameters">> => AOCParameters},
+mt_call_record18(#{lrnQuryStatus := LrnQuryStatus} = Record, Acc) ->
+	Acc1 = Acc#{<<"lrnQuryStatus">> => LrnQuryStatus},
 	mt_call_record19(Record, Acc1);
 mt_call_record18(Record, Acc) ->
 	mt_call_record19(Record, Acc).
 %% @hidden
-mt_call_record19(#{callDuration := Duration} = Record, Acc) ->
-	Acc1 = Acc#{<<"callDuration">> => Duration},
+mt_call_record19(#{aocParameters := AOCParameters} = Record, Acc) ->
+	Acc1 = Acc#{<<"aocParameters">> => AOCParameters},
 	mt_call_record20(Record, Acc1);
 mt_call_record19(Record, Acc) ->
 	mt_call_record20(Record, Acc).
 %% @hidden
-mt_call_record20(#{mSCAddress := {_, {_, MSCAddress}} } = Record, Acc) ->
-	Acc1 = Acc#{<<"mSCAddress">> => cgf_lib:ip_address(MSCAddress)},
+mt_call_record20(#{callDuration := Duration} = Record, Acc) ->
+	Acc1 = Acc#{<<"callDuration">> => Duration},
 	mt_call_record21(Record, Acc1);
 mt_call_record20(Record, Acc) ->
 	mt_call_record21(Record, Acc).
 %% @hidden
-mt_call_record21(#{privateUserID := PrivateUserID} = Record, Acc) ->
-	Acc1 = Acc#{<<"privateUserID">> => PrivateUserID},
+mt_call_record21(#{mSCAddress := {_, {_, MSCAddress}} } = Record, Acc) ->
+	Acc1 = Acc#{<<"mSCAddress">> => cgf_lib:ip_address(MSCAddress)},
 	mt_call_record22(Record, Acc1);
 mt_call_record21(Record, Acc) ->
 	mt_call_record22(Record, Acc).
 %% @hidden
-mt_call_record22(#{iCSI2ActiveFlag := _ICSI2ActiveFlag} = Record, Acc) ->
-	Acc1 = Acc#{<<"iCSI2ActiveFlag">> => undefined},
+mt_call_record22(#{privateUserID := PrivateUserID} = Record, Acc) ->
+	Acc1 = Acc#{<<"privateUserID">> => PrivateUserID},
 	mt_call_record23(Record, Acc1);
 mt_call_record22(Record, Acc) ->
 	mt_call_record23(Record, Acc).
 %% @hidden
-mt_call_record23(#{jIPPara := JIPPara} = Record, Acc) ->
-	Acc1 = Acc#{<<"jIPPara">> => JIPPara},
+mt_call_record23(#{iCSI2ActiveFlag := _ICSI2ActiveFlag} = Record, Acc) ->
+	Acc1 = Acc#{<<"iCSI2ActiveFlag">> => undefined},
 	mt_call_record24(Record, Acc1);
 mt_call_record23(Record, Acc) ->
 	mt_call_record24(Record, Acc).
 %% @hidden
-mt_call_record24(#{servedIMSI := ServedIMSI} = Record, Acc) ->
-	Acc1 = Acc#{<<"servedIMSI">> => cgf_lib:tbcd(ServedIMSI)},
+mt_call_record24(#{jIPPara := JIPPara} = Record, Acc) ->
+	Acc1 = Acc#{<<"jIPPara">> => JIPPara},
 	mt_call_record25(Record, Acc1);
 mt_call_record24(Record, Acc) ->
 	mt_call_record25(Record, Acc).
 %% @hidden
-mt_call_record25(#{seizureTime := SeizureTime} = Record, Acc) ->
-	Acc1 = Acc#{<<"seizureTime">> => cgf_lib:bcd_date_time(SeizureTime)},
+mt_call_record25(#{servedIMSI := ServedIMSI} = Record, Acc) ->
+	Acc1 = Acc#{<<"servedIMSI">> => cgf_lib:tbcd(ServedIMSI)},
 	mt_call_record26(Record, Acc1);
 mt_call_record25(Record, Acc) ->
 	mt_call_record26(Record, Acc).
 %% @hidden
-mt_call_record26(#{serviceChangeInitiator := ServiceChangeInitiator} = Record, Acc) ->
-	Acc1 = Acc#{<<"serviceChangeInitiator">> => ServiceChangeInitiator},
+mt_call_record26(#{seizureTime := SeizureTime} = Record, Acc) ->
+	Acc1 = Acc#{<<"seizureTime">> => cgf_lib:bcd_date_time(SeizureTime)},
 	mt_call_record27(Record, Acc1);
 mt_call_record26(Record, Acc) ->
 	mt_call_record27(Record, Acc).
 %% @hidden
-mt_call_record27(#{connectedNumber := ConnectedNumber} = Record, Acc) ->
-	Acc1 = Acc#{<<"connectedNumber">> => cgf_lib:bcd_dn(ConnectedNumber)},
+mt_call_record27(#{serviceChangeInitiator := ServiceChangeInitiator} = Record, Acc) ->
+	Acc1 = Acc#{<<"serviceChangeInitiator">> => ServiceChangeInitiator},
 	mt_call_record28(Record, Acc1);
 mt_call_record27(Record, Acc) ->
 	mt_call_record28(Record, Acc).
 %% @hidden
-mt_call_record28(#{'iMS-Charging-Identifier' := IMSChargingIdentifier} = Record, Acc) ->
-	Acc1 = Acc#{<<"iMS-Charging-Identifier">> => cgf_lib:octet_string(IMSChargingIdentifier)},
+mt_call_record28(#{connectedNumber := ConnectedNumber} = Record, Acc) ->
+	Acc1 = Acc#{<<"connectedNumber">> => cgf_lib:bcd_dn(ConnectedNumber)},
 	mt_call_record29(Record, Acc1);
 mt_call_record28(Record, Acc) ->
 	mt_call_record29(Record, Acc).
 %% @hidden
-mt_call_record29(#{serviceKey := ServiceKey} = Record, Acc) ->
-	Acc1 = Acc#{<<"serviceKey">> => ServiceKey},
+mt_call_record29(#{'iMS-Charging-Identifier' := IMSChargingIdentifier} = Record, Acc) ->
+	Acc1 = Acc#{<<"iMS-Charging-Identifier">> => cgf_lib:octet_string(IMSChargingIdentifier)},
 	mt_call_record30(Record, Acc1);
 mt_call_record29(Record, Acc) ->
 	mt_call_record30(Record, Acc).
 %% @hidden
-mt_call_record30(#{chanCodingUsed := ChanCodingUsed} = Record, Acc) ->
-	Acc1 = Acc#{<<"chanCodingUsed">> => ChanCodingUsed},
+mt_call_record30(#{serviceKey := ServiceKey} = Record, Acc) ->
+	Acc1 = Acc#{<<"serviceKey">> => ServiceKey},
 	mt_call_record31(Record, Acc1);
 mt_call_record30(Record, Acc) ->
 	mt_call_record31(Record, Acc).
 %% @hidden
-mt_call_record31(#{changeOfClassmark := ChangeOfClassmark} = Record, Acc) ->
-	Acc1 = Acc#{<<"changeOfClassmark">> => ChangeOfClassmark},
+mt_call_record31(#{chanCodingUsed := ChanCodingUsed} = Record, Acc) ->
+	Acc1 = Acc#{<<"chanCodingUsed">> => ChanCodingUsed},
 	mt_call_record32(Record, Acc1);
 mt_call_record31(Record, Acc) ->
 	mt_call_record32(Record, Acc).
 %% @hidden
-mt_call_record32(#{dataVolume := DataVolume} = Record, Acc) ->
-	Acc1 = Acc#{<<"dataVolume">> => DataVolume},
+mt_call_record32(#{changeOfClassmark := ChangeOfClassmark} = Record, Acc) ->
+	Acc1 = Acc#{<<"changeOfClassmark">> => ChangeOfClassmark},
 	mt_call_record33(Record, Acc1);
 mt_call_record32(Record, Acc) ->
 	mt_call_record33(Record, Acc).
 %% @hidden
-mt_call_record33(#{hSCSDChanAllocated := HSCSDChanAllocated} = Record, Acc) ->
-	Acc1 = Acc#{<<"hSCSDChanAllocated">> => HSCSDChanAllocated},
+mt_call_record33(#{dataVolume := DataVolume} = Record, Acc) ->
+	Acc1 = Acc#{<<"dataVolume">> => DataVolume},
 	mt_call_record34(Record, Acc1);
 mt_call_record33(Record, Acc) ->
 	mt_call_record34(Record, Acc).
 %% @hidden
-mt_call_record34(#{hSCSDChanRequested := HSCSDChanRequested} = Record, Acc) ->
-	Acc1 = Acc#{<<"hSCSDChanRequested">> => HSCSDChanRequested},
+mt_call_record34(#{hSCSDChanAllocated := HSCSDChanAllocated} = Record, Acc) ->
+	Acc1 = Acc#{<<"hSCSDChanAllocated">> => HSCSDChanAllocated},
 	mt_call_record35(Record, Acc1);
 mt_call_record34(Record, Acc) ->
 	mt_call_record35(Record, Acc).
 %% @hidden
-mt_call_record35(#{lrnSoInd := LrnSoInd} = Record, Acc) ->
-	Acc1 = Acc#{<<"lrnSoInd">> => LrnSoInd},
+mt_call_record35(#{hSCSDChanRequested := HSCSDChanRequested} = Record, Acc) ->
+	Acc1 = Acc#{<<"hSCSDChanRequested">> => HSCSDChanRequested},
 	mt_call_record36(Record, Acc1);
 mt_call_record35(Record, Acc) ->
 	mt_call_record36(Record, Acc).
 %% @hidden
-mt_call_record36(#{systemType := SystemType} = Record, Acc) ->
-	Acc1 = Acc#{<<"systemType">> => SystemType},
+mt_call_record36(#{lrnSoInd := LrnSoInd} = Record, Acc) ->
+	Acc1 = Acc#{<<"lrnSoInd">> => LrnSoInd},
 	mt_call_record37(Record, Acc1);
 mt_call_record36(Record, Acc) ->
 	mt_call_record37(Record, Acc).
 %% @hidden
-mt_call_record37(#{'gsm-SCFAddress' := GsmSCFAddress} = Record, Acc) ->
-	Acc1 = Acc#{<<"gsm-SCFAddress">> => GsmSCFAddress},
+mt_call_record37(#{systemType := SystemType} = Record, Acc) ->
+	Acc1 = Acc#{<<"systemType">> => SystemType},
 	mt_call_record38(Record, Acc1);
 mt_call_record37(Record, Acc) ->
 	mt_call_record38(Record, Acc).
 %% @hidden
-mt_call_record38(#{mscOutgoingTKGP := TrunkGroup} = Record, Acc) ->
-	Acc1 = Acc#{<<"mscOutgoingTKGP">> => trunk_group(TrunkGroup)},
+mt_call_record38(#{'gsm-SCFAddress' := GsmSCFAddress} = Record, Acc) ->
+	Acc1 = Acc#{<<"gsm-SCFAddress">> => GsmSCFAddress},
 	mt_call_record39(Record, Acc1);
 mt_call_record38(Record, Acc) ->
 	mt_call_record39(Record, Acc).
 %% @hidden
-mt_call_record39(#{sequenceNumber := SequenceNumber} = Record, Acc) ->
-	Acc1 = Acc#{<<"sequenceNumber">> => SequenceNumber},
+mt_call_record39(#{mscOutgoingTKGP := TrunkGroup} = Record, Acc) ->
+	Acc1 = Acc#{<<"mscOutgoingTKGP">> => trunk_group(TrunkGroup)},
 	mt_call_record40(Record, Acc1);
 mt_call_record39(Record, Acc) ->
 	mt_call_record40(Record, Acc).
 %% @hidden
-mt_call_record40(#{chanCodingsAcceptable := ChanCodingsAcceptable} = Record, Acc) ->
-	Acc1 = Acc#{<<"chanCodingsAcceptable">> => ChanCodingsAcceptable},
+mt_call_record40(#{sequenceNumber := SequenceNumber} = Record, Acc) ->
+	Acc1 = Acc#{<<"sequenceNumber">> => SequenceNumber},
 	mt_call_record41(Record, Acc1);
 mt_call_record40(Record, Acc) ->
 	mt_call_record41(Record, Acc).
 %% @hidden
-mt_call_record41(#{locationRoutNum := LocationRoutNum} = Record, Acc) ->
-	Acc1 = Acc#{<<"locationRoutNum">> => cgf_lib:tbcd(LocationRoutNum)},
+mt_call_record41(#{chanCodingsAcceptable := ChanCodingsAcceptable} = Record, Acc) ->
+	Acc1 = Acc#{<<"chanCodingsAcceptable">> => ChanCodingsAcceptable},
 	mt_call_record42(Record, Acc1);
 mt_call_record41(Record, Acc) ->
 	mt_call_record42(Record, Acc).
 %% @hidden
-mt_call_record42(#{msClassmark := MSClassmark} = Record, Acc) ->
-	Acc1 = Acc#{<<"msClassmark">> => cgf_lib:octet_string(MSClassmark)},
+mt_call_record42(#{locationRoutNum := LocationRoutNum} = Record, Acc) ->
+	Acc1 = Acc#{<<"locationRoutNum">> => cgf_lib:tbcd(LocationRoutNum)},
 	mt_call_record43(Record, Acc1);
 mt_call_record42(Record, Acc) ->
 	mt_call_record43(Record, Acc).
 %% @hidden
-mt_call_record43(#{jIPSoInd := JIPSoInd} = Record, Acc) ->
-	Acc1 = Acc#{<<"jIPSoInd">> => JIPSoInd},
+mt_call_record43(#{msClassmark := MSClassmark} = Record, Acc) ->
+	Acc1 = Acc#{<<"msClassmark">> => cgf_lib:octet_string(MSClassmark)},
 	mt_call_record44(Record, Acc1);
 mt_call_record43(Record, Acc) ->
 	mt_call_record44(Record, Acc).
 %% @hidden
-mt_call_record44(#{networkCallReference := Reference} = Record, Acc) ->
-	Acc1 = Acc#{<<"networkCallReference">> => cgf_lib:octet_string(Reference)},
+mt_call_record44(#{jIPSoInd := JIPSoInd} = Record, Acc) ->
+	Acc1 = Acc#{<<"jIPSoInd">> => JIPSoInd},
 	mt_call_record45(Record, Acc1);
 mt_call_record44(Record, Acc) ->
 	mt_call_record45(Record, Acc).
 %% @hidden
-mt_call_record45(#{radioChanUsed := RadioChanUsed} = Record, Acc) ->
-	Acc1 = Acc#{<<"radioChanUsed">> => RadioChanUsed},
+mt_call_record45(#{networkCallReference := Reference} = Record, Acc) ->
+	Acc1 = Acc#{<<"networkCallReference">> => cgf_lib:octet_string(Reference)},
 	mt_call_record46(Record, Acc1);
 mt_call_record45(Record, Acc) ->
 	mt_call_record46(Record, Acc).
 %% @hidden
-mt_call_record46(#{maximumBitRate := MaximumBitRate} = Record, Acc) ->
-	Acc1 = Acc#{<<"maximumBitRate">> => MaximumBitRate},
+mt_call_record46(#{radioChanUsed := RadioChanUsed} = Record, Acc) ->
+	Acc1 = Acc#{<<"radioChanUsed">> => RadioChanUsed},
 	mt_call_record47(Record, Acc1);
 mt_call_record46(Record, Acc) ->
 	mt_call_record47(Record, Acc).
 %% @hidden
-mt_call_record47(#{radioChanRequested := RadioChanRequested} = Record, Acc) ->
-	Acc1 = Acc#{<<"radioChanRequested">> => RadioChanRequested},
+mt_call_record47(#{maximumBitRate := MaximumBitRate} = Record, Acc) ->
+	Acc1 = Acc#{<<"maximumBitRate">> => MaximumBitRate},
 	mt_call_record48(Record, Acc1);
 mt_call_record47(Record, Acc) ->
 	mt_call_record48(Record, Acc).
 %% @hidden
-mt_call_record48(#{basicService := BasicService} = Record, Acc) ->
-	Acc1 = Acc#{<<"basicService">> => basic_service_code(BasicService)},
+mt_call_record48(#{radioChanRequested := RadioChanRequested} = Record, Acc) ->
+	Acc1 = Acc#{<<"radioChanRequested">> => RadioChanRequested},
 	mt_call_record49(Record, Acc1);
 mt_call_record48(Record, Acc) ->
 	mt_call_record49(Record, Acc).
 %% @hidden
-mt_call_record49(#{guaranteedBitRate := GuaranteedBitRate} = Record, Acc) ->
-	Acc1 = Acc#{<<"guaranteedBitRate">> => GuaranteedBitRate},
+mt_call_record49(#{basicService := BasicService} = Record, Acc) ->
+	Acc1 = Acc#{<<"basicService">> => basic_service_code(BasicService)},
 	mt_call_record50(Record, Acc1);
 mt_call_record49(Record, Acc) ->
 	mt_call_record50(Record, Acc).
 %% @hidden
-mt_call_record50(#{additionalChgInfo := AdditionalChgInfo} = Record, Acc) ->
-	Acc1 = Acc#{<<"additionalChgInfo">> => AdditionalChgInfo},
+mt_call_record50(#{guaranteedBitRate := GuaranteedBitRate} = Record, Acc) ->
+	Acc1 = Acc#{<<"guaranteedBitRate">> => GuaranteedBitRate},
 	mt_call_record51(Record, Acc1);
 mt_call_record50(Record, Acc) ->
 	mt_call_record51(Record, Acc).
 %% @hidden
-mt_call_record51(#{changeOfLocation := ChangeOfLocation} = Record, Acc) ->
-	Acc1 = Acc#{<<"changeOfLocation">> => ChangeOfLocation},
+mt_call_record51(#{additionalChgInfo := AdditionalChgInfo} = Record, Acc) ->
+	Acc1 = Acc#{<<"additionalChgInfo">> => AdditionalChgInfo},
 	mt_call_record52(Record, Acc1);
 mt_call_record51(Record, Acc) ->
 	mt_call_record52(Record, Acc).
 %% @hidden
-mt_call_record52(#{servedIMEI := ServedIMEI} = Record, Acc) ->
-	Acc1 = Acc#{<<"servedIMEI">> => cgf_lib:tbcd(ServedIMEI)},
+mt_call_record52(#{changeOfLocation := ChangeOfLocation} = Record, Acc) ->
+	Acc1 = Acc#{<<"changeOfLocation">> => ChangeOfLocation},
 	mt_call_record53(Record, Acc1);
 mt_call_record52(Record, Acc) ->
 	mt_call_record53(Record, Acc).
 %% @hidden
-mt_call_record53(#{diagnostics := Diagnostics} = Record, Acc) ->
-	Acc1 = Acc#{<<"diagnostics">> => cgf_lib:diagnostics(Diagnostics)},
+mt_call_record53(#{servedIMEI := ServedIMEI} = Record, Acc) ->
+	Acc1 = Acc#{<<"servedIMEI">> => cgf_lib:tbcd(ServedIMEI)},
 	mt_call_record54(Record, Acc1);
 mt_call_record53(Record, Acc) ->
 	mt_call_record54(Record, Acc).
 %% @hidden
-mt_call_record54(#{transparencyIndicator := TransparencyIndicator} = Record, Acc) ->
-	Acc1 = Acc#{<<"transparencyIndicator">> => TransparencyIndicator},
+mt_call_record54(#{diagnostics := Diagnostics} = Record, Acc) ->
+	Acc1 = Acc#{<<"diagnostics">> => cgf_lib:diagnostics(Diagnostics)},
 	mt_call_record55(Record, Acc1);
 mt_call_record54(Record, Acc) ->
 	mt_call_record55(Record, Acc).
 %% @hidden
-mt_call_record55(#{mscIncomingTKGP := TrunkGroup} = Record, Acc) ->
-	Acc1 = Acc#{<<"mscIncomingTKGP">> => trunk_group(TrunkGroup)},
+mt_call_record55(#{transparencyIndicator := TransparencyIndicator} = Record, Acc) ->
+	Acc1 = Acc#{<<"transparencyIndicator">> => TransparencyIndicator},
 	mt_call_record56(Record, Acc1);
 mt_call_record55(Record, Acc) ->
 	mt_call_record56(Record, Acc).
 %% @hidden
-mt_call_record56(#{callReference := CallReference} = Record, Acc) ->
-	Acc1 = Acc#{<<"callReference">> => cgf_lib:octet_string(CallReference)},
+mt_call_record56(#{mscIncomingTKGP := TrunkGroup} = Record, Acc) ->
+	Acc1 = Acc#{<<"mscIncomingTKGP">> => trunk_group(TrunkGroup)},
 	mt_call_record57(Record, Acc1);
 mt_call_record56(Record, Acc) ->
 	mt_call_record57(Record, Acc).
 %% @hidden
-mt_call_record57(#{speechVersionUsed := SpeechVersionUsed} = Record, Acc) ->
-	Acc1 = Acc#{<<"speechVersionUsed">> => cgf_lib:octet_string(SpeechVersionUsed)},
+mt_call_record57(#{callReference := CallReference} = Record, Acc) ->
+	Acc1 = Acc#{<<"callReference">> => cgf_lib:octet_string(CallReference)},
 	mt_call_record58(Record, Acc1);
 mt_call_record57(Record, Acc) ->
 	mt_call_record58(Record, Acc).
