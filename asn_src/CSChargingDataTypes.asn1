@@ -115,7 +115,8 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		niLCSRecord         [19] NILCSRecord,
 		mSCsRVCCRecord      [20] MSCsRVCCRecord,
 		mMTRFRecord         [21] MTRFRecord,
-		iCSRegisterRecord   [22] ICSregisterRecord
+		iCSRegisterRecord   [22] ICSregisterRecord,
+		...
 	}
 
 	MOCallRecord ::= SET
