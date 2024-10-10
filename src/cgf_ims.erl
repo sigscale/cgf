@@ -85,7 +85,7 @@ import2(_Log, _Metadata, {error, Reason}) ->
 	{error, Reason}.
 
 %%----------------------------------------------------------------------
-%%  The cgf_ims public API
+%%  Internal functions
 %%----------------------------------------------------------------------
 
 -spec parse(Log, Metadata, CDR) -> Result
@@ -201,10 +201,6 @@ parse(Log, Metadata, {aTCFRecord, ATCFRecord}) ->
 					{error, Reason}])
 	end.
 
-%%----------------------------------------------------------------------
-%%  Internal functions
-%%----------------------------------------------------------------------
-
 -spec parse_scscf(Log, Metadata, SCSCFRecord) -> Result
 	when
 		Log :: disk_log:log(),
@@ -293,8 +289,10 @@ parse_bgcf(_Log, _Metadata, _BGCFRecord) ->
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a CDR event detail for an ASRecord.
-parse_as(_Log, _Metadata, _ASRecord) ->
-	{error, not_implemented}.
+parse_as(Log, Metadata, ASRecord) ->
+	Call = as_record(ASRecord),
+	CDR = [{ac_record, Call} | Metadata],
+	cgf_log:blog(Log, CDR).
 
 -spec parse_ecscf(Log, Metadata, ECSCFRecord) -> Result
 	when
@@ -360,4 +358,401 @@ parse_tf(_Log, _Metadata, _TFRecord) ->
 %% @doc Parse a CDR event detail for an ATCFRecord.
 parse_atcf(_Log, _Metadata, _ATCFRecord) ->
 	{error, not_implemented}.
+
+%% @hidden
+as_record(#{accessNetworkInformation := AccessNetworkInformation} = Record) ->
+	Acc= #{<<"accessNetworkInformation">> =>
+			cgf_lib:octet_string(AccessNetworkInformation)},
+	as_record1(Record, Acc);
+as_record(Record) ->
+	as_record1(Record, #{}).
+%% @hidden
+as_record1(#{additionalAccessNetworkInformation := AdditionalAccessNetworkInformation} = Record, Acc) ->
+	Acc1 = Acc#{<<"additionalAccessNetworkInformation">> =>
+			cgf_lib:octet_string(AdditionalAccessNetworkInformation)},
+	as_record2(Record, Acc1);
+as_record1(Record, Acc) ->
+	as_record2(Record, Acc).
+%% @hidden
+as_record2(#{alternateChargedPartyAddress := AlternateChargedPartyAddress} = Record, Acc) ->
+	Acc1 = Acc#{<<"alternateChargedPartyAddress">> => AlternateChargedPartyAddress},
+	as_record3(Record, Acc1);
+as_record2(Record, Acc) ->
+	as_record3(Record, Acc).
+%% @hidden
+as_record3(#{'called-Party-Address' := CalledPartyAddress} = Record, Acc) ->
+	Acc1 = Acc#{<<"called-Party-Address">> =>  cgf_lib:bcd_dn(CalledPartyAddress)},
+	as_record4(Record, Acc1);
+as_record3(Record, Acc) ->
+	as_record4(Record, Acc).
+%% @hidden
+as_record4(#{carrierSelectRouting := CarrierSelectRouting} = Record, Acc) ->
+	Acc1 = Acc#{<<"carrierSelectRouting">> => CarrierSelectRouting},
+	as_record5(Record, Acc1);
+as_record4(Record, Acc) ->
+	as_record5(Record, Acc).
+%% @hidden
+as_record5(#{causeForRecordClosing := CauseForRecordClosing} = Record, Acc) ->
+	Acc1 = Acc#{<<"causeForRecordClosing">> => CauseForRecordClosing},
+	as_record6(Record, Acc1);
+as_record5(Record, Acc) ->
+	as_record6(Record, Acc).
+%% @hidden
+as_record6(#{cellularNetworkInformation := CellularNetworkInformation} = Record, Acc) ->
+	Acc1 = Acc#{<<"cellularNetworkInformation">> => CellularNetworkInformation},
+	as_record7(Record, Acc1);
+as_record6(Record, Acc) ->
+	as_record7(Record, Acc).
+%% @hidden
+as_record7(#{event := Event} = Record, Acc) ->
+	Acc1 = Acc#{<<"event">> => Event},
+	as_record8(Record, Acc1);
+as_record7(Record, Acc) ->
+	as_record8(Record, Acc).
+%% @hidden
+as_record8(#{expiresInformation := ExpiresInformation} = Record, Acc) ->
+	Acc1 = Acc#{<<"expiresInformation">> => ExpiresInformation},
+	as_record9(Record, Acc1);
+as_record8(Record, Acc) ->
+	as_record9(Record, Acc).
+%% @hidden
+as_record9(#{fEIdentifierList := FEIdentifierList} = Record, Acc) ->
+	Acc1 = Acc#{<<"fEIdentifierList">> => FEIdentifierList},
+	as_record10(Record, Acc1);
+as_record9(Record, Acc) ->
+	as_record10(Record, Acc).
+%% @hidden
+as_record10(#{fromAddress := FromAddress} = Record, Acc) ->
+	Acc1 = Acc#{<<"fromAddress">> => cgf_lib:bcd_dn(FromAddress)},
+	as_record11(Record, Acc1);
+as_record10(Record, Acc) ->
+	as_record11(Record, Acc).
+%% @hidden
+as_record11(#{gGSNaddress := GGSNAddress} = Record, Acc) ->
+	Acc1 = Acc#{<<"gGSNaddress">> => cgf_lib:ip_address(GGSNAddress)},
+	as_record12(Record, Acc1);
+as_record11(Record, Acc) ->
+	as_record12(Record, Acc).
+%% @hidden
+as_record12(#{'iMS-Charging-Identifier' := IMSChargingIdentifier} = Record, Acc) ->
+	Acc1 = Acc#{<<"iMS-Charging-Identifier">> => IMSChargingIdentifier},
+	as_record13(Record, Acc1);
+as_record12(Record, Acc) ->
+	as_record13(Record, Acc).
+%% @hidden
+as_record13(#{iMSCommunicationServiceIdentifier := IMSCommunicationServiceIdentifier} = Record, Acc) ->
+	Acc1 = Acc#{<<"iMSCommunicationServiceIdentifier">> => IMSCommunicationServiceIdentifier},
+	as_record14(Record, Acc1);
+as_record13(Record, Acc) ->
+	as_record14(Record, Acc).
+%% @hidden
+as_record14(#{iMSVisitedNetworkIdentifier := IMSVisitedNetworkIdentifier} = Record, Acc) ->
+	Acc1 = Acc#{<<"iMSVisitedNetworkIdentifier">> => IMSVisitedNetworkIdentifier},
+	as_record15(Record, Acc1);
+as_record14(Record, Acc) ->
+	as_record15(Record, Acc).
+%% @hidden
+as_record15(#{'incomplete-CDR-Indication' := IncompleteCDRIndication} = Record, Acc) ->
+	Acc1 = Acc#{<<"incomplete-CDR-Indication">> => IncompleteCDRIndication},
+	as_record16(Record, Acc1);
+as_record15(Record, Acc) ->
+	as_record16(Record, Acc).
+%% @hidden
+as_record16(#{initialIMSChargingIdentifier := InitialIMSChargingIdentifier} = Record, Acc) ->
+	Acc1 = Acc#{<<"initialIMSChargingIdentifier">> => InitialIMSChargingIdentifier},
+	as_record17(Record, Acc1);
+as_record16(Record, Acc) ->
+	as_record17(Record, Acc).
+%% @hidden
+as_record17(#{instanceId := InstanceId} = Record, Acc) ->
+	Acc1 = Acc#{<<"instanceId">> => InstanceId},
+	as_record18(Record, Acc1);
+as_record17(Record, Acc) ->
+	as_record18(Record, Acc).
+%% @hidden
+as_record18(#{interOperatorIdentifiers := InterOperatorIdentifiers} = Record, Acc) ->
+	Acc1 = Acc#{<<"interOperatorIdentifiers">> => InterOperatorIdentifiers},
+	as_record19(Record, Acc1);
+as_record18(Record, Acc) ->
+	as_record19(Record, Acc).
+%% @hidden
+as_record19(#{'list-Of-AccessNetworkInfoChange' := ListOfAccessNetworkInfoChange} = Record, Acc) ->
+	Acc1 = Acc#{<<"list-Of-AccessNetworkInfoChange">> => ListOfAccessNetworkInfoChange},
+	as_record20(Record, Acc1);
+as_record19(Record, Acc) ->
+	as_record20(Record, Acc).
+%% @hidden
+as_record20(#{'list-Of-AccessTransferInformation' := ListOfAccessTransferInformation} = Record, Acc) ->
+	Acc1 = Acc#{<<"list-Of-AccessTransferInformation">> => ListOfAccessTransferInformation},
+	as_record21(Record, Acc1);
+as_record20(Record, Acc) ->
+	as_record21(Record, Acc).
+%% @hidden
+as_record21(#{'list-Of-Called-Asserted-Identity' := ListOfCalledAssertedIdentity} = Record, Acc) ->
+	Acc1 = Acc#{<<"list-Of-Called-Asserted-Identity">> => ListOfCalledAssertedIdentity},
+	as_record22(Record, Acc1);
+as_record21(Record, Acc) ->
+	as_record22(Record, Acc).
+%% @hidden
+as_record22(#{'list-Of-Calling-Party-Address' := ListOfCallingPartyAddress} = Record, Acc) ->
+	Acc1 = Acc#{<<"list-Of-Calling-Party-Address">> => ListOfCallingPartyAddress},
+	as_record23(Record, Acc1);
+as_record22(Record, Acc) ->
+	as_record23(Record, Acc).
+%% @hidden
+as_record23(#{'list-Of-Early-SDP-Media-Components' := ListOfEarlySDPMediaComponents} = Record, Acc) ->
+	Acc1 = Acc#{<<"list-Of-Early-SDP-Media-Components">> => ListOfEarlySDPMediaComponents},
+	as_record24(Record, Acc1);
+as_record23(Record, Acc) ->
+	as_record24(Record, Acc).
+%% @hidden
+as_record24(#{'list-Of-Message-Bodies' := ListOfMessageBodies} = Record, Acc) ->
+	Acc1 = Acc#{<<"list-Of-Message-Bodies">> => ListOfMessageBodies},
+	as_record25(Record, Acc1);
+as_record24(Record, Acc) ->
+	as_record25(Record, Acc).
+%% @hidden
+as_record25(#{'list-Of-SDP-Media-Components' := ListOfSDPMediaComponents} = Record, Acc) ->
+	Acc1 = Acc#{<<"list-Of-SDP-Media-Components">> => ListOfSDPMediaComponents},
+	as_record26(Record, Acc1);
+as_record25(Record, Acc) ->
+	as_record26(Record, Acc).
+%% @hidden
+as_record26(#{'list-of-Requested-Party-Address' := ListOfRequestedPartyAddress} = Record, Acc) ->
+	Acc1 = Acc#{<<"list-of-Requested-Party-Address">> => ListOfRequestedPartyAddress},
+	as_record27(Record, Acc1);
+as_record26(Record, Acc) ->
+	as_record27(Record, Acc).
+%% @hidden
+as_record27(#{'list-of-subscription-ID' := ListOfSubscriptionID} = Record, Acc) ->
+	Acc1 = Acc#{<<"list-of-subscription-ID">> => ListOfSubscriptionID},
+	as_record28(Record, Acc1);
+as_record27(Record, Acc) ->
+	as_record28(Record, Acc).
+%% @hidden
+as_record28(#{listOfCalledIdentityChanges := ListOfCalledIdentityChanges} = Record, Acc) ->
+	Acc1 = Acc#{<<"listOfCalledIdentityChanges">> => ListOfCalledIdentityChanges},
+	as_record29(Record, Acc1);
+as_record28(Record, Acc) ->
+	as_record29(Record, Acc).
+%% @hidden
+as_record29(#{listOfReasonHeader := ListOfReasonHeader} = Record, Acc) ->
+	Acc1 = Acc#{<<"listOfReasonHeader">> => ListOfReasonHeader},
+	as_record30(Record, Acc1);
+as_record29(Record, Acc) ->
+	as_record30(Record, Acc).
+%% @hidden
+as_record30(#{localRecordSequenceNumber := LocalRecordSequenceNumber} = Record, Acc) ->
+	Acc1 = Acc#{<<"localRecordSequenceNumber">> => LocalRecordSequenceNumber},
+	as_record31(Record, Acc1);
+as_record30(Record, Acc) ->
+	as_record31(Record, Acc).
+%% @hidden
+as_record31(#{mSTimeZone := MSTimeZone} = Record, Acc) ->
+	Acc1 = Acc#{<<"mSTimeZone">> => cgf_lib:bcd_date_time(MSTimeZone)},
+	as_record32(Record, Acc1);
+as_record31(Record, Acc) ->
+	as_record32(Record, Acc).
+%% @hidden
+as_record32(#{'msc-Address' := MSCAddress} = Record, Acc) ->
+	Acc1 = Acc#{<<"msc-Address">> => MSCAddress},
+	as_record33(Record, Acc1);
+as_record32(Record, Acc) ->
+	as_record33(Record, Acc).
+%% @hidden
+as_record33(#{'nNI-Information' := NNIInformation} = Record, Acc) ->
+	Acc1 = Acc#{<<"nNI-Information">> => NNIInformation},
+	as_record34(Record, Acc1);
+as_record33(Record, Acc) ->
+	as_record34(Record, Acc).
+%% @hidden
+as_record34(#{nodeAddress := NodeAddress} = Record, Acc) ->
+	Acc1 = Acc#{<<"nodeAddress">> => NodeAddress},
+	as_record35(Record, Acc1);
+as_record34(Record, Acc) ->
+	as_record35(Record, Acc).
+%% @hidden
+as_record35(#{numberPortabilityRouting := NumberPortabilityRouting} = Record, Acc) ->
+	Acc1 = Acc#{<<"numberPortabilityRouting">> => NumberPortabilityRouting},
+	as_record36(Record, Acc1);
+as_record35(Record, Acc) ->
+	as_record36(Record, Acc).
+%% @hidden
+as_record36(#{'online-charging-flag' := OnlineChargingFlag} = Record, Acc) ->
+	Acc1 = Acc#{<<"online-charging-flag">> => OnlineChargingFlag},
+	as_record37(Record, Acc1);
+as_record36(Record, Acc) ->
+	as_record37(Record, Acc).
+%% @hidden
+as_record37(#{outgoingSessionId := OutgoingSessionId} = Record, Acc) ->
+	Acc1 = Acc#{<<"outgoingSessionId">> => OutgoingSessionId},
+	as_record38(Record, Acc1);
+as_record37(Record, Acc) ->
+	as_record38(Record, Acc).
+%% @hidden
+as_record38(#{privateUserID := PrivateUserID} = Record, Acc) ->
+	Acc1 = Acc#{<<"privateUserID">> => PrivateUserID},
+	as_record39(Record, Acc1);
+as_record38(Record, Acc) ->
+	as_record39(Record, Acc).
+%% @hidden
+as_record39(#{realTimeTariffInformation := RealTimeTariffInformation} = Record, Acc) ->
+	Acc1 = Acc#{<<"realTimeTariffInformation">> => RealTimeTariffInformation},
+	as_record40(Record, Acc1);
+as_record39(Record, Acc) ->
+	as_record40(Record, Acc).
+%% @hidden
+as_record40(#{recordClosureTime := RecordClosureTime} = Record, Acc) ->
+	Acc1 = Acc#{<<"recordClosureTime">> => cgf_lib:bcd_date_time(RecordClosureTime)},
+	as_record41(Record, Acc1);
+as_record40(Record, Acc) ->
+	as_record41(Record, Acc).
+%% @hidden
+as_record41(#{recordExtensions := RecordExtensions} = Record, Acc) ->
+	Acc1 = Acc#{<<"recordExtensions">> => RecordExtensions},
+	as_record42(Record, Acc1);
+as_record41(Record, Acc) ->
+	as_record42(Record, Acc).
+%% @hidden
+as_record42(#{recordOpeningTime := RecordOpeningTime} = Record, Acc) ->
+	Acc1 = Acc#{<<"recordOpeningTime">> => cgf_lib:bcd_date_time(RecordOpeningTime)},
+	as_record43(Record, Acc1);
+as_record42(Record, Acc) ->
+	as_record43(Record, Acc).
+%% @hidden
+as_record43(#{recordSequenceNumber := RecordSequenceNumber} = Record, Acc) ->
+	Acc1 = Acc#{<<"recordSequenceNumber">> => RecordSequenceNumber},
+	as_record44(Record, Acc1);
+as_record43(Record, Acc) ->
+	as_record44(Record, Acc).
+%% @hidden
+as_record44(#{'requested-Party-Address' := RequestedPartyAddress} = Record, Acc) ->
+	Acc1 = Acc#{<<"requested-Party-Address">> => RequestedPartyAddress},
+	as_record45(Record, Acc1);
+as_record44(Record, Acc) ->
+	as_record45(Record, Acc).
+%% @hidden
+as_record45(#{retransmission := Retransmission} = Record, Acc) ->
+	Acc1 = Acc#{<<"retransmission">> => Retransmission},
+	as_record46(Record, Acc1);
+as_record45(Record, Acc) ->
+	as_record46(Record, Acc).
+%% @hidden
+as_record46(#{'role-of-Node' := RoleOfNode} = Record, Acc) ->
+	Acc1 = Acc#{<<"role-of-Node">> => RoleOfNode},
+	as_record47(Record, Acc1);
+as_record46(Record, Acc) ->
+	as_record47(Record, Acc).
+%% @hidden
+as_record47(#{'sIP-Method' := SIPMethod} = Record, Acc) ->
+	Acc1 = Acc#{<<"sIP-Method">> => SIPMethod},
+	as_record48(Record, Acc1);
+as_record47(Record, Acc) ->
+	as_record48(Record, Acc).
+%% @hidden
+as_record48(#{serviceContextID := ServiceContextID} = Record, Acc) ->
+	Acc1 = Acc#{<<"serviceContextID">> => ServiceContextID},
+	as_record49(Record, Acc1);
+as_record48(Record, Acc) ->
+	as_record49(Record, Acc).
+%% @hidden
+as_record49(#{serviceDeliveryEndTimeStamp := ServiceDeliveryEndTimeStamp} = Record, Acc) ->
+	Acc1 = Acc#{<<"serviceDeliveryEndTimeStamp">> =>
+		cgf_lib:bcd_date_time(ServiceDeliveryEndTimeStamp)},
+	as_record50(Record, Acc1);
+as_record49(Record, Acc) ->
+	as_record50(Record, Acc).
+%% @hidden
+as_record50(#{serviceDeliveryEndTimeStampFraction := ServiceDeliveryEndTimeStampFraction} = Record, Acc) ->
+	Acc1 = Acc#{<<"serviceDeliveryEndTimeStampFraction">> =>
+		cgf_lib:bcd_date_time(ServiceDeliveryEndTimeStampFraction)},
+	as_record51(Record, Acc1);
+as_record50(Record, Acc) ->
+	as_record51(Record, Acc).
+%% @hidden
+as_record51(#{serviceDeliveryStartTimeStamp := ServiceDeliveryStartTimeStamp} = Record, Acc) ->
+	Acc1 = Acc#{<<"serviceDeliveryStartTimeStamp">> =>
+			cgf_lib:bcd_date_time(ServiceDeliveryStartTimeStamp)},
+	as_record52(Record, Acc1);
+as_record51(Record, Acc) ->
+	as_record52(Record, Acc).
+%% @hidden
+as_record52(#{serviceDeliveryStartTimeStampFraction := ServiceDeliveryStartTimeStampFraction} = Record, Acc) ->
+	Acc1 = Acc#{<<"serviceDeliveryStartTimeStampFraction">> =>
+			cgf_lib:bcd_date_time(ServiceDeliveryStartTimeStampFraction)},
+	as_record53(Record, Acc1);
+as_record52(Record, Acc) ->
+	as_record53(Record, Acc).
+%% @hidden
+as_record53(#{serviceReasonReturnCode := ServiceReasonReturnCode} = Record, Acc) ->
+	Acc1 = Acc#{<<"serviceReasonReturnCode">> => ServiceReasonReturnCode},
+	as_record54(Record, Acc1);
+as_record53(Record, Acc) ->
+as_record54(Record, Acc).
+%% @hidden
+as_record54(#{serviceRequestTimeStamp := ServiceRequestTimeStamp} = Record, Acc) ->
+	Acc1 = Acc#{<<"serviceRequestTimeStamp">> =>
+			cgf_lib:bcd_date_time(ServiceRequestTimeStamp)},
+	as_record55(Record, Acc1);
+as_record54(Record, Acc) ->
+	as_record55(Record, Acc).
+as_record55(#{serviceRequestTimeStampFraction := ServiceRequestTimeStampFraction} = Record, Acc) ->
+	Acc1 = Acc#{<<"serviceRequestTimeStampFraction">> =>
+			cgf_lib:bcd_date_time(ServiceRequestTimeStampFraction)},
+	as_record56(Record, Acc1);
+as_record55(Record, Acc) ->
+	as_record56(Record, Acc).
+%% @hidden
+as_record56(#{serviceSpecificInfo := ServiceSpecificInfo} = Record, Acc) ->
+	Acc1 = Acc#{<<"serviceSpecificInfo">> => ServiceSpecificInfo},
+	as_record57(Record, Acc1);
+as_record56(Record, Acc) ->
+	as_record57(Record, Acc).
+%% @hidden
+as_record57(#{'session-Id' := SessionId} = Record, Acc) ->
+	Acc1 = Acc#{<<"session-Id">> => SessionId},
+	as_record58(Record, Acc1);
+as_record57(Record, Acc) ->
+	as_record58(Record, Acc).
+%% @hidden
+as_record58(#{sessionPriority := SessionPriority} = Record, Acc) ->
+	Acc1 = Acc#{<<"sessionPriority">> => SessionPriority},
+	as_record59(Record, Acc1);
+as_record58(Record, Acc) ->
+	as_record59(Record, Acc).
+%% @hidden
+as_record59(#{subscriberEquipmentNumber := SubscriberEquipmentNumber} = Record, Acc) ->
+	Acc1 = Acc#{<<"subscriberEquipmentNumber">> => SubscriberEquipmentNumber},
+	as_record60(Record, Acc1);
+as_record59(Record, Acc) ->
+	as_record60(Record, Acc).
+%% @hidden
+as_record60(#{'tADS-Identifier' := TADSIdentifier} = Record, Acc) ->
+	Acc1 = Acc#{<<"tADS-Identifier">> => TADSIdentifier},
+	as_record61(Record, Acc1);
+as_record60(Record, Acc) ->
+	as_record61(Record, Acc).
+%% @hidden
+as_record61(#{'threeGPPPSDataOffStatus' := ThreeGPPPSDataOffStatus} = Record, Acc) ->
+	Acc1 = Acc#{<<"threeGPPPSDataOffStatus">> => ThreeGPPPSDataOffStatus},
+	as_record62(Record, Acc1);
+as_record61(Record, Acc) ->
+	as_record62(Record, Acc).
+%% @hidden
+as_record62(#{'transit-IOI-Lists' := TransitIOILists} = Record, Acc) ->
+	Acc1 = Acc#{<<"transit-IOI-Lists">> => TransitIOILists},
+	as_record63(Record, Acc1);
+as_record62(Record, Acc) ->
+	as_record63(Record, Acc).
+%% @hidden
+as_record63(#{userLocationInformation := UserLocationInformation} = Record, Acc) ->
+	Acc1 = Acc#{<<"userLocationInformation">> => UserLocationInformation},
+	as_record64(Record, Acc1);
+as_record63(Record, Acc) ->
+	as_record64(Record, Acc).
+%% @hidden
+as_record64(#{'vlr-Number' := VLRNumber} = _Record, Acc) ->
+	Acc#{<<"vlr-Number">> => VLRNumber};
+as_record64(_Record, Acc) ->
+	Acc.
 
