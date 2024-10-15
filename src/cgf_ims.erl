@@ -211,8 +211,10 @@ parse(Log, Metadata, {aTCFRecord, ATCFRecord}) ->
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a CDR event detail for an SCSCFRecord.
-parse_scscf(_Log, _Metadata, _SCSCFRecord) ->
-	{error, not_implemented}.
+parse_scscf(Log, Metadata, SCSCFRecord) ->
+	Call = scscf_record(SCSCFRecord),
+	CDR = [{scscf_record, Call} | Metadata],
+	cgf_log:blog(Log, CDR).
 
 -spec parse_pcscf(Log, Metadata, PCSCFRecord) -> Result
 	when
@@ -381,7 +383,7 @@ as_record2(Record, Acc) ->
 	as_record3(Record, Acc).
 %% @hidden
 as_record3(#{'called-Party-Address' := CalledPartyAddress} = Record, Acc) ->
-	Acc1 = Acc#{<<"called-Party-Address">> =>  cgf_lib:bcd_dn(CalledPartyAddress)},
+	Acc1 = Acc#{<<"called-Party-Address">> => cgf_lib:bcd_dn(CalledPartyAddress)},
 	as_record4(Record, Acc1);
 as_record3(Record, Acc) ->
 	as_record4(Record, Acc).
@@ -755,4 +757,374 @@ as_record64(#{'vlr-Number' := VLRNumber} = _Record, Acc) ->
 	Acc#{<<"vlr-Number">> => VLRNumber};
 as_record64(_Record, Acc) ->
 	Acc.
+
+%% @hidden
+scscf_record(#{listOfCalledIdentityChanges := List} = Record) ->
+	Acc = #{<<"listOfCalledIdentityChanges">> => identity_changes(List)},
+	scscf_record1(Record, Acc);
+scscf_record(Record) ->
+	scscf_record1(Record, #{}).
+%% @hidden
+scscf_record1(#{'list-Of-Associated-URI' := Uri} = Record, Acc) ->
+	Acc1 = Acc#{<<"listOfAssociatedURI">> => associated_uri(Uri)},
+	scscf_record2(Record, Acc1);
+scscf_record1(Record, Acc) ->
+	scscf_record2(Record, Acc).
+%% @hidden
+scscf_record2(#{iMSCommunicationServiceIdentifier := Identifier} = Record, Acc) ->
+	Acc1 = Acc#{<<"iMSCommunicationServiceIdentifier">> => Identifier},
+	scscf_record3(Record, Acc1);
+scscf_record2(Record, Acc) ->
+	scscf_record3(Record, Acc).
+%% @hidden
+scscf_record3(#{'list-Of-AccessNetworkInfoChange' := List} = Record, Acc) ->
+	Acc1 = Acc#{<<"listOfAccessNetworkInfoChange">> => network_info_change(List)},
+	scscf_record4(Record, Acc1);
+scscf_record3(Record, Acc) ->
+	scscf_record4(Record, Acc).
+%% @hidden
+scscf_record4(#{realTimeTariffInformation := Info} = Record, Acc) ->
+	Acc1 = Acc#{<<"realTimeTariffInformation">> => Info},
+	scscf_record5(Record, Acc1);
+scscf_record4(Record, Acc) ->
+	scscf_record5(Record, Acc).
+%% @hidden
+scscf_record5(#{iMSVisitedNetworkIdentifier := Id} = Record, Acc) ->
+	Acc1 = Acc#{<<"iMSVisitedNetworkIdentifier">> => Id},
+	scscf_record6(Record, Acc1);
+scscf_record5(Record, Acc) ->
+	scscf_record6(Record, Acc).
+%% @hidden
+scscf_record6(#{expiresInformation := Info} = Record, Acc) ->
+	Acc1 = Acc#{<<"expiresInformation">> => Info},
+	scscf_record7(Record, Acc1);
+scscf_record6(Record, Acc) ->
+	scscf_record7(Record, Acc).
+%% @hidden
+scscf_record7(#{'list-Of-Message-Bodies' := Bodies} = Record, Acc) ->
+	MessageBodies = [message_body(Message) || Message <- Bodies],
+	Acc1 = Acc#{<<"listOfMessageBodies">> => MessageBodies},
+	scscf_record8(Record, Acc1);
+scscf_record7(Record, Acc) ->
+	scscf_record8(Record, Acc).
+%% @hidden
+scscf_record8(#{listOfReasonHeader := Reason} = Record, Acc) ->
+	Acc1 = Acc#{<<"listOfReasonHeader">> => Reason},
+	scscf_record9(Record, Acc1);
+scscf_record8(Record, Acc) ->
+	scscf_record9(Record, Acc).
+%% @hidden
+scscf_record9(#{serviceDeliveryEndTimeStampFraction := Fraction} = Record, Acc) ->
+	Acc1 = Acc#{<<"serviceDeliveryEndTimeStampFraction">> =>
+				cgf_lib:bcd_date_time(Fraction)},
+	scscf_record10(Record, Acc1);
+scscf_record9(Record, Acc) ->
+	scscf_record10(Record, Acc).
+%% @hidden
+scscf_record10(#{recordExtensions := Extensions} = Record, Acc) ->
+	Acc1 = Acc#{<<"recordExtensions">> => Extensions},
+	scscf_record11(Record, Acc1);
+scscf_record10(Record, Acc) ->
+	scscf_record11(Record, Acc).
+%% @hidden
+scscf_record11(#{applicationServersInformation := Info} = Record, Acc) ->
+	Acc1 = Acc#{<<"applicationServersInformation">> => server_info(Info)},
+	scscf_record12(Record, Acc1);
+scscf_record11(Record, Acc) ->
+	scscf_record12(Record, Acc).
+%% @hidden
+scscf_record12(#{serviceRequestTimeStampFraction := Fraction} = Record, Acc) ->
+	Acc1 = Acc#{<<"serviceRequestTimeStampFraction">> =>
+			 cgf_lib:bcd_date_time(Fraction)},
+	scscf_record13(Record, Acc1);
+scscf_record12(Record, Acc) ->
+	scscf_record13(Record, Acc).
+%% @hidden
+scscf_record13(#{serviceRequestTimeStamp := Timestamp} = Record, Acc) ->
+	Acc1 = Acc#{<<"serviceRequestTimeStamp">> =>
+			 cgf_lib:bcd_date_time(Timestamp)},
+	scscf_record14(Record, Acc1);
+scscf_record13(Record, Acc) ->
+	scscf_record14(Record, Acc).
+%% @hidden
+scscf_record14(#{serviceDeliveryEndTimeStamp := Timestamp} = Record, Acc) ->
+	Acc1 = Acc#{<<"serviceDeliveryEndTimeStamp">> =>
+			 cgf_lib:bcd_date_time(Timestamp)},
+	scscf_record15(Record, Acc1);
+scscf_record14(Record, Acc) ->
+	scscf_record15(Record, Acc).
+%% @hidden
+scscf_record15(#{causeForRecordClosing := Cause} = Record, Acc) ->
+	Acc1 = Acc#{<<"causeForRecordClosing">> => Cause},
+	scscf_record16(Record, Acc1);
+scscf_record15(Record, Acc) ->
+	scscf_record16(Record, Acc).
+%% @hidden
+scscf_record16(#{serviceReasonReturnCode := Reason} = Record, Acc) ->
+	Acc1 = Acc#{<<"serviceReasonReturnCode">> => Reason},
+	scscf_record17(Record, Acc1);
+scscf_record16(Record, Acc) ->
+	scscf_record17(Record, Acc).
+%% @hidden
+scscf_record17(#{recordSequenceNumber := Sequence} = Record, Acc) ->
+	Acc1 = Acc#{<<"recordSequenceNumber">> => Sequence},
+	scscf_record18(Record, Acc1);
+scscf_record17(Record, Acc) ->
+	scscf_record18(Record, Acc).
+%% @hidden
+scscf_record18(#{cellularNetworkInformation := Info} = Record, Acc) ->
+	Acc1 = Acc#{<<"cellularNetworkInformation">> => cgf_lib:bcd_dn(Info)},
+	scscf_record19(Record, Acc1);
+scscf_record18(Record, Acc) ->
+	scscf_record19(Record, Acc).
+%% @hidden
+scscf_record19(#{userLocationInformation := Location} = Record, Acc) ->
+	Acc1 = Acc#{<<"userLocationInformation">> => cgf_lib:bcd_dn(Location)},
+	scscf_record20(Record, Acc1);
+scscf_record19(Record, Acc) ->
+	scscf_record20(Record, Acc).
+%% @hidden
+scscf_record20(#{recordType := Type} = Record, Acc) ->
+	Acc1 = Acc#{<<"recordType">> => Type},
+	scscf_record21(Record, Acc1);
+scscf_record20(Record, Acc) ->
+	scscf_record21(Record, Acc).
+%% @hidden
+scscf_record21(#{recordOpeningTime := Time} = Record, Acc) ->
+	Acc1 = Acc#{<<"recordOpeningTime">> => cgf_lib:bcd_date_time(Time)},
+	scscf_record22(Record, Acc1);
+scscf_record21(Record, Acc) ->
+	scscf_record22(Record, Acc).
+%% @hidden
+scscf_record22(#{'list-Of-Called-Asserted-Identity' := List} = Record, Acc) ->
+	Acc1 = Acc#{<<"listOfCalledAssertedIdentity">> => asserted_identity(List)},
+	scscf_record23(Record, Acc1);
+scscf_record22(Record, Acc) ->
+	scscf_record23(Record, Acc).
+%% @hidden
+scscf_record23(#{instanceId := Id} = Record, Acc) ->
+	Acc1 = Acc#{<<"instanceId">> => Id},
+	scscf_record24(Record, Acc1);
+scscf_record23(Record, Acc) ->
+	scscf_record24(Record, Acc).
+%% @hidden
+scscf_record24(#{mSTimeZone := TimeZone} = Record, Acc) ->
+	Acc1 = Acc#{<<"mSTimeZone">> => TimeZone},
+	scscf_record25(Record, Acc1);
+scscf_record24(Record, Acc) ->
+	scscf_record25(Record, Acc).
+%% @hidden
+scscf_record25(#{routeHeaderReceived := Route} = Record, Acc) ->
+	Acc1 = Acc#{<<"routeHeaderReceived">> => Route},
+	scscf_record26(Record, Acc1);
+scscf_record25(Record, Acc) ->
+	scscf_record26(Record, Acc).
+%% @hidden
+scscf_record26(#{'transit-IOI-Lists' := IOI} = Record, Acc) ->
+	Acc1 = Acc#{<<"transitIOILists">> => IOI},
+	scscf_record27(Record, Acc1);
+scscf_record26(Record, Acc) ->
+	scscf_record27(Record, Acc).
+%% @hidden
+scscf_record27(#{routeHeaderTransmitted := Route} = Record, Acc) ->
+	Acc1 = Acc#{<<"routeHeaderTransmitted">> => Route},
+	scscf_record28(Record, Acc1);
+scscf_record27(Record, Acc) ->
+	scscf_record28(Record, Acc).
+%% @hidden
+scscf_record28(#{gGSNaddress := Address} = Record, Acc) ->
+	Acc1 = Acc#{<<"gGSNaddress">> => cgf_lib:ip_address(Address)},
+	scscf_record29(Record, Acc1);
+scscf_record28(Record, Acc) ->
+	scscf_record29(Record, Acc).
+%% @hidden
+scscf_record29(#{'list-Of-SDP-Media-Components' := List} = Record, Acc) ->
+	Acc1 = Acc#{<<"listOfSDPMediaComponents">> => media_components(List)},
+	scscf_record30(Record, Acc1);
+scscf_record29(Record, Acc) ->
+	scscf_record30(Record, Acc).
+%% @hidden
+scscf_record30(#{'requested-Party-Address' := Address} = Record, Acc) ->
+	Acc1 = Acc#{<<"requestedPartyAddress">> => cgf_lib:ip_address(Address)},
+	scscf_record31(Record, Acc1);
+scscf_record30(Record, Acc) ->
+	scscf_record31(Record, Acc).
+%% @hidden
+scscf_record31(#{sessionPriority := Priority} = Record, Acc) ->
+	Acc1 = Acc#{<<"sessionPriority">> => Priority},
+	scscf_record32(Record, Acc1);
+scscf_record31(Record, Acc) ->
+	scscf_record32(Record, Acc).
+%% @hidden
+scscf_record32(#{carrierSelectRouting := Routing} = Record, Acc) ->
+	Acc1 = Acc#{<<"carrierSelectRouting">> => Routing},
+	scscf_record33(Record, Acc1);
+scscf_record32(Record, Acc) ->
+	scscf_record33(Record, Acc).
+%%%% @hidden
+scscf_record33(#{serviceContextID := ContextID} = Record, Acc) ->
+	Acc1 = Acc#{<<"serviceContextID">> => ContextID},
+	scscf_record34(Record, Acc1);
+scscf_record33(Record, Acc) ->
+	scscf_record34(Record, Acc).
+%% @hidden
+scscf_record34(#{subscriberEquipmentNumber := EquipmentNumber} = Record, Acc) ->
+	Acc1 = Acc#{<<"subscriberEquipmentNumber">> => EquipmentNumber},
+	scscf_record35(Record, Acc1);
+scscf_record34(Record, Acc) ->
+	scscf_record35(Record, Acc).
+%% @hidden
+scscf_record35(#{nodeAddress := NodeAddress} = Record, Acc) ->
+	Acc1 = Acc#{<<"nodeAddress">> => NodeAddress},
+	scscf_record36(Record, Acc1);
+scscf_record35(Record, Acc) ->
+	scscf_record36(Record, Acc).
+%% @hidden
+scscf_record36(#{fromAddress := FromAddress} = Record, Acc) ->
+	Acc1 = Acc#{<<"fromAddress">> => FromAddress},
+	scscf_record37(Record, Acc1);
+scscf_record36(Record, Acc) ->
+	scscf_record37(Record, Acc).
+%% @hidden
+scscf_record37(#{'list-of-subscription-ID' := SubscriptionList} = Record, Acc) ->
+	Acc1 = Acc#{<<"listofsubscriptionID">> => SubscriptionList},
+	scscf_record38(Record, Acc1);
+scscf_record37(Record, Acc) ->
+	scscf_record38(Record, Acc).
+%% @hidden
+scscf_record38(#{'nNI-Information' := NNIInfo} = Record, Acc) ->
+	Acc1 = Acc#{<<"nNIInformation">> => NNIInfo},
+	scscf_record39(Record, Acc1);
+scscf_record38(Record, Acc) ->
+	scscf_record39(Record, Acc).
+%% @hidden
+scscf_record39(#{event := Event} = Record, Acc) ->
+	Acc1 = Acc#{<<"event">> => Event},
+	scscf_record40(Record, Acc1);
+scscf_record39(Record, Acc) ->
+	scscf_record40(Record, Acc).
+%% @hidden
+scscf_record40(#{'list-Of-Calling-Party-Address' := List} = Record, Acc) ->
+	PartyList = [party_address(Party) || Party <- List],
+	Acc1 = Acc#{<<"listOfCallingPartyAddress">> => PartyList},
+	scscf_record41(Record, Acc1);
+scscf_record40(Record, Acc) ->
+	scscf_record41(Record, Acc).
+%% @hidden
+scscf_record41(#{'list-Of-Early-SDP-Media-Components' := MediaList} = Record, Acc) ->
+	Components = [media_components(Media) || Media <- MediaList],
+	Acc1 = Acc#{<<"listOfEarlySDPMediaComponents">> => Components},
+	scscf_record42(Record, Acc1);
+scscf_record41(Record, Acc) ->
+	scscf_record42(Record, Acc).
+%% @hidden
+scscf_record42(#{iMSEmergencyIndicator := _EmergencyIndicator} = Record, Acc) ->
+	Acc1 = Acc#{<<"iMSEmergencyIndicator">> => undefined},
+	scscf_record43(Record, Acc1);
+scscf_record42(Record, Acc) ->
+	scscf_record43(Record, Acc).
+%% @hidden
+scscf_record43(#{'role-of-Node' := RoleNode} = Record, Acc) ->
+	Acc1 = Acc#{<<"roleofNode">> => RoleNode},
+	scscf_record44(Record, Acc1);
+scscf_record43(Record, Acc) ->
+	scscf_record44(Record, Acc).
+%% @hidden
+scscf_record44(#{numberPortabilityRouting := Routing} = Record, Acc) ->
+	Acc1 = Acc#{<<"numberPortabilityRouting">> => Routing},
+	scscf_record45(Record, Acc1);
+scscf_record44(Record, Acc) ->
+	scscf_record45(Record, Acc).
+%% @hidden
+scscf_record45(#{privateUserID := UserID} = Record, Acc) ->
+	Acc1 = Acc#{<<"privateUserID">> => UserID},
+	scscf_record46(Record, Acc1);
+scscf_record45(Record, Acc) ->
+	scscf_record46(Record, Acc).
+%% @hidden
+scscf_record46(#{'sIP-Method' := SIPMethod} = Record, Acc) ->
+	Acc1 = Acc#{<<"sIPMethod">> => SIPMethod},
+	scscf_record47(Record, Acc1);
+scscf_record46(Record, Acc) ->
+	scscf_record47(Record, Acc).
+%% @hidden
+scscf_record47(#{fEIdentifierList := FEList} = Record, Acc) ->
+	Acc1 = Acc#{<<"fEIdentifierList">> => FEList},
+	scscf_record48(Record, Acc1);
+scscf_record47(Record, Acc) ->
+	scscf_record48(Record, Acc).
+%% @hidden
+scscf_record48(#{'iMS-Charging-Identifier' := ChargingID} = Record, Acc) ->
+	Acc1 = Acc#{<<"iMSChargingIdentifier">> => ChargingID},
+	scscf_record49(Record, Acc1);
+scscf_record48(Record, Acc) ->
+	scscf_record49(Record, Acc).
+%% @hidden
+scscf_record49(#{serviceDeliveryStartTimeStampFraction := Fraction} = Record, Acc) ->
+	Acc1 = Acc#{<<"serviceDeliveryStartTimeStampFraction">> =>
+				cgf_lib:bcd_date_time(Fraction)},
+	scscf_record50(Record, Acc1);
+scscf_record49(Record, Acc) ->
+	scscf_record50(Record, Acc).
+%% @hidden
+scscf_record50(#{localRecordSequenceNumber := SequenceNumber} = Record, Acc) ->
+	Acc1 = Acc#{<<"localRecordSequenceNumber">> => SequenceNumber},
+	scscf_record51(Record, Acc1);
+scscf_record50(Record, Acc) ->
+	scscf_record51(Record, Acc).
+%% @hidden
+scscf_record51(#{'called-Party-Address' := PartyAddress} = Record, Acc) ->
+	Acc1 = Acc#{<<"called_Party_Address">> => cgf_lib:bcd_dn(PartyAddress)},
+	scscf_record52(Record, Acc1);
+scscf_record51(Record, Acc) ->
+	scscf_record52(Record, Acc).
+%% @hidden
+scscf_record52(#{retransmission := _Retransmission} = Record, Acc) ->
+	Acc1 = Acc#{<<"retransmission">> => undefined},
+	scscf_record53(Record, Acc1);
+scscf_record52(Record, Acc) ->
+	scscf_record53(Record, Acc).
+%% @hidden
+scscf_record53(#{additionalAccessNetworkInformation := AdditionalInfo} = Record, Acc) ->
+	Acc1 = Acc#{<<"additionalAccessNetworkInformation">> => AdditionalInfo},
+	scscf_record54(Record, Acc1);
+scscf_record53(Record, Acc) ->
+	scscf_record54(Record, Acc).
+%% @hidden
+scscf_record54(#{recordClosureTime := ClosureTime} = _Record, Acc) ->
+	Acc#{<<"recordClosureTime">> => cgf_lib:bcd_date_time(ClosureTime)};
+scscf_record54(_Record, Acc) ->
+	Acc.
+
+%% @hidden
+identity_changes(_Identity) ->
+	{error, not_implmented}.
+
+%% @hidden
+associated_uri(_Uri) ->
+	{error, not_implmented}.
+
+%% @hidden
+network_info_change(_List) ->
+	{error, not_implmented}.
+
+%% @hidden
+message_body(_Body) ->
+	{error, not_implmented}.
+
+%% @hidden
+server_info(_Info) ->
+	{error, not_implmented}.
+
+%% @hidden
+asserted_identity(_List) ->
+	{error, not_implmented}.
+
+%% @hidden
+party_address(Party) ->
+	{error, not_implmented}.
+
+%% @hidden
+media_components(Media) ->
+	{error, not_implmented}.
 
