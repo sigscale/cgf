@@ -1521,7 +1521,7 @@
 					"description": "Identifies a cell within a location area (TS 24.008).",
 					"type": "integer",
 					"minimum": 0,
-					"maximum": 65535
+					"maximum": 990211880578
 				},
 				"mCC-MNC": {
 					"description": "PLMN identifier as MCCMNC.",
@@ -1530,7 +1530,6 @@
 				}
 			},
 			"required": [
-				"locationAreaCode",
 				"cellId"
 			],
 			"examples": [

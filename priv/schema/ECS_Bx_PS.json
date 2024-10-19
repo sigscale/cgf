@@ -945,7 +945,7 @@
 					"description": "E-UTRA cell identifier (3GPP TS 38.413).",
 					"type": "integer",
 					"minimum": 0,
-					"maximum": 268435455
+					"maximum": 990211880578
 				},
 				"nid": {
 					"description": "A non-3GPP access Network identifier (NID).",
