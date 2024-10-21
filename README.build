@@ -6,6 +6,14 @@
 
 ## Configure new build directory
 mkdir -p shell/lib
+ln -st shell/lib ../../$(ls -d ../cap.build/shell/lib/cap-*)
+ln -st shell/lib ../../$(ls -d ../inap.build/shell/lib/inap-*)
+ln -st shell/lib ../../$(ls -d ../map.build/shell/lib/map-*)
+ln -st shell/lib ../../$(ls -d ../sccp.build/shell/lib/sccp-*)
+ln -st shell/lib ../../$(ls -d ../tcap.build/shell/lib/tcap-*)
+ZJ=$(basename $(ls -d ../zj-*)) 
+mkdir -p shell/lib/$ZJ/ebin
+cp -r ../$ZJ/ebin shell/lib/$ZJ/
 
 ## Make documentation and test reports available
 mkdir -p ~/public_html/cgf
