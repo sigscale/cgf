@@ -20,7 +20,7 @@ mkdir -p ~/public_html/cgf
 ln -st ~/public_html/cgf ../../cgf.build/doc
 
 ## Configure project
-ERLANG_INSTALL_LIB_DIR=$PWD/shell/lib ERL_LIBS=$PWD/shell/lib ../cse/configure --with-systemdsystemunitdir=no
+ERLANG_INSTALL_LIB_DIR=$PWD/shell/lib ERL_LIBS=$PWD/shell/lib ../cgf/configure --with-systemdsystemunitdir=no
 
 ## Install in shell/lib
 ERL_LIBS=$PWD/shell/lib make install
