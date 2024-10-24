@@ -271,7 +271,7 @@ bx([{abmf = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_user(MSISDN, [], []), $,,
 			ecs_event(Timestamp, [], [],
 					"event", "session", ["connection"], Outcome), $,,
-			$", "Bx_ABMF", $", $:, zj:encode(Parameters)]);
+			$", "Bx_balance", $", $:, zj:encode(Parameters)]);
 bx([{roam_moCall = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
 	MSISDN = msisdn(Parameters),
