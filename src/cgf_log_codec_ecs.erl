@@ -38,7 +38,7 @@
 		CDR :: [{RecordType, Parameters}],
 		RecordType :: moCall | mtCall
 				| moSMS | mtSMS | scSMO | scSMT
-				| sgsnPDP | sgw | ssAction
+				| sgsnPDP | ggsnPDP | sgw | ssAction
 				| incGateway | outGateway | transit | roaming
 				| roam_batchControlInfo | roam_accountingInfo
 				| roam_moCall | roam_mtCall | roam_gprs
@@ -221,6 +221,24 @@ bx([{sgsnPDP = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_event(Timestamp, StopTime, Duration,
 					"event", "session", ["connection"], Outcome), $,,
 			$", "Bx_sgsnPDP", $", $:, zj:encode(Parameters)]);
+bx([{ggsnPDP = _RecordType, Parameters} | T] = _CDR) ->
+	IMSI = imsi(Parameters),
+	MSISDN = msisdn(Parameters),
+	{StartTime, StopTime, Duration} = session_duration(Parameters),
+	Timestamp = case {StartTime, StopTime} of
+		{[], StopTime} ->
+			StopTime;
+		{StartTime, _} ->
+			StartTime
+	end,
+	Outcome = session_outcome(Parameters),
+	bx1(T, [${,
+			ecs_base(Timestamp), $,,
+			ecs_service("bx", "cgf"), $,,
+			ecs_user(MSISDN, IMSI, []), $,,
+			ecs_event(Timestamp, StopTime, Duration,
+					"event", "session", ["connection"], Outcome), $,,
+			$", "Bx_ggsnPDP", $", $:, zj:encode(Parameters)]);
 bx([{sgw = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
 	MSISDN = msisdn(Parameters),

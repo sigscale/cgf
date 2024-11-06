@@ -15,6 +15,15 @@
 		{
 			"type": "object",
 			"properties": {
+				"Bx_ggsnPDP": {
+					"$ref": "#/$defs/GGSNPDPRecord"
+				}
+			},
+			"required": ["Bx_ggsnPDP"]
+		},
+		{
+			"type": "object",
+			"properties": {
 				"Bx_sgsnMM": {
 					"$ref": "#/$defs/SGSNMMRecord"
 				}
@@ -199,8 +208,7 @@
 					}
 				},
 				"recordOpeningTime": {
-					"type": "string",
-					"format": "date-time"
+					"$ref": "#/$defs/RecordOpeningTime"
 				},
 				"duration": {
 					"type": "integer"
@@ -269,6 +277,112 @@
 				},
 				"cNOperatorSelectionEnt": {
 					"$ref": "#/$defs/CNOperatorSelectionEntity"
+				}
+			},
+			"examples": [
+			]
+		},
+		"GGSNPDPRecord": {
+			"description": "Packet switched (PS) gateway GPRS support node (GGSN) packet data protocol (PDP) charging data record (CDR).",
+			"type": "object",
+			"properties": {
+				"networkInitiation": {
+					"type": "boolean"
+				},
+				"servedIMSI": {
+					"$ref": "#/$defs/IMSI"
+				},
+				"ggsnAddress": {
+					"$ref": "#/$defs/GSNAddress"
+				},
+				"chargingID": {
+					"$ref": "#/$defs/ChargingID"
+				},
+				"sgsnAddress": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/GSNAddress"
+					}
+				},
+				"accessPointNameNI": {
+					"$ref": "#/$defs/AccessPointNameNI"
+				},
+				"pdpType": {
+					"$ref": "#/$defs/PDPType"
+				},
+				"servedPDPAddress": {
+					"$ref": "#/$defs/PDPAddress"
+				},
+				"dynamicAddressFlag": {
+					"$ref": "#/$defs/DynamicAddressFlag"
+				},
+				"listOfTrafficVolumes": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/ChangeOfCharCondition"
+					}
+				},
+				"recordOpeningTime": {
+					"$ref": "#/$defs/RecordOpeningTime"
+				},
+				"duration": {
+					"type": "integer"
+				},
+				"causeForRecClosing": {
+					"$ref": "#/$defs/CauseForRecClosing"
+				},
+				"diagnostics": {
+					"$ref": "#/$defs/Diagnostics"
+				},
+				"recordSequenceNumber": {
+					"type": "integer"
+				},
+				"nodeID": {
+					"$ref": "#/$defs/NodeID"
+				},
+				"recordExtensions": {
+				},
+				"localSequenceNumber": {
+					"$ref": "#/$defs/LocalSequenceNumber"
+				},
+				"apnSelectionMode": {
+					"$ref": "#/$defs/APNSelectionMode"
+				},
+				"servedMSISDN": {
+					"$ref": "#/$defs/MSISDN"
+				},
+				"chargingCharacteristics": {
+					"$ref": "#/$defs/ChargingCharacteristics"
+				},
+				"chChSelectionMode": {
+					"$ref": "#/$defs/ChChSelectionMode"
+				},
+				"iMSsignalingContext": {
+					"type": "null"
+				},
+				"externalChargingID": {
+					"type": "string",
+					"pattern": "^([0-9a-f]{2})*$"
+				},
+				"sgsnPLMNIdentifier": {
+					"$ref": "#/$defs/PLMN-Id"
+				},
+				"servedIMEI": {
+					"$ref": "#/$defs/IMEI"
+				},
+				"rATType": {
+					"$ref": "#/$defs/RATType"
+				},
+				"mSTimeZone": {
+				},
+				"userLocationInformation": {
+					"description": "Contains the User Location Information (TS 29.060).",
+					"type": "string",
+					"pattern": "^([0-9a-f]{2})*$"
+				},
+				"cAMELChargingInformation": {
+					"type": "string",
+					"pattern": "^([0-9a-f]{2})*$"
 				}
 			},
 			"examples": [
@@ -896,6 +1010,7 @@
 					"$ref": "#/$defs/UserCSGInformation"
 				},
 				"userLocationInformation": {
+					"description": "Contains the User Location Information (TS 29.060).",
 					"type": "string",
 					"pattern": "^([0-9a-f]{2})*$"
 				}
@@ -1203,6 +1318,53 @@
 			"type": "string",
 			"pattern": "^[0-9a-f]{2,16}$"
 		},
+		"PartyAddress": {
+			"description": "Circuit Switched (CS) calling/called/translated number",
+			"type": "object",
+			"properties": {
+				"natureOfAddress": {
+					"description": "Indicates the scope of the address value.",
+					"type": "string",
+					"enum": [
+						"unknown",
+						"subscriber",
+						"national",
+						"international",
+						"network specific",
+						"spare",
+						"reserved"
+					]
+				},
+				"numberingPlan": {
+					"description": "Describes which numbering plan is used.",
+					"type": "string",
+					"enum": [
+						"unknown",
+						"e164",
+						"x121",
+						"e212",
+						"national",
+						"private",
+						"reserved"
+					]
+				},
+				"address": {
+					"description": "The digits of the address.",
+					"type": "string",
+					"pattern": "^[0-9#*]{1,38}$"
+				}
+			},
+			"required": [
+				"address"
+			],
+			"examples": [
+				{
+					"natureOfAddress": "international",
+					"numberingPlan": "e164",
+					"address": "14165551234"
+				}
+			]
+		},
 		"PDPAddress": {
 			"description": "The PDP address of the served IMSI.",
 			"oneOf": [
@@ -1322,14 +1484,21 @@
 					"$ref": "#/$defs/UserCSGInformation"
 				},
 				"userLocationInformation": {
-					"pattern": "^([0-9a-f]{2})*$",
-					"type": "string"
+					"description": "Contains the User Location Information (TS 29.060).",
+					"type": "string",
+					"pattern": "^([0-9a-f]{2})*$"
 				}
 			}
 		},
 		"RoutingAreaCode": {
 			"type": "string",
 			"pattern": "^[0-9a-f]{2}$"
+		},
+		"ServiceKey": {
+			"description": " Service key is defined in HLR as part of CAMEL subscription information.",
+			"type": "integer",
+			"minimum": 0,
+			"maximum": 2147483647
 		},
 		"ServingNodeType": {
 			"description": "Serving node types in control plane of S-GW or P-GW, which have been connected during the record.",

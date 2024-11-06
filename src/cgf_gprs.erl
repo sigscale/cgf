@@ -96,7 +96,8 @@ import2(_Log, _Metadata, {error, Reason}) ->
 		AttributeName :: string(),
 		AttributeValue :: term(),
 		CDR :: {RecordType, Record},
-		RecordType :: sgsnPDPRecord | sgsnMMRecord | sgsnSMORecord
+		RecordType :: sgsnPDPRecord | ggsnPDPRecord
+				| sgsnMMRecord | sgsnSMORecord
 				| sgsnSMTRecord | sgsnMTLCSRecord | sgsnMOLCSRecord
 				| sgsnNILCSRecord | sgsnMBMSRecord | ggsnMBMSRecord
 				| sGWRecord | pGWRecord | gwMBMSRecord | tDFRecord
@@ -112,6 +113,14 @@ parse(Log, Metadata, {sgsnPDPRecord, SGSNPDPRecord} = _CDR) ->
 			ok;
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, parse_sgsn_pdp},
+					{error, Reason}])
+	end;
+parse(Log, Metadata, {ggsnPDPRecord, GGSNPDPRecord} = _CDR) ->
+	case parse_ggsn_pdp(Log, Metadata, GGSNPDPRecord) of
+		ok ->
+			ok;
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, parse_ggsn_pdp},
 					{error, Reason}])
 	end;
 parse(Log, Metadata, {sgsnMMRecord, SGSNMMRecord}) ->
@@ -252,6 +261,21 @@ parse(Log, Metadata, {tWAGRecord, TWAGRecord}) ->
 parse_sgsn_pdp(Log, Metadata, SGSNPDPRecord) ->
 	Call = sgsn_pdp_record(SGSNPDPRecord),
 	CDR = [{sgsnPDP, Call} | Metadata],
+	cgf_log:blog(Log, CDR).
+
+-spec parse_ggsn_pdp(Log, Metadata, GGSNPDPRecord) -> Result
+	when
+		Log :: disk_log:log(),
+		Metadata :: [{AttributeName, AttributeValue}],
+		AttributeName :: string(),
+		AttributeValue :: term(),
+		GGSNPDPRecord :: map(),
+		Result :: ok | {error, Reason},
+		Reason :: term().
+%% @doc Parse a CDR event detail for a GGSN PDP.
+parse_ggsn_pdp(Log, Metadata, GGSNPDPRecord) ->
+	Call = ggsn_pdp_record(GGSNPDPRecord),
+	CDR = [{ggsnPDP, Call} | Metadata],
 	cgf_log:blog(Log, CDR).
 
 -spec parse_sgsn_mmr(Log, Metadata, SGSNMMRecord) -> Result
@@ -685,6 +709,188 @@ sgsn_pdp_record33(#{userCSGInformation := UserCSGInformation}
 	Acc#{<<"userCSGInformation">> => UserCSGInformation};
 sgsn_pdp_record33(_SGSNPDPRecord, Acc) ->
 		Acc.
+
+%% @hidden
+ggsn_pdp_record(#{networkInitiation := NetworkInitiation} = GGSNPDPRecord) ->
+	Acc = #{<<"networkInitiation">> => NetworkInitiation},
+	ggsn_pdp_record1(GGSNPDPRecord, Acc);
+ggsn_pdp_record(GGSNPDPRecord) ->
+	ggsn_pdp_record1(GGSNPDPRecord, #{}).
+%% @hidden
+ggsn_pdp_record1(#{servedIMSI := IMSI} = GGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"servedIMSI">> => cgf_lib:tbcd(IMSI)},
+	ggsn_pdp_record2(GGSNPDPRecord, Acc1);
+ggsn_pdp_record1(GGSNPDPRecord, Acc) ->
+	ggsn_pdp_record2(GGSNPDPRecord, Acc).
+%% @hidden
+ggsn_pdp_record2(#{ggsnAddress := Address} = GGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"ggsnAddress">> => cgf_lib:ip_address(Address)},
+	ggsn_pdp_record3(GGSNPDPRecord, Acc1);
+ggsn_pdp_record2(GGSNPDPRecord, Acc) ->
+	ggsn_pdp_record3(GGSNPDPRecord, Acc).
+%% @hidden
+ggsn_pdp_record3(#{chargingID := ID} = GGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"chargingID">> => ID},
+	ggsn_pdp_record4(GGSNPDPRecord, Acc1);
+ggsn_pdp_record3(GGSNPDPRecord, Acc) ->
+	ggsn_pdp_record4(GGSNPDPRecord, Acc).
+%% @hidden
+ggsn_pdp_record4(#{sgsnAddress := SA} = GGSNPDPRecord, Acc) ->
+	Address = [cgf_lib:ip_address(A) || A <- SA],
+	Acc1 = Acc#{<<"sgsnAddress">> => Address},
+	ggsn_pdp_record5(GGSNPDPRecord, Acc1);
+ggsn_pdp_record4(GGSNPDPRecord, Acc) ->
+	ggsn_pdp_record5(GGSNPDPRecord, Acc).
+%% @hidden
+ggsn_pdp_record5(#{accessPointNameNI := APNNI} = GGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"accessPointNameNI">> => APNNI},
+	ggsn_pdp_record6(GGSNPDPRecord, Acc1);
+ggsn_pdp_record5(GGSNPDPRecord, Acc) ->
+	ggsn_pdp_record6(GGSNPDPRecord, Acc).
+%% @hidden
+ggsn_pdp_record6(#{pdpType := PDPType} = GGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"pdpType">> => cgf_lib:octet_string(PDPType)},
+	ggsn_pdp_record7(GGSNPDPRecord, Acc1);
+ggsn_pdp_record6(GGSNPDPRecord, Acc) ->
+	ggsn_pdp_record7(GGSNPDPRecord, Acc).
+%% @hidden
+ggsn_pdp_record7(#{servedPDPAddress
+		:= {iPAddress, Address}} = GGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"servedPDPAddress">> => cgf_lib:ip_address(Address)},
+	ggsn_pdp_record8(GGSNPDPRecord, Acc1);
+ggsn_pdp_record7(GGSNPDPRecord, Acc) ->
+	ggsn_pdp_record8(GGSNPDPRecord, Acc).
+%% @hidden
+ggsn_pdp_record8(#{dynamicAddressFlag := DAF} = GGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"dynamicAddressFlag">> => DAF},
+	ggsn_pdp_record9(GGSNPDPRecord, Acc1);
+ggsn_pdp_record8(GGSNPDPRecord, Acc) ->
+	ggsn_pdp_record9(GGSNPDPRecord, Acc).
+%% @hidden
+ggsn_pdp_record9(#{listOfTrafficVolumes
+		:= ListOfTrafficVolumes} = GGSNPDPRecord, Acc) ->
+	LOTV = [traffic_volumes(TV) || TV <- ListOfTrafficVolumes],
+	Acc1 = Acc#{<<"listOfTrafficVolumes">> => LOTV},
+	ggsn_pdp_record10(GGSNPDPRecord, Acc1);
+ggsn_pdp_record9(GGSNPDPRecord, Acc) ->
+	ggsn_pdp_record10(GGSNPDPRecord, Acc).
+%% @hidden
+ggsn_pdp_record10(#{recordOpeningTime
+		:= RecordOpeningTime} = GGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"recordOpeningTime">> => cgf_lib:bcd_date_time(RecordOpeningTime)},
+	ggsn_pdp_record11(GGSNPDPRecord, Acc1);
+ggsn_pdp_record10(GGSNPDPRecord, Acc) ->
+	ggsn_pdp_record11(GGSNPDPRecord, Acc).
+%% @hidden
+ggsn_pdp_record11(#{duration := Duration} = GGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"duration">> => Duration},
+	ggsn_pdp_record12(GGSNPDPRecord, Acc1);
+ggsn_pdp_record11(GGSNPDPRecord, Acc) ->
+	ggsn_pdp_record12(GGSNPDPRecord, Acc).
+%% @hidden
+ggsn_pdp_record12(#{causeForRecClosing := CFRC} = GGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"causeForRecClosing">> => CFRC},
+	ggsn_pdp_record13(GGSNPDPRecord, Acc1);
+ggsn_pdp_record12(GGSNPDPRecord, Acc) ->
+	ggsn_pdp_record13(GGSNPDPRecord, Acc).
+%% @hidden
+ggsn_pdp_record13(#{diagnostics := Diagnostics} = GGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"diagnostics">> => cgf_lib:diagnostics(Diagnostics)},
+	ggsn_pdp_record14(GGSNPDPRecord, Acc1);
+ggsn_pdp_record13(GGSNPDPRecord, Acc) ->
+	ggsn_pdp_record14(GGSNPDPRecord, Acc).
+%% @hidden
+ggsn_pdp_record14(#{recordSequenceNumber
+		:= SequenceNumber} = GGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"recordSequenceNumber">> => SequenceNumber},
+	ggsn_pdp_record15(GGSNPDPRecord, Acc1);
+ggsn_pdp_record14(GGSNPDPRecord, Acc) ->
+	ggsn_pdp_record15(GGSNPDPRecord, Acc).
+%% @hidden
+ggsn_pdp_record15(#{nodeID := Identifier} = GGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"nodeID">> => Identifier},
+	ggsn_pdp_record16(GGSNPDPRecord, Acc1);
+ggsn_pdp_record15(GGSNPDPRecord, Acc) ->
+	ggsn_pdp_record16(GGSNPDPRecord, Acc).
+%% @hidden
+ggsn_pdp_record16(#{localSequenceNumber
+		:= SequenceNumber} = GGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"localSequenceNumber">> => SequenceNumber},
+	ggsn_pdp_record17(GGSNPDPRecord, Acc1);
+ggsn_pdp_record16(GGSNPDPRecord, Acc) ->
+	ggsn_pdp_record17(GGSNPDPRecord, Acc).
+%% @hidden
+ggsn_pdp_record17(#{apnSelectionMode := APNSM} = GGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"apnSelectionMode">> => APNSM},
+	ggsn_pdp_record18(GGSNPDPRecord, Acc1);
+ggsn_pdp_record17(GGSNPDPRecord, Acc) ->
+	ggsn_pdp_record18(GGSNPDPRecord, Acc).
+%% @hidden
+ggsn_pdp_record18(#{servedMSISDN := ServedMSISDN} = GGSNPDPRecord, Acc) ->
+	#{<<"address">> := MSISDN} = cgf_lib:bcd_dn(ServedMSISDN),
+	Acc1 = Acc#{<<"servedMSISDN">> => MSISDN},
+	ggsn_pdp_record19(GGSNPDPRecord, Acc1);
+ggsn_pdp_record18(GGSNPDPRecord, Acc) ->
+	ggsn_pdp_record19(GGSNPDPRecord, Acc).
+%% @hidden
+ggsn_pdp_record19(#{chargingCharacteristics := CC} = GGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"chargingCharacteristics">> => cgf_lib:octet_string(CC)},
+	ggsn_pdp_record20(GGSNPDPRecord, Acc1);
+ggsn_pdp_record19(GGSNPDPRecord, Acc) ->
+	ggsn_pdp_record20(GGSNPDPRecord, Acc).
+%% @hidden
+ggsn_pdp_record20(#{chChSelectionMode := CHCHSM} = GGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"chChSelectionMode">> => CHCHSM},
+	ggsn_pdp_record21(GGSNPDPRecord, Acc1);
+ggsn_pdp_record20(GGSNPDPRecord, Acc) ->
+	ggsn_pdp_record21(GGSNPDPRecord, Acc).
+%% @hidden
+ggsn_pdp_record21(#{iMSsignalingContext := _} = GGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"iMSsignalingContext">> => undefined},
+	ggsn_pdp_record22(GGSNPDPRecord, Acc1);
+ggsn_pdp_record21(GGSNPDPRecord, Acc) ->
+	ggsn_pdp_record22(GGSNPDPRecord, Acc).
+%% @hidden
+ggsn_pdp_record22(#{externalChargingID := ID} = GGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"externalChargingID">> => cgf_lib:octet_string(ID)},
+	ggsn_pdp_record23(GGSNPDPRecord, Acc1);
+ggsn_pdp_record22(GGSNPDPRecord, Acc) ->
+	ggsn_pdp_record23(GGSNPDPRecord, Acc).
+%% @hidden
+ggsn_pdp_record23(#{sgsnPLMNIdentifier := ID} = GGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"sgsnPLMNIdentifier">> => cgf_lib:octet_string(ID)},
+	ggsn_pdp_record24(GGSNPDPRecord, Acc1);
+ggsn_pdp_record23(GGSNPDPRecord, Acc) ->
+	ggsn_pdp_record24(GGSNPDPRecord, Acc).
+%% @hidden
+ggsn_pdp_record24(#{servedIMEI := IMEI} = GGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"servedIMEI">> => cgf_lib:tbcd(IMEI)},
+	ggsn_pdp_record25(GGSNPDPRecord, Acc1);
+ggsn_pdp_record24(GGSNPDPRecord, Acc) ->
+	ggsn_pdp_record25(GGSNPDPRecord, Acc).
+%% @hidden
+ggsn_pdp_record25(#{rATType := RATType} = GGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"rATType">> => RATType},
+	ggsn_pdp_record26(GGSNPDPRecord, Acc1);
+ggsn_pdp_record25(GGSNPDPRecord, Acc) ->
+	ggsn_pdp_record26(GGSNPDPRecord, Acc).
+%% @hidden
+ggsn_pdp_record26(#{mSTimeZone := TZ} = GGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"mSTimeZone">> => cgf_lib:octet_string(TZ)},
+	ggsn_pdp_record27(GGSNPDPRecord, Acc1);
+ggsn_pdp_record26(GGSNPDPRecord, Acc) ->
+	ggsn_pdp_record27(GGSNPDPRecord, Acc).
+%% @hidden
+ggsn_pdp_record27(#{userLocationInformation := LI} = GGSNPDPRecord, Acc) ->
+	Acc1 = Acc#{<<"userLocationInformation">> => cgf_lib:octet_string(LI)},
+	ggsn_pdp_record28(GGSNPDPRecord, Acc1);
+ggsn_pdp_record27(GGSNPDPRecord, Acc) ->
+	ggsn_pdp_record28(GGSNPDPRecord, Acc).
+%% @hidden
+ggsn_pdp_record28(#{cAMELChargingInformation := CI}, Acc) ->
+	Acc#{<<"cAMELChargingInformation">> => cgf_lib:octet_string(CI)};
+ggsn_pdp_record28(_GGSNPDPRecord, Acc) ->
+	Acc.
 
 %% @hidden
 traffic_volumes(#{accessAvailabilityChangeReason
