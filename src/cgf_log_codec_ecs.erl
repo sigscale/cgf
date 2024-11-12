@@ -37,7 +37,7 @@
 	when
 		CDR :: [{RecordType, Parameters}],
 		RecordType :: moCall | mtCall
-				| moSMS | mtSMS | scSMO | scSMT
+				| moSMS | mtSMS | scSMO | scSMT | sgsnSMO | sgsnSMT
 				| sgsnPDP | ggsnPDP | sgw | ssAction
 				| incGateway | outGateway | transit | roaming
 				| roam_batchControlInfo | roam_accountingInfo
@@ -239,6 +239,40 @@ bx([{ggsnPDP = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_event(Timestamp, StopTime, Duration,
 					"event", "session", ["connection"], Outcome), $,,
 			$", "Bx_ggsnPDP", $", $:, zj:encode(Parameters)]);
+bx([{sgsnSMO = _RecordType, Parameters} | T] = _CDR) ->
+	IMSI = imsi(Parameters),
+	MSISDN = msisdn(Parameters),
+	Timestamp = case maps:find(<<"eventtimestamp">>, Parameters) of
+		{ok, Ts} ->
+			Ts;
+		error ->
+			cgf_log:iso8601(erlang:system_time(millisecond))
+	end,
+	Outcome = call_outcome(Parameters),
+	bx1(T, [${,
+			ecs_base(Timestamp), $,,
+			ecs_service("bx", "cgf"), $,,
+			ecs_user(MSISDN, IMSI, []), $,,
+			ecs_event(Timestamp, [], [],
+					"event", "session", ["connection"], Outcome), $,,
+			$", "Bx_sgsnSMO", $", $:, zj:encode(Parameters)]);
+bx([{sgsnSMT = _RecordType, Parameters} | T] = _CDR) ->
+	IMSI = imsi(Parameters),
+	MSISDN = msisdn(Parameters),
+	Timestamp = case maps:find(<<"eventtimestamp">>, Parameters) of
+		{ok, Ts} ->
+			Ts;
+		error ->
+			cgf_log:iso8601(erlang:system_time(millisecond))
+	end,
+	Outcome = call_outcome(Parameters),
+	bx1(T, [${,
+			ecs_base(Timestamp), $,,
+			ecs_service("bx", "cgf"), $,,
+			ecs_user(MSISDN, IMSI, []), $,,
+			ecs_event(Timestamp, [], [],
+					"event", "session", ["connection"], Outcome), $,,
+			$", "Bx_sgsnSMT", $", $:, zj:encode(Parameters)]);
 bx([{sgw = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
 	MSISDN = msisdn(Parameters),

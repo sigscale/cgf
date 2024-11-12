@@ -400,6 +400,127 @@
 			"description": "Packet switched (PS) serving GPRS support node (SGSN) short message origination (SMO) charging data record (CDR).",
 			"type": "object",
 			"properties": {
+				"servedIMSI": {
+					"description": "The international mobile subscriber identity (IMSI) of the served party.",
+					"type": "string",
+					"pattern": "^[0-9]{5,15}$"
+				},
+				"servedIMEI": {
+					"description": "The international mobile equipment identity (IMEI) of the equipment served.",
+					"type": "string",
+					"pattern": "^[0-9]{14,15}$"
+				},
+				"servedMSISDN": {
+					"description": "The mobile station ISDN number (MSISDN) of the served party.",
+					"type": "string",
+					"pattern": "^[0-9]{5,15}$"
+				},
+				"msNetworkCapability": {
+					"$ref": "#/$defs/MSNetworkCapability"
+				},
+				"serviceCentre": {
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"recordingEntity": {
+					"description": "The E.164 number assigned to the entity (MSC, VLR, HLR etc.) that produced the record.",
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"locationArea": {
+					"$ref": "#/$defs/LocationAreaCode"
+				},
+				"routingArea": {
+					"$ref": "#/$defs/RoutingAreaCode"
+				},
+				"cellIdentifier": {
+					"$ref": "#/$defs/CellId"
+				},
+				"messageReference": {
+					"$ref": "#/$defs/MessageReference"
+				},
+				"eventTimeStamp": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"smsResult": {
+					"$ref": "#/$defs/Diagnostics"
+				},
+				"recordExtensions": {
+				},
+				"nodeID": {
+					"$ref": "#/$defs/NodeID"
+				},
+				"localSequenceNumber": {
+					"$ref": "#/$defs/LocalSequenceNumber"
+				},
+				"chargingCharacteristics": {
+					"$ref": "#/$defs/ChargingCharacteristics"
+				},
+				"rATType": {
+					"$ref": "#/$defs/RATType"
+				},
+				"destinationNumber": {
+					"description": "The short message destination number requested by the user (TS 32.250).",
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"cAMELInformationSMS": {
+					"$ref": "#/$defs/CAMELInformationSMS"
+				},
+				"chChSelectionMode": {
+					"$ref": "#/$defs/ChChSelectionMode"
+				},
+				"servingNodeType": {
+					"description": "Provides the types of nodes in servingNodeAddress in matching order.",
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/ServingNodeType"
+					}
+				},
+				"servingNodeAddress": {
+					"description": "IP addresses of SGSN, MME, ePDG, HSGW, TWAG or S-GW, which have been connected during the record.",
+					"type": "array",
+					"items": {
+						"oneOf": [
+							{
+								"$ref": "#/$defs/IPv4Address"
+							},
+							{
+								"$ref": "#/$defs/IPv6Address"
+							}
+						]
+					}
+				},
+				"servingNodeiPv6Address": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/GSNAddress"
+					}
+				},
+				"mMEName": {
+					"type": "string"
+				},
+				"mMERealm": {
+					"type": "string"
+				},
+				"userLocationInformation": {
+					"description": "Contains the User Location Information (TS 29.060).",
+					"type": "string",
+					"pattern": "^([0-9a-f]{2})*$"
+				},
+				"retransmission": {
+					"type": "null"
+				},
+				"servingNodePLMNIdentifier": {
+					"description": "The PLMN Identifier (Mobile Country Code and Mobile Network Code) serving the UE.",
+					"type": "string",
+					"pattern": "^[0-9]{5,6}$"
+				},
+				"userLocationInfoTime": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"cNOperatorSelectionEnt": {
+					"$ref": "#/$defs/CNOperatorSelectionEntity"
+				}
 			},
 			"examples": [
 			]
@@ -408,6 +529,124 @@
 			"description": "Packet switched (PS) serving GPRS support node (SGSN) short message termination (SMT) charging data record (CDR).",
 			"type": "object",
 			"properties": {
+				"servedIMSI": {
+					"description": "The international mobile subscriber identity (IMSI) of the served party.",
+					"type": "string",
+					"pattern": "^[0-9]{5,15}$"
+				},
+				"servedIMEI": {
+					"description": "The international mobile equipment identity (IMEI) of the equipment served.",
+					"type": "string",
+					"pattern": "^[0-9]{14,15}$"
+				},
+				"servedMSISDN": {
+					"description": "The mobile station ISDN number (MSISDN) of the served party.",
+					"type": "string",
+					"pattern": "^[0-9]{5,15}$"
+				},
+				"msNetworkCapability": {
+					"$ref": "#/$defs/MSNetworkCapability"
+				},
+				"serviceCentre": {
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"recordingEntity": {
+					"description": "The E.164 number assigned to the entity (MSC, VLR, HLR etc.) that produced the record.",
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"locationArea": {
+					"$ref": "#/$defs/LocationAreaCode"
+				},
+				"routingArea": {
+					"$ref": "#/$defs/RoutingAreaCode"
+				},
+				"cellIdentifier": {
+					"$ref": "#/$defs/CellId"
+				},
+				"eventTimeStamp": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"smsResult": {
+					"$ref": "#/$defs/Diagnostics"
+				},
+				"recordExtensions": {
+				},
+				"nodeID": {
+					"$ref": "#/$defs/NodeID"
+				},
+				"localSequenceNumber": {
+					"$ref": "#/$defs/LocalSequenceNumber"
+				},
+				"chargingCharacteristics": {
+					"$ref": "#/$defs/ChargingCharacteristics"
+				},
+				"rATType": {
+					"$ref": "#/$defs/RATType"
+				},
+				"chChSelectionMode": {
+					"$ref": "#/$defs/ChChSelectionMode"
+				},
+				"cAMELInformationSMS": {
+					"$ref": "#/$defs/CAMELInformationSMS"
+				},
+				"originatingAddress": {
+					"description": "The Originating address of the SME (TS 23.040).",
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"servingNodeType": {
+					"description": "Provides the types of nodes in servingNodeAddress in matching order.",
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/ServingNodeType"
+					}
+				},
+				"servingNodeAddress": {
+					"description": "IP addresses of SGSN, MME, ePDG, HSGW, TWAG or S-GW, which have been connected during the record.",
+					"type": "array",
+					"items": {
+						"oneOf": [
+							{
+								"$ref": "#/$defs/IPv4Address"
+							},
+							{
+								"$ref": "#/$defs/IPv6Address"
+							}
+						]
+					}
+				},
+				"servingNodeiPv6Address": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/GSNAddress"
+					}
+				},
+				"mMEName": {
+					"type": "string"
+				},
+				"mMERealm": {
+					"type": "string"
+				},
+				"userLocationInformation": {
+					"description": "Contains the User Location Information (TS 29.060).",
+					"type": "string",
+					"pattern": "^([0-9a-f]{2})*$"
+				},
+				"retransmission": {
+					"type": "null"
+				},
+				"servingNodePLMNIdentifier": {
+					"description": "The PLMN Identifier (Mobile Country Code and Mobile Network Code) serving the UE.",
+					"type": "string",
+					"pattern": "^[0-9]{5,6}$"
+				},
+				"userLocationInfoTime": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"cNOperatorSelectionEnt": {
+					"$ref": "#/$defs/CNOperatorSelectionEntity"
+				}
 			},
 			"examples": [
 			]
@@ -821,6 +1060,12 @@
 				"networkProvidedSubscriptionNotVerified"
 			]
 		},
+		"CallReferenceNumber": {
+			"description": "Uniquely identifies a call or transaction on one side of the interface (i.e. 'A' or 'B' side).",
+			"type": "integer",
+			"minimum": 0,
+			"maximum": 18446744073709551615
+		},
 		"CAMELInformationPDP": {
 			"type": "object",
 			"properties": {
@@ -831,7 +1076,7 @@
 					"$ref": "#/$defs/ServiceKey"
 				},
 				"defaultTransactionHandling": {
-					"$ref": "#/$defs/DefaultGPRS-Handling"
+					"$ref": "#/$defs/DefaultHandling"
 				},
 				"cAMELAccessPointNameNI": {
 					"$ref": "#/$defs/AccessPointNameNI"
@@ -850,6 +1095,35 @@
 				},
 				"fFDAppendIndicator": {
 					"type": "boolean"
+				}
+			}
+		},
+		"CAMELInformationSMS": {
+			"type": "object",
+			"properties": {
+				"sCFAddress": {
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"serviceKey": {
+					"$ref": "#/$defs/ServiceKey"
+				},
+				"defaultSMSHandling": {
+					"$ref": "#/$defs/DefaultHandling"
+				},
+				"cAMELCallingPartyNumber": {
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"cAMELDestinationSubscriberNumber": {
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"cAMELSMSCAddress": {
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"freeFormatData": {
+					"$ref": "#/$defs/FreeFormatData"
+				},
+				"smsReferenceNumber": {
+					"$ref": "#/$defs/CallReferenceNumber"
 				}
 			}
 		},
@@ -1047,7 +1321,7 @@
 				"servCNSelectedbyNtw"
 			]
 		},
-		"DefaultGPRS-Handling": {
+		"DefaultHandling": {
 			"type": "string",
 			"enum": [
 				"continueTransaction",
@@ -1271,6 +1545,11 @@
 		"LocationAreaCode": {
 			"type": "string",
 			"pattern": "^[0-9a-f]{4}$"
+		},
+		"MessageReference": {
+			"description": "Unique number allocated by the Mobile Station (MS) when transmitting a short message to the SC.",
+			"type": "string",
+			"pattern": "^([0-9a-f]{2})*$"
 		},
 		"MSISDN": {
 			"description": "The mobile station ISDN number (MSISDN) of the served party.",

@@ -97,8 +97,8 @@ import2(_Log, _Metadata, {error, Reason}) ->
 		AttributeValue :: term(),
 		CDR :: {RecordType, Record},
 		RecordType :: sgsnPDPRecord | ggsnPDPRecord
-				| sgsnMMRecord | sgsnSMORecord
-				| sgsnSMTRecord | sgsnMTLCSRecord | sgsnMOLCSRecord
+				| sgsnMMRecord | sgsnSMORecord | sgsnSMTRecord
+				| sgsnMTLCSRecord | sgsnMOLCSRecord
 				| sgsnNILCSRecord | sgsnMBMSRecord | ggsnMBMSRecord
 				| sGWRecord | pGWRecord | gwMBMSRecord | tDFRecord
 				| iPERecord | ePDGRecord | tWAGRecord,
@@ -303,8 +303,10 @@ parse_sgsn_mmr(Log, Metadata, SGSNMMRecord) ->
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a CDR event detail for an SGSN SMO.
-parse_sgsn_smo(_Log, _Metadata, _SGSNSMORecord) ->
-	{error, not_implemented}.
+parse_sgsn_smo(Log, Metadata, SGSNSMORecord) ->
+	SMS = sgsn_smo(SGSNSMORecord),
+	CDR = [{sgsnSMO, SMS} | Metadata],
+	cgf_log:blog(Log, CDR).
 
 -spec parse_sgsn_smt(Log, Metadata, SGSNSMTRecord) -> Result
 	when
@@ -316,8 +318,10 @@ parse_sgsn_smo(_Log, _Metadata, _SGSNSMORecord) ->
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse a CDR event detail for an SGSN SMT.
-parse_sgsn_smt(_Log, _Metadata, _SGSNSMTRecord) ->
-	{error, not_implemented}.
+parse_sgsn_smt(Log, Metadata, SGSNSMTRecord) ->
+	SMS = sgsn_smt(SGSNSMTRecord),
+	CDR = [{sgsnSMT, SMS} | Metadata],
+	cgf_log:blog(Log, CDR).
 
 -spec parse_sgsn_mt_lcs(Log, Metadata, SGSNMTLCSRecord) -> Result
 	when
@@ -1840,9 +1844,10 @@ event_charging_info1(#{numberOfEvents := NumberOfEvents} = _Info, Acc) ->
 event_charging_info1(_Info, Acc) ->
 	Acc.
 
-sgsn_mmr(#{cAMELInformationMM := CAMELInformationMM} = SGSNMMRRecord) ->
-	Acc = #{<<"cAMELInformationMM">> => CAMELInformationMM},
-	sgsn_mmr1(SGSNMMRRecord, Acc);
+%% @hidden
+sgsn_mmr(#{cAMELInformationMM := CAMELInfo} = SGSNMMRRecord) ->
+	% Acc = #{<<"cAMELInformationMM">> => camel_info_mm(CAMELInfo)},
+	sgsn_mmr1(SGSNMMRRecord, #{});
 sgsn_mmr(SGSNMMRRecord) ->
 	sgsn_mmr1(SGSNMMRRecord, #{}).
 %% @hidden
@@ -2029,6 +2034,350 @@ change_location4(_ChangeLocation, Acc) ->
 
 %% @hidden
 enhanced_dianostics(#{rANNASCause := RanNasCause}) ->
-	Causes = [cgf_lig:octet_string(Cause) || Cause <- RanNasCause],
+	Causes = [cgf_lib:octet_string(Cause) || Cause <- RanNasCause],
 	#{<<"rANNASCause">> => Causes}.
+
+%% @hidden
+sgsn_smo(#{servedIMSI := IMSI} = Record) ->
+	Acc = #{<<"servedIMSI">> => cgf_lib:tbcd(IMSI)},
+	sgsn_smo1(Record, Acc);
+sgsn_smo(Record) ->
+	sgsn_smo1(Record, #{}).
+%% @hidden
+sgsn_smo1(#{servedIMEI := IMEI} = Record, Acc) ->
+	Acc1 = Acc#{<<"servedIMEI">> => cgf_lib:tbcd(IMEI)},
+	sgsn_smo2(Record, Acc1);
+sgsn_smo1(Record, Acc) ->
+	sgsn_smo2(Record, Acc).
+%% @hidden
+sgsn_smo2(#{servedMSISDN := ServedMSISDN} = Record, Acc) ->
+	#{<<"address">> := MSISDN} = cgf_lib:bcd_dn(ServedMSISDN),
+	Acc1 = Acc#{<<"servedMSISDN">> => MSISDN},
+	sgsn_smo3(Record, Acc1);
+sgsn_smo2(Record, Acc) ->
+	sgsn_smo3(Record, Acc).
+%% @hidden
+sgsn_smo3(#{msNetworkCapability := Capability} = Record, Acc) ->
+	Acc1 = Acc#{<<"msNetworkCapability">> => cgf_lib:octet_string(Capability)},
+	sgsn_smo4(Record, Acc1);
+sgsn_smo3(Record, Acc) ->
+	sgsn_smo4(Record, Acc).
+%% @hidden
+sgsn_smo4(#{serviceCenter := SC} = Record, Acc) ->
+	Acc1 = Acc#{<<"serviceCenter">> => cgf_lib:bcd_dn(SC)},
+	sgsn_smo5(Record, Acc1);
+sgsn_smo4(Record, Acc) ->
+	sgsn_smo5(Record, Acc).
+%% @hidden
+sgsn_smo5(#{recordingEntity := Entity} = Record, Acc) ->
+	Acc1 = Acc#{<<"recordingEntity">> => cgf_lib:bcd_dn(Entity)},
+	sgsn_smo6(Record, Acc1);
+sgsn_smo5(Record, Acc) ->
+	sgsn_smo6(Record, Acc).
+%% @hidden
+sgsn_smo6(#{locationArea := Area} = Record, Acc) ->
+	Acc1 = Acc#{<<"locationArea">> => cgf_lib:octet_string(Area)},
+	sgsn_smo7(Record, Acc1);
+sgsn_smo6(Record, Acc) ->
+	sgsn_smo7(Record, Acc).
+%% @hidden
+sgsn_smo7(#{routingArea := Area} = Record, Acc) ->
+	Acc1 = Acc#{<<"routingArea">> => cgf_lib:octet_string(Area)},
+	sgsn_smo8(Record, Acc1);
+sgsn_smo7(Record, Acc) ->
+	sgsn_smo8(Record, Acc).
+%% @hidden
+sgsn_smo8(#{cellIdentifier := CI} = Record, Acc) ->
+	Acc1 = Acc#{<<"cellIdentifier">> => cgf_lib:octet_string(CI)},
+	sgsn_smo9(Record, Acc1);
+sgsn_smo8(Record, Acc) ->
+	sgsn_smo9(Record, Acc).
+%% @hidden
+sgsn_smo9(#{messageReference := Ref} = Record, Acc) ->
+	Acc1 = Acc#{<<"messageReference">> => cgf_lib:octet_string(Ref)},
+	sgsn_smo10(Record, Acc1);
+sgsn_smo9(Record, Acc) ->
+	sgsn_smo10(Record, Acc).
+%% @hidden
+sgsn_smo10(#{eventTimeStamp := TS} = Record, Acc) ->
+	Acc1 = Acc#{<<"eventTimeStamp">> => cgf_lib:bcd_date_time(TS)},
+	sgsn_smo11(Record, Acc1);
+sgsn_smo10(Record, Acc) ->
+	sgsn_smo11(Record, Acc).
+%% @hidden
+sgsn_smo11(#{smsResult := Diagnostics} = Record, Acc) ->
+	Acc1 = Acc#{<<"smsResult">> => cgf_lib:diagnostics(Diagnostics)},
+	sgsn_smo12(Record, Acc1);
+sgsn_smo11(Record, Acc) ->
+	sgsn_smo12(Record, Acc).
+%% @hidden
+sgsn_smo12(#{nodeID := NodeID} = Record, Acc) ->
+	Acc1 = Acc#{<<"nodeID">> => NodeID},
+	sgsn_smo13(Record, Acc1);
+sgsn_smo12(Record, Acc) ->
+	sgsn_smo13(Record, Acc).
+%% @hidden
+sgsn_smo13(#{localSequenceNumber := Sequence} = Record, Acc) ->
+	Acc1 = Acc#{<<"localSequenceNumber">> => Sequence},
+	sgsn_smo14(Record, Acc1);
+sgsn_smo13(Record, Acc) ->
+	sgsn_smo14(Record, Acc).
+%% @hidden
+sgsn_smo14(#{chargingCharacteristics := CC} = Record, Acc) ->
+	Acc1 = Acc#{<<"chargingCharacteristics">> => cgf_lib:octet_string(CC)},
+	sgsn_smo15(Record, Acc1);
+sgsn_smo14(Record, Acc) ->
+	sgsn_smo15(Record, Acc).
+%% @hidden
+sgsn_smo15(#{rATType := RATType} = Record, Acc) ->
+	Acc1 = Acc#{<<"rATType">> => RATType},
+	sgsn_smo16(Record, Acc1);
+sgsn_smo15(Record, Acc) ->
+	sgsn_smo16(Record, Acc).
+%% @hidden
+sgsn_smo16(#{destinationNumber := DN} = Record, Acc) ->
+	Acc1 = Acc#{<<"SmsTpDestinationNumber">> => cgf_lib:bcd_dn(DN)},
+	sgsn_smo17(Record, Acc1);
+sgsn_smo16(Record, Acc) ->
+	sgsn_smo17(Record, Acc).
+%% @hidden
+sgsn_smo17(#{cAMELInformationSMS := CAMELInfo} = Record, Acc) ->
+	% Acc1 = Acc#{<<"cAMELInformationSMS">> => camel_info_sms(CAMELInfo)},
+	sgsn_smo18(Record, Acc);
+sgsn_smo17(Record, Acc) ->
+	sgsn_smo18(Record, Acc).
+%% @hidden
+sgsn_smo18(#{chChSelectionMode := Mode} = Record, Acc) ->
+	Acc1 = Acc#{<<"chChSelectionMode">> => Mode},
+	sgsn_smo19(Record, Acc1);
+sgsn_smo18(Record, Acc) ->
+	sgsn_smo19(Record, Acc).
+%% @hidden
+sgsn_smo19(#{servingNodeType := Type} = Record, Acc) ->
+	Acc1 = Acc#{<<"servingNodeType">> => Type},
+	sgsn_smo20(Record, Acc1);
+sgsn_smo19(Record, Acc) ->
+	sgsn_smo20(Record, Acc).
+%% @hidden
+sgsn_smo20(#{servingNodeAddress := Address} = Record, Acc) ->
+	Acc1 = Acc#{<<"servingNodeAddress">> => cgf_lib:ip_address(Address)},
+	sgsn_smo21(Record, Acc1);
+sgsn_smo20(Record, Acc) ->
+	sgsn_smo21(Record, Acc).
+%% @hidden
+sgsn_smo21(#{servingNodeiPv6Address := Address} = Record, Acc) ->
+	Acc1 = Acc#{<<"servingNodeiPv6Address">> => cgf_lib:ip_address(Address)},
+	sgsn_smo22(Record, Acc1);
+sgsn_smo21(Record, Acc) ->
+	sgsn_smo22(Record, Acc).
+%% @hidden
+sgsn_smo22(#{mMEName := Address} = Record, Acc) ->
+	Acc1 = Acc#{<<"mMEName">> => Address},
+	sgsn_smo23(Record, Acc1);
+sgsn_smo22(Record, Acc) ->
+	sgsn_smo23(Record, Acc).
+%% @hidden
+sgsn_smo23(#{mMERealm := Realm} = Record, Acc) ->
+	Acc1 = Acc#{<<"mMERealm">> => Realm},
+	sgsn_smo24(Record, Acc1);
+sgsn_smo23(Record, Acc) ->
+	sgsn_smo24(Record, Acc).
+%% @hidden
+sgsn_smo24(#{userLocationInformation := Info} = Record, Acc) ->
+	Acc1 = Acc#{<<"userLocationInformation">> => cgf_lib:octet_string(Info)},
+	sgsn_smo25(Record, Acc1);
+sgsn_smo24(Record, Acc) ->
+	sgsn_smo25(Record, Acc).
+%% @hidden
+sgsn_smo25(#{retransmission := _} = Record, Acc) ->
+	Acc1 = Acc#{<<"retransmission">> => undefined},
+	sgsn_smo26(Record, Acc1);
+sgsn_smo25(Record, Acc) ->
+	sgsn_smo26(Record, Acc).
+%% @hidden
+sgsn_smo26(#{servingNodePLMNIdentifier := PLMN} = Record, Acc) ->
+	Acc1 = Acc#{<<"servingNodePLMNIdentifier">> => cgf_lib:octet_string(PLMN)},
+	sgsn_smo27(Record, Acc1);
+sgsn_smo26(Record, Acc) ->
+	sgsn_smo27(Record, Acc).
+%% @hidden
+sgsn_smo27(#{userLocationInfoTime := Time} = Record, Acc) ->
+	Acc1 = Acc#{<<"userLocationInfoTime">> => cgf_lib:bcd_date_time(Time)},
+	sgsn_smo28(Record, Acc1);
+sgsn_smo27(Record, Acc) ->
+	sgsn_smo28(Record, Acc).
+%% @hidden
+sgsn_smo28(#{cNOperatorSelectionEnt := Entity}, Acc) ->
+	Acc#{<<"cNOperatorSelectionEnt">> => Entity};
+sgsn_smo28(_Record, Acc) ->
+	Acc.
+
+%% @hidden
+sgsn_smt(#{servedIMSI := IMSI} = Record) ->
+	Acc = #{<<"servedIMSI">> => cgf_lib:tbcd(IMSI)},
+	sgsn_smt1(Record, Acc);
+sgsn_smt(Record) ->
+	sgsn_smt1(Record, #{}).
+%% @hidden
+sgsn_smt1(#{servedIMEI := IMEI} = Record, Acc) ->
+	Acc1 = Acc#{<<"servedIMEI">> => cgf_lib:tbcd(IMEI)},
+	sgsn_smt2(Record, Acc1);
+sgsn_smt1(Record, Acc) ->
+	sgsn_smt2(Record, Acc).
+%% @hidden
+sgsn_smt2(#{servedMSISDN := ServedMSISDN} = Record, Acc) ->
+	#{<<"address">> := MSISDN} = cgf_lib:bcd_dn(ServedMSISDN),
+	Acc1 = Acc#{<<"servedMSISDN">> => MSISDN},
+	sgsn_smt3(Record, Acc1);
+sgsn_smt2(Record, Acc) ->
+	sgsn_smt3(Record, Acc).
+%% @hidden
+sgsn_smt3(#{msNetworkCapability := Capability} = Record, Acc) ->
+	Acc1 = Acc#{<<"msNetworkCapability">> => cgf_lib:octet_string(Capability)},
+	sgsn_smt4(Record, Acc1);
+sgsn_smt3(Record, Acc) ->
+	sgsn_smt4(Record, Acc).
+%% @hidden
+sgsn_smt4(#{serviceCenter := SC} = Record, Acc) ->
+	Acc1 = Acc#{<<"serviceCenter">> => cgf_lib:bcd_dn(SC)},
+	sgsn_smt5(Record, Acc1);
+sgsn_smt4(Record, Acc) ->
+	sgsn_smt5(Record, Acc).
+%% @hidden
+sgsn_smt5(#{recordingEntity := Entity} = Record, Acc) ->
+	Acc1 = Acc#{<<"recordingEntity">> => cgf_lib:bcd_dn(Entity)},
+	sgsn_smt6(Record, Acc1);
+sgsn_smt5(Record, Acc) ->
+	sgsn_smt6(Record, Acc).
+%% @hidden
+sgsn_smt6(#{locationArea := Area} = Record, Acc) ->
+	Acc1 = Acc#{<<"locationArea">> => cgf_lib:octet_string(Area)},
+	sgsn_smt7(Record, Acc1);
+sgsn_smt6(Record, Acc) ->
+	sgsn_smt7(Record, Acc).
+%% @hidden
+sgsn_smt7(#{routingArea := Area} = Record, Acc) ->
+	Acc1 = Acc#{<<"routingArea">> => cgf_lib:octet_string(Area)},
+	sgsn_smt8(Record, Acc1);
+sgsn_smt7(Record, Acc) ->
+	sgsn_smt8(Record, Acc).
+%% @hidden
+sgsn_smt8(#{cellIdentifier := CI} = Record, Acc) ->
+	Acc1 = Acc#{<<"cellIdentifier">> => cgf_lib:octet_string(CI)},
+	sgsn_smt9(Record, Acc1);
+sgsn_smt8(Record, Acc) ->
+	sgsn_smt9(Record, Acc).
+%% @hidden
+sgsn_smt9(#{eventTimeStamp := TS} = Record, Acc) ->
+	Acc1 = Acc#{<<"eventTimeStamp">> => cgf_lib:bcd_date_time(TS)},
+	sgsn_smt10(Record, Acc1);
+sgsn_smt9(Record, Acc) ->
+	sgsn_smt10(Record, Acc).
+%% @hidden
+sgsn_smt10(#{smsResult := Diagnostics} = Record, Acc) ->
+	Acc1 = Acc#{<<"smsResult">> => cgf_lib:diagnostics(Diagnostics)},
+	sgsn_smt11(Record, Acc1);
+sgsn_smt10(Record, Acc) ->
+	sgsn_smt11(Record, Acc).
+%% @hidden
+sgsn_smt11(#{nodeID := NodeID} = Record, Acc) ->
+	Acc1 = Acc#{<<"nodeID">> => NodeID},
+	sgsn_smt12(Record, Acc1);
+sgsn_smt11(Record, Acc) ->
+	sgsn_smt12(Record, Acc).
+%% @hidden
+sgsn_smt12(#{localSequenceNumber := Sequence} = Record, Acc) ->
+	Acc1 = Acc#{<<"localSequenceNumber">> => Sequence},
+	sgsn_smt13(Record, Acc1);
+sgsn_smt12(Record, Acc) ->
+	sgsn_smt13(Record, Acc).
+%% @hidden
+sgsn_smt13(#{chargingCharacteristics := CC} = Record, Acc) ->
+	Acc1 = Acc#{<<"chargingCharacteristics">> => cgf_lib:octet_string(CC)},
+	sgsn_smt14(Record, Acc1);
+sgsn_smt13(Record, Acc) ->
+	sgsn_smt14(Record, Acc).
+%% @hidden
+sgsn_smt14(#{rATType := RATType} = Record, Acc) ->
+	Acc1 = Acc#{<<"rATType">> => RATType},
+	sgsn_smt15(Record, Acc1);
+sgsn_smt14(Record, Acc) ->
+	sgsn_smt15(Record, Acc).
+%% @hidden
+sgsn_smt15(#{chChSelectionMode := Mode} = Record, Acc) ->
+	Acc1 = Acc#{<<"chChSelectionMode">> => Mode},
+	sgsn_smt16(Record, Acc1);
+sgsn_smt15(Record, Acc) ->
+	sgsn_smt16(Record, Acc).
+%% @hidden
+sgsn_smt16(#{cAMELInformationSMS := CAMELInfo} = Record, Acc) ->
+	% Acc1 = Acc#{<<"cAMELInformationSMS">> => camel_info_sms(CAMELInfo)},
+	sgsn_smt17(Record, Acc);
+sgsn_smt16(Record, Acc) ->
+	sgsn_smt17(Record, Acc).
+%% @hidden
+sgsn_smt17(#{originatingAddress := DN} = Record, Acc) ->
+	Acc1 = Acc#{<<"originatingAddress">> => cgf_lib:bcd_dn(DN)},
+	sgsn_smt18(Record, Acc1);
+sgsn_smt17(Record, Acc) ->
+	sgsn_smt18(Record, Acc).
+%% @hidden
+sgsn_smt18(#{servingNodeType := Type} = Record, Acc) ->
+	Acc1 = Acc#{<<"servingNodeType">> => Type},
+	sgsn_smt19(Record, Acc1);
+sgsn_smt18(Record, Acc) ->
+	sgsn_smt19(Record, Acc).
+%% @hidden
+sgsn_smt19(#{servingNodeAddress := Address} = Record, Acc) ->
+	Acc1 = Acc#{<<"servingNodeAddress">> => cgf_lib:ip_address(Address)},
+	sgsn_smt20(Record, Acc1);
+sgsn_smt19(Record, Acc) ->
+	sgsn_smt20(Record, Acc).
+%% @hidden
+sgsn_smt20(#{servingNodeiPv6Address := Address} = Record, Acc) ->
+	Acc1 = Acc#{<<"servingNodeiPv6Address">> => cgf_lib:ip_address(Address)},
+	sgsn_smt21(Record, Acc1);
+sgsn_smt20(Record, Acc) ->
+	sgsn_smt21(Record, Acc).
+%% @hidden
+sgsn_smt21(#{mMEName := Address} = Record, Acc) ->
+	Acc1 = Acc#{<<"mMEName">> => Address},
+	sgsn_smt22(Record, Acc1);
+sgsn_smt21(Record, Acc) ->
+	sgsn_smt22(Record, Acc).
+%% @hidden
+sgsn_smt22(#{mMERealm := Realm} = Record, Acc) ->
+	Acc1 = Acc#{<<"mMERealm">> => Realm},
+	sgsn_smt23(Record, Acc1);
+sgsn_smt22(Record, Acc) ->
+	sgsn_smt23(Record, Acc).
+%% @hidden
+sgsn_smt23(#{userLocationInformation := Info} = Record, Acc) ->
+	Acc1 = Acc#{<<"userLocationInformation">> => cgf_lib:octet_string(Info)},
+	sgsn_smt24(Record, Acc1);
+sgsn_smt23(Record, Acc) ->
+	sgsn_smt24(Record, Acc).
+%% @hidden
+sgsn_smt24(#{retransmission := _} = Record, Acc) ->
+	Acc1 = Acc#{<<"retransmission">> => undefined},
+	sgsn_smt25(Record, Acc1);
+sgsn_smt24(Record, Acc) ->
+	sgsn_smt25(Record, Acc).
+%% @hidden
+sgsn_smt25(#{servingNodePLMNIdentifier := PLMN} = Record, Acc) ->
+	Acc1 = Acc#{<<"servingNodePLMNIdentifier">> => cgf_lib:octet_string(PLMN)},
+	sgsn_smt26(Record, Acc1);
+sgsn_smt25(Record, Acc) ->
+	sgsn_smt26(Record, Acc).
+%% @hidden
+sgsn_smt26(#{userLocationInfoTime := Time} = Record, Acc) ->
+	Acc1 = Acc#{<<"userLocationInfoTime">> => cgf_lib:bcd_date_time(Time)},
+	sgsn_smt27(Record, Acc1);
+sgsn_smt26(Record, Acc) ->
+	sgsn_smt27(Record, Acc).
+%% @hidden
+sgsn_smt27(#{cNOperatorSelectionEnt := Entity}, Acc) ->
+	Acc#{<<"cNOperatorSelectionEnt">> => Entity};
+sgsn_smt27(_Record, Acc) ->
+	Acc.
 
