@@ -194,7 +194,6 @@ parse(Log, Metadata, {roamingRecord, RoamingRecord}) ->
 %% @doc Parse a CDR event detail for an MO Call Record.
 parse_mo_call(Log, Metadata, MOCallRecord) ->
 	Call = mo_call_record(MOCallRecord),
-erlang:display({?MODULE, ?FUNCTION_NAME, Call}),
 	CDR = [{moCall, Call} | Metadata],
 	cgf_log:blog(Log, CDR).
 
