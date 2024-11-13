@@ -525,8 +525,8 @@ mo_call_record33(#{additionalChgInfo := AdditionalChgInfo} = MOCallRecord, Acc) 
 mo_call_record33(MOCallRecord, Acc) ->
 	mo_call_record34(MOCallRecord, Acc).
 %% @hidden
-mo_call_record34(#{'gsm-SCFAddress' := GsmSCFAddress} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"gsm-SCFAddress">> => cgf_lib:bcd_dn(GsmSCFAddress)},
+mo_call_record34(#{'gsm-SCFAddress' := Address} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"gsm-SCFAddress">> => cgf_lib:bcd_dn(Address)},
 	mo_call_record35(MOCallRecord, Acc1);
 mo_call_record34(MOCallRecord, Acc) ->
 	mo_call_record35(MOCallRecord, Acc).
@@ -651,8 +651,8 @@ mo_call_record54(#{defaultCallHandling2 := DefaultCallHandling2} = MOCallRecord,
 mo_call_record54(MOCallRecord, Acc) ->
 	mo_call_record55(MOCallRecord, Acc).
 %% @hidden
-mo_call_record55(#{'gsm-SCFAddress2' := GsmSCFAddress2} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"gsm-SCFAddressa-2">> => GsmSCFAddress2},
+mo_call_record55(#{'gsm-SCFAddress-2' := Address} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"gsm-SCFAddress-2">> => cgf_lib:bcd_dn(Address)},
 	mo_call_record56(MOCallRecord, Acc1);
 mo_call_record55(MOCallRecord, Acc) ->
 	mo_call_record56(MOCallRecord, Acc).
@@ -1151,8 +1151,8 @@ mt_call_record37(#{systemType := SystemType} = Record, Acc) ->
 mt_call_record37(Record, Acc) ->
 	mt_call_record38(Record, Acc).
 %% @hidden
-mt_call_record38(#{'gsm-SCFAddress' := GsmSCFAddress} = Record, Acc) ->
-	Acc1 = Acc#{<<"gsm-SCFAddress">> => GsmSCFAddress},
+mt_call_record38(#{'gsm-SCFAddress' := Address} = Record, Acc) ->
+	Acc1 = Acc#{<<"gsm-SCFAddress">> => cgf_lib:bcd_dn(Address)},
 	mt_call_record39(Record, Acc1);
 mt_call_record38(Record, Acc) ->
 	mt_call_record39(Record, Acc).
