@@ -628,7 +628,7 @@ mo_call_record50(MOCallRecord, Acc) ->
 	mo_call_record51(MOCallRecord, Acc).
 %% @hidden
 mo_call_record51(#{freeFormatData := FreeFormatData} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"freeFormatData">> => FreeFormatData},
+	Acc1 = Acc#{<<"freeFormatData">> => cgf_lib:octet_string(FreeFormatData)},
 	mo_call_record52(MOCallRecord, Acc1);
 mo_call_record51(MOCallRecord, Acc) ->
 	mo_call_record52(MOCallRecord, Acc).
@@ -664,7 +664,7 @@ mo_call_record56(MOCallRecord, Acc) ->
 	mo_call_record57(MOCallRecord, Acc).
 %% @hidden
 mo_call_record57(#{freeFormatData2 := FreeFormatData2} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"freeFormatData-2">> => FreeFormatData2},
+	Acc1 = Acc#{<<"freeFormatData-2">> => cgf_lib:octet_string(FreeFormatData2)},
 	mo_call_record58(MOCallRecord, Acc1);
 mo_call_record57(MOCallRecord, Acc) ->
 	mo_call_record58(MOCallRecord, Acc).
