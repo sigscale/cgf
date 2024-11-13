@@ -194,6 +194,7 @@ parse(Log, Metadata, {roamingRecord, RoamingRecord}) ->
 %% @doc Parse a CDR event detail for an MO Call Record.
 parse_mo_call(Log, Metadata, MOCallRecord) ->
 	Call = mo_call_record(MOCallRecord),
+erlang:display({?MODULE, ?FUNCTION_NAME, Call}),
 	CDR = [{moCall, Call} | Metadata],
 	cgf_log:blog(Log, CDR).
 
@@ -494,8 +495,8 @@ mo_call_record28(#{changeOfRadioChan := ChangeOfRadioChan} = MOCallRecord, Acc) 
 mo_call_record28(MOCallRecord, Acc) ->
 	mo_call_record29(MOCallRecord, Acc).
 %% @hidden
-mo_call_record29(#{causeForTerm := CauseForTerm} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"causeForTerm">> => CauseForTerm},
+mo_call_record29(#{causeForTerm := Cause} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"causeForTerm">> => atom_to_binary(Cause)},
 	mo_call_record30(MOCallRecord, Acc1);
 mo_call_record29(MOCallRecord, Acc) ->
 	mo_call_record30(MOCallRecord, Acc).
@@ -675,7 +676,7 @@ mo_call_record58(MOCallRecord, Acc) ->
 	mo_call_record59(MOCallRecord, Acc).
 %% @hidden
 mo_call_record59(#{systemType := SystemType} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"systemType">> => SystemType},
+	Acc1 = Acc#{<<"systemType">> => atom_to_binary(SystemType)},
 	mo_call_record60(MOCallRecord, Acc1);
 mo_call_record59(MOCallRecord, Acc) ->
 	mo_call_record60(MOCallRecord, Acc).
@@ -913,7 +914,7 @@ mo_sms_record11(Record, Acc) ->
 	mo_sms_record12(Record, Acc).
 %% @hidden
 mo_sms_record12(#{systemType := SystemType} = _Record, Acc) ->
-	Acc#{<<"systemType">> => SystemType};
+	Acc#{<<"systemType">> => atom_to_binary(SystemType)};
 mo_sms_record12(_Record, Acc) ->
 	Acc.
 
@@ -968,8 +969,8 @@ mt_call_record7(#{partialRecordType := PartialRecordType} = Record, Acc) ->
 mt_call_record7(Record, Acc) ->
 	mt_call_record8(Record, Acc).
 %% @hidden
-mt_call_record8(#{causeForTerm := CauseForTerm} = Record, Acc) ->
-	Acc1 = Acc#{<<"causeForTerm">> => CauseForTerm},
+mt_call_record8(#{causeForTerm := Cause} = Record, Acc) ->
+	Acc1 = Acc#{<<"causeForTerm">> => atom_to_binary(Cause)},
 	mt_call_record9(Record, Acc1);
 mt_call_record8(Record, Acc) ->
 	mt_call_record9(Record, Acc).
@@ -1145,7 +1146,7 @@ mt_call_record36(Record, Acc) ->
 	mt_call_record37(Record, Acc).
 %% @hidden
 mt_call_record37(#{systemType := SystemType} = Record, Acc) ->
-	Acc1 = Acc#{<<"systemType">> => SystemType},
+	Acc1 = Acc#{<<"systemType">> => atom_to_binary(SystemType)},
 	mt_call_record38(Record, Acc1);
 mt_call_record37(Record, Acc) ->
 	mt_call_record38(Record, Acc).
@@ -1572,7 +1573,7 @@ inc_gateway_record9(Record, Acc) ->
 	inc_gateway_record10(Record, Acc).
 %% @hidden
 inc_gateway_record10(#{causeForTerm := Cause} = Record, Acc) ->
-	Acc1 = Acc#{<<"causeForTerm">> => Cause},
+	Acc1 = Acc#{<<"causeForTerm">> => atom_to_binary(Cause)},
 	inc_gateway_record11(Record, Acc1);
 inc_gateway_record10(Record, Acc) ->
 	inc_gateway_record11(Record, Acc).
@@ -1704,7 +1705,7 @@ out_gateway_record9(Record, Acc) ->
 	out_gateway_record10(Record, Acc).
 %% @hidden
 out_gateway_record10(#{causeForTerm := Cause} = Record, Acc) ->
-	Acc1 = Acc#{<<"causeForTerm">> => Cause},
+	Acc1 = Acc#{<<"causeForTerm">> => atom_to_binary(Cause)},
 	out_gateway_record11(Record, Acc1);
 out_gateway_record10(Record, Acc) ->
 	out_gateway_record11(Record, Acc).
@@ -1842,7 +1843,7 @@ transit_call_record10(Record, Acc) ->
 	transit_call_record11(Record, Acc).
 %% @hidden
 transit_call_record11(#{causeForTerm := Cause} = Record, Acc) ->
-	Acc1 = Acc#{<<"causeForTerm">> => Cause},
+	Acc1 = Acc#{<<"causeForTerm">> => atom_to_binary(Cause)},
 	transit_call_record12(Record, Acc1);
 transit_call_record11(Record, Acc) ->
 	transit_call_record12(Record, Acc).
@@ -1999,8 +2000,8 @@ roaming_record15(#{dataVolume := DataVolume} = Record, Acc) ->
 roaming_record15(Record, Acc) ->
 	roaming_record16(Record, Acc).
 %% @hidden
-roaming_record16(#{causeForTerm := CauseForTerm} = Record, Acc) ->
-	Acc1 = Acc#{<<"causeForTerm">> => CauseForTerm},
+roaming_record16(#{causeForTerm := Cause} = Record, Acc) ->
+	Acc1 = Acc#{<<"causeForTerm">> => atom_to_binary(Cause)},
 	roaming_record17(Record, Acc1);
 roaming_record16(Record, Acc) ->
 	roaming_record17(Record, Acc).
