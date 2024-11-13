@@ -303,16 +303,23 @@
 				"cAMELCallLegInformation": {
 				},
 				"freeFormatDataAppend": {
+					"description": "Indicates whether free format data is to be appended to free format data stored in previous partial CDR.",
+					"type": "boolean"
 				},
 				"defaultCallHandling-2": {
+					"$ref": "#/$defs/DefaultCallHandling"
 				},
 				"gsm-SCFAddress-2": {
+					"$ref": "#/$defs/Gsm-SCFAddres"
 				},
 				"serviceKey-2": {
+					"$ref": "#/$defs/ServiceKey"
 				},
 				"freeFormatData-2": {
+					"$ref": "#/$defs/FreeFormatData"
 				},
 				"freeFormatDataAppend-2": {
+					"type": "boolean"
 				},
 				"systemType": {
 					"description": "Indicates the radio access network type used (GERAN, UTRAN).",
