@@ -1,3 +1,90 @@
+2024-12-20   Vance Shipley <vances@sigscale.org>
+
+	* simplify finding release package
+	* configure for optional jesse schema validation application
+	* script to install a release package
+	* missing types for camel
+	* correct encoding of scf addresses
+	* correct encoding of free form data
+	* correct encoding of enums
+	* sgsn mobile originated/terminated sms
+	* serving node type optional for backwards compatibility
+	* add base pcscf_record codec (#29)
+	* support ggsn pdp cdr (deprecated in 3gpp release 8)
+	* refactor ps schema to preserve asn1 set order
+	* transit call records
+	* expose html test reports
+	* dependend on zj application (json codec)
+	* build instructions for dependencies
+	* skip systemd in local build
+	* fix tbcd codec string input
+	* Merge pull request #27 from RefathWadood/import-3gpp-ims-cdr-issue4
+	* add base codec for scscf record
+	* Merge pull request #25 from RefathWadood/import-3gpp-ims-cdr-issue4
+	* add base codec for Bx_as
+	* open type for cs record, no error on proprietary extensions
+	* ms classmark should be optional in all cdr
+	* speech version identifier as octet string
+	* correct json representation of asn.1 bit string
+	* handle mobile call roaming records
+	* correct mobile call network call reference
+	* correct handling choice in trunk group
+	* correct handling choice in basic service code
+	* enumeration for partial record type
+	* bearer, tele and supplementary service codes in hex
+	* correct duration type
+	* removed required properties from all charging record schemas
+	* readme with validation example command line
+	* refactor top schema for optional rated and ecs user, network and data stream
+	* correct ecs schemas
+	* correct schemas in oneof to match uniquely
+	* handle cs incoming/outgoing gateway cdr
+	* handle cs supplementary service cdr
+	* ps enhanced diagnostics schema
+	* library function for diagnostics (causes)
+	* corrections to codec functions
+	* complete properties for mobile terminating sms; clean up types
+	* location area and cell codec
+	* correct cs location codec
+	* document exported private api
+	* correct decoding bcd for imsi, imei and msisdn
+	* include e212 and network specific enumerations in party address
+	* build and install cgf_cs module
+	* document exported private api
+	* handle terminating call/message (mtcall, mtSMS) in log ecs codec
+	* Merge pull request #24 from RefathWadood/import-3gpp-cs-cdr-issue3
+	* add change_of_paramsZZ codec
+	* add aoc_params helper codec; fix typos
+	* add supply_service_used helper codec; fix typos
+	* add change_of_service helper codec
+	* Merge pull request #23 from RefathWadood/import-3gpp-ims-cdr-issue4
+	* Merge pull request #22 from RefathWadood/import-3gpp-cs-cdr-issue3
+	* add cgf_ims module
+	* add base mtsmsrecord codec
+	* use correct tags
+	* add base codec for mtcallrecord
+	* Merge pull request #21 from RefathWadood/import-3gpp-ps-cdr-issue2
+	* set lowPriorityIndicator to undefined if it is present
+	* Merge pull request #20 from RefathWadood/import-3gpp-cs-cdr-issue3
+	* correct cdr type in log call
+	* handle binary or string values of imsi/msisdn in log codec
+	* Merge branch 'main' of github.com:sigscale/cgf
+	* handle outcome for tap records
+	* handle sgsnpdp cdr in log codec; session outcome
+	* json schema for sgsn pdp cdr
+	* add #classdef{};  add #'Externalvaluereference'{}
+	* add base codec for handling mosmsrecord
+	* Merge pull request #19 from RefathWadood/import-3gpp-cs-cdr-issue3
+	* add base codec for handling mocallrecord
+	* Merge pull request #18 from RefathWadood/import-3gpp-cs-cdr-issue3
+	* add cgf_cs module
+	* Merge branch 'main' of github.com:sigscale/cgf
+	* correct address and time mapping with new library functions
+	* tbcd, address abd date-time codec functions in library module
+	* Merge pull request #17 from RefathWadood/import-3gpp-ps-cdr-issue2
+	* remove incorrect pattern match, correct numbering
+	* export preprocessed cdr parsing and logging
+
 2024-09-04   Vance Shipley <vances@sigscale.org>
 
 	* accept cdr file to import as filename or binary
