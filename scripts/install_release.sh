@@ -6,9 +6,9 @@ PKG_NAME=cgf
 cd ${HOME}
 if [ -f "releases/RELEASES" ];
 then
-	OLD_VER=$(grep "{$PKG_NAME," releases/RELEASES | sed -e 's/[[:blank:]]*{'$PKG_NAME',[[:blank:]]*"//' -e 's/\([0-9.]*\).*/\1/')
+	OLD_VER=$(erl -noinput -eval '{ok, [R]} = file:consult("releases/RELEASES"), {release, _, Vsn, _, _, permanent} = lists:keyfind(permanent, 6, R), io:fwrite("~s", [Vsn]), init:stop()' | sed -e 's/'$PKG_NAME'-//')
 fi
-PKG_NEW=$(find releases -name ${PKG_NAME}-*.tar.gz 2> /dev/null | sort --version-sort | tail -1 | sed -e 's/releases\///' -e 's/\.tar\.gz//')
+PKG_NEW=$(basename -as .tar.gz releases/${PKG_NAME}-*.tar.gz | sort --version-sort | tail -1)
 if [ -z "$PKG_NEW" ];
 then
 	echo "Release package not found."
@@ -53,8 +53,10 @@ then
 		if echo -e "4.2\n$SASLVER"  | sort --check=quiet --version-sort;
 		then
 			if erl -noshell -sname $RPC_SNAME \
+					-eval "rpc:call('$OTP_NODE', application, stop, [sasl])" \
+					-eval "rpc:call('$OTP_NODE', application, set_env, [sasl, releases_dir, \"$HOME/releases\"])" \
 					-eval "rpc:call('$OTP_NODE', application, start, [sasl])" \
-					-eval "rpc:call('$OTP_NODE', systools, make_relup, [\"releases/$PKG_NEW\", [\"releases/$PKG_NAME-$OLD_VER\"], [\"releases/$PKG_NAME-$OLD_VER\"], [{path,[\"lib/$PKG_NEW/ebin\"]}, {outdir, \"releases/$PKG_NEW\"}]])" \
+					-eval "rpc:call('$OTP_NODE', systools, make_relup, [\"releases/$PKG_NEW\", [\"releases/$PKG_NAME-$OLD_VER\"], [\"releases/$PKG_NAME-$OLD_VER\"], [{path,[\"lib/*/ebin\"]}, {outdir, \"releases/$PKG_NEW\"}]])" \
 					-eval "{ok, _} = rpc:call('$OTP_NODE', release_handler, set_unpacked, [\"$HOME/releases/$PKG_NEW.rel\", $APPDIRS])" \
 					-eval "{ok, _, _} = rpc:call('$OTP_NODE', release_handler, install_release, [\"$PKG_NEW\", [{update_paths, true}]])" \
 					-eval "ok = rpc:call('$OTP_NODE', release_handler, make_permanent, [\"$PKG_NEW\"])" \
@@ -68,7 +70,7 @@ then
 		else
 			if erl -noshell -sname $RPC_SNAME \
 					-eval "rpc:call('$OTP_NODE', application, start, [sasl])" \
-					-eval "rpc:call('$OTP_NODE', systools, make_relup, [\"releases/$PKG_NEW\", [\"releases/$PKG_NAME-$OLD_VER\"], [\"releases/$PKG_NAME-$OLD_VER\"], [{path,[\"lib/$PKG_NEW/ebin\"]}, {outdir, \"releases/$PKG_NEW\"}]])" \
+					-eval "rpc:call('$OTP_NODE', systools, make_relup, [\"releases/$PKG_NEW\", [\"releases/$PKG_NAME-$OLD_VER\"], [\"releases/$PKG_NAME-$OLD_VER\"], [{path,[\"lib/*/ebin\"]}, {outdir, \"releases/$PKG_NEW\"}]])" \
 					-eval "{ok, _} = rpc:call('$OTP_NODE', release_handler, set_unpacked, [\"releases/$PKG_NEW.rel\", $APPDIRS])" \
 					-eval "{ok, _, _} = rpc:call('$OTP_NODE', release_handler, install_release, [\"$PKG_NEW\", [{update_paths, true}]])" \
 					-eval "ok = rpc:call('$OTP_NODE', release_handler, make_permanent, [\"$PKG_NEW\"])" \
@@ -90,7 +92,7 @@ then
 					-s mnesia \
 					-eval "application:start(sasl)" \
 					-eval "application:load($PKG_NAME)" \
-					-eval "systools:make_relup(\"releases/$PKG_NEW\", [\"releases/$PKG_NAME-$OLD_VER\"], [\"releases/$PKG_NAME-$OLD_VER\"], [{path,[\"lib/$PKG_NAME-$OLD_VER/ebin\"]}, {outdir, \"releases/$PKG_NEW\"}])" \
+					-eval "systools:make_relup(\"releases/$PKG_NEW\", [\"releases/$PKG_NAME-$OLD_VER\"], [\"releases/$PKG_NAME-$OLD_VER\"], [{path,[\"lib/*/ebin\"]}, {outdir, \"releases/$PKG_NEW\"}])" \
 					-eval "{ok, _} = release_handler:set_unpacked(\"$HOME/releases/$PKG_NEW.rel\", $APPDIRS)" \
 					-eval "{ok, _, _} = release_handler:install_release(\"$PKG_NEW\", [{update_paths, true}])" \
 					-eval "ok = release_handler:make_permanent(\"$PKG_NEW\")" \
@@ -106,7 +108,7 @@ then
 					-s mnesia \
 					-eval "application:start(sasl)" \
 					-eval "application:load($PKG_NAME)" \
-					-eval "systools:make_relup(\"releases/$PKG_NEW\", [\"releases/$PKG_NAME-$OLD_VER\"], [\"releases/$PKG_NAME-$OLD_VER\"], [{path,[\"lib/$PKG_NAME-$OLD_VER/ebin\"]}, {outdir, \"releases/$PKG_NEW\"}])" \
+					-eval "systools:make_relup(\"releases/$PKG_NEW\", [\"releases/$PKG_NAME-$OLD_VER\"], [\"releases/$PKG_NAME-$OLD_VER\"], [{path,[\"lib/*/ebin\"]}, {outdir, \"releases/$PKG_NEW\"}])" \
 					-eval "{ok, _} = release_handler:set_unpacked(\"releases/$PKG_NEW.rel\", $APPDIRS)" \
 					-eval "{ok, _, _} = release_handler:install_release(\"$PKG_NEW\", [{update_paths, true}])" \
 					-eval "ok = release_handler:make_permanent(\"$PKG_NEW\")" \
