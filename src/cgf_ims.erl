@@ -1109,6 +1109,7 @@ identity_changes(_Identity) ->
 associated_uri(_Uri) ->
 	{error, not_implmented}.
 
+-dialyzer({no_unused, network_info_change/1}).
 %% @hidden
 network_info_change(_List) ->
 	{error, not_implmented}.
@@ -1126,11 +1127,11 @@ asserted_identity(_List) ->
 	{error, not_implmented}.
 
 %% @hidden
-party_address(Party) ->
+party_address(_Party) ->
 	{error, not_implmented}.
 
 %% @hidden
-media_components(Media) ->
+media_components(_Media) ->
 	{error, not_implmented}.
 
 %% @hidden
