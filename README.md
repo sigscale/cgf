@@ -7,3 +7,4 @@ Prebuilt packages available for
 This application provides the Charging Gateway Function (CGF) of the
 3GPP reference architecture (TS 32.240).
 
+![diagram](https://raw.githubusercontent.com/sigscale/cgf/main/doc/3gpp-architecture.svg)
