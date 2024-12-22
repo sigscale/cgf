@@ -70,7 +70,7 @@ bx([{moCall = _RecordType, Parameters} | T] = _CDR) ->
 	bx1(T, [${,
 			ecs_base(Timestamp), $,,
 			ecs_service("bx", "cgf"), $,,
-			ecs_user(MSISDN, IMSI, []), $,,
+			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(StartTime, StopTime, Duration,
 					"event", "session", ["connection"], Outcome), $,,
 			$", "Bx_moCall", $", $:, zj:encode(Parameters)]);
@@ -88,7 +88,7 @@ bx([{mtCall = _RecordType, Parameters} | T] = _CDR) ->
 	bx1(T, [${,
 			ecs_base(Timestamp), $,,
 			ecs_service("bx", "cgf"), $,,
-			ecs_user(MSISDN, IMSI, []), $,,
+			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(StartTime, StopTime, Duration,
 					"event", "session", ["connection"], Outcome), $,,
 			$", "Bx_mtCall", $", $:, zj:encode(Parameters)]);
@@ -105,7 +105,7 @@ bx([{moSMS = _RecordType, Parameters} | T] = _CDR) ->
 	bx1(T, [${,
 			ecs_base(Timestamp), $,,
 			ecs_service("bx", "cgf"), $,,
-			ecs_user(MSISDN, IMSI, []), $,,
+			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(Timestamp, [], [],
 					"event", "session", ["connection"], Outcome), $,,
 			$", "Bx_moSMS", $", $:, zj:encode(Parameters)]);
@@ -122,7 +122,7 @@ bx([{mtSMS = _RecordType, Parameters} | T] = _CDR) ->
 	bx1(T, [${,
 			ecs_base(Timestamp), $,,
 			ecs_service("bx", "cgf"), $,,
-			ecs_user(MSISDN, IMSI, []), $,,
+			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(Timestamp, [], [],
 					"event", "session", ["connection"], Outcome), $,,
 			$", "Bx_mtSMS", $", $:, zj:encode(Parameters)]);
@@ -139,7 +139,7 @@ bx([{ssAction = _RecordType, Parameters} | T] = _CDR) ->
 	bx1(T, [${,
 			ecs_base(Timestamp), $,,
 			ecs_service("bx", "cgf"), $,,
-			ecs_user(MSISDN, IMSI, []), $,,
+			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(Timestamp, [], [],
 					"event", "session", ["connection"], Outcome), $,,
 			$", "Bx_ssAction", $", $:, zj:encode(Parameters)]);
@@ -199,7 +199,7 @@ bx([{roaming = _RecordType, Parameters} | T] = _CDR) ->
 	bx1(T, [${,
 			ecs_base(Timestamp), $,,
 			ecs_service("bx", "cgf"), $,,
-			ecs_user(MSISDN, IMSI, []), $,,
+			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(StartTime, StopTime, Duration,
 					"event", "session", ["connection"], Outcome), $,,
 			$", "Bx_roaming", $", $:, zj:encode(Parameters)]);
@@ -217,7 +217,7 @@ bx([{sgsnPDP = _RecordType, Parameters} | T] = _CDR) ->
 	bx1(T, [${,
 			ecs_base(Timestamp), $,,
 			ecs_service("bx", "cgf"), $,,
-			ecs_user(MSISDN, IMSI, []), $,,
+			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(Timestamp, StopTime, Duration,
 					"event", "session", ["connection"], Outcome), $,,
 			$", "Bx_sgsnPDP", $", $:, zj:encode(Parameters)]);
@@ -235,7 +235,7 @@ bx([{ggsnPDP = _RecordType, Parameters} | T] = _CDR) ->
 	bx1(T, [${,
 			ecs_base(Timestamp), $,,
 			ecs_service("bx", "cgf"), $,,
-			ecs_user(MSISDN, IMSI, []), $,,
+			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(Timestamp, StopTime, Duration,
 					"event", "session", ["connection"], Outcome), $,,
 			$", "Bx_ggsnPDP", $", $:, zj:encode(Parameters)]);
@@ -252,7 +252,7 @@ bx([{sgsnSMO = _RecordType, Parameters} | T] = _CDR) ->
 	bx1(T, [${,
 			ecs_base(Timestamp), $,,
 			ecs_service("bx", "cgf"), $,,
-			ecs_user(MSISDN, IMSI, []), $,,
+			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(Timestamp, [], [],
 					"event", "session", ["connection"], Outcome), $,,
 			$", "Bx_sgsnSMO", $", $:, zj:encode(Parameters)]);
@@ -269,7 +269,7 @@ bx([{sgsnSMT = _RecordType, Parameters} | T] = _CDR) ->
 	bx1(T, [${,
 			ecs_base(Timestamp), $,,
 			ecs_service("bx", "cgf"), $,,
-			ecs_user(MSISDN, IMSI, []), $,,
+			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(Timestamp, [], [],
 					"event", "session", ["connection"], Outcome), $,,
 			$", "Bx_sgsnSMT", $", $:, zj:encode(Parameters)]);
@@ -287,7 +287,7 @@ bx([{sgw = _RecordType, Parameters} | T] = _CDR) ->
 	bx1(T, [${,
 			ecs_base(Timestamp), $,,
 			ecs_service("bx", "cgf"), $,,
-			ecs_user(MSISDN, IMSI, []), $,,
+			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(Timestamp, StopTime, Duration,
 					"event", "session", ["connection"], Outcome), $,,
 			$", "Bx_sgw", $", $:, zj:encode(Parameters)]);
@@ -304,7 +304,7 @@ bx([{vas = _RecordType, Parameters} | T] = _CDR) ->
 	bx1(T, [${,
 			ecs_base(Timestamp), $,,
 			ecs_service("bx", "cgf"), $,,
-			ecs_user(MSISDN, IMSI, []), $,,
+			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(Timestamp, [], [],
 					"event", "session", ["connection"], Outcome), $,,
 			$", "Bx_vas", $", $:, zj:encode(Parameters)]);
@@ -320,7 +320,7 @@ bx([{abmf = _RecordType, Parameters} | T] = _CDR) ->
 	bx1(T, [${,
 			ecs_base(Timestamp), $,,
 			ecs_service("bx", "cgf"), $,,
-			ecs_user(MSISDN, [], []), $,,
+			ecs_user(MSISDN, []), $,,
 			ecs_event(Timestamp, [], [],
 					"event", "session", ["connection"], Outcome), $,,
 			$", "Bx_balance", $", $:, zj:encode(Parameters)]);
@@ -332,7 +332,7 @@ bx([{roam_moCall = _RecordType, Parameters} | T] = _CDR) ->
 	bx1(T, [${,
 			ecs_base(StartTime), $,,
 			ecs_service("bx", "cgf"), $,,
-			ecs_user(MSISDN, IMSI, []), $,,
+			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(StartTime, [], Duration,
 					"event", "session", ["connection"], Outcome), $,,
 			$", "Bx_roam_moCall", $", $:, zj:encode(Parameters)]);
@@ -344,7 +344,7 @@ bx([{roam_mtCall = _RecordType, Parameters} | T] = _CDR) ->
 	bx1(T, [${,
 			ecs_base(StartTime), $,,
 			ecs_service("bx", "cgf"), $,,
-			ecs_user(MSISDN, IMSI, []), $,,
+			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(StartTime, [], Duration,
 					"event", "session", ["connection"], Outcome), $,,
 			$", "Bx_roam_mtCall", $", $:, zj:encode(Parameters)]);
@@ -356,7 +356,7 @@ bx([{roam_gprs = _RecordType, Parameters} | T] = _CDR) ->
 	bx1(T, [${,
 			ecs_base(StartTime), $,,
 			ecs_service("bx", "cgf"), $,,
-			ecs_user(MSISDN, IMSI, []), $,,
+			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(StartTime, [], Duration,
 					"event", "session", ["connection"], Outcome), $,,
 			$", "Bx_roam_gprsCall", $", $:, zj:encode(Parameters)]);
@@ -673,33 +673,26 @@ ecs_event(Start, End, Duration, Kind, Category, Type, Outcome) ->
 	[$", "event", $", $:, ${, Ecreated, Estart, Eend,
 			Eduration, Ekind, Ecategory, Etype, Eoutcome, $}].
 
--spec ecs_user(Name, Id, Domain) -> iodata()
+-spec ecs_user(Name, Id) -> iodata()
 	when
 		Name :: string(),
-		Id :: string(),
-		Domain :: string().
+		Id :: string().
 %% @doc Elastic Common Schema (ECS): User attributes.
-ecs_user([] = _Name, Id, Domain) ->
-	ecs_user1(Id, Domain, []);
-ecs_user(Name, Id, Domain) ->
+ecs_user([] = _Name, Id) ->
+	ecs_user1(Id, []);
+ecs_user(Name, Id) ->
 	Uname = [$", "name", $", $:, $", Name, $"],
-	ecs_user1(Id, Domain, [Uname]).
+	ecs_user1(Id, [Uname]).
 %% @hidden
-ecs_user1([] = _Id, Domain, Acc) ->
-	ecs_user2(Domain, Acc);
-ecs_user1(Id, Domain, Acc) ->
+ecs_user1([] = _Id, Acc) ->
+	ecs_user2(Acc);
+ecs_user1(Id, Acc) ->
 	Uid = [$", "id", $", $:, $", Id, $"],
-	ecs_user2(Domain, [Uid | Acc]).
+	ecs_user2([Uid | Acc]).
 %% @hidden
-ecs_user2([] = _Domain, Acc) ->
-	ecs_user3(Acc);
-ecs_user2(Domain, Acc) ->
-	Udomain = [$", "domain", $", $:, $", Domain, $"],
-	ecs_user3([Udomain | Acc]).
-%% @hidden
-ecs_user3([]) ->
+ecs_user2([]) ->
 	[];
-ecs_user3(Acc) ->
+ecs_user2(Acc) ->
 	[H | T] = lists:reverse(Acc),
 	Rest = [[$,, Field] || Field <- T],
 	[$", "user", $", $:, ${, H, Rest, $}].
