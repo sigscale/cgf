@@ -85,6 +85,7 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 	--
 	{
 		sgsnPDPRecord    [20] SGSNPDPRecord,
+		ggsnPDPRecord    [21] GGSNPDPRecord,
 		sgsnMMRecord     [22] SGSNMMRecord,
 		sgsnSMORecord    [23] SGSNSMORecord,
 		sgsnSMTRecord    [24] SGSNSMTRecord,
@@ -523,7 +524,7 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		destinationNumber          [18] SmsTpDestinationNumber OPTIONAL,
 		cAMELInformationSMS        [19] CAMELInformationSMS OPTIONAL,
 		chChSelectionMode          [20] ChChSelectionMode OPTIONAL,
-		servingNodeType            [21] ServingNodeType,
+		servingNodeType            [21] ServingNodeType OPTIONAL,
 		servingNodeAddress         [22] GSNAddress OPTIONAL,
 		servingNodeiPv6Address     [23] GSNAddress OPTIONAL,
 		mMEName                    [24] DiameterIdentity OPTIONAL,
@@ -561,7 +562,7 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		chChSelectionMode          [17] ChChSelectionMode OPTIONAL,
 		cAMELInformationSMS        [18] CAMELInformationSMS OPTIONAL,
 		originatingAddress         [19] AddressString OPTIONAL,
-		servingNodeType            [20] ServingNodeType,
+		servingNodeType            [20] ServingNodeType OPTIONAL,
 		servingNodeAddress         [21] GSNAddress OPTIONAL,
 		servingNodeiPv6Address     [22] GSNAddress OPTIONAL,
 		mMEName                    [23] DiameterIdentity OPTIONAL,
@@ -740,6 +741,42 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		mbmsInformation           [16] MBMSInformation OPTIONAL,
 		commonTeid                [17] CTEID OPTIONAL,
 		iPMulticastSourceAddress  [18] PDPAddress OPTIONAL,
+		...
+	}
+
+	GGSNPDPRecord ::= SET
+	{
+		recordType                [0] RecordType,
+		networkInitiation         [1] NetworkInitiatedPDPContext OPTIONAL,
+		servedIMSI                [3] IMSI,
+		ggsnAddress               [4] GSNAddress,
+		chargingID                [5] ChargingID,
+		sgsnAddress               [6] SEQUENCE OF GSNAddress,
+		accessPointNameNI         [7] AccessPointNameNI OPTIONAL,
+		pdpType                   [8] PDPType OPTIONAL,
+		servedPDPAddress          [9] PDPAddress OPTIONAL,
+		dynamicAddressFlag        [11] DynamicAddressFlag OPTIONAL,
+		listOfTrafficVolumes      [12] SEQUENCE OF ChangeOfCharCondition OPTIONAL,
+		recordOpeningTime         [13] TimeStamp,
+		duration                  [14] CallDuration,
+		causeForRecClosing        [15] CauseForRecClosing,
+		diagnostics               [16] Diagnostics OPTIONAL,
+		recordSequenceNumber      [17] INTEGER OPTIONAL,
+		nodeID                    [18] NodeID OPTIONAL,
+		recordExtensions          [19] ManagementExtensions OPTIONAL,
+		localSequenceNumber       [20] LocalSequenceNumber OPTIONAL,
+		apnSelectionMode          [21] APNSelectionMode OPTIONAL,
+		servedMSISDN              [22] MSISDN OPTIONAL,
+		chargingCharacteristics   [23] ChargingCharacteristics,
+		chChSelectionMode         [24] ChChSelectionMode OPTIONAL,
+		iMSsignalingContext       [25] NULL OPTIONAL,
+		externalChargingID        [26] OCTET STRING OPTIONAL,
+		sgsnPLMNIdentifier        [27] PLMN-Id OPTIONAL,
+		servedIMEI                [29] IMEI OPTIONAL,
+		rATType                   [30] RATType OPTIONAL,
+		mSTimeZone                [31] MSTimeZone OPTIONAL,
+		userLocationInformation   [32] OCTET STRING OPTIONAL,
+		cAMELChargingInformation  [33] OCTET STRING OPTIONAL,
 		...
 	}
 

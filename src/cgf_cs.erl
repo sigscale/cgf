@@ -98,7 +98,7 @@ import2(_Log, _Metadata, {error, Reason}) ->
 		RecordType :: moCallRecord | mtCallRecord
 				| moSMSRecord | mtSMSRecord
 				| ssActionRecord
-				| incGatewayRecord | outGatewayRecord
+				| incGatewayRecord | outGatewayRecord | transitRecord
 				| roamingRecord,
 		Record :: map(),
 		Result :: ok | {error, Reason},
@@ -159,6 +159,14 @@ parse(Log, Metadata, {outGatewayRecord, OutGatewayRecord}) ->
 			ok;
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, parse_out_gateway},
+					{error, Reason}])
+	end;
+parse(Log, Metadata, {transitRecord, TransitCallRecord}) ->
+	case parse_transit(Log, Metadata, TransitCallRecord) of
+		ok ->
+			ok;
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, parse_transit},
 					{error, Reason}])
 	end;
 parse(Log, Metadata, {roamingRecord, RoamingRecord}) ->
@@ -277,6 +285,21 @@ parse_inc_gateway(Log, Metadata, IncGatewayRecord) ->
 parse_out_gateway(Log, Metadata, OutGatewayRecord) ->
 	Out = out_gateway_record(OutGatewayRecord),
 	CDR = [{outGateway, Out} | Metadata],
+	cgf_log:blog(Log, CDR).
+
+-spec parse_transit(Log, Metadata, TransitCallRecord) -> Result
+	when
+		Log :: disk_log:log(),
+		Metadata :: [{AttributeName, AttributeValue}],
+		AttributeName :: string(),
+		AttributeValue :: term(),
+		TransitCallRecord :: map(),
+		Result :: ok | {error, Reason},
+		Reason :: term().
+%% @doc Parse a CDR event detail for a Transit Call Record.
+parse_transit(Log, Metadata, TransitCallRecord) ->
+	Call = transit_call_record(TransitCallRecord),
+	CDR = [{transit, Call} | Metadata],
 	cgf_log:blog(Log, CDR).
 
 -spec parse_roaming(Log, Metadata, RoamingRecord) -> Result
@@ -471,8 +494,8 @@ mo_call_record28(#{changeOfRadioChan := ChangeOfRadioChan} = MOCallRecord, Acc) 
 mo_call_record28(MOCallRecord, Acc) ->
 	mo_call_record29(MOCallRecord, Acc).
 %% @hidden
-mo_call_record29(#{causeForTerm := CauseForTerm} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"causeForTerm">> => CauseForTerm},
+mo_call_record29(#{causeForTerm := Cause} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"causeForTerm">> => atom_to_binary(Cause)},
 	mo_call_record30(MOCallRecord, Acc1);
 mo_call_record29(MOCallRecord, Acc) ->
 	mo_call_record30(MOCallRecord, Acc).
@@ -501,8 +524,8 @@ mo_call_record33(#{additionalChgInfo := AdditionalChgInfo} = MOCallRecord, Acc) 
 mo_call_record33(MOCallRecord, Acc) ->
 	mo_call_record34(MOCallRecord, Acc).
 %% @hidden
-mo_call_record34(#{'gsm-SCFAddress' := GsmSCFAddress} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"gsm-SCFAddress">> => cgf_lib:bcd_dn(GsmSCFAddress)},
+mo_call_record34(#{'gsm-SCFAddress' := Address} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"gsm-SCFAddress">> => cgf_lib:bcd_dn(Address)},
 	mo_call_record35(MOCallRecord, Acc1);
 mo_call_record34(MOCallRecord, Acc) ->
 	mo_call_record35(MOCallRecord, Acc).
@@ -604,7 +627,7 @@ mo_call_record50(MOCallRecord, Acc) ->
 	mo_call_record51(MOCallRecord, Acc).
 %% @hidden
 mo_call_record51(#{freeFormatData := FreeFormatData} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"freeFormatData">> => FreeFormatData},
+	Acc1 = Acc#{<<"freeFormatData">> => cgf_lib:octet_string(FreeFormatData)},
 	mo_call_record52(MOCallRecord, Acc1);
 mo_call_record51(MOCallRecord, Acc) ->
 	mo_call_record52(MOCallRecord, Acc).
@@ -627,8 +650,8 @@ mo_call_record54(#{defaultCallHandling2 := DefaultCallHandling2} = MOCallRecord,
 mo_call_record54(MOCallRecord, Acc) ->
 	mo_call_record55(MOCallRecord, Acc).
 %% @hidden
-mo_call_record55(#{'gsm-SCFAddress2' := GsmSCFAddress2} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"gsm-SCFAddressa-2">> => GsmSCFAddress2},
+mo_call_record55(#{'gsm-SCFAddress-2' := Address} = MOCallRecord, Acc) ->
+	Acc1 = Acc#{<<"gsm-SCFAddress-2">> => cgf_lib:bcd_dn(Address)},
 	mo_call_record56(MOCallRecord, Acc1);
 mo_call_record55(MOCallRecord, Acc) ->
 	mo_call_record56(MOCallRecord, Acc).
@@ -640,7 +663,7 @@ mo_call_record56(MOCallRecord, Acc) ->
 	mo_call_record57(MOCallRecord, Acc).
 %% @hidden
 mo_call_record57(#{freeFormatData2 := FreeFormatData2} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"freeFormatData-2">> => FreeFormatData2},
+	Acc1 = Acc#{<<"freeFormatData-2">> => cgf_lib:octet_string(FreeFormatData2)},
 	mo_call_record58(MOCallRecord, Acc1);
 mo_call_record57(MOCallRecord, Acc) ->
 	mo_call_record58(MOCallRecord, Acc).
@@ -652,7 +675,7 @@ mo_call_record58(MOCallRecord, Acc) ->
 	mo_call_record59(MOCallRecord, Acc).
 %% @hidden
 mo_call_record59(#{systemType := SystemType} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"systemType">> => SystemType},
+	Acc1 = Acc#{<<"systemType">> => atom_to_binary(SystemType)},
 	mo_call_record60(MOCallRecord, Acc1);
 mo_call_record59(MOCallRecord, Acc) ->
 	mo_call_record60(MOCallRecord, Acc).
@@ -890,7 +913,7 @@ mo_sms_record11(Record, Acc) ->
 	mo_sms_record12(Record, Acc).
 %% @hidden
 mo_sms_record12(#{systemType := SystemType} = _Record, Acc) ->
-	Acc#{<<"systemType">> => SystemType};
+	Acc#{<<"systemType">> => atom_to_binary(SystemType)};
 mo_sms_record12(_Record, Acc) ->
 	Acc.
 
@@ -945,8 +968,8 @@ mt_call_record7(#{partialRecordType := PartialRecordType} = Record, Acc) ->
 mt_call_record7(Record, Acc) ->
 	mt_call_record8(Record, Acc).
 %% @hidden
-mt_call_record8(#{causeForTerm := CauseForTerm} = Record, Acc) ->
-	Acc1 = Acc#{<<"causeForTerm">> => CauseForTerm},
+mt_call_record8(#{causeForTerm := Cause} = Record, Acc) ->
+	Acc1 = Acc#{<<"causeForTerm">> => atom_to_binary(Cause)},
 	mt_call_record9(Record, Acc1);
 mt_call_record8(Record, Acc) ->
 	mt_call_record9(Record, Acc).
@@ -1122,13 +1145,13 @@ mt_call_record36(Record, Acc) ->
 	mt_call_record37(Record, Acc).
 %% @hidden
 mt_call_record37(#{systemType := SystemType} = Record, Acc) ->
-	Acc1 = Acc#{<<"systemType">> => SystemType},
+	Acc1 = Acc#{<<"systemType">> => atom_to_binary(SystemType)},
 	mt_call_record38(Record, Acc1);
 mt_call_record37(Record, Acc) ->
 	mt_call_record38(Record, Acc).
 %% @hidden
-mt_call_record38(#{'gsm-SCFAddress' := GsmSCFAddress} = Record, Acc) ->
-	Acc1 = Acc#{<<"gsm-SCFAddress">> => GsmSCFAddress},
+mt_call_record38(#{'gsm-SCFAddress' := Address} = Record, Acc) ->
+	Acc1 = Acc#{<<"gsm-SCFAddress">> => cgf_lib:bcd_dn(Address)},
 	mt_call_record39(Record, Acc1);
 mt_call_record38(Record, Acc) ->
 	mt_call_record39(Record, Acc).
@@ -1549,7 +1572,7 @@ inc_gateway_record9(Record, Acc) ->
 	inc_gateway_record10(Record, Acc).
 %% @hidden
 inc_gateway_record10(#{causeForTerm := Cause} = Record, Acc) ->
-	Acc1 = Acc#{<<"causeForTerm">> => Cause},
+	Acc1 = Acc#{<<"causeForTerm">> => atom_to_binary(Cause)},
 	inc_gateway_record11(Record, Acc1);
 inc_gateway_record10(Record, Acc) ->
 	inc_gateway_record11(Record, Acc).
@@ -1681,7 +1704,7 @@ out_gateway_record9(Record, Acc) ->
 	out_gateway_record10(Record, Acc).
 %% @hidden
 out_gateway_record10(#{causeForTerm := Cause} = Record, Acc) ->
-	Acc1 = Acc#{<<"causeForTerm">> => Cause},
+	Acc1 = Acc#{<<"causeForTerm">> => atom_to_binary(Cause)},
 	out_gateway_record11(Record, Acc1);
 out_gateway_record10(Record, Acc) ->
 	out_gateway_record11(Record, Acc).
@@ -1749,6 +1772,132 @@ out_gateway_record20(Record, Acc) ->
 out_gateway_record21(#{serviceChangeInitiator := Boolean}, Acc) ->
 	Acc#{<<"reasonForServiceChange">> => Boolean};
 out_gateway_record21(_Record, Acc) ->
+	Acc.
+
+%% @hidden
+transit_call_record(#{recordingEntity := Number} = Record) ->
+	Acc = #{<<"recordingEntity">> => cgf_lib:bcd_dn(Number)},
+	transit_call_record1(Record, Acc);
+transit_call_record(Record) ->
+	transit_call_record1(Record, #{}).
+%% @hidden
+transit_call_record1(#{mscIncomingTKGP := TrunkGroup} = Record, Acc) ->
+	Acc1 = Acc#{<<"mscIncomingTKGP">> => trunk_group(TrunkGroup)},
+	transit_call_record2(Record, Acc1);
+transit_call_record1(Record, Acc) ->
+	transit_call_record2(Record, Acc).
+%% @hidden
+transit_call_record2(#{mscOutgoingTKGP := TrunkGroup} = Record, Acc) ->
+	Acc1 = Acc#{<<"mscOutgoingTKGP">> => trunk_group(TrunkGroup)},
+	transit_call_record3(Record, Acc1);
+transit_call_record2(Record, Acc) ->
+	transit_call_record3(Record, Acc).
+%% @hidden
+transit_call_record3(#{callingNumber := Number} = Record, Acc) ->
+	Acc1 = Acc#{<<"callingNumber">> => cgf_lib:bcd_dn(Number)},
+	transit_call_record4(Record, Acc1);
+transit_call_record3(Record, Acc) ->
+	transit_call_record4(Record, Acc).
+%% @hidden
+transit_call_record4(#{calledNumber := Number} = Record, Acc) ->
+	Acc1 = Acc#{<<"calledNumber">> => cgf_lib:bcd_dn(Number)},
+	transit_call_record5(Record, Acc1);
+transit_call_record4(Record, Acc) ->
+	transit_call_record5(Record, Acc).
+%% @hidden
+transit_call_record5(#{isdnBasicService := BasicService} = Record, Acc) ->
+	Acc1 = Acc#{<<"isdnBasicServic">> => BasicService},
+	transit_call_record6(Record, Acc1);
+transit_call_record5(Record, Acc) ->
+	transit_call_record6(Record, Acc).
+%% @hidden
+transit_call_record6(#{seizureTimestamp := Time} = Record, Acc) ->
+	Acc1 = Acc#{<<"seizureTimestamp">> => cgf_lib:bcd_date_time(Time)},
+	transit_call_record7(Record, Acc1);
+transit_call_record6(Record, Acc) ->
+	transit_call_record7(Record, Acc).
+%% @hidden
+transit_call_record7(#{answerTimestamp := Time} = Record, Acc) ->
+	Acc1 = Acc#{<<"answerTimestamp">> => cgf_lib:bcd_date_time(Time)},
+	transit_call_record8(Record, Acc1);
+transit_call_record7(Record, Acc) ->
+	transit_call_record8(Record, Acc).
+%% @hidden
+transit_call_record8(#{ releaseTimestamp := Time} = Record, Acc) ->
+	Acc1 = Acc#{<<"releaseTimestamp">> => cgf_lib:bcd_date_time(Time)},
+	transit_call_record9(Record, Acc1);
+transit_call_record8(Record, Acc) ->
+	transit_call_record9(Record, Acc).
+%% @hidden
+transit_call_record9(#{callDuration := Duration} = Record, Acc) ->
+	Acc1 = Acc#{<<"callDuration">> => Duration},
+	transit_call_record10(Record, Acc1);
+transit_call_record9(Record, Acc) ->
+	transit_call_record10(Record, Acc).
+%% @hidden
+transit_call_record10(#{dataVolume := Volume} = Record, Acc) ->
+	Acc1 = Acc#{<<"dataVolume">> => Volume},
+	transit_call_record11(Record, Acc1);
+transit_call_record10(Record, Acc) ->
+	transit_call_record11(Record, Acc).
+%% @hidden
+transit_call_record11(#{causeForTerm := Cause} = Record, Acc) ->
+	Acc1 = Acc#{<<"causeForTerm">> => atom_to_binary(Cause)},
+	transit_call_record12(Record, Acc1);
+transit_call_record11(Record, Acc) ->
+	transit_call_record12(Record, Acc).
+%% @hidden
+transit_call_record12(#{diagnostics := Diagnostics} = Record, Acc) ->
+	Acc1 = Acc#{<<"diagnostics">> => cgf_lib:diagnostics(Diagnostics)},
+	transit_call_record13(Record, Acc1);
+transit_call_record12(Record, Acc) ->
+	transit_call_record13(Record, Acc).
+%% @hidden
+transit_call_record13(#{callReference := Reference} = Record, Acc) ->
+	Acc1 = Acc#{<<"callReference">> => cgf_lib:octet_string(Reference)},
+	transit_call_record14(Record, Acc1);
+transit_call_record13(Record, Acc) ->
+	transit_call_record14(Record, Acc).
+%% @hidden
+transit_call_record14(#{sequenceNumber := Number} = Record, Acc) ->
+	Acc1 = Acc#{<<"sequenceNumber">> => Number},
+	transit_call_record15(Record, Acc1);
+transit_call_record14(Record, Acc) ->
+	transit_call_record15(Record, Acc).
+%% @hidden
+transit_call_record15(#{locationRoutNum := Number} = Record, Acc) ->
+	Acc1 = Acc#{<<"locationRoutNum">> => cgf_lib:tbcd(Number)},
+	transit_call_record16(Record, Acc1);
+transit_call_record15(Record, Acc) ->
+	transit_call_record16(Record, Acc).
+%% @hidden
+transit_call_record16(#{lrnSoInd := Indicator} = Record, Acc) ->
+	Acc1 = Acc#{<<"lrnSoInd">> => Indicator},
+	transit_call_record17(Record, Acc1);
+transit_call_record16(Record, Acc) ->
+	transit_call_record17(Record, Acc).
+%% @hidden
+transit_call_record17(#{lrnQuryStatus := Status} = Record, Acc) ->
+	Acc1 = Acc#{<<"lrnQuryStatus">> => Status},
+	transit_call_record18(Record, Acc1);
+transit_call_record17(Record, Acc) ->
+	transit_call_record18(Record, Acc).
+%% @hidden
+transit_call_record18(#{jIPPara := Parameter} = Record, Acc) ->
+	Acc1 = Acc#{<<"jIPPara">> => Parameter},
+	transit_call_record19(Record, Acc1);
+transit_call_record18(Record, Acc) ->
+	transit_call_record19(Record, Acc).
+%% @hidden
+transit_call_record19(#{jIPSoInd := Indicator} = Record, Acc) ->
+	Acc1 = Acc#{<<"jIPSoInd">> => Indicator},
+	transit_call_record20(Record, Acc1);
+transit_call_record19(Record, Acc) ->
+	transit_call_record20(Record, Acc).
+%% @hidden
+transit_call_record20(#{jIPQuryStatus := Status} = _Record, Acc) ->
+	Acc#{<<"jIPQuryStatus">> => Status};
+transit_call_record20(_Record, Acc) ->
 	Acc.
 
 %% @hidden
@@ -1850,8 +1999,8 @@ roaming_record15(#{dataVolume := DataVolume} = Record, Acc) ->
 roaming_record15(Record, Acc) ->
 	roaming_record16(Record, Acc).
 %% @hidden
-roaming_record16(#{causeForTerm := CauseForTerm} = Record, Acc) ->
-	Acc1 = Acc#{<<"causeForTerm">> => CauseForTerm},
+roaming_record16(#{causeForTerm := Cause} = Record, Acc) ->
+	Acc1 = Acc#{<<"causeForTerm">> => atom_to_binary(Cause)},
 	roaming_record17(Record, Acc1);
 roaming_record16(Record, Acc) ->
 	roaming_record17(Record, Acc).

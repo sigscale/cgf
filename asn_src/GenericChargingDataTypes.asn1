@@ -526,6 +526,7 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 	--    Record values 18..22 are GPRS specific. The contents are defined in TS 32.251
 	--
 		sgsnPDPRecord           (18),
+		ggsnPDPRecord           (19),
 		sgsnMMRecord            (20),
 		sgsnSMORecord           (21),    -- also MME UE originated SMS record
 		sgsnSMTRecord           (22),    -- also MME UE terminated SMS record

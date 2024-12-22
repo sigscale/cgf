@@ -69,6 +69,15 @@
 		{
 			"type": "object",
 			"properties": {
+				"Bx_transit": {
+					"$ref": "#/$defs/TransitCallRecord"
+				}
+			},
+			"required": ["Bx_transit"]
+		},
+		{
+			"type": "object",
+			"properties": {
 				"Bx_roaming": {
 					"$ref": "#/$defs/RoamingRecord"
 				}
@@ -294,16 +303,23 @@
 				"cAMELCallLegInformation": {
 				},
 				"freeFormatDataAppend": {
+					"description": "Indicates whether free format data is to be appended to free format data stored in previous partial CDR.",
+					"type": "boolean"
 				},
 				"defaultCallHandling-2": {
+					"$ref": "#/$defs/DefaultCallHandling"
 				},
 				"gsm-SCFAddress-2": {
+					"$ref": "#/$defs/Gsm-SCFAddres"
 				},
 				"serviceKey-2": {
+					"$ref": "#/$defs/ServiceKey"
 				},
 				"freeFormatData-2": {
+					"$ref": "#/$defs/FreeFormatData"
 				},
 				"freeFormatDataAppend-2": {
+					"type": "boolean"
 				},
 				"systemType": {
 					"description": "Indicates the radio access network type used (GERAN, UTRAN).",
@@ -1004,6 +1020,89 @@
 			},
 			"examples": []
 		},
+		"TransitCallRecord": {
+			"type": "object",
+			"properties": {
+				"recordingEntity": {
+					"description": "The E.164 number assigned to the entity (MSC, VLR, HLR etc.) that produced the record.",
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"mscIncomingTKGP": {
+					"description": "Describes the trunk on which the call originates as seen from the MSC.",
+					"$ref": "#/$defs/TrunkGroup"
+				},
+				"mscOutgoingTKGP": {
+					"description": "Describes the trunk on which the call leaves the MSC.",
+					"$ref": "#/$defs/TrunkGroup"
+				},
+				"callingNumber": {
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"calledNumber": {
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"isdnBasicService": {
+					"$ref": "#/$defs/BasicService"
+				},
+				"seizureTimestamp": {
+					"description": "The time at which the traffic channel is allocated.",
+					"type": "string",
+					"format": "date-time"
+				},
+				"answerTimestamp": {
+					"description": "The time at which the call was answered or at which charging commences.",
+					"type": "string",
+					"format": "date-time"
+				},
+				"releaseTimestamp": {
+					"description": "The time at which the connection is released by either party.",
+					"type": "string",
+					"format": "date-time"
+				},
+				"callDuration": {
+					"description": "The relevant call duration in seconds. For incomplete calls (call attempts) the relevant duration is the call holding time from the seizure to the release of the traffic channel. For complete (answered) calls this is the chargeable duration from answer to release of the traffic channel. For partial records this is the duration of the individual partial record and not the cumulative duration of the call.",
+					"type": "integer"
+				},
+				"dataVolume": {
+					"description": "The number of 64 octet segments transmitted during the use of data services, if known",
+					"type": "integer"
+				},
+				"causeForTerm": {
+					"description": "Provides a generalised reason for the release of the connection.",
+					"$ref": "#/$defs/CauseForTerm"
+				},
+				"diagnostics": {
+					"description": "Indicates a more detailed technical reason for the release of the connection.",
+					"$ref": "#/$defs/Diagnostics"
+				},
+				"callReference": {
+					"description": "Uniquely identifies a call or transaction.",
+					"$ref": "#/$defs/CallReferenceNumber"
+				},
+				"sequenceNumber": {
+					"description": "Indicates the sequence of a partial records within a connection.",
+					"type": "integer"
+				},
+				"locationRoutNum": {
+					"$ref": "#/$defs/LocationRoutingNumber"
+				},
+				"lrnSoInd": {
+					"$ref": "#/$defs/LocationRoutingNumberSourceIndicator"
+				},
+				"lrnQuryStatus": {
+					"$ref": "#/$defs/LocationRoutingNumberQueryStatus"
+				},
+				"jIPPara": {
+					"$ref": "#/$defs/JurisdictionInformationParameter"
+				},
+				"jIPSoInd": {
+					"$ref": "#/$defs/JurisdictionInformationParameterSourceIndicator"
+				},
+				"jIPQuryStatus": {
+					"$ref": "#/$defs/JurisdictionInformationParameterQueryStatus"
+				}
+			}
+		},
 		"RoamingRecord": {
 			"description": "Circuit switched (CS) mobile roaming call charging data record (CDR).",
 			"type": "object",
@@ -1192,6 +1291,23 @@
 					"$ref": "#/$defs/AOCParameters"
 				}
 			}
+		},
+		"BasicService": {
+			"type": "string",
+			"enum": [
+				"allServices",
+				"speech",
+				"unrestrictedDigitalInformation",
+				"audio3k1Hz",
+				"unrestrictedDigitalInformationWithTonesAndAnnouncements",
+				"telephony3k1Hz",
+				"teletex",
+				"telefaxGroup4Class1",
+				"videotexSyntaxBased",
+				"videotelephony",
+				"telefaxGroup2-3",
+				"telephony7kHz"
+			]
 		},
 		"BasicServiceCode": {
 			"description": "Identifies a basic service.",

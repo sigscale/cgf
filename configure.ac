@@ -4,7 +4,7 @@
 ##
 ## Boilerplate:  standard boilerplate code
 ##
-AC_INIT([cgf], [1.1.1], [issues@sigscale.org])
+AC_INIT([cgf], [1.1.2], [issues@sigscale.org])
 AC_COPYRIGHT([Copyright (c) 2024 SigScale Global Inc.])
 AC_PREREQ(2.64)
 AC_CONFIG_SRCDIR([src/cgf_app.erl])
@@ -100,6 +100,7 @@ AC_ERLANG_CHECK_LIB([zj], [], [AC_MSG_ERROR([zj was not found!])])
 AC_ERLANG_CHECK_LIB([inap], [], [AC_MSG_ERROR([inap was not found!])])
 AC_ERLANG_CHECK_LIB([sccp], [], [AC_MSG_ERROR([sccp was not found!])])
 AC_ERLANG_CHECK_LIB([tcap], [], [AC_MSG_ERROR([tcap was not found!])])
+AC_ERLANG_CHECK_LIB([jesse], [], [AC_MSG_WARN([jesse was not found!])])
 
 
 ##
