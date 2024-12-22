@@ -6,10 +6,11 @@
 check_DATA = .dialyzer_ok .common_test_ok
 
 testmods = cgf_test_lib \
-		cgf_lib_SUITE
+		cgf_lib_SUITE \
+		cgf_json_validation_SUITE
 
-DIA_ARGS =
-CT_ARGS =
+DIA_ARGS = -Wno_unknown
+CT_ARGS = -spec test.spec
 
 .dialyzer_ok:	$(addsuffix .beam, $(testmods))
 	dialyzer $(DIA_ARGS) --src $(top_srcdir)/src -I $(top_builddir)/src
@@ -25,7 +26,9 @@ CT_ARGS =
 	ct_run -no_auto_compile \
 			-pa $(top_builddir)/ebin \
 			$(CT_ARGS) \
-			-logdir log -config ct.cfg -spec test.spec -dir . \
+			-logdir log \
+			-config ct.cfg \
+			-dir . \
 			-erl_args -noshell -sname $(LOGNAME)-ct
 
 clean-local:
