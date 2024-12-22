@@ -88,6 +88,7 @@ import2(_Log, _Metadata, {error, Reason}) ->
 %%  Internal functions
 %%----------------------------------------------------------------------
 
+-dialyzer({no_match, parse/3}).
 -spec parse(Log, Metadata, CDR) -> Result
 	when
 		Log :: disk_log:log(),

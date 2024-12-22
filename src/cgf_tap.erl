@@ -139,6 +139,7 @@ import5(_Log, _Metadata, _State, _TransferBatch) ->
 %%  The cgf_tap public API
 %%----------------------------------------------------------------------
 
+-dialyzer({no_match, parse/4}).
 -spec parse(Log, Metadata, State, CDRs) -> Result
 	when
 		Log :: disk_log:log(),

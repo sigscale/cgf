@@ -89,6 +89,7 @@ import2(_Log, _Metadata, {error, Reason}) ->
 %%  The cgf_gprs public API
 %%----------------------------------------------------------------------
 
+-dialyzer({no_match, parse/3}).
 -spec parse(Log, Metadata, CDR) -> Result
 	when
 		Log :: disk_log:log(),
