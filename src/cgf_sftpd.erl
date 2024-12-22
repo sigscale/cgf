@@ -89,7 +89,7 @@ subsystem_spec1({Name, {ssh_sftpd, Options}}) ->
 -spec init(Options) -> Result
 	when
 		Options :: options(),
-		Result :: {ok, State} | {ok, State, timeout()} | {stop, Reason},
+		Result :: {ok, State} | {stop, Reason},
 		State :: {CgfState, SftpdState},
 		CgfState :: cgf_state(),
 		SftpdState :: sftpd_state(),
@@ -98,12 +98,11 @@ subsystem_spec1({Name, {ssh_sftpd, Options}}) ->
 %% @private
 init(Options) ->
 	CgfState = #{write_handles => ordsets:new()},
-	case ssh_sftpd:init(Options) of
+	try ssh_sftpd:init(Options) of
 		{ok, SftpdState} ->
-			{ok, {CgfState, SftpdState}};
-		{ok, SftpdState, Timeout} ->
-			{pk, {CgfState, SftpdState}, Timeout};
-		{stop, Reason} ->
+			{ok, {CgfState, SftpdState}}
+	catch
+		_:Reason ->
 			{stop, Reason}
 	end.
 
@@ -118,24 +117,27 @@ init(Options) ->
 %% @doc Handle messages other than SSH Connection Protocol,
 %% 	call, or cast messages sent to the channel.
 %% @private
-handle_msg({ssh_channel_up, _ChannelId, ConnectionRef} = Msg,
+handle_msg({ssh_channel_up, ChannelId, ConnectionRef} = Msg,
 		{CgfState, #state{root = Root} = SftpdState} = _State) ->
 	{user, Username} = ssh:connection_info(ConnectionRef, user),
 	CgfState1 = CgfState#{user => Username},
 	UserRoot = filename:join(Root, Username),
 	SftpdState1 = SftpdState#state{root = UserRoot},
-	case ssh_sftpd:handle_msg(Msg, SftpdState1) of
+	try ssh_sftpd:handle_msg(Msg, SftpdState1) of
 		{ok, SftpdState2} ->
-			{ok, {CgfState1, SftpdState2}};
-		{stop, ChannelId, SftpdState2} ->
-			{stop, ChannelId, {CgfState1, SftpdState2}}
+			{ok, {CgfState1, SftpdState2}}
+	catch
+		_:_Reason ->
+			{stop, ChannelId, {CgfState1, SftpdState1}}
 	end;
-handle_msg(Msg, {CgfState, SftpdState} = _State) ->
-	case ssh_sftpd:handle_msg(Msg, SftpdState) of
+handle_msg({_, ChannelId, _ConnectionRef} = Msg,
+		{CgfState, SftpdState} = State) ->
+	try ssh_sftpd:handle_msg(Msg, SftpdState) of
 		{ok, SftpdState1} ->
-			{ok, {CgfState, SftpdState1}};
-		{stop, ChannelId, SftpdState1} ->
-			{stop, ChannelId, {CgfState, SftpdState1}}
+			{ok, {CgfState, SftpdState1}}
+	catch
+		_:_Reason ->
+			{stop, ChannelId, State}
 	end.
 
 -spec handle_ssh_msg(Event, State) -> Result
