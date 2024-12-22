@@ -561,8 +561,6 @@ ecs_source3(UserName, [H | _] = UserIds, Acc) ->
 			$", "id", $", $:, $", H, $", $}],
 	ecs_source4(UserIds, [User | Acc]).
 %% @hidden
-ecs_source4([], Acc) ->
-	ecs_source5(Acc);
 ecs_source4([H | T] = _UserIds, Acc) ->
 	Related = [$", "related", $", $:, ${,
 			$", "user", $", $:, $[, $", H, $",
