@@ -39,7 +39,8 @@
 %% Require variables and set default values for the suite.
 %%
 suite() ->
-	[{timetrap, {minutes, 1}}].
+	Description = "Test suite for the public API of the cgf application.",
+   [{userdata, [{doc, Description}]}, {timetrap, {minutes, 1}}].
 
 -spec init_per_suite(Config :: [tuple()]) -> Config :: [tuple()].
 %% Initiation before the whole suite.
@@ -82,7 +83,9 @@ all() ->
 %%---------------------------------------------------------------------
 
 octets() ->
-	[{userdata, [{doc, "Convert an OCTET STRING to hexadecimal"}]}].
+	Description = "Convert an OCTET STRING to hexadecimal",
+	ct:comment(Description),
+	[{userdata, [{doc, Description}]}].
 
 octets(_Config) ->
 	Size = rand:uniform(64),
@@ -92,7 +95,9 @@ octets(_Config) ->
 	HexString = iolist_to_binary(io_lib:fwrite("~*.16.0b", [Size * 2, Integer])).
 
 bcd() ->
-	[{userdata, [{doc, "Decode a BCD directory number (DN)"}]}].
+	Description = "Decode a BCD directory number (DN)",
+	ct:comment(Description),
+	[{userdata, [{doc, Description}]}].
 
 bcd(_Config) ->
 	TON = rand:uniform(4) - 1,
