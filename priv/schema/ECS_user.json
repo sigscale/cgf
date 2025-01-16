@@ -1,5 +1,5 @@
 {
-	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$schema": "http://json-schema.org/draft-06/schema#",
 	"$id": "http://sigscale.org/schema/cgf/ECS_user",
 	"title": "Elastic Common Schema (ECS) User",
 	"description": "The user fields describe information about the user that is relevant to the event.",

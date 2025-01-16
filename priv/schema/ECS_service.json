@@ -1,5 +1,5 @@
 {
-	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$schema": "http://json-schema.org/draft-06/schema#",
 	"$id": "http://sigscale.org/schema/cgf/ECS_service",
 	"title": "Elastic Common Schema (ECS) Service",
 	"description": "The Service fields describe the service for or from which the data was collected.",

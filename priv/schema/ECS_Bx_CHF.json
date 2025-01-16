@@ -1,5 +1,5 @@
 {
-	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$schema": "http://json-schema.org/draft-06/schema#",
 	"$id": "http://sigscale.org/schema/cgf/ECS_Bx_CHF",
 	"title": "SigScale CGF: Records on the Bx interface for 5GC",
 	"oneOf": [

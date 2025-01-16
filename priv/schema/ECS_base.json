@@ -1,5 +1,5 @@
 {
-	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$schema": "http://json-schema.org/draft-06/schema#",
 	"$id": "http://sigscale.org/schema/cgf/ECS_base",
 	"title": "Elastic Common Schema (ECS) Base",
 	"description": "The ECS `base` field set contains all fields which are at the root of the events.  These fields are common across all types of events.",
