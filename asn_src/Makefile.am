@@ -23,5 +23,6 @@ asn_DATA = ACSE-1.asn1 \
 		ProSeChargingDataTypes.asn1 \
 		SMSChargingDataTypes.asn1 \
 		SS-DataTypes.asn1 \
-		TAP-0312.asn1
+		TAP-0312.asn1 \
+		Huawei-CS.asn1
 

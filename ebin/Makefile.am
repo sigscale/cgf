@@ -38,10 +38,12 @@ beam_DATA = cgf.beam \
 		CHFChargingDataTypes.beam \
 		ExposureFunctionAPIChargingDataTypes.beam \
 		TAP-0312.beam \
+		Huawei-CS.beam \
 		cgf_tap.beam \
 		cgf_gprs.beam \
 		cgf_cs.beam \
-		cgf_ims.beam
+		cgf_ims.beam \
+		cgf_cs_huawei.beam
 
 %.beam:$(top_builddir)/src/%.erl
 	$(ERLC) $(ERLCFLAGS) -I $(top_builddir)/src $<

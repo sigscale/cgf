@@ -20,7 +20,8 @@ modhtml = cgf.html \
 		cgf_tap.html \
 		cgf_gprs.html \
 		cgf_cs.html \
-		cgf_ims.html
+		cgf_ims.html \
+		cgf_cs_huawei.html
 
 doc_DATA = overview.edoc $(modhtml) \
 		modules-frame.html overview-summary.html \

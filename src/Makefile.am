@@ -23,6 +23,7 @@ noinst_DATA = GenericChargingDataTypes.erl \
 		CHFChargingDataTypes.erl \
 		ExposureFunctionAPIChargingDataTypes.erl \
 		TAP-0312.erl \
+		Huawei-CS.erl \
 		ssh_sftpd.hrl
 
 %.erl %.hrl:$(top_srcdir)/asn_src/%.asn1
