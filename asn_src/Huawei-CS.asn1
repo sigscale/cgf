@@ -201,7 +201,7 @@ Huawei-CS DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		partialRecordType                  [69] PartialRecordType OPTIONAL,
 		guaranteedBitRate                  [70] GuaranteedBitRate OPTIONAL,
 		maximumBitRate                     [71] MaximumBitRate OPTIONAL,
-unknown [132] OCTET STRING OPTIONAL,
+--    ???                               [132] OCTET STRING OPTIONAL,
 		ussdCallBackFlag                  [138] NULL OPTIONAL,
 		modemType                         [139] ModemType OPTIONAL,
 		classmark3                        [140] Classmark3 OPTIONAL,
@@ -342,7 +342,8 @@ unknown [132] OCTET STRING OPTIONAL,
 		calledGsm-SCFAddress              [740] Gsm-SCFAddress OPTIONAL,
 		calledServiceKey                  [773] Gsm-SCFAddress OPTIONAL,
 		calledFreeFormatData              [741] FreeFormatData OPTIONAL,
-		calledMSISDN                      [742] MSISDN OPTIONAL
+		calledMSISDN                      [742] MSISDN OPTIONAL,
+		...
 	}
 
 	MOCFCallRecord ::= SET
@@ -546,7 +547,8 @@ unknown [132] OCTET STRING OPTIONAL,
 		calledFreeFormatData              [741] FreeFormatData OPTIONAL,
 		calledMSISDN                      [742] MSISDN OPTIONAL,
 		hplmnLcfOptimalRoutingFlag        [754] BOOLEAN OPTIONAL,
-		calledServiceKey                  [773] Gsm-SCFAddress OPTIONAL
+		calledServiceKey                  [773] Gsm-SCFAddress OPTIONAL,
+		...
 	}
 
 	MTCallRecord ::= SET
@@ -722,7 +724,8 @@ unknown [132] OCTET STRING OPTIONAL,
 		camel-Exchange-ID                 [360] Camel-Exchange-ID OPTIONAL,
 		csfb-flag                         [366] BOOLEAN OPTIONAL,
 		calledByPass                      [367] BOOLEAN OPTIONAL,
-		bearSeizureTime                   [382] TimeStamp OPTIONAL
+		bearSeizureTime                   [382] TimeStamp OPTIONAL,
+		...
 	}
 
 	SSActionRecord ::= SET
@@ -768,7 +771,8 @@ unknown [132] OCTET STRING OPTIONAL,
 		callingNumber       [321] CallingNumber OPTIONAL,
 		calledNumber        [322] CalledNumber OPTIONAL,
 		mscOutgoingROUTE    [323] ROUTE OPTIONAL,
-		ussdPhase           [324] UssdPhase OPTIONAL
+		ussdPhase           [324] UssdPhase OPTIONAL,
+		...
 	}
 
 	CallEventRecordType     ::= INTEGER
