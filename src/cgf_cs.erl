@@ -1451,7 +1451,7 @@ ss_action_record7(Record, Acc) ->
 %% @hidden
 ss_action_record8(#{ssAction := ActionType} = Record, Acc) ->
 	Acc1 = Acc#{<<"ssAction">> => ActionType},
-	ss_action_record8(Record, Acc1);
+	ss_action_record9(Record, Acc1);
 ss_action_record8(Record, Acc) ->
 	ss_action_record9(Record, Acc).
 %% @hidden
