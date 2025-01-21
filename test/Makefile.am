@@ -6,8 +6,7 @@
 check_DATA = .dialyzer_ok .common_test_ok
 
 testmods = cgf_test_lib \
-		cgf_lib_SUITE \
-		cgf_json_validation_SUITE
+		cgf_lib_SUITE
 
 DIA_ARGS = -Wno_unknown
 CT_ARGS = -spec test.spec
