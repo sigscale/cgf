@@ -6,6 +6,7 @@
 -export([start/0, start/1, stop/0, stop/1]).
 -export([load/1, unload/1]).
 -export([rand_dn/0, rand_dn/1]).
+-export([rand_ip/0, rand_ipv4/0, rand_ipv6/0]).
 
 applications() ->
 	[crypto, asn1, ssh, cgf].
@@ -75,4 +76,28 @@ rand_dn(0, Acc) ->
 	Acc;
 rand_dn(N, Acc) ->
 	rand_dn(N - 1, [47 + rand:uniform(10) | Acc]).
+
+%% @doc Returns a random `inet:ip_address()' value.
+rand_ip() ->
+	case rand:uniform(2) of
+		1 ->
+			rand_ipv4();
+		2 ->
+			rand_ipv6()
+	end.
+
+%% @doc Returns a random `inet:ip4_address()' value.
+rand_ipv4() ->
+	case rand:uniform(3) of
+		1 ->
+			{10, rand:uniform(255), rand:uniform(255), rand:uniform(255)};
+		2 ->
+			{172, 15 + rand:uniform(16), rand:uniform(255), rand:uniform(255)};
+		3 ->
+			{192, 168, rand:uniform(255), rand:uniform(255)}
+	end.
+
+%% @doc Returns a random `inet:ip6_address()' value.
+rand_ipv6() ->
+	inet:ipv4_mapped_ipv6_address(rand_ipv4()).
 
