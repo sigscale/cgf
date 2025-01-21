@@ -92,7 +92,7 @@ rand_imsi(MCCMNC) ->
 %% @doc Returns a random IMEI.
 rand_imei() ->
 	TAC = "01130000",
-	rand_imsi(TAC).
+	rand_imei(TAC).
 
 %% @doc Returns a random IMEI in TAC.
 rand_imei(TAC) ->
