@@ -31,8 +31,8 @@
 		octets/0, octets/1,
 		bcd/0, bcd/1]).
 
--include_lib("cgf/include/cgf_3gpp_file.hrl").
 -include_lib("common_test/include/ct.hrl").
+-include("cgf_3gpp_file.hrl").
 
 %%---------------------------------------------------------------------
 %%  Test server callback functions

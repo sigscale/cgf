@@ -6,7 +6,8 @@
 check_DATA = .dialyzer_ok .common_test_ok
 
 testmods = cgf_test_lib \
-		cgf_lib_SUITE
+		cgf_lib_SUITE \
+		cgf_cdr_SUITE
 
 DIA_ARGS = -Wno_unknown
 CT_ARGS = -spec test.spec
@@ -14,8 +15,8 @@ CT_ARGS = -spec test.spec
 .dialyzer_ok:	$(addsuffix .beam, $(testmods))
 	dialyzer $(DIA_ARGS) --src $(top_srcdir)/src -I $(top_builddir)/src
 
-%.beam:$(top_srcdir)/test/%.erl
-	$(ERLC) $(ERLCFLAGS) $<
+%.beam:$(top_srcdir)/test/%.erl $(top_srcdir)/include/cgf_3gpp_file.hrl
+	$(ERLC) $(ERLCFLAGS) -I $(top_srcdir)/include $<
 
 .common_test_ok:	$(addsuffix .beam, $(testmods))
 	@if [ ! -d log ]; then mkdir log; fi
