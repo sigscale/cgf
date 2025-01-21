@@ -9,6 +9,7 @@
 -export([rand_imsi/0, rand_imsi/1]).
 -export([rand_imei/0, rand_imei/1]).
 -export([rand_ip/0, rand_ipv4/0, rand_ipv6/0]).
+-export([rand_duration/0]).
 
 applications() ->
 	[crypto, asn1, ssh, cgf].
@@ -132,4 +133,14 @@ luhn_check(Digits) ->
 	end,
 	{_, S} = lists:foldr(F, {1, 0}, Digits),
 	Digits ++ [((10 - (S rem 10)) rem 10) + $0].
+
+%% @doc Returns a random call duration value.
+rand_duration() ->
+	rand_duration(100).
+rand_duration(N) when N < 50 ->
+	rand:uniform(360);
+rand_duration(N) when N < 95 ->
+	rand:uniform(3600);
+rand_duration(_) ->
+	rand:uniform(7200).
 
