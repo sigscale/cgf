@@ -6,6 +6,8 @@
 -export([start/0, start/1, stop/0, stop/1]).
 -export([load/1, unload/1]).
 -export([rand_dn/0, rand_dn/1]).
+-export([rand_imsi/0, rand_imsi/1]).
+-export([rand_imei/0, rand_imei/1]).
 -export([rand_ip/0, rand_ipv4/0, rand_ipv6/0]).
 
 applications() ->
@@ -77,6 +79,24 @@ rand_dn(0, Acc) ->
 rand_dn(N, Acc) ->
 	rand_dn(N - 1, [47 + rand:uniform(10) | Acc]).
 
+%% @doc Returns a random IMSI.
+rand_imsi() ->
+	MCCMNC = "001001",
+	rand_imsi(MCCMNC).
+
+%% @doc Returns a random IMSI in MCCMNC.
+rand_imsi(MCCMNC) ->
+	MCCMNC ++ rand_dn(9).
+
+%% @doc Returns a random IMEI.
+rand_imei() ->
+	TAC = "01130000",
+	rand_imsi(TAC).
+
+%% @doc Returns a random IMEI in TAC.
+rand_imei(TAC) ->
+	luhn_check(TAC ++ rand_dn(6)).
+
 %% @doc Returns a random `inet:ip_address()' value.
 rand_ip() ->
 	case rand:uniform(2) of
@@ -100,4 +120,16 @@ rand_ipv4() ->
 %% @doc Returns a random `inet:ip6_address()' value.
 rand_ipv6() ->
 	inet:ipv4_mapped_ipv6_address(rand_ipv4()).
+
+%% @doc Calculate and append check digit.
+luhn_check(Digits) ->
+	F = fun(C, {0, Sum}) ->
+				{1, Sum + (C - $0)};
+			(C, {1, Sum}) when (C - $0) < 5 ->
+				{0, Sum + ((C - $0) * 2)};
+			(C, {1, Sum}) ->
+				{0, Sum + ((C - $0) * 2) - 9}
+	end,
+	{_, S} = lists:foldr(F, {1, 0}, Digits),
+	Digits ++ [((10 - (S rem 10)) rem 10) + $0].
 
