@@ -18,6 +18,7 @@ modhtml = cgf.html \
 		cgf_lib.html \
 		cgf_tools.html \
 		cgf_tap.html \
+		cgf_3gpp_file.html \
 		cgf_gprs.html \
 		cgf_cs.html \
 		cgf_ims.html \

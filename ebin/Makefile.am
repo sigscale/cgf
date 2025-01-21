@@ -40,6 +40,7 @@ beam_DATA = cgf.beam \
 		TAP-0312.beam \
 		Huawei-CS.beam \
 		cgf_tap.beam \
+		cgf_3gpp_file.beam \
 		cgf_gprs.beam \
 		cgf_cs.beam \
 		cgf_ims.beam \
@@ -47,6 +48,9 @@ beam_DATA = cgf.beam \
 
 %.beam:$(top_builddir)/src/%.erl
 	$(ERLC) $(ERLCFLAGS) -I $(top_builddir)/src $<
+
+cgf_3gpp_file.beam:$(top_builddir)/src/cgf_3gpp_file.erl $(top_srcdir)/include/cgf_3gpp_file.hrl
+	$(ERLC) $(ERLCFLAGS) -I $(top_srcdir)/include -I $(top_builddir)/src $<
 
 %.app:   %.app-in
 	sed -e 's/%APP_NAME%/$(PACKAGE_NAME)/' \

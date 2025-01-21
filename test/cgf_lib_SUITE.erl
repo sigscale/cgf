@@ -21,14 +21,17 @@
 -author('Vance Shipley <vances@sigscale.org>').
 
 %% common_test required callbacks
--export([suite/0, sequences/0, all/0]).
+-export([suite/0, all/0]).
 -export([init_per_suite/1, end_per_suite/1]).
 -export([init_per_testcase/2, end_per_testcase/2]).
 
 %% export test cases
--export([octets/0, octets/1,
+-export([file_header/0, file_header/1,
+		cdr_header/0, cdr_header/1,
+		octets/0, octets/1,
 		bcd/0, bcd/1]).
 
+-include_lib("cgf/include/cgf_3gpp_file.hrl").
 -include_lib("common_test/include/ct.hrl").
 
 %%---------------------------------------------------------------------
@@ -66,21 +69,52 @@ init_per_testcase(_TestCase, Config) ->
 end_per_testcase(_TestCase, _Config) ->
 	ok.
 
--spec sequences() -> Sequences :: [{SeqName :: atom(), Testcases :: [atom()]}].
-%% Group test cases into a test sequence.
-%%
-sequences() ->
-	[].
-
 -spec all() -> TestCases :: [Case :: atom()].
 %% Returns a list of all test cases in this test suite.
 %%
 all() ->
-	[octets, bcd].
+	[file_header, cdr_header, octets, bcd].
 
 %%---------------------------------------------------------------------
 %%  Test cases
 %%---------------------------------------------------------------------
+
+file_header() ->
+	Description = "CDR file header CODEC (3GPP TS 32.297)",
+	ct:comment(Description),
+	[{userdata, [{doc, Description}]}].
+
+file_header(_Config) ->
+	Low = {release(), rand:uniform(10) - 1},
+	High = {release(), rand:uniform(10) - 1},
+	Open = cdr_timestamp(),
+	Append = cdr_timestamp(),
+	Count = rand:uniform(16#fffffffe),
+	Sequence = rand:uniform(16#ffffffff) - 1,
+	CloseReason = close_reason(),
+	Address = cgf_test_lib:rand_ipv6(),
+	Lost = cdr_lost(),
+	Header = #cdr_file_header{low = Low, high = High,
+			open = Open, append = Append, count = Count,
+			sequence = Sequence, reason = CloseReason,
+			address = Address, lost = Lost},
+	Binary = cgf_3gpp_file:file_header(Header),
+	Header = cgf_3gpp_file:file_header(Binary).
+
+cdr_header() ->
+	Description = "CDR event record header CODEC (3GPP TS 32.297)",
+	ct:comment(Description),
+	[{userdata, [{doc, Description}]}].
+
+cdr_header(_Config) ->
+	TS = ts_number(),
+	Release = release(),
+	Version = rand:uniform(10) - 1,
+	Format = cdr_format(),
+	Header = #cdr_header{ts = TS, release = Release,
+			version = Version, format = Format},
+	Binary = cgf_3gpp_file:cdr_header(Header),
+	Header = cgf_3gpp_file:cdr_header(Binary).
 
 octets() ->
 	Description = "Convert an OCTET STRING to hexadecimal",
@@ -128,4 +162,115 @@ bcd(_Config) ->
 %%---------------------------------------------------------------------
 %%  Internal functions
 %%---------------------------------------------------------------------
+
+cdr_timestamp() ->
+	{rand:uniform(12), rand:uniform(28), rand:uniform(24),
+			rand:uniform(60) - 1, (rand:uniform(27) - 13) * 60}.
+
+close_reason() ->
+	close_reason(rand:uniform(10)).
+close_reason(1) ->
+	normal;
+close_reason(2) ->
+	size;
+close_reason(3) ->
+	time;
+close_reason(4) ->
+	count;
+close_reason(5) ->
+	manual;
+close_reason(6) ->
+	change;
+close_reason(7) ->
+	undefined;
+close_reason(8) ->
+	error;
+close_reason(9) ->
+	space;
+close_reason(10) ->
+	integrity.
+
+cdr_lost() ->
+	cdr_lost(rand:uniform(256) - 1).
+cdr_lost(0) ->
+	{'==', 0};
+cdr_lost(N) when N =< 127 ->
+	{'>=', N};
+cdr_lost(128) ->
+	{'>=', 1};
+cdr_lost(N) when N < 255 ->
+	{'==', N - 128};
+cdr_lost(255) ->
+	{'>=', 127}.
+
+cdr_format() ->
+	cdr_format(rand:uniform(4)).
+cdr_format(1) ->
+	ber;
+cdr_format(2) ->
+	uper;
+cdr_format(3) ->
+	per;
+cdr_format(4) ->
+	xer.
+
+ts_number() ->
+	ts_number(rand:uniform(26) - 1).
+ts_number(0) ->
+	32005;
+ts_number(1) ->
+	32015;
+ts_number(2) ->
+	32205;
+ts_number(3) ->
+	32215;
+ts_number(4) ->
+	32225;
+ts_number(5) ->
+	32235;
+ts_number(6) ->
+	32250;
+ts_number(7) ->
+	32251;
+ts_number(9) ->
+	32260;
+ts_number(10) ->
+	32270;
+ts_number(11) ->
+	32271;
+ts_number(12) ->
+	32272;
+ts_number(13) ->
+	32273;
+ts_number(14) ->
+	32275;
+ts_number(15) ->
+	32274;
+ts_number(16) ->
+	32277;
+ts_number(17) ->
+	32296;
+ts_number(18) ->
+	32278;
+ts_number(19) ->
+	32253;
+ts_number(20) ->
+	32255;
+ts_number(21) ->
+	32254;
+ts_number(22) ->
+	32256;
+ts_number(23) ->
+	28201;
+ts_number(24) ->
+	28202;
+ts_number(25) ->
+	32257.
+
+release() ->
+	release(rand:uniform(18)).
+release(N) when N < 4 ->
+	99;
+release(N) ->
+	N.
 

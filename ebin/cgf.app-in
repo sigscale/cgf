@@ -33,6 +33,7 @@
 				'ExposureFunctionAPIChargingDataTypes',
 				'TAP-0312',
 				cgf_tap,
+				cgf_3gpp_file,
 				cgf_gprs,
 				cgf_cs,
 				cgf_ims,

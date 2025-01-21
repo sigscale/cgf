@@ -122,8 +122,8 @@ AC_ERLANG_CHECK_LIB([jesse], [], [AC_MSG_WARN([jesse was not found!])])
 ##
 ## Output:  create output files
 ##
-AC_OUTPUT([Makefile ebin/Makefile doc/Makefile src/Makefile
-		asn_src/Makefile priv/Makefile priv/schema/Makefile
+AC_OUTPUT([Makefile include/Makefile ebin/Makefile doc/Makefile
+		src/Makefile asn_src/Makefile priv/Makefile priv/schema/Makefile
 		test/Makefile sys.config $PACKAGE_NAME.rel ebin/cgf.appup
 		scripts/cgf scripts/cgf.service])
 
