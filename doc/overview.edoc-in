@@ -82,11 +82,9 @@ broken out for convenience (e.g. `[{root, "/var/spool/cgf"}]'):
 		<dd>Sets the initial current working directory for the server.
 				(default: `/')</dd>
 	<dt>`root'</dt>
-		<dd>Sets the SFTP root directory. The user cannot see any files above
-				this root. If, for example, the root directory is set to `/tmp',
-				then the user sees this directory as `/'. The command `cd /etc'
-				would change the actual current working directory to `/tmp/etc'
-				while the user would see it as `/etc'. (default: `/tmp')</dd>
+		<dd>Sets the SFTP server root directory. Username subdirectories
+				of the server root directory provide the root directory
+				as seen by each SFTP user. (default: `/tmp')</dd>
 	<dt>`max_files'</dt>
 		<dd>The maximum number of files in the response to a directory listing.
 				(default: `0' which is unlimited).</dd>
