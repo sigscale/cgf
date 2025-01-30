@@ -220,8 +220,7 @@ handle_op(?SSH_FXP_CLOSE, _ReqId,
 		{value, {Handle, file, {Path, _IoDevice}}} ->
 			case ordsets:is_element(Handle, CgfHandles) of
 				true ->
-					RealPath = Root ++ Path,
-					EventPayload = #{user => Username, path => RealPath},
+					EventPayload = #{user => Username, path => Path},
 					cgf_event:notify(file_close, EventPayload),
 					CgfHandles1 = ordsets:del_element(Handle, CgfHandles),
 					CgfState1 = CgfState#{write_handles => CgfHandles1},
