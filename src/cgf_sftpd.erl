@@ -57,7 +57,8 @@
 -type options() :: [option()].
 -type cgf_state() :: #{
 		user => Username :: string(),
-		write_handles := ordsets:set(Handle :: non_neg_integer())}.
+		write_handles := ordsets:set(Handle :: non_neg_integer()),
+		pending := binary()}.
 -type sftpd_state() :: #state{}.
 
 %%----------------------------------------------------------------------
@@ -97,7 +98,7 @@ subsystem_spec1({Name, {ssh_sftpd, Options}}) ->
 %% Initialize an `sftpd' server channel.
 %% @private
 init(Options) ->
-	CgfState = #{write_handles => ordsets:new()},
+	CgfState = #{write_handles => ordsets:new(), pending => <<>>},
 	try ssh_sftpd:init(Options) of
 		{ok, SftpdState} ->
 			{ok, {CgfState, SftpdState}}
@@ -151,18 +152,30 @@ handle_msg({_, ChannelId, _ConnectionRef} = Msg,
 %% @doc Handles SSH Connection Protocol messages
 %% 	that may need service-specific attention.
 %% @private
-handle_ssh_msg({ssh_cm, _ConnectionRef,
-		{data, _ChannelId, Type, Data}} = Event, State) ->
+handle_ssh_msg({ssh_cm, ConnectionRef,
+		{data, ChannelId, Type, Data}} = _Event, State) ->
 	case handle_data(Type, Data, State) of
-		{ok, {CgfState, SftpdState} = _State1} ->
-			case ssh_sftpd:handle_ssh_msg(Event, SftpdState) of
-				{ok, SftpdState1} ->
+		{ok, Data1, Rest, {CgfState, SftpdState}} ->
+			Event1 = {ssh_cm, ConnectionRef,
+					{data, ChannelId, Type, Data1}},
+			case ssh_sftpd:handle_ssh_msg(Event1, SftpdState) of
+				{ok, SftpdState1} when Rest == <<>> ->
 					{ok, {CgfState, SftpdState1}};
+				{ok, SftpdState1} ->
+					Event2 = {ssh_cm, ConnectionRef,
+							{data, ChannelId, Type, Rest}},
+					handle_ssh_msg(Event2, {CgfState, SftpdState1});
 				{stop, ChannelId, SftpdState1} ->
 					{stop, ChannelId, {CgfState, SftpdState1}}
 			end;
-		{prohibit, State1} ->
-			{ok, State1}
+		{pending, State1} ->
+			{ok, State1};
+		{prohibit, <<>> = _Rest, State1} ->
+			{ok, State1};
+		{prohibit, Rest, State1} ->
+			Event1 = {ssh_cm, ConnectionRef,
+					{data, ChannelId, Type, Rest}},
+			handle_ssh_msg(Event1, State1)
 	end;
 handle_ssh_msg(Event,
 		{CgfState, SftpdState} = _State) ->
@@ -188,17 +201,25 @@ terminate(Reason, {_CgfState, SftpdState} = _State) ->
 %%----------------------------------------------------------------------
 
 %% @hidden
-handle_data(0, <<?UINT32(Len), Msg:Len/binary, _/binary>>,
-		{_CgfState, #state{pending = <<>>} = _SftpdState} = State) ->
-	<<Op, ?UINT32(ReqId), Data/binary>> = Msg,
-	handle_op(Op, ReqId, Data, State);
+handle_data(0, <<?UINT32(Len), Msg:Len/binary, Rest/binary>> = Data,
+		{#{pending := <<>>} = _CgfState, _SftpdState} = State) ->
+	<<Op, ?UINT32(ReqId), Data1/binary>> = Msg,
+	case handle_op(Op, ReqId, Data1, State) of
+		{ok, State1} ->
+			{ok, binary:part(Data, 0, Len + 4), Rest, State1};
+		{prohibit, State1} ->
+			{prohibit, Rest, State1}
+	end;
+handle_data(0, Data,
+		{#{pending := <<>>} = CgfState, SftpdState} = _State) ->
+	CgfState1 = CgfState#{pending => Data},
+	State1 = {CgfState1, SftpdState},
+	{pending, State1};
 handle_data(Type, Data,
-		{CgfState, #state{pending = Pending} = SftpdState} = _State) ->
-	SftpdState1 = SftpdState#state{pending = <<>>},
-	State1 = {CgfState, SftpdState1},
-	handle_data(Type, <<Pending/binary, Data/binary>>, State1);
-handle_data(_Type, _Data, State) ->
-	{ok, State}.
+		{#{pending := Pending} = CgfState, SftpdState} = _State) ->
+	CgfState1 = CgfState#{pending => <<>>},
+	State1 = {CgfState1, SftpdState},
+	handle_data(Type, <<Pending/binary, Data/binary>>, State1).
 
 %% @hidden
 handle_op(?SSH_FXP_INIT, _Version, _Data, State) ->
