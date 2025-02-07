@@ -31,6 +31,8 @@
 -export([init/1, handle_call/2, handle_event/2, handle_info/2,
 			terminate/2, code_change/3]).
 
+-include_lib("kernel/include/logger.hrl").
+
 -record(state, {}).
 -type state() :: #state{}.
 
@@ -81,7 +83,11 @@ init([] = _Args) ->
 %% 	gen_event:notify/2, gen_event:sync_notify/2}.
 %% @private
 %%
-handle_event({_Type, _EventPayload} = _Event, State) ->
+handle_event({file_close,
+		#{module := Module, user := User, root := _Root, path := Path} = _Event,
+		State) ->
+	Report = #{Module => file_close, user => User, path => Path},
+	?LOG_INFO(Report),
 	{ok, State};
 handle_event(_Event, State) ->
 	{ok, State}.
