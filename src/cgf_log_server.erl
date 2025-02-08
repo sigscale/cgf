@@ -27,9 +27,8 @@
 -behaviour(gen_server).
 
 % export the gen_server call backs
--export([init/1, handle_call/3, handle_cast/2,
-		handle_info/2, terminate/2, handle_continue/2,
-		code_change/3, format_status/2]).
+-export([init/1, handle_call/3, handle_cast/2, handle_info/2,
+		terminate/2, handle_continue/2, code_change/3]).
 % export the cgf_log_server private api
 -export([codec_worker/5]).
 
@@ -290,18 +289,6 @@ terminate2(Log, {error, Reason}) ->
 %% @private
 code_change(_OldVersion, State, _Extra) ->
 	{ok, State}.
-
--spec format_status(Opt, StatusData) -> Status
-	when
-      Opt :: 'normal' | 'terminate',
-      StatusData :: [PDict | State],
-      PDict :: [{Key :: term(), Value :: term()}],
-      State :: term(),
-      Status :: term().
-%% @see //stdlib/gen_server:format_status/3
-%% @private
-format_status(_Opt, [_PDict, State] = _StatusData) ->
-	[{data, [{"State", State}]}].
 
 %%----------------------------------------------------------------------
 %%  The cgf_log_server private API
