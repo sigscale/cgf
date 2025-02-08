@@ -8,7 +8,9 @@ modhtml = cgf.html \
 		cgf_sup.html \
 		cgf_server.html \
 		cgf_sftpd.html
+		cgf_event_sup.html\
 		cgf_event.html \
+		cgf_event_server.html \
 		cgf_log_sup.html \
 		cgf_log_server_sup.html \
 		cgf_log_server.html \

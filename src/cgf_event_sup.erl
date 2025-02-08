@@ -1,4 +1,4 @@
-%%% cgf_sup.erl
+%%% cgf_event_sup.erl
 %%% vim: ts=3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% @copyright 2021-2024 SigScale Global Inc.
@@ -18,7 +18,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% @docfile "{@docsrc supervision.edoc}"
 %%%
--module(cgf_sup).
+-module(cgf_event_sup).
 -copyright('Copyright (c) 2021-2024 SigScale Global Inc.').
 -author('Vance Shipley <vances@sigscale.org>').
 
@@ -26,15 +26,6 @@
 
 %% export the callback needed for supervisor behaviour
 -export([init/1]).
-
--type registered_name() :: {local, Name :: atom()}
-		| {global, Name :: atom()}
-		| {via, ViaModule :: atom(), Name :: any()}.
-
-%%----------------------------------------------------------------------
-%%  The cgf_sup private API
-%%----------------------------------------------------------------------
-
 
 %%----------------------------------------------------------------------
 %%  The supervisor callback
@@ -51,9 +42,8 @@
 %% @private
 %%
 init(_Args) ->
-	ChildSpecs = [server({local, cgf}, cgf_server, [self()], []),
-			supervisor({local, cgf_log_sup}, cgf_log_sup, []),
-			supervisor({local, cgf_event_sup}, cgf_event_sup, [])],
+	ChildSpecs = [event(cgf_event, []),
+			server(cgf_event_server, [], [])],
 	SupFlags = #{},
 	{ok, {SupFlags, ChildSpecs}}.
 
@@ -61,41 +51,40 @@ init(_Args) ->
 %%  internal functions
 %%----------------------------------------------------------------------
 
--spec supervisor(RegName, StartMod, Args) -> Result
+-spec event(StartMod, Options) -> Result
 	when
-		RegName :: registered_name(),
 		StartMod :: atom(),
-		Args :: [term()],
-		Result :: supervisor:child_spec().
-%% @doc Build a supervisor child specification for a
-%%    {@link //stdlib/supervisor. supervisor} behaviour
-%%    with registered name.
-%% @private
-%%
-supervisor(RegName, StartMod, Args) ->
-	StartArgs = [RegName, StartMod, Args],
-	StartFunc = {supervisor, start_link, StartArgs},
-	#{id => StartMod, start => StartFunc,
-			type => supervisor, modules => [StartMod]}.
-
--spec server(RegName, StartMod, Args, Opts) -> Result
-	when
-		RegName :: registered_name(),
-		StartMod :: atom(),
-		Args :: [term()],
-		Opts :: [Option],
+		Options :: [Option],
 		Option :: {timeout, Timeout} | {debug, [Flag]},
 		Timeout :: pos_integer(),
 		Flag :: trace | log | {logfile, file:filename()}
 				| statistics | debug,
 		Result :: supervisor:child_spec().
 %% @doc Build a supervisor child specification for a
-%% 	{@link gen_server. gen_server} behaviour
-%% 	with a registered name and options.
+%%		{@link //stdlib/gen_event. gen_event} behaviour.
 %% @private
 %%
-server(RegName, StartMod, Args, Opts) ->
-	StartArgs = [RegName, StartMod, Args, Opts],
+event(StartMod, Options) ->
+	StartArgs = [{local, StartMod}, Options],
+	StartFunc = {gen_event, start_link, StartArgs},
+	#{id => StartMod, start => StartFunc, modules => [StartMod]}.
+
+-spec server(StartMod, Args, Options) -> Result
+	when
+		StartMod :: atom(),
+		Args :: [term()],
+		Options :: [Option],
+		Option :: {timeout, Timeout} | {debug, [Flag]},
+		Timeout :: pos_integer(),
+		Flag :: trace | log | {logfile, file:filename()}
+				| statistics | debug,
+		Result :: supervisor:child_spec().
+%% @doc Build a supervisor child specification for a
+%% 	{@link gen_server. gen_server} behaviour.
+%% @private
+%%
+server(StartMod, Args, Options) ->
+	StartArgs = [{local, StartMod}, StartMod, Args, Options],
 	StartFunc = {gen_server, start_link, StartArgs},
 	#{id => StartMod, start => StartFunc, modules => [StartMod]}.
 

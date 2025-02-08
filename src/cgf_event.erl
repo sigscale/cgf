@@ -25,6 +25,7 @@
 -behaviour(gen_event).
 
 %% export the cgf_event API
+-export([add_handler/2, add_sup_handler/2]).
 -export([notify/2]).
 
 %% export the callbacks needed for gen_event behaviour
@@ -36,9 +37,34 @@
 -record(state, {}).
 -type state() :: #state{}.
 
+-type file_close() ::
+		#{module := Module :: atom(),
+		user := User :: binary(),
+		root := Root :: binary(),
+		path := Path :: binary()}.
+-export_type([file_close/0]).
+
 %%----------------------------------------------------------------------
 %%  The cgf_event API
 %%----------------------------------------------------------------------
+
+-spec add_handler(Handler, Args) -> Result
+	when
+		Handler :: gen_event:handler(),
+		Args :: list(),
+		Result :: gen_event:add_handler_ret().
+%% @doc Add a new event handler.
+add_handler(Handler, Args) ->
+	gen_event:add_handler(?MODULE, Handler, Args).
+
+-spec add_sup_handler(Handler, Args) -> Result
+	when
+		Handler :: gen_event:handler(),
+		Args :: list(),
+		Result :: gen_event:add_handler_ret().
+%% @doc Add a new supervised event handler.
+add_sup_handler(Handler, Args) ->
+	gen_event:add_sup_handler(?MODULE, Handler, Args).
 
 -spec notify(EventType, EventPayLoad) -> ok
 	when
@@ -84,10 +110,9 @@ init([] = _Args) ->
 %% @private
 %%
 handle_event({file_close,
-		#{module := Module, user := User, root := _Root, path := Path} = _Event,
+		#{module := Module, user := User, root := _Root, path := Path}} = _Event,
 		State) ->
-	Report = #{Module => file_close, user => User, path => Path},
-	?LOG_INFO(Report),
+	?LOG_INFO([{Module, file_close}, {user, User}, {path, Path}]),
 	{ok, State};
 handle_event(_Event, State) ->
 	{ok, State}.
