@@ -22,12 +22,355 @@
 -copyright('Copyright (c) 2024 SigScale Global Inc.').
 -author('Vance Shipley <vances@sigscale.org>').
 
+-export([add_action/3, find_action/2, get_action/2,
+		get_actions/1, delete_action/2, match_event/2]).
 -export([plmn/1]).
 
+-export_type([action/0]).
+-type action() :: {Module :: atom(), Log :: disk_log:log()}
+		| {Module :: atom(), Log :: disk_log:log(),
+			Metadata :: map()}
+		| {Module :: atom(), Function :: atom(),
+			Log :: disk_log:log(), Metadata :: map()}
+		| {Module :: atom(), Function :: atom(),
+			Log :: disk_log:log(), Metadata :: map(),
+			ExtraArgs :: [term()]}
+		| {Module :: atom(), Function :: atom(),
+			Log :: disk_log:log(), Metadata :: map(),
+			ExtraArgs :: [term()], Opts :: gen_statem:start_opt()}.
+
+-define(CHUNKSIZE, 100).
 
 %%----------------------------------------------------------------------
 %%  The cgf public API
 %%----------------------------------------------------------------------
+
+-spec add_action(Event, Match, Action) -> Result
+	when
+		Event :: file_close,
+		Match :: {User, Directory, Filename, Suffix},
+		User :: string() | binary(),
+		Directory :: string() | binary(),
+		Filename :: string() | binary(),
+		Suffix :: string() | binary(),
+		Action :: action(),
+		Result :: ok | {error, Reason},
+		Reason :: term().
+%% @doc Add an event action.
+%%
+%% 	The SFTP server sends a `file_close' notification once
+%% 	a file is finished transferring. The event handler uses
+%% 	{@link //cgf/cgf:match_event/2. match_event/2} to find
+%% 	actions to perform on the received file. The `Match' values
+%% 	are compared as prefixes and if all are a match the `Action'
+%% 	is selected. A zero length prefix always matches.
+%%
+%% 	A supervised {@link //cgf/cgf_import_fsm. cgf_import_fsm}
+%% 	process is started to perform the `Action' with a function
+%% 	call constructed as follows:
+%%
+%% 	<dl>
+%% 		<dt>`{Module, Log}'</dt>
+%% 			<dd>The function call is as in
+%% 			{@link //cgf/cgf_cs:import/2. cgf_[cs|ps|ims]:import/2}:
+%% 			`Module:import(Path, Log)'. The `Path' is contructed
+%% 			from the notification received from the SFTP server.</dd>
+%% 		<dt>`{Module, Log, Metadata}'</dt>
+%% 			<dd>The function call is as in
+%% 			{@link //cgf/cgf_cs:import/3. cgf_[cs|ps|ims]:import/3}:
+%% 			`Module:import(Path, Log, Metadata)'. The `Metadata' is
+%% 			merged with that from the SFTP server notification.</dd>
+%% 		<dt>`{Module, Function, Log, Metadata}'</dt>
+%% 			<dd>User provided import modules may use any function
+%% 			name: `Module:Function(Path, Log, Metadata)'.</dd>
+%% 		<dt>`{Module, Function, Log, Metadata, ExtraArgs}'</dt>
+%% 			<dd>User provided import module functions may accept
+%% 			extra arguments:
+%% 			`Module:Function(Path, Log, Metadata, ...).'</dd>
+%% 		<dt>`{Module, Function, Log, Metadata, ExtraArgs, Opts}'</dt>
+%% 			<dd>The {@link //cgf/cgf_import_fsm. cgf_import_fsm}
+%% 			process will be started with `Opts'
+%% 			(e.g. `[{debug, [trace]}]').</dd>
+%% 	</dl>
+%%
+add_action(Event, {User, Directory, Filename, Suffix},
+		Action) when is_list(User) ->
+	add_action(Event,
+			{list_to_binary(User), Directory, Filename, Suffix}, Action);
+add_action(Event, {User, Directory, Filename, Suffix},
+		Action) when is_list(Directory) ->
+	add_action(Event,
+			{User, list_to_binary(Directory), Filename, Suffix}, Action);
+add_action(Event, {User, Directory, Filename, Suffix},
+		Action) when is_list(Filename) ->
+	add_action(Event,
+			{User, Directory, list_to_binary(Filename), Suffix}, Action);
+add_action(Event, {User, Directory, Filename, Suffix},
+		Action) when is_list(Suffix) ->
+	add_action(Event,
+			{User, Directory, Filename, list_to_binary(Suffix)}, Action);
+add_action(file_close = _Event, Match, Action)
+		when tuple_size(Match) == 4,
+		is_binary(element(1, Match)),
+		is_binary(element(2, Match)),
+		is_binary(element(3, Match)),
+		is_binary(element(4, Match)),
+		(((tuple_size(Action) == 2)
+						andalso is_atom(element(1, Action)))
+				orelse ((tuple_size(Action) == 3) 
+						andalso is_atom(element(1, Action))
+						andalso is_map(element(3, Action)))
+				orelse ((tuple_size(Action) == 4) 
+						andalso is_atom(element(1, Action))
+						andalso is_atom(element(2, Action))
+						andalso is_map(element(4, Action)))
+				orelse ((tuple_size(Action) == 5) 
+						andalso is_atom(element(1, Action))
+						andalso is_atom(element(2, Action))
+						andalso is_map(element(4, Action))
+						andalso is_list(element(5, Action)))
+				orelse ((tuple_size(Action) == 6) 
+						andalso is_atom(element(1, Action))
+						andalso is_atom(element(2, Action))
+						andalso is_map(element(4, Action))
+						andalso is_list(element(5, Action))
+						andalso is_list(element(6, Action)))) ->
+	F = fun() ->
+			mnesia:write({cgf_action, Match, Action})
+	end,
+	case mnesia:transaction(F) of
+		{atomic, ok} ->
+			ok;
+		{aborted, Reason} ->
+			{error, Reason}
+	end.
+
+-spec find_action(Event, Match) -> Result
+	when
+		Event :: file_close,
+		Match :: {User, Directory, Filename, Suffix},
+		User :: string() | binary(),
+		Directory :: string() | binary(),
+		Filename :: string() | binary(),
+		Suffix :: string() | binary(),
+		Result :: {ok, Action} | {error, Reason},
+		Action :: action(),
+		Reason :: not_found | term().
+%% @doc Find an event action.
+find_action(Event, {User, Directory, Filename, Suffix} = _Match)
+		when is_list(User) ->
+	find_action(Event,
+			{list_to_binary(User), Directory, Filename, Suffix});
+find_action(Event, {User, Directory, Filename, Suffix})
+		when is_list(Directory) ->
+	find_action(Event,
+			{User, list_to_binary(Directory), Filename, Suffix});
+find_action(Event, {User, Directory, Filename, Suffix})
+		when is_list(Filename) ->
+	find_action(Event,
+			{User, Directory, list_to_binary(Filename), Suffix});
+find_action(Event, {User, Directory, Filename, Suffix})
+		when is_list(Suffix) ->
+	find_action(Event,
+			{User, Directory, Filename, list_to_binary(Suffix)});
+find_action(file_close = _Event, Match)
+		when tuple_size(Match) == 4,
+		is_binary(element(1, Match)),
+		is_binary(element(2, Match)),
+		is_binary(element(3, Match)),
+		is_binary(element(4, Match)) ->
+	F = fun() ->
+			mnesia:read({cgf_action, Match})
+	end,
+	case mnesia:transaction(F) of
+		{atomic, [{_, _, Action}]} ->
+			{ok, Action};
+		{atomic, []} ->
+			{error, not_found};
+		{aborted, Reason} ->
+			{error, Reason}
+	end.
+
+-spec get_action(Event, Match) -> Action
+	when
+		Event :: file_close,
+		Match :: {User, Directory, Filename, Suffix},
+		User :: string() | binary(),
+		Directory :: string() | binary(),
+		Filename :: string() | binary(),
+		Suffix :: string() | binary(),
+		Action :: action().
+%% @doc Get an event action.
+get_action(Event, {User, Directory, Filename, Suffix} = _Match)
+		when is_list(User) ->
+	get_action(Event,
+			{list_to_binary(User), Directory, Filename, Suffix});
+get_action(Event, {User, Directory, Filename, Suffix})
+		when is_list(Directory) ->
+	get_action(Event,
+			{User, list_to_binary(Directory), Filename, Suffix});
+get_action(Event, {User, Directory, Filename, Suffix})
+		when is_list(Filename) ->
+	get_action(Event,
+			{User, Directory, list_to_binary(Filename), Suffix});
+get_action(Event, {User, Directory, Filename, Suffix})
+		when is_list(Suffix) ->
+	get_action(Event,
+			{User, Directory, Filename, list_to_binary(Suffix)});
+get_action(file_close = _Event, Match)
+		when tuple_size(Match) == 4,
+		is_binary(element(1, Match)),
+		is_binary(element(2, Match)),
+		is_binary(element(3, Match)),
+		is_binary(element(4, Match)) ->
+	F = fun() ->
+			mnesia:read({cgf_action, Match})
+	end,
+	case mnesia:transaction(F) of
+		{atomic, [{_, _, Action}]} ->
+			Action;
+		{atomic, []} ->
+			exit(not_found);
+		{aborted, Reason} ->
+			exit(Reason)
+	end.
+
+-spec get_actions(Event) -> Actions
+	when
+		Event :: file_close,
+		Actions :: [{Match, Action}],
+		Match :: {User, Directory, Filename, Suffix},
+		User :: binary(),
+		Directory :: binary(),
+		Filename :: binary(),
+		Suffix :: binary(),
+		Action :: action().
+%% @doc Get all event actions.
+get_actions(file_close = _Event) ->
+	MatchSpec = [{'_', [], ['$_']}],
+	F = fun F(start, Acc) ->
+				F(mnesia:select(cgf_action, MatchSpec,
+					?CHUNKSIZE, read), Acc);
+			F('$end_of_table', Acc) ->
+				{ok, Acc};
+			F({error, Reason}, _Acc) ->
+				{error, Reason};
+			F({Matched, Cont}, Acc) ->
+				Actions = [{Match, Action}
+						|| {_, Match, Action} <- Matched],
+				F(mnesia:select(Cont), [Actions | Acc])
+	end,
+	case mnesia:ets(F, [start, []]) of
+		{error, Reason} ->
+			exit(Reason);
+		{ok, Acc} when is_list(Acc) ->
+			lists:flatten(lists:reverse(Acc))
+	end.
+
+-spec delete_action(Event, Match) -> Result
+	when
+		Event :: file_close,
+		Match :: {User, Directory, Filename, Suffix},
+		User :: string() | binary(),
+		Directory :: string() | binary(),
+		Filename :: string() | binary(),
+		Suffix :: string() | binary(),
+		Result :: ok | {error, Reason},
+		Reason :: term().
+%% @doc Delete an event action.
+delete_action(Event, {User, Directory, Filename, Suffix} = _Match)
+		when is_list(User) ->
+	delete_action(Event,
+			{list_to_binary(User), Directory, Filename, Suffix});
+delete_action(Event, {User, Directory, Filename, Suffix})
+		when is_list(Directory) ->
+	delete_action(Event,
+			{User, list_to_binary(Directory), Filename, Suffix});
+delete_action(Event, {User, Directory, Filename, Suffix})
+		when is_list(Filename) ->
+	delete_action(Event,
+			{User, Directory, list_to_binary(Filename), Suffix});
+delete_action(Event, {User, Directory, Filename, Suffix})
+		when is_list(Suffix) ->
+	delete_action(Event,
+			{User, Directory, Filename, list_to_binary(Suffix)});
+delete_action(file_close = _Event, Match)
+		when tuple_size(Match) == 4,
+		is_binary(element(1, Match)),
+		is_binary(element(2, Match)),
+		is_binary(element(3, Match)),
+		is_binary(element(4, Match)) ->
+	F = fun() ->
+			mnesia:delete({cgf_action, Match})
+	end,
+	case mnesia:transaction(F) of
+		{atomic, ok} ->
+			ok;
+		{aborted, Reason} ->
+			{error, Reason}
+	end.
+
+-spec match_event(Event, Content) -> Result
+	when
+		Event :: file_close,
+		Content :: cgf_event:file_close(),
+		Result :: {ok, Actions} | {error, Reason},
+		Actions :: [{Match, Action}],
+		Match :: {User, Directory, Filename, Suffix},
+		User :: binary(),
+		Directory :: binary(),
+		Filename :: binary(),
+		Suffix :: binary(),
+		Action :: action(),
+		Reason :: term().
+%% @doc Find actions matching event.
+match_event(file_close = _Event,
+		#{user := User, path := Path} = _Content)
+		when is_binary(User), is_binary(Path) ->
+	Directory = case filename:dirname(Path) of
+		<<".">> ->
+			<<>>;
+		<<>> ->
+			<<>>;
+		Dir ->
+			Dir
+	end,
+	Filename = filename:basename(Path),
+	Suffix = case filename:extension(Path) of
+		<<$., Rest/binary>> ->
+			Rest;
+		<<>> ->
+			<<>>
+	end,
+	MatchHead = {'_', {'$1', '$2', '$3', '$4'}, '_'},
+	UserCond = {'orelse', {'==', '$1', <<>>},
+			{'==', '$1', {binary_part, User, 0, {byte_size, '$1'}}}},
+	DirectoryCond = {'orelse', {'==', '$2', <<>>},
+			{'==', '$2', {binary_part, Directory, 0, {byte_size, '$2'}}}},
+	FilenameCond = {'orelse', {'==', '$3', <<>>},
+			{'==', '$3', {binary_part, Filename, 0, {byte_size, '$3'}}}},
+	SuffixCond = {'orelse', {'==', '$4', <<>>},
+			{'==', '$4', {binary_part, Suffix, 0, {byte_size, '$4'}}}},
+	MatchCond = [{'andalso', UserCond,
+			DirectoryCond, FilenameCond, SuffixCond}],
+	MatchSpec = [{MatchHead, MatchCond, ['$_']}],
+	F = fun F(start, Acc) ->
+				F(mnesia:select(cgf_action, MatchSpec,
+					?CHUNKSIZE, read), Acc);
+			F('$end_of_table', Acc) ->
+				{ok, Acc};
+			F({error, Reason}, _Acc) ->
+				{error, Reason};
+			F({Matched, Cont}, Acc) ->
+				Actions = [Action || {_, _, Action} <- Matched],
+				F(mnesia:select(Cont), [Actions | Acc])
+	end,
+	case mnesia:ets(F, [start, []]) of
+		{error, Reason} ->
+			{error, Reason};
+		{ok, Acc} when is_list(Acc) ->
+			{ok, lists:flatten(lists:reverse(Acc))}
+	end.
 
 -spec plmn(String) -> Result
 	when

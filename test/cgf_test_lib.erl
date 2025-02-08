@@ -3,6 +3,7 @@
 %%%
 -module(cgf_test_lib).
 
+-export([init_tables/0]).
 -export([start/0, start/1, stop/0, stop/1]).
 -export([load/1, unload/1]).
 -export([rand_dn/0, rand_dn/1]).
@@ -12,7 +13,19 @@
 -export([rand_duration/0]).
 
 applications() ->
-	[crypto, asn1, ssh, cgf].
+	[crypto, mnesia, asn1, public_key, ssh, cgf].
+
+-spec init_tables() -> Result
+	when
+		Result :: ok | {error, Reason :: term()}.
+%% @doc Initialize mnesia tabless.
+init_tables() ->
+	case cgf_app:install() of
+		{ok, _Installed} ->
+			ok;
+		{error, Reason} ->
+			{error, Reason}
+	end.
 
 start() ->
 	start(applications()).

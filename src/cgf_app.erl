@@ -31,7 +31,12 @@
 %% export the cgf private API for installation
 -export([install/0, install/1]).
 
+-include_lib("kernel/include/logger.hrl").
+
 -type state() :: #{}.
+
+-define(WAITFORSCHEMA, 10000).
+-define(WAITFORTABLES, 60000).
 
 %%----------------------------------------------------------------------
 %%  The cgf_app aplication callbacks
@@ -47,19 +52,34 @@
 		Reason :: term().
 %% @doc Starts the application processes.
 start(normal = _StartType, _Args) ->
-	case supervisor:start_link({local, cgf_sup}, cgf_sup, []) of
-		{ok, TopSup} ->
-			start1(TopSup);
+	Tables = [cgf_action],
+	{ok, Wait} = application:get_env(wait_tables),
+	case mnesia:wait_for_tables(Tables, Wait) of
+		ok ->
+			start1();
+		{timeout, BadTables} ->
+			case force(BadTables) of
+				ok ->
+					?LOG_WARNING([{?MODULE, "Force loaded mnesia tables"},
+							{tables, BadTables}]),
+					start1();
+				{error, Reason} ->
+					?LOG_ERROR([{?MODULE, "Failed to force load mnesia tables"},
+							{tables, BadTables}, {reason, Reason}]),
+					{error, Reason}
+			end;
 		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, "Failed to load mnesia tables"},
+					{tables, Tables}, {reason, Reason}]),
 			{error, Reason}
 	end.
 %% @hidden
-start1(TopSup) ->
-	case gen_event:add_handler(cgf_event, cgf_event, []) of
-		ok ->
+start1() ->
+	case supervisor:start_link({local, cgf_sup}, cgf_sup, []) of
+		{ok, TopSup} ->
 			{ok, Logs} = application:get_env(logs),
 			start2(TopSup, Logs);
-		{_Error, Reason} ->
+		{error, Reason} ->
 			{error, Reason}
 	end.
 %% @hidden
@@ -190,9 +210,165 @@ install() ->
 %% @private
 %%
 install(Nodes) when is_list(Nodes) ->
-	{ok, []}.
+	case mnesia:system_info(is_running) of
+		no ->
+			case mnesia:create_schema(Nodes) of
+				ok ->
+					?LOG_INFO([{?MODULE, "Created mnesia schema"},
+							{nodes, Nodes}]),
+					install1(Nodes);
+				{error, {_, {already_exists, _}}} ->
+					?LOG_INFO([{?MODULE, "Existing mnesia schema"},
+						{nodes, Nodes}]),
+					install1(Nodes);
+				{error, Reason} ->
+					?LOG_ERROR([{?MODULE, "Failed to create mnesia schema"},
+							{description, mnesia:error_description(Reason)},
+							{nodes, Nodes}, {error, Reason}]),
+					{error, Reason}
+			end;
+		_ ->
+			install2(Nodes)
+	end.
+%% @hidden
+install1([Node] = Nodes) when Node == node() ->
+	case mnesia:start() of
+		ok ->
+			?LOG_INFO([{?MODULE, "Started mnesia"}]),
+			install2(Nodes);
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, "Failed to start mnesia"},
+					{description, mnesia:error_description(Reason)},
+					{error, Reason}]),
+			{error, Reason}
+	end;
+install1(Nodes) ->
+	case rpc:multicall(Nodes, mnesia, start, [], 60000) of
+		{Results, []} ->
+			F = fun(ok) ->
+						false;
+					(_) ->
+						true
+			end,
+			case lists:filter(F, Results) of
+				[] ->
+					?LOG_INFO([{?MODULE, "Started mnesia on all nodes"},
+							{nodes, Nodes}]),
+					install2(Nodes);
+				NotOKs ->
+					?LOG_ERROR([{?MODULE, "Failed to start mnesia on all nodes"},
+							{nodes, Nodes}, {errors, NotOKs}]),
+					{error, NotOKs}
+			end;
+		{Results, BadNodes} ->
+			?LOG_ERROR([{?MODULE, "Failed to start mnesia on all nodes"},
+					{nodes, Nodes}, {results, Results},
+					{badnodes, BadNodes}]),
+			{error, {Results, BadNodes}}
+	end.
+%% @hidden
+install2(Nodes) ->
+	Wait = case application:get_env(cgf, wait_tables) of
+		{ok, Wait1} ->
+			Wait1;
+		undefined ->
+			ok = application:load(cgf),
+			{ok, Wait1} = application:get_env(cgf, wait_tables),
+			Wait1
+	end,
+	case mnesia:wait_for_tables([schema], Wait) of
+		ok ->
+			install3(Nodes, []);
+		{timeout, _BadTables} ->
+			?LOG_ERROR([{?MODULE, "Timeout waiting for mnesia schema table"}]),
+			{error, timeout};
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, "Failed waiting for mnesia schema table"},
+					{description, mnesia:error_description(Reason)},
+					{error, Reason}]),
+			{error, Reason}
+	end.
+%% @hidden
+install3(Nodes, Acc) ->
+	case create_table(cgf_action, Nodes) of
+		ok ->
+			install4(Nodes, [cgf_action | Acc]);
+		{error, Reason} ->
+			{error, Reason}
+	end.
+%% @hidden
+install4(Nodes, Tables) ->
+	{ok, Wait} = application:get_env(cgf, wait_tables),
+	case mnesia:wait_for_tables(Tables, Wait) of
+		ok ->
+			install5(Nodes, Tables);
+		{timeout, Tables} ->
+			?LOG_ERROR([{?MODULE, "Timeout waiting for mnesia tables"},
+					{tables, Tables}]),
+			{error, timeout};
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, "Failed waiting for mnesia tables"},
+					{description, mnesia:error_description(Reason)},
+					{tables, Tables},
+					{error, Reason}]),
+			{error, Reason}
+	end.
+%% @hidden
+install5(_Nodes, Tables) ->
+	{ok, Tables}.
+
 
 %%----------------------------------------------------------------------
 %%  Internal functions
 %%----------------------------------------------------------------------
+
+-spec force(Tables) -> Result
+	when
+		Tables :: [TableName],
+		Result :: ok | {error, Reason},
+		TableName :: atom(),
+		Reason :: term().
+%% @doc Try to force load bad tables.
+%% @private
+force([H | T]) ->
+	case mnesia:force_load_table(H) of
+		yes ->
+			force(T);
+		ErrorDescription ->
+			{error, ErrorDescription}
+	end;
+force([]) ->
+	ok.
+
+-spec create_table(Table, Nodes) -> Result
+	when
+		Table :: atom(),
+		Nodes :: [node()],
+		Result :: ok | {error, Reason},
+		Reason :: term().
+%% @doc Create mnesia table.
+%% @private
+create_table(cgf_action, Nodes) when is_list(Nodes) ->
+	create_table1(cgf_action, mnesia:create_table(cgf_action,
+			[{disc_copies, Nodes},
+			{user_properties, [{cgf, true}]}])).
+%% @hidden
+create_table1(Table, {atomic, ok}) ->
+	?LOG_INFO([{?MODULE, "Created new mnesia table"},
+			{table, Table}]),
+	ok;
+create_table1(Table, {aborted, {already_exists, Table}}) ->
+	?LOG_INFO([{?MODULE, "Found existing mnesia table"},
+			{table, Table}]),
+	ok;
+create_table1(_Table, {aborted, {not_active, _, Node} = Reason}) ->
+	?LOG_ERROR([{?MODULE, "Mnesia not started on node"},
+			{node, Node}]),
+	{error, Reason};
+create_table1(Table, {aborted, Reason}) ->
+	?LOG_ERROR([{?MODULE, "Failed to create mnesia table"},
+			{table, Table},
+			{description, mnesia:error_description(Reason)},
+			{error, Reason}]),
+	{error, Reason}.
 

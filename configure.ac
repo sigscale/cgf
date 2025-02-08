@@ -88,6 +88,7 @@ AC_ERLANG_CHECK_LIB([stdlib],
 		[AS_VERSION_COMPARE([$ERLANG_LIB_VER_stdlib], ["3.5"],
 				[AC_MSG_ERROR([>= stdlib-3.5 required!])])],
 		[AC_MSG_ERROR([stdlib was not found!])])
+AC_ERLANG_CHECK_LIB([mnesia], [], [AC_MSG_ERROR([mnesia was not found!])])
 AC_ERLANG_CHECK_LIB([sasl], [], [AC_MSG_ERROR([sasl was not found!])])
 AC_ERLANG_CHECK_LIB([inets], [], [AC_MSG_ERROR([inets was not found!])])
 AC_ERLANG_CHECK_LIB([crypto], [], [AC_MSG_ERROR([crypto was not found!])])

@@ -33,5 +33,7 @@
             {server_root, "./"},
             {directory_index, ["index.html"]},
             {document_root, "lib/@PACKAGE@-@VERSION@/doc"}]}]}]},
+{mnesia,
+      [{dir, "db"}]},
 {cgf,
       []}].
