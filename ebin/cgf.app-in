@@ -9,6 +9,8 @@
 				cgf_event_sup,
 				cgf_event,
 				cgf_event_server,
+				cgf_import_sup,
+				cgf_import_fsm,
 				cgf_sftpd,
 				cgf_log_sup,
 				cgf_log_server_sup,

@@ -53,7 +53,8 @@
 init(_Args) ->
 	ChildSpecs = [server({local, cgf}, cgf_server, [self()], []),
 			supervisor({local, cgf_log_sup}, cgf_log_sup, []),
-			supervisor({local, cgf_event_sup}, cgf_event_sup, [])],
+			supervisor({local, cgf_event_sup}, cgf_event_sup, []),
+			supervisor({local, cgf_import_sup}, cgf_import_sup, [])],
 	SupFlags = #{},
 	{ok, {SupFlags, ChildSpecs}}.
 

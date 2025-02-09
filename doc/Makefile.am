@@ -11,6 +11,8 @@ modhtml = cgf.html \
 		cgf_event_sup.html\
 		cgf_event.html \
 		cgf_event_server.html \
+		cgf_import_sup.html \
+		cgf_import_fsm.html \
 		cgf_log_sup.html \
 		cgf_log_server_sup.html \
 		cgf_log_server.html \
