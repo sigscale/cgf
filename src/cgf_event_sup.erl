@@ -67,7 +67,7 @@ init(_Args) ->
 event(StartMod, Options) ->
 	StartArgs = [{local, StartMod}, Options],
 	StartFunc = {gen_event, start_link, StartArgs},
-	#{id => StartMod, start => StartFunc, modules => [StartMod]}.
+	#{id => StartMod, start => StartFunc, modules => [dynamic]}.
 
 -spec server(StartMod, Args, Options) -> Result
 	when
