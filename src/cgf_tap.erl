@@ -136,7 +136,7 @@ import5(_Log, _Metadata, _State, _TransferBatch) ->
 	{reason, empty}.
 
 %%----------------------------------------------------------------------
-%%  The cgf_tap public API
+%%  The cgf_tap private API
 %%----------------------------------------------------------------------
 
 -dialyzer({no_match, parse/4}).

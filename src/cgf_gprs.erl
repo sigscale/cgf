@@ -86,7 +86,7 @@ import2(_Log, _Metadata, {error, Reason}) ->
 	{error, Reason}.
 
 %%----------------------------------------------------------------------
-%%  The cgf_gprs public API
+%%  The cgf_gprs private API
 %%----------------------------------------------------------------------
 
 -dialyzer({no_match, parse/3}).

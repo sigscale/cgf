@@ -22,7 +22,7 @@
 -copyright('Copyright (c) 2021-2024 SigScale Global Inc.').
 -author('Vance Shipley <vances@sigscale.org>').
 
-%% export the cgf_log  public API
+%% export the cgf_log public API
 -export([open/2, close/1, log/2, blog/2, alog/2, balog/2]).
 -export([now/0, date/1, iso8601/1]).
 

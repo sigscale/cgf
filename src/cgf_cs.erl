@@ -85,7 +85,7 @@ import2(_Log, _Metadata, {error, Reason}) ->
 	{error, Reason}.
 
 %%----------------------------------------------------------------------
-%%  The cgf_cs public API
+%%  The cgf_cs private API
 %%----------------------------------------------------------------------
 
 -spec parse(Log, Metadata, CDR) -> Result
