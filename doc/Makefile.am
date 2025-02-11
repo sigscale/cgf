@@ -22,18 +22,24 @@ modhtml = cgf.html \
 		cgf_lib.html \
 		cgf_tools.html \
 		cgf_tap.html \
+		cgf_tap_fsm.html \
 		cgf_3gpp_file.html \
 		cgf_gprs.html \
+		cgf_gprs_fsm.html \
 		cgf_cs.html \
+		cgf_cs_fsm.html \
 		cgf_ims.html \
-		cgf_cs_huawei.html
+		cgf_ims_fsm.html \
+		cgf_cs_huawei.html \
+		cgf_cs_huawei_fsm.html
 
 doc_DATA = overview.edoc $(modhtml) \
 		modules-frame.html overview-summary.html \
 		index.html stylesheet.css edoc-info \
 		sigscale-logo.png \
 		supervision.svg \
-		3gpp-architecture.svg
+		3gpp-architecture.svg \
+		import-fsm.svg
 
 overview.edoc: overview.edoc-in
 	sed -e 's!%VERSION%!$(VERSION)!' \
@@ -52,6 +58,7 @@ overview.edoc: overview.edoc-in
 	-cp -n $(top_srcdir)/doc/sigscale-logo.png .
 	-cp -n $(top_srcdir)/doc/supervision.svg .
 	-cp -n $(top_srcdir)/doc/3gpp-architecture.svg .
+	-cp -n $(top_srcdir)/doc/import-fsm.svg .
 
 CLEANFILES = $(doc_DATA) $(modhtml) erlang.png
 

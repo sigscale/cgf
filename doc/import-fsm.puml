@@ -1,0 +1,22 @@
+@startuml
+
+hide empty description
+skinparam shadowing false
+state open #white ##f57f17
+state read #white ##f57f17
+state parse #white ##f57f17
+state close #white ##f57f17
+
+[*] -> open
+open --> read : ok
+open -> [*] : error
+
+read -> parse : ok
+read --> close : eof
+
+parse -> read : ok
+parse --> close : error
+
+close -> [*]
+
+@enduml

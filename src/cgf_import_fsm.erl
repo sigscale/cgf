@@ -17,8 +17,130 @@
 %%% limitations under the License.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% @doc This {@link //stdlib/gen_statem. gen_statem} behaviour callback
-%%% 	module implements an event action handler within the
+%%% 	module implements an event action handler behaviour within the
 %%% 	{@link //cgf. cgf} application.
+%%%
+%%% 	This module provides a CDR file importing behaviour. Specific CDR
+%%% 	file type handlers are implemented as callback modules behaving to
+%%% 	this behaviour module. This module behaves to
+%%% 	{@link //stdlib/gen_statem. gen_statem}.
+%%%
+%%% 	==Usage==
+%%% 	The callback module should declare a `{@module}' behaviour
+%%% 	module attribute:
+%%% 	```
+%%% 	-behaviour({@module}).
+%%% 	'''
+%%% 	The call back module handles reading the CDR file, parsing the
+%%% 	charging data records and logging.
+%%%
+%%% 	== State Transitions ==
+%%% 	The following diagram depicts the states, and events which drive
+%%% 	state transitions, in the finite state machine (FSM):
+%%%
+%%% 	<img alt="state machine" src="import-fsm.svg" />
+%%%
+%%% 	<h2><a name="callbacks">Callback Functions</a></h2>
+%%% 	The following callback functions are used.
+%%%
+%%% 	<h3 class="function">
+%%% 		<a name="init">init/2</a>
+%%% 	</h3>
+%%% 	<div class="spec">
+%%% 		<p>
+%%% 			<tt>init(Args) -&gt; Result</tt>
+%%% 		</p>
+%%% 		<ul class="definitions">
+%%% 			<li><tt>Args = [Filename, Log]
+%%% 					| [Filename, Log, Metadata]
+%%% 					| [Filename, Log, Metadata, ...]</tt></li>
+%%% 			<li><tt>Result = {ok, StateData} | {error, Reason}</tt></li>
+%%% 			<li><tt>StateData = term()</tt></li>
+%%% 			<li><tt>Reason = term()</tt></li>
+%%% 		</ul>
+%%% 	</div>
+%%% 	Called to initialize the import handler.
+%%%
+%%% 	See {@link //cgf/cgf:add_action/3. cgf:add_action/3}.
+%%%
+%%% 	<h3 class="function">
+%%% 		<a name="open">open/2</a>
+%%% 	</h3>
+%%% 	<div class="spec">
+%%% 		<p>
+%%% 			<tt>open(Filename, StateData) -&gt; Result</tt>
+%%% 		</p>
+%%% 		<ul class="definitions">
+%%% 			<li><tt>Filename :: file:filename() | binary()</tt></li>
+%%% 			<li><tt>StateData = term()</tt></li>
+%%% 			<li><tt>Result = {continue, Cont, StateData}
+%%% 					| {error, Reason}</tt></li>
+%%% 			<li><tt>Cont = {@link //kernel/file:io_device(). file:io_device()}
+%%% 					| binary() | list()</tt></li>
+%%% 			<li><tt>Reason = term()</tt></li>
+%%% 		</ul>
+%%% 	</div>
+%%% 	Called once, directly after initialization. It should open
+%%% 	the CDR file for reading. On success returns `Cont', an opaque
+%%% 	continuation, typically either a file handle or data.
+%%%
+%%% 	<h3 class="function">
+%%% 		<a name="read">read/2</a>
+%%% 	</h3>
+%%% 	<div class="spec">
+%%% 		<p>
+%%% 			<tt>read(Cont, StateData) -&gt; Result</tt>
+%%% 		</p>
+%%% 		<ul class="definitions">
+%%% 			<li><tt>Cont = {@link //kernel/file:io_device(). file:io_device()}
+%%% 					| binary() | list()</tt></li>
+%%% 			<li><tt>StateData = term()</tt></li>
+%%% 			<li><tt>Result = {continue, CDR, Cont, StateData}
+%%% 					| {error, Reason, Cont, StateData}
+%%% 					| {close, Reason Cont, StateData}
+%%% 					| {stop, Reason, StateData}</tt></li>
+%%% 			<li><tt>Reason = normal | shutdown | term()</tt></li>
+%%% 		</ul>
+%%% 	</div>
+%%% 	Called to read the next `CDR' from the file.
+%%%
+%%% 	<h3 class="function">
+%%% 		<a name="parse">parse/2</a>
+%%% 	</h3>
+%%% 	<div class="spec">
+%%% 		<p>
+%%% 			<tt>parse(CDR, Log, StateData) -&gt; Result</tt>
+%%% 		</p>
+%%% 		<ul class="definitions">
+%%% 			<li><tt>CDR = term()</tt></li>
+%%% 			<li><tt>Log = disk_log:log()</tt></li>
+%%% 			<li><tt>StateData = term()</tt></li>
+%%% 			<li><tt>Result = {continue, StateData}
+%%% 					| {error, Reason, StateData}
+%%% 					| {close, Reason, StateData}
+%%% 					| {stop, Reason, StateData}</tt></li>
+%%% 			<li><tt>Reason = normal | shutdown | term()</tt></li>
+%%% 		</ul>
+%%% 	</div>
+%%% 	Called to parse and log a CDR.
+%%%
+%%% 	<h3 class="function">
+%%% 		<a name="close">close/2</a>
+%%% 	</h3>
+%%% 	<div class="spec">
+%%% 		<p>
+%%% 			<tt>close(Cont, StateData) -&gt; Result</tt>
+%%% 		</p>
+%%% 		<ul class="definitions">
+%%% 			<li><tt>Cont = {@link //kernel/file:io_device(). file:io_device()}
+%%% 					| binary() | list()</tt></li>
+%%% 			<li><tt>StateData = term()</tt></li>
+%%% 			<li><tt>Result = {stop, StateData}
+%%% 					| {error, Reason, StateData}</tt></li>
+%%% 			<li><tt>Reason = normal | shutdown | term()</tt></li>
+%%% 		</ul>
+%%% 	</div>
+%%% 	Called to close a CDR File.
 %%%
 -module(cgf_import_fsm).
 -copyright('Copyright (c) 2025 SigScale Global Inc.').
@@ -26,17 +148,110 @@
 
 -behaviour(gen_statem).
 
+%% export the public api
+-export([start/3, start_link/3]).
 %% export the callbacks needed for gen_statem behaviour
 -export([init/1, handle_event/4, callback_mode/0,
 			terminate/3, code_change/4]).
 %% export the callbacks for gen_statem states.
--export([]).
+-export([open/3, read/3, parse/3, close/3]).
 
 -include_lib("kernel/include/logger.hrl").
 
--type state() :: null.
+-callback init(Args) -> Result
+	when
+		Args :: list(),
+		Result :: {ok, StateData} | {error, Reason},
+		StateData :: term(),
+		Reason :: term().
+-callback open(Filename, StateData) -> Result
+	when
+		Filename :: file:filename() | binary(),
+		StateData :: term(),
+		Result :: {continue, Cont, StateData}
+				| {error, Reason},
+		Cont :: file:io_device() | binary() | list(),
+		Reason :: term().
+-callback read(Cont, StateData) -> Result
+	when
+		Cont :: file:io_device() | binary() | list(),
+		StateData :: term(),
+		Result :: {continue, CDR, Cont, StateData}
+				| {error, Reason, Cont, StateData}
+				| {close, Reason, Cont, StateData}
+				| {stop, Reason, StateData},
+		CDR :: term(),
+		Reason :: normal | shutdown | term().
+-callback parse(CDR, Log, StateData) -> Result
+	when
+		CDR :: term(),
+		Log :: disk_log:log(),
+		StateData :: term(),
+		Result :: {continue, StateData}
+				| {error, Reason, StateData}
+				| {close, Reason, StateData}
+				| {stop, Reason, StateData},
+		Reason :: normal | shutdown | term().
+-callback close(Cont, StateData) -> Result
+	when
+		Cont :: file:io_device() | binary() | list(),
+		StateData :: term(),
+		Result :: {stop, StateData}
+				| {error, Reason, StateData},
+		Reason :: normal | shutdown | term().
 
--type statedata() :: #{}.
+-type state() :: open | read | parse | close.
+
+-type statedata() ::
+		#{module := erlang:module(),
+		filename := file:filename() | binary(),
+		log := disk_log:log(),
+		metadata =>  map(),
+		args => [term()],
+		cb_statedata => term(),
+		cont => file:io_device() | binary() | list() | map()}.
+
+%%----------------------------------------------------------------------
+%%  The cgf_import_fsm public API
+%%----------------------------------------------------------------------
+
+-spec start(Module, Args, Opts) -> Result
+	when
+		Module :: erlang:module(),
+		Args :: [term()],
+		Opts :: [gen_statem:start_opt()],
+		Result :: gen_statem:start_ret().
+%% @doc Start a {@module} behaviour process.
+%%
+%% 	The callback `Module' is initialized with `Args':
+%% 	```
+%% 	[Filename, Log]
+%% 			| [Filename, Log, Metadata]
+%% 			| [Filename, Log, Metadata | ExtraArgs]
+%% 	'''
+start(Module, Args, Opts)
+		when is_atom(Module), is_list(Args),
+		length(Args) >= 2, is_list(Opts) ->
+	gen_statem:start(?MODULE, [Module | Args], Opts).
+
+-spec start_link(Module, Args, Opts) -> Result
+	when
+		Module :: erlang:module(),
+		Args :: [term()],
+		Opts :: [gen_statem:start_opt()],
+		Result :: gen_statem:start_ret().
+%% @doc Start a supervised {@module} behaviour process.
+%%
+%% 	The callback `Module' is initialized with `Args':
+%% 	```
+%% 	[Filename, Log]
+%% 			| [Filename, Log, Metadata]
+%% 			| [Filename, Log, Metadata | ExtraArgs]
+%% 	'''
+start_link(Module, Args, Opts)
+		when is_atom(Module), is_list(Args),
+		length(Args) >= 2, is_list(Opts) ->
+	gen_statem:start_link(?MODULE, [Module | Args], Opts).
 
 %%----------------------------------------------------------------------
 %%  The cgf_import_fsm gen_statem callbacks
@@ -50,7 +265,7 @@
 %% @private
 %%
 callback_mode() ->
-	[state_functions].
+	[state_functions, state_enter].
 
 -spec init(Args) -> Result
 	when
@@ -68,20 +283,197 @@ callback_mode() ->
 %%
 %% @see //stdlib/gen_statem:init/1
 %% @private
-init([Filename, Log, Metadata | _ExtraArgs]) ->
-	Data = #{},
-	{ok, null, Data}.
+init([Module, Filename, Log])
+		when is_atom(Module),
+		(is_list(Filename) orelse is_binary(Filename)) ->
+	Data = #{module => Module,
+			filename => Filename,
+			log => Log},
+	case Module:init([Filename, Log]) of
+		{ok, CbStateData} ->
+			NewData = Data#{cb_statedata => CbStateData},
+			{ok, open, NewData};
+		{error, Reason} ->
+			?LOG_ERROR([{Module, Reason},
+					{filename, Filename},
+					{log, Log}]),
+			{stop, Reason}
+	end;
+init([Module, Filename, Log, Metadata])
+		when is_atom(Module),
+		(is_list(Filename) orelse is_binary(Filename)),
+		is_map(Metadata) ->
+	Data = #{module => Module,
+			filename => Filename,
+			log => Log,
+			metadata => Metadata},
+	case Module:init([Filename, Log, Metadata]) of
+		{ok, CbStateData} ->
+			NewData = Data#{cb_statedata => CbStateData},
+			{ok, open, NewData};
+		{error, Reason} ->
+			?LOG_ERROR([{Module, Reason},
+					{filename, Filename},
+					{log, Log}]),
+			{stop, Reason}
+	end;
+init([Module, Filename, Log, Metadata | ExtraArgs])
+		when is_atom(Module),
+		(is_list(Filename) orelse is_binary(Filename)),
+		is_map(Metadata), is_list(ExtraArgs) ->
+	Data = #{module => Module,
+			filename => Filename,
+			log => Log,
+			metadata => Metadata,
+			extra_args => ExtraArgs},
+	case Module:init([Filename, Log, Metadata | ExtraArgs]) of
+		{ok, CbStateData} ->
+			NewData = Data#{cb_statedata => CbStateData},
+			{ok, open, NewData};
+		{error, Reason} ->
+			?LOG_ERROR([{Module, Reason},
+					{filename, Filename},
+					{log, Log}]),
+			{stop, Reason}
+	end.
 
--spec null(EventType, EventContent, Data) -> Result
+-spec open(EventType, EventContent, Data) -> Result
 	when
-		EventType :: gen_statem:event_type(),
+		EventType :: enter | gen_statem:event_type(),
 		EventContent :: term(),
 		Data :: statedata(),
 		Result :: gen_statem:event_handler_result(state()).
-%% @doc Handles events received in the <em>null</em> state.
+%% @doc Handles events received in the <em>open</em> state.
 %% @private
-null(_EventType, _EventContent, _Data) ->
-	keep_state_and_data.
+open(enter = _EventType, open = _EventContent, _Data) ->
+	Action = {state_timeout, 0, internal},
+	{keep_state_and_data, Action};
+open(state_timeout = _EventType, internal = _EventContent,
+		#{module := Module,
+				filename := Filename, log := Log,
+				cb_statedata := CbStateData} = Data) ->
+	case Module:open(Filename, CbStateData) of
+		{continue, Cont, CbStateData1} ->
+			NewData = Data#{cont => Cont,
+					cb_statedata => CbStateData1},
+			{next_state, read, NewData};
+		{error, Reason} ->
+			?LOG_ERROR([{Module, Reason},
+					{state, ?FUNCTION_NAME},
+					{filename, Filename},
+					{log, Log}]),
+			{stop, Reason}
+	end.
+
+-spec read(EventType, EventContent, Data) -> Result
+	when
+		EventType :: enter | gen_statem:event_type(),
+		EventContent :: term(),
+		Data :: statedata(),
+		Result :: gen_statem:event_handler_result(state()).
+%% @doc Handles events received in the <em>read</em> state.
+%% @private
+read(enter = _EventType, _EventContent, _Data) ->
+	Action = {state_timeout, 0, internal},
+	{keep_state_and_data, Action};
+read(state_timeout = _EventType, internal = _EventContent,
+		#{module := Module, cont := Cont,
+				filename := Filename, log := Log,
+				cb_statedata := CbStateData} = Data) ->
+	case Module:read(Cont, CbStateData) of
+		{continue, CDR, Cont1, CbStateData1} ->
+			NewData = Data#{cont => Cont1,
+					cb_statedata => CbStateData1},
+			Action = {next_event, internal, CDR},
+			{next_state, parse, NewData, Action};
+		{error, Reason, Cont1, CbStateData1} ->
+			?LOG_WARNING([{Module, Reason},
+					{state, ?FUNCTION_NAME},
+					{filename, Filename},
+					{log, Log}]),
+			NewData = Data#{cont => Cont1,
+					cb_statedata => CbStateData1},
+			{next_state, read, NewData};
+		{close, Reason, Cont1, CbStateData1} ->
+			NewData = Data#{cont => Cont1,
+					cb_statedata => CbStateData1},
+			Action = {next_event, internal, Reason},
+			{next_state, close, NewData, Action};
+		{stop, Reason, CbStateData1} ->
+			?LOG_ERROR([{Module, Reason},
+					{state, ?FUNCTION_NAME},
+					{filename, Filename},
+					{log, Log}]),
+			NewData = Data#{cb_statedata => CbStateData1},
+			{stop, Reason, NewData}
+	end.
+
+-spec parse(EventType, EventContent, Data) -> Result
+	when
+		EventType :: enter | gen_statem:event_type(),
+		EventContent :: term(),
+		Data :: statedata(),
+		Result :: gen_statem:event_handler_result(state()).
+%% @doc Handles events received in the <em>parse</em> state.
+%% @private
+parse(enter = _EventType, _EventContent, _Data) ->
+	keep_state_and_data;
+parse(internal = _EventType, CDR = _EventContent,
+		#{module := Module,
+				filename := Filename, log := Log,
+				cb_statedata := CbStateData} = Data) ->
+	case Module:parse(CDR, Log, CbStateData) of
+		{continue, CbStateData1} ->
+			NewData = Data#{cb_statedata => CbStateData1},
+			{next_state, read, NewData};
+		{error, Reason, CbStateData1} ->
+			?LOG_WARNING([{Module, Reason},
+					{state, ?FUNCTION_NAME},
+					{filename, Filename},
+					{log, Log}]),
+			NewData = Data#{cb_statedata => CbStateData1},
+			{next_state, read, NewData};
+		{close, Reason, CbStateData1} ->
+			NewData = Data#{cb_statedata => CbStateData1},
+			Action = {next_event, internal, Reason},
+			{next_state, close, NewData, Action};
+		{stop, Reason, CbStateData1} ->
+			?LOG_ERROR([{Module, Reason},
+					{state, ?FUNCTION_NAME},
+					{filename, Filename},
+					{log, Log}]),
+			NewData = Data#{cb_statedata => CbStateData1},
+			{stop, Reason, NewData}
+	end.
+
+-spec close(EventType, EventContent, Data) -> Result
+	when
+		EventType :: enter | gen_statem:event_type(),
+		EventContent :: term(),
+		Data :: statedata(),
+		Result :: gen_statem:event_handler_result(state()).
+%% @doc Handles events received in the <em>close</em> state.
+%% @private
+close(enter = _EventType, _EventContent, _Data) ->
+	keep_state_and_data;
+close(internal = _EventType, Reason = _EventContent,
+		#{module := Module, cont := Cont,
+				filename := Filename, log := Log,
+				cb_statedata := CbStateData} = Data) ->
+	case Module:close(Cont, CbStateData) of
+		{stop, CbStateData1} ->
+			Data1 = maps:remove(cont, Data),
+			NewData = Data1#{cb_statedata => CbStateData1},
+			{stop, Reason, NewData};
+		{error, Reason1, CbStateData1} ->
+			?LOG_WARNING([{Module, Reason},
+					{state, ?FUNCTION_NAME},
+					{filename, Filename},
+					{log, Log}]),
+			Data1 = maps:remove(cont, Data),
+			NewData = Data1#{cb_statedata => CbStateData1},
+			{stop, Reason1, NewData}
+	end.
 
 -spec handle_event(EventType, EventContent, State, Data) -> Result
 	when
@@ -93,8 +485,8 @@ null(_EventType, _EventContent, _Data) ->
 %% @doc Handles events received in any state.
 %% @private
 %%
-handle_event(_EventType, _EventContent, _State, _Data) ->
-	keep_state_and_data.
+handle_event(EventType, EventContent, _State, Data) ->
+	{stop, {EventType, EventContent}, Data}.
 
 -spec terminate(Reason, State, Data) -> any()
 	when

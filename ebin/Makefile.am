@@ -44,11 +44,16 @@ beam_DATA = cgf.beam \
 		TAP-0312.beam \
 		Huawei-CS.beam \
 		cgf_tap.beam \
+		cgf_tap_fsm.beam \
 		cgf_3gpp_file.beam \
 		cgf_gprs.beam \
+		cgf_gprs_fsm.beam \
 		cgf_cs.beam \
+		cgf_cs_fsm.beam \
 		cgf_ims.beam \
-		cgf_cs_huawei.beam
+		cgf_ims_fsm.beam \
+		cgf_cs_huawei.beam \
+		cgf_cs_huawei_fsm.beam
 
 %.beam:$(top_builddir)/src/%.erl
 	$(ERLC) $(ERLCFLAGS) -I $(top_builddir)/src $<
