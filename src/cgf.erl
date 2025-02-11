@@ -27,17 +27,14 @@
 -export([plmn/1]).
 
 -export_type([action/0]).
--type action() :: {Module :: atom(), Log :: disk_log:log()}
-		| {Module :: atom(), Log :: disk_log:log(),
-			Metadata :: map()}
-		| {Module :: atom(), Function :: atom(),
-			Log :: disk_log:log(), Metadata :: map()}
-		| {Module :: atom(), Function :: atom(),
-			Log :: disk_log:log(), Metadata :: map(),
-			ExtraArgs :: [term()]}
-		| {Module :: atom(), Function :: atom(),
-			Log :: disk_log:log(), Metadata :: map(),
-			ExtraArgs :: [term()], Opts :: gen_statem:start_opt()}.
+-type action() :: {Module :: erlang:module(), Log :: disk_log:log()}
+		| {Module :: erlang:module(), Log :: disk_log:log(),
+				Metadata :: map()}
+		| {Module :: erlang:module(), Log :: disk_log:log(),
+				Metadata :: map(), ExtraArgs :: [term()]}
+		| {Module :: erlang:module(), Log :: disk_log:log(),
+				Metadata :: map(), ExtraArgs :: [term()],
+				Opts :: [gen_statem:start_opt()]}.
 
 -define(CHUNKSIZE, 100).
 
@@ -66,28 +63,23 @@
 %% 	is selected. A zero length prefix always matches.
 %%
 %% 	A supervised {@link //cgf/cgf_import_fsm. cgf_import_fsm}
-%% 	process is started to perform the `Action' with a function
-%% 	call constructed as follows:
+%% 	behaviour process is started to perform the `Action' with
+%% 	the callback `Module:init/1' called as follows:
 %%
 %% 	<dl>
 %% 		<dt>`{Module, Log}'</dt>
-%% 			<dd>The function call is as in
-%% 			{@link //cgf/cgf_cs:import/2. cgf_[cs|ps|ims]:import/2}:
-%% 			`Module:import(Path, Log)'. The `Path' is contructed
+%% 			<dd>The action handler is initialized with:
+%% 			`Module:init(Path, Log)'. The `Path' is contructed
 %% 			from the notification received from the SFTP server.</dd>
 %% 		<dt>`{Module, Log, Metadata}'</dt>
-%% 			<dd>The function call is as in
-%% 			{@link //cgf/cgf_cs:import/3. cgf_[cs|ps|ims]:import/3}:
-%% 			`Module:import(Path, Log, Metadata)'. The `Metadata' is
+%% 			<dd>The action handler is initialized with:
+%% 			`Module:init(Path, Log, Metadata)'. The `Metadata' is
 %% 			merged with that from the SFTP server notification.</dd>
-%% 		<dt>`{Module, Function, Log, Metadata}'</dt>
-%% 			<dd>User provided import modules may use any function
-%% 			name: `Module:Function(Path, Log, Metadata)'.</dd>
-%% 		<dt>`{Module, Function, Log, Metadata, ExtraArgs}'</dt>
-%% 			<dd>User provided import module functions may accept
+%% 		<dt>`{Module, Log, Metadata, ExtraArgs}'</dt>
+%% 			<dd>The action handler is initialized with
 %% 			extra arguments:
-%% 			`Module:Function(Path, Log, Metadata, ...).'</dd>
-%% 		<dt>`{Module, Function, Log, Metadata, ExtraArgs, Opts}'</dt>
+%% 			`Module:init(Path, Log, Metadata, ...).'</dd>
+%% 		<dt>`{Module, Log, Metadata, ExtraArgs, Opts}'</dt>
 %% 			<dd>The {@link //cgf/cgf_import_fsm. cgf_import_fsm}
 %% 			process will be started with `Opts'
 %% 			(e.g. `[{debug, [trace]}]').</dd>
@@ -122,19 +114,13 @@ add_action(file_close = _Event, Match, Action)
 						andalso is_map(element(3, Action)))
 				orelse ((tuple_size(Action) == 4) 
 						andalso is_atom(element(1, Action))
-						andalso is_atom(element(2, Action))
-						andalso is_map(element(4, Action)))
+						andalso is_map(element(3, Action))
+						andalso is_list(element(4, Action)))
 				orelse ((tuple_size(Action) == 5) 
 						andalso is_atom(element(1, Action))
-						andalso is_atom(element(2, Action))
-						andalso is_map(element(4, Action))
-						andalso is_list(element(5, Action)))
-				orelse ((tuple_size(Action) == 6) 
-						andalso is_atom(element(1, Action))
-						andalso is_atom(element(2, Action))
-						andalso is_map(element(4, Action))
-						andalso is_list(element(5, Action))
-						andalso is_list(element(6, Action)))) ->
+						andalso is_map(element(3, Action))
+						andalso is_list(element(4, Action))
+						andalso is_list(element(5, Action)))) ->
 	F = fun() ->
 			mnesia:write({cgf_action, Match, Action})
 	end,

@@ -203,7 +203,7 @@ match_event(_Config) ->
 	end,
 	Fadd(Count),
 	Actions = cgf:get_actions(Event),
-	{Match, Action} = lists:nth(rand:uniform(Count), Actions),
+	{Match, _Action} = lists:nth(rand:uniform(Count), Actions),
 	{UserPrefix, DirPrefix, FilePrefix, SuffPrefix} = Match,
 	UserSuffix = list_to_binary(rand_chars()),
 	User = <<UserPrefix/binary, UserSuffix/binary>>,
@@ -237,7 +237,7 @@ rand_match() ->
 
 %% @doc Returns random `Action'.
 rand_action() ->
-	Arity = rand:uniform(5) + 1,
+	Arity = rand:uniform(4) + 1,
 	rand_action(Arity).
 
 rand_action(2) ->
@@ -251,25 +251,17 @@ rand_action(3) ->
 	{Module, Log, Metadata};
 rand_action(4) ->
 	Module = rand_mod(),
-	Function = import,
-	Log = log_name(Module),
-	Metadata = #{foo => 42},
-	{Module, Function, Log, Metadata};
-rand_action(5) ->
-	Module = rand_mod(),
-	Function = import,
 	Log = log_name(Module),
 	Metadata = #{foo => 42},
 	ExtraArgs = [bar],
-	{Module, Function, Log, Metadata, ExtraArgs};
-rand_action(6) ->
+	{Module, Log, Metadata, ExtraArgs};
+rand_action(5) ->
 	Module = rand_mod(),
-	Function = import,
 	Log = log_name(Module),
 	Metadata = #{foo => 42},
 	ExtraArgs = [bar],
 	Opts = [{debug, [trace]}],
-	{Module, Function, Log, Metadata, ExtraArgs, Opts}.
+	{Module, Log, Metadata, ExtraArgs, Opts}.
 
 %% @doc Returns random characters.
 rand_chars() ->
