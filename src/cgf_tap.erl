@@ -35,9 +35,11 @@
 
 %% export the private API
 -export([parse/4]).
+-export([parse_accounting/1, parse_networkinfo/1, parse_batchcontrol/1]).
 
 -include_lib("kernel/include/logger.hrl").
 
+-export_type([state/0]).
 -type state() :: #{
 		zones := #{Code :: integer() => Offset :: binary()},
 		entities := #{Code :: integer() => map()}}.
@@ -109,7 +111,7 @@ import2(Log, Metadata, State, TransferBatch) ->
 import3(Log, Metadata, State,
 		#{batchControlInfo := BatchControlInfo} = TransferBatch)
 		when map_size(BatchControlInfo) > 0 ->
-	Metadata1 = case parse_batchcontrol(BatchControlInfo, State) of
+	Metadata1 = case parse_batchcontrol(BatchControlInfo) of
 		BatchControlInfo1 when map_size(BatchControlInfo1) > 0 ->
 			[{roam_batchControlInfo, BatchControlInfo1} | Metadata];
 		_ ->
@@ -122,128 +124,230 @@ import3(Log, Metadata, State, TransferBatch) ->
 import4(Log, Metadata, State,
 		#{networkInfo := NetworkInfo} = TransferBatch)
 		when map_size(NetworkInfo) > 0 ->
-	State1 = parse_networkinfo(NetworkInfo, State),
+	State1 = maps:merge(State, parse_networkinfo(NetworkInfo)),
 	import5(Log, Metadata, State1, TransferBatch);
 import4(Log, Metadata, State, TransferBatch) ->
 	import5(Log, Metadata, State, TransferBatch).
 
 %% @hidden
 import5(Log, Metadata, State,
-		#{callEventDetails := CDRs} = _TransferBatch)
-		when CDRs /= [] ->
-	parse(Log, Metadata, State, CDRs);
-import5(_Log, _Metadata, _State, _TransferBatch) ->
-	{reason, empty}.
+		#{callEventDetails := [H | T]} = TransferBatch) ->
+	case parse(Log, Metadata, State, H) of
+		ok ->
+			ok;
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, element(1, H)}, {error, Reason}])
+	end,
+	import5(Log, Metadata, State, TransferBatch#{callEventDetails := T});
+import5(_Log, _Metadata, _State,
+		#{callEventDetails := []} = _TransferBatch) ->
+	ok.
 
 %%----------------------------------------------------------------------
 %%  The cgf_tap private API
 %%----------------------------------------------------------------------
 
--dialyzer({no_match, parse/4}).
--spec parse(Log, Metadata, State, CDRs) -> Result
+-spec parse(Log, Metadata, State, CDR) -> Result
 	when
 		Log :: disk_log:log(),
 		Metadata :: [{AttributeName, AttributeValue}],
 		State :: state(),
 		AttributeName :: string(),
 		AttributeValue :: term(),
-		CDRs :: [tuple()],
+		CDR :: {RecordType, Record},
+		RecordType :: mobileOriginatedCall | mobileTerminatedCall
+				| supplServiceEvent | serviceCentreUsage | gprsCall
+				| contentTransaction | locationService
+				| messagingEvent | mobileSession,
+		Record :: map(),
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Parse CDRs from the import file.
 %% @private
 parse(Log, Metadata, State,
-		[{mobileOriginatedCall, MobileOriginatedCall} | T]) ->
-	case parse_mo_call(Log, Metadata, State, MobileOriginatedCall) of
-		ok ->
-			parse(Log, Metadata, State, T);
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_mo_call},
-					{error, Reason}]),
-			parse(Log, Metadata, State, T)
-	end;
+		{mobileOriginatedCall, MobileOriginatedCall}) ->
+	parse_mo_call(Log, Metadata, State, MobileOriginatedCall);
 parse(Log, Metadata, State,
-		[{mobileTerminatedCall, MobileTerminatedCall} | T]) ->
-	case parse_mt_call(Log, Metadata, State, MobileTerminatedCall) of
-		ok ->
-			parse(Log, Metadata, State, T);
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_mt_call},
-					{error, Reason}]),
-			parse(Log, Metadata, State, T)
-	end;
+		{mobileTerminatedCall, MobileTerminatedCall}) ->
+	parse_mt_call(Log, Metadata, State, MobileTerminatedCall);
+parse(Log, Metadata, _State,
+		{supplServiceEvent, SupplServiceEvent}) ->
+	parse_mmtel(Log, Metadata, SupplServiceEvent);
+parse(Log, Metadata, _State,
+		{serviceCentreUsage, ServiceCentreUsage}) ->
+	parse_sc_sm(Log, Metadata, ServiceCentreUsage);
 parse(Log, Metadata, State,
-		[{supplServiceEvent, SupplServiceEvent} | T]) ->
-	case parse_mmtel(Log, Metadata, SupplServiceEvent) of
-		ok ->
-			parse(Log, Metadata, State, T);
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_mmtel},
-					{error, Reason}]),
-			parse(Log, Metadata, State, T)
-	end;
-parse(Log, Metadata, State,
-		[{serviceCentreUsage, ServiceCentreUsage} | T]) ->
-	case parse_sc_sm(Log, Metadata, ServiceCentreUsage) of
-		ok ->
-			parse(Log, Metadata, State, T);
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_sc_sm},
-					{error, Reason}]),
-			parse(Log, Metadata, State, T)
-	end;
-parse(Log, Metadata, State,
-		[{gprsCall, GprsCall} | T]) ->
-	case parse_gprs(Log, Metadata, State, GprsCall) of
-		ok ->
-			parse(Log, Metadata, State, T);
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_gprs},
-					{error, Reason}]),
-			parse(Log, Metadata, State, T)
-	end;
-parse(Log, Metadata, State,
-		[{contentTransaction, ContentTransaction} | T]) ->
-	case parse_content(Log, Metadata, ContentTransaction) of
-		ok ->
-			parse(Log, Metadata, State, T);
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_content},
-					{error, Reason}]),
-			parse(Log, Metadata, State, T)
-	end;
-parse(Log, Metadata, State,
-		[{locationService, LocationService} | T]) ->
-	case parse_location(Log, Metadata, LocationService) of
-		ok ->
-			parse(Log, Metadata, State, T);
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_location},
-					{error, Reason}]),
-			parse(Log, Metadata, State, T)
-	end;
-parse(Log, Metadata, State,
-		[{messagingEvent, MessagingEvent} | T]) ->
-	case parse_message(Log, Metadata, MessagingEvent) of
-		ok ->
-			parse(Log, Metadata, State, T);
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_message},
-					{error, Reason}]),
-			parse(Log, Metadata, State, T)
-	end;
-parse(Log, Metadata, State,
-		[{mobileSession, MobileSession} | T]) ->
-	case parse_session(Log, Metadata, MobileSession) of
-		ok ->
-			parse(Log, Metadata, State, T);
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_session},
-					{error, Reason}]),
-			parse(Log, Metadata, State, T)
-	end;
-parse(_Log, _Metadata, _State, []) ->
-	ok.
+		{gprsCall, GprsCall}) ->
+	parse_gprs(Log, Metadata, State, GprsCall);
+parse(Log, Metadata, _State,
+		{contentTransaction, ContentTransaction}) ->
+	parse_content(Log, Metadata, ContentTransaction);
+parse(Log, Metadata, _State,
+		{locationService, LocationService}) ->
+	parse_location(Log, Metadata, LocationService);
+parse(Log, Metadata, _State,
+		{messagingEvent, MessagingEvent}) ->
+	parse_message(Log, Metadata, MessagingEvent);
+parse(Log, Metadata, _State,
+		{mobileSession, MobileSession}) ->
+	parse_session(Log, Metadata, MobileSession).
+
+-spec parse_accounting(AccountingInfo) -> Result
+	when
+		AccountingInfo :: map(),
+		Result :: #{currencyConversionInfo => [map()],
+			discounting => map(),
+			localCurrency => list(),
+			tapCurrency => list(),
+			tapDecimalPlaces => integer(),
+			taxation => [map()]}.
+%% @doc Parse Accounting Info from the import file.
+%% @private
+parse_accounting(AccountingInfo) ->
+	parse_accounting(AccountingInfo, #{}).
+%% @hidden
+parse_accounting(#{currencyConversionInfo
+		:= CurrencyConversionInfo} = AI, Acc) ->
+	CCI = parse_cci(CurrencyConversionInfo),
+	parse_accounting1(AI,
+			Acc#{currencyConversionInfo => CCI});
+parse_accounting(AI, Acc) ->
+	parse_accounting1(AI, Acc).
+%% @hidden
+parse_accounting1(#{auditControlInfo := AuditControlInfo} = AI, Acc) ->
+	Discounting = parse_discounting(AuditControlInfo),
+	parse_accounting2(AI, Acc#{discounting => Discounting});
+parse_accounting1(AI, Acc) ->
+	parse_accounting2(AI, Acc).
+%% @hidden
+parse_accounting2(#{localCurrency := LocalCurrency} = AI, Acc)
+		when is_binary(LocalCurrency) ->
+	parse_accounting3(AI,
+		Acc#{localCurrency => binary_to_list(LocalCurrency)});
+parse_accounting2(AI, Acc) ->
+	parse_accounting3(AI, Acc).
+%% @hidden
+parse_accounting3(#{tapCurrency := TapCurrency} = AI, Acc)
+		when is_binary(TapCurrency) ->
+	parse_accounting4(AI,
+		Acc#{tapCurrency => binary_to_list(TapCurrency)});
+parse_accounting3(AI, Acc) ->
+	parse_accounting4(AI, Acc).
+%% @hidden
+parse_accounting4(#{tapDecimalPlaces := TapDecimalPlaces} = AI, Acc)
+		when TapDecimalPlaces > 0 ->
+	parse_accounting5(AI,
+		Acc#{tapCurrency => TapDecimalPlaces});
+parse_accounting4(AI, Acc) ->
+	parse_accounting5(AI, Acc).
+%% @hidden
+parse_accounting5(#{taxation := Taxation} = _AI, Acc) ->
+	Acc#{taxation => parse_tax(Taxation)};
+parse_accounting5(_AI, Acc) ->
+	Acc.
+
+-spec parse_networkinfo(NetworkInfo) -> Result
+	when
+		NetworkInfo :: map(),
+		Result :: map().
+%% @doc Parse Network Info from the import file.
+%% @private
+parse_networkinfo(#{utcTimeOffsetInfo
+		:= UtcTimeOffsetInfoList} = NetworkInfo) ->
+	Zones = utc_offset_info(UtcTimeOffsetInfoList),
+	parse_networkinfo1(NetworkInfo, #{zones => Zones});
+parse_networkinfo(NetworkInfo) ->
+	parse_networkinfo1(NetworkInfo, #{}).
+%% @hidden
+parse_networkinfo1(#{recEntityInfo := RecEntityInfo}, Acc) ->
+	Acc#{entities => rec_entity_info(RecEntityInfo)};
+parse_networkinfo1(_NetworkInfo, Acc) ->
+	Acc.
+
+-spec parse_batchcontrol(BatchControlInfo) -> Result
+	when
+		BatchControlInfo :: map(),
+		Result :: map().
+%% @doc Parse Batch Control Info from the import file.
+%% @private
+parse_batchcontrol(BatchControlInfo) ->
+	parse_batchcontrol(BatchControlInfo, #{}).
+%% @hidden
+parse_batchcontrol(#{sender := Sender}
+		= BatchControlInfo, Acc) when byte_size(Sender) > 0 ->
+	Acc1 = Acc#{<<"sender">> => Sender},
+	parse_batchcontrol1(BatchControlInfo, Acc1);
+parse_batchcontrol(BatchControlInfo, Acc) ->
+	parse_batchcontrol1(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol1(#{recipient := Recipient}
+		= BatchControlInfo, Acc) when byte_size(Recipient) > 0 ->
+	Acc1 = Acc#{<<"recipient">> => Recipient},
+	parse_batchcontrol2(BatchControlInfo, Acc1);
+parse_batchcontrol1(BatchControlInfo, Acc) ->
+	parse_batchcontrol2(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol2(#{fileSequenceNumber := FSN}
+		= BatchControlInfo, Acc) when byte_size(FSN) > 0 ->
+	Acc1 = Acc#{<<"fileSequenceNumber">> => binary_to_integer(FSN)},
+	parse_batchcontrol3(BatchControlInfo, Acc1);
+parse_batchcontrol2(BatchControlInfo, Acc) ->
+	parse_batchcontrol3(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol3(#{fileCreationTimeStamp := TS}
+		= BatchControlInfo, Acc) when map_size(TS) > 0 ->
+	Acc1 = Acc#{<<"fileCreationTimeStamp">> => timestamp(TS, #{})},
+	parse_batchcontrol4(BatchControlInfo, Acc1);
+parse_batchcontrol3(BatchControlInfo, Acc) ->
+	parse_batchcontrol4(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol4(#{transferCutOffTimeStamp := TS}
+		= BatchControlInfo, Acc) when map_size(TS) > 0 ->
+	Acc1 = Acc#{<<"transferCutOffTimeStamp">> => timestamp(TS, #{})},
+	parse_batchcontrol5(BatchControlInfo, Acc1);
+parse_batchcontrol4(BatchControlInfo, Acc) ->
+	parse_batchcontrol5(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol5(#{fileAvailableTimeStamp := TS}
+		= BatchControlInfo, Acc) when map_size(TS) > 0 ->
+	Acc1 = Acc#{<<"fileAvailableTimeStamp">> => timestamp(TS, #{})},
+	parse_batchcontrol6(BatchControlInfo, Acc1);
+parse_batchcontrol5(BatchControlInfo, Acc) ->
+	parse_batchcontrol6(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol6(#{specificationVersionNumber := VSN}
+		= BatchControlInfo, Acc) when is_integer(VSN) > 0 ->
+	Acc1 = Acc#{<<"specificationVersionNumber">> => VSN},
+	parse_batchcontrol7(BatchControlInfo, Acc1);
+parse_batchcontrol6(BatchControlInfo, Acc) ->
+	parse_batchcontrol7(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol7(#{releaseVersionNumber := VSN}
+		= BatchControlInfo, Acc) when is_integer(VSN) > 0 ->
+	Acc1 = Acc#{<<"releaseVersionNumber">> => VSN},
+	parse_batchcontrol8(BatchControlInfo, Acc1);
+parse_batchcontrol7(BatchControlInfo, Acc) ->
+	parse_batchcontrol8(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol8(#{fileTypeIndicator := FTI}
+		= BatchControlInfo, Acc) when byte_size(FTI) > 0 ->
+	Acc1 = Acc#{<<"fileTypeIndicator">> => FTI},
+	parse_batchcontrol9(BatchControlInfo, Acc1);
+parse_batchcontrol8(BatchControlInfo, Acc) ->
+	parse_batchcontrol9(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol9(#{rapFileSequenceNumber := FSN}
+		= BatchControlInfo, Acc) when byte_size(FSN) > 0 ->
+	Acc1 = Acc#{<<"rapFileSequenceNumber">> => binary_to_integer(FSN)},
+	parse_batchcontrol10(BatchControlInfo, Acc1);
+parse_batchcontrol9(BatchControlInfo, Acc) ->
+	parse_batchcontrol10(BatchControlInfo, Acc).
+%% @hidden
+parse_batchcontrol10(#{operatorSpecInformation := OSI}
+		= _BatchControlInfo, Acc) when length(OSI) > 0 ->
+	Acc#{<<"operatorSpecInformation">> => OSI};
+parse_batchcontrol10(_BatchControlInfo, Acc) ->
+	Acc.
 
 %%----------------------------------------------------------------------
 %%  Internal functions
@@ -374,164 +478,6 @@ parse_message(_Log, _Metadata, _MessagingEvent) ->
 %% @doc Parse a TAP event detail for a mobile session.
 parse_session(_Log, _Metadata, _MobileSession) ->
 	{error, not_implemented}.
-
--spec parse_accounting(AccountingInfo) -> Result
-	when
-		AccountingInfo :: map(),
-		Result :: #{currencyConversionInfo => [map()],
-			discounting => map(),
-			localCurrency => list(),
-			tapCurrency => list(),
-			tapDecimalPlaces => integer(),
-			taxation => [map()]}.
-%% @doc Parse Accounting Info from the import file.
-%% @private
-parse_accounting(AccountingInfo) ->
-	parse_accounting(AccountingInfo, #{}).
-%% @hidden
-parse_accounting(#{currencyConversionInfo
-		:= CurrencyConversionInfo} = AI, Acc) ->
-	CCI = parse_cci(CurrencyConversionInfo),
-	parse_accounting1(AI,
-			Acc#{currencyConversionInfo => CCI});
-parse_accounting(AI, Acc) ->
-	parse_accounting1(AI, Acc).
-%% @hidden
-parse_accounting1(#{auditControlInfo := AuditControlInfo} = AI, Acc) ->
-	Discounting = parse_discounting(AuditControlInfo),
-	parse_accounting2(AI, Acc#{discounting => Discounting});
-parse_accounting1(AI, Acc) ->
-	parse_accounting2(AI, Acc).
-%% @hidden
-parse_accounting2(#{localCurrency := LocalCurrency} = AI, Acc)
-		when is_binary(LocalCurrency) ->
-	parse_accounting3(AI,
-		Acc#{localCurrency => binary_to_list(LocalCurrency)});
-parse_accounting2(AI, Acc) ->
-	parse_accounting3(AI, Acc).
-%% @hidden
-parse_accounting3(#{tapCurrency := TapCurrency} = AI, Acc)
-		when is_binary(TapCurrency) ->
-	parse_accounting4(AI,
-		Acc#{tapCurrency => binary_to_list(TapCurrency)});
-parse_accounting3(AI, Acc) ->
-	parse_accounting4(AI, Acc).
-%% @hidden
-parse_accounting4(#{tapDecimalPlaces := TapDecimalPlaces} = AI, Acc)
-		when TapDecimalPlaces > 0 ->
-	parse_accounting5(AI,
-		Acc#{tapCurrency => TapDecimalPlaces});
-parse_accounting4(AI, Acc) ->
-	parse_accounting5(AI, Acc).
-%% @hidden
-parse_accounting5(#{taxation := Taxation} = _AI, Acc) ->
-	Acc#{taxation => parse_tax(Taxation)};
-parse_accounting5(_AI, Acc) ->
-	Acc.
-
--spec parse_networkinfo(NetworkInfo, State) -> State
-	when
-		NetworkInfo :: map(),
-		State :: state().
-%% @doc Parse Network Info from the import file.
-%% @private
-parse_networkinfo(#{utcTimeOffsetInfo
-		:= UtcTimeOffsetInfoList} = NetworkInfo, State) ->
-	Zones = utc_offset_info(UtcTimeOffsetInfoList),
-	parse_networkinfo1(NetworkInfo, State#{zones => Zones});
-parse_networkinfo(NetworkInfo, State) ->
-	parse_networkinfo1(NetworkInfo, State).
-%% @hidden
-parse_networkinfo1(#{recEntityInfo := RecEntityInfo}, State) ->
-	State#{entities => rec_entity_info(RecEntityInfo)};
-parse_networkinfo1(_NetworkInfo, State) ->
-	State.
-
--spec parse_batchcontrol(BatchControlInfo, State) -> Result
-	when
-		BatchControlInfo :: map(),
-		State :: state(),
-		Result :: map().
-%% @doc Parse Batch Control Info from the import file.
-%% @private
-parse_batchcontrol(BatchControlInfo, State) ->
-	parse_batchcontrol(BatchControlInfo, State, #{}).
-%% @hidden
-parse_batchcontrol(#{sender := Sender}
-		= BatchControlInfo, State, Acc) when byte_size(Sender) > 0 ->
-	Acc1 = Acc#{<<"sender">> => Sender},
-	parse_batchcontrol1(BatchControlInfo, State, Acc1);
-parse_batchcontrol(BatchControlInfo, State, Acc) ->
-	parse_batchcontrol1(BatchControlInfo, State, Acc).
-%% @hidden
-parse_batchcontrol1(#{recipient := Recipient}
-		= BatchControlInfo, State, Acc) when byte_size(Recipient) > 0 ->
-	Acc1 = Acc#{<<"recipient">> => Recipient},
-	parse_batchcontrol2(BatchControlInfo, State, Acc1);
-parse_batchcontrol1(BatchControlInfo, State, Acc) ->
-	parse_batchcontrol2(BatchControlInfo, State, Acc).
-%% @hidden
-parse_batchcontrol2(#{fileSequenceNumber := FSN}
-		= BatchControlInfo, State, Acc) when byte_size(FSN) > 0 ->
-	Acc1 = Acc#{<<"fileSequenceNumber">> => binary_to_integer(FSN)},
-	parse_batchcontrol3(BatchControlInfo, State, Acc1);
-parse_batchcontrol2(BatchControlInfo, State, Acc) ->
-	parse_batchcontrol3(BatchControlInfo, State, Acc).
-%% @hidden
-parse_batchcontrol3(#{fileCreationTimeStamp := TS}
-		= BatchControlInfo, State, Acc) when map_size(TS) > 0 ->
-	Acc1 = Acc#{<<"fileCreationTimeStamp">> => timestamp(TS, State)},
-	parse_batchcontrol4(BatchControlInfo, State, Acc1);
-parse_batchcontrol3(BatchControlInfo, State, Acc) ->
-	parse_batchcontrol4(BatchControlInfo, State, Acc).
-%% @hidden
-parse_batchcontrol4(#{transferCutOffTimeStamp := TS}
-		= BatchControlInfo, State, Acc) when map_size(TS) > 0 ->
-	Acc1 = Acc#{<<"transferCutOffTimeStamp">> => timestamp(TS, State)},
-	parse_batchcontrol5(BatchControlInfo, State, Acc1);
-parse_batchcontrol4(BatchControlInfo, State, Acc) ->
-	parse_batchcontrol5(BatchControlInfo, State, Acc).
-%% @hidden
-parse_batchcontrol5(#{fileAvailableTimeStamp := TS}
-		= BatchControlInfo, State, Acc) when map_size(TS) > 0 ->
-	Acc1 = Acc#{<<"fileAvailableTimeStamp">> => timestamp(TS, State)},
-	parse_batchcontrol6(BatchControlInfo, State, Acc1);
-parse_batchcontrol5(BatchControlInfo, State, Acc) ->
-	parse_batchcontrol6(BatchControlInfo, State, Acc).
-%% @hidden
-parse_batchcontrol6(#{specificationVersionNumber := VSN}
-		= BatchControlInfo, State, Acc) when is_integer(VSN) > 0 ->
-	Acc1 = Acc#{<<"specificationVersionNumber">> => VSN},
-	parse_batchcontrol7(BatchControlInfo, State, Acc1);
-parse_batchcontrol6(BatchControlInfo, State, Acc) ->
-	parse_batchcontrol7(BatchControlInfo, State, Acc).
-%% @hidden
-parse_batchcontrol7(#{releaseVersionNumber := VSN}
-		= BatchControlInfo, State, Acc) when is_integer(VSN) > 0 ->
-	Acc1 = Acc#{<<"releaseVersionNumber">> => VSN},
-	parse_batchcontrol8(BatchControlInfo, State, Acc1);
-parse_batchcontrol7(BatchControlInfo, State, Acc) ->
-	parse_batchcontrol8(BatchControlInfo, State, Acc).
-%% @hidden
-parse_batchcontrol8(#{fileTypeIndicator := FTI}
-		= BatchControlInfo, State, Acc) when byte_size(FTI) > 0 ->
-	Acc1 = Acc#{<<"fileTypeIndicator">> => FTI},
-	parse_batchcontrol9(BatchControlInfo, State, Acc1);
-parse_batchcontrol8(BatchControlInfo, State, Acc) ->
-	parse_batchcontrol9(BatchControlInfo, State, Acc).
-%% @hidden
-parse_batchcontrol9(#{rapFileSequenceNumber := FSN}
-		= BatchControlInfo, State, Acc) when byte_size(FSN) > 0 ->
-	Acc1 = Acc#{<<"rapFileSequenceNumber">> => binary_to_integer(FSN)},
-	parse_batchcontrol10(BatchControlInfo, State, Acc1);
-parse_batchcontrol9(BatchControlInfo, State, Acc) ->
-	parse_batchcontrol10(BatchControlInfo, State, Acc).
-%% @hidden
-parse_batchcontrol10(#{operatorSpecInformation := OSI}
-		= _BatchControlInfo, _State, Acc) when length(OSI) > 0 ->
-	Acc#{<<"operatorSpecInformation">> => OSI};
-parse_batchcontrol10(_BatchControlInfo, _State, Acc) ->
-	Acc.
 
 -spec parse_cci(CCI) -> Result
 	when

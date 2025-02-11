@@ -78,7 +78,10 @@ import2(Log, Metadata, {ok, CDR, Rest}) ->
 	case parse(Log, Metadata, CDR) of
 		ok when byte_size(Rest) == 0 ->
 			ok;
-		_ ->
+		ok ->
+			import1(Log, Metadata, Rest);
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, element(1, CDR)}, {error, Reason}]),
 			import1(Log, Metadata, Rest)
 	end;
 import2(_Log, _Metadata, {error, Reason}) ->
@@ -106,77 +109,23 @@ import2(_Log, _Metadata, {error, Reason}) ->
 %% @doc Parse a CDR.
 %% @private
 parse(Log, Metadata, {moCallRecord, MOCallRecord} = _CDR) ->
-	case parse_mo_call(Log, Metadata, MOCallRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_mo_call},
-					{error, Reason}])
-	end;
+	parse_mo_call(Log, Metadata, MOCallRecord);
 parse(Log, Metadata, {mtCallRecord, MTCallRecord}) ->
-	case parse_mt_call(Log, Metadata, MTCallRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_mt_call},
-					{error, Reason}])
-	end;
+	parse_mt_call(Log, Metadata, MTCallRecord);
 parse(Log, Metadata, {moSMSRecord, MOSMSRecord}) ->
-	case parse_mo_sms(Log, Metadata, MOSMSRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_mo_sms},
-					{error, Reason}])
-	end;
+	parse_mo_sms(Log, Metadata, MOSMSRecord);
 parse(Log, Metadata, {mtSMSRecord, MTSMSRecord}) ->
-	case parse_mt_sms(Log, Metadata, MTSMSRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_mt_sms},
-					{error, Reason}])
-	end;
+	parse_mt_sms(Log, Metadata, MTSMSRecord);
 parse(Log, Metadata, {ssActionRecord, SSActionRecord}) ->
-	case parse_ss_action(Log, Metadata, SSActionRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_ss_action},
-					{error, Reason}])
-	end;
+	parse_ss_action(Log, Metadata, SSActionRecord);
 parse(Log, Metadata, {incGatewayRecord, IncGatewayRecord}) ->
-	case parse_inc_gateway(Log, Metadata, IncGatewayRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_inc_gateway},
-					{error, Reason}])
-	end;
+	parse_inc_gateway(Log, Metadata, IncGatewayRecord);
 parse(Log, Metadata, {outGatewayRecord, OutGatewayRecord}) ->
-	case parse_out_gateway(Log, Metadata, OutGatewayRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_out_gateway},
-					{error, Reason}])
-	end;
+	parse_out_gateway(Log, Metadata, OutGatewayRecord);
 parse(Log, Metadata, {transitRecord, TransitCallRecord}) ->
-	case parse_transit(Log, Metadata, TransitCallRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_transit},
-					{error, Reason}])
-	end;
+	parse_transit(Log, Metadata, TransitCallRecord);
 parse(Log, Metadata, {roamingRecord, RoamingRecord}) ->
-	case parse_roaming(Log, Metadata, RoamingRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_roaming},
-					{error, Reason}])
-	end.
+	parse_roaming(Log, Metadata, RoamingRecord).
 
 %%----------------------------------------------------------------------
 %%  Internal functions

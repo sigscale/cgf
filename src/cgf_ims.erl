@@ -78,7 +78,10 @@ import2(Log, Metadata, {ok, CDR, Rest}) ->
 	case parse(Log, Metadata, CDR) of
 		ok when byte_size(Rest) == 0 ->
 			ok;
-		_ ->
+		ok ->
+			import1(Log, Metadata, Rest);
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, element(1, CDR)}, {error, Reason}]),
 			import1(Log, Metadata, Rest)
 	end;
 import2(_Log, _Metadata, {error, Reason}) ->
@@ -88,7 +91,6 @@ import2(_Log, _Metadata, {error, Reason}) ->
 %%  Internal functions
 %%----------------------------------------------------------------------
 
--dialyzer({no_match, parse/3}).
 -spec parse(Log, Metadata, CDR) -> Result
 	when
 		Log :: disk_log:log(),
@@ -106,101 +108,29 @@ import2(_Log, _Metadata, {error, Reason}) ->
 %% @doc Parse a CDR.
 %% @private
 parse(Log, Metadata, {sCSCFRecord, SCSCFRecord} = _CDR) ->
-	case parse_scscf(Log, Metadata, SCSCFRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_scscf},
-					{error, Reason}])
-	end;
+	parse_scscf(Log, Metadata, SCSCFRecord);
 parse(Log, Metadata, {pCSCFRecord, PCSCFRecord}) ->
-	case parse_pcscf(Log, Metadata, PCSCFRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_pcscf},
-					{error, Reason}])
-	end;
+	parse_pcscf(Log, Metadata, PCSCFRecord);
 parse(Log, Metadata, {iCSCFRecord, ICSCFRecord}) ->
-	case parse_icscf(Log, Metadata, ICSCFRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_icscf},
-					{error, Reason}])
-	end;
+	parse_icscf(Log, Metadata, ICSCFRecord);
 parse(Log, Metadata, {mRFCRecord, MRFCRecord}) ->
-	case parse_mrfc(Log, Metadata, MRFCRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_mrfc},
-					{error, Reason}])
-	end;
+	parse_mrfc(Log, Metadata, MRFCRecord);
 parse(Log, Metadata, {mGCFRecord, MGCFRecord}) ->
-	case parse_mgcf(Log, Metadata, MGCFRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_mgcf},
-					{error, Reason}])
-	end;
+	parse_mgcf(Log, Metadata, MGCFRecord);
 parse(Log, Metadata, {bGCFRecord, BGCFRecord}) ->
-	case parse_bgcf(Log, Metadata, BGCFRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_bgcf},
-					{error, Reason}])
-	end;
+	parse_bgcf(Log, Metadata, BGCFRecord);
 parse(Log, Metadata, {aSRecord, ASRecord}) ->
-	case parse_as(Log, Metadata, ASRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_as},
-					{error, Reason}])
-	end;
+	parse_as(Log, Metadata, ASRecord);
 parse(Log, Metadata, {eCSCFRecord, ECSCFRecord}) ->
-	case parse_ecscf(Log, Metadata, ECSCFRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_ecscf},
-					{error, Reason}])
-	end;
+	parse_ecscf(Log, Metadata, ECSCFRecord);
 parse(Log, Metadata, {iBCFRecord, IBCFRecord}) ->
-	case parse_ibcf(Log, Metadata, IBCFRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_ibcf},
-					{error, Reason}])
-	end;
+	parse_ibcf(Log, Metadata, IBCFRecord);
 parse(Log, Metadata, {tRFRecord, TRFRecord}) ->
-	case parse_trf(Log, Metadata, TRFRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_trf},
-					{error, Reason}])
-	end;
+	parse_trf(Log, Metadata, TRFRecord);
 parse(Log, Metadata, {tFRecord, TFRecord}) ->
-	case parse_tf(Log, Metadata, TFRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_trf},
-					{error, Reason}])
-	end;
+	parse_tf(Log, Metadata, TFRecord);
 parse(Log, Metadata, {aTCFRecord, ATCFRecord}) ->
-	case parse_atcf(Log, Metadata, ATCFRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_atcf},
-					{error, Reason}])
-	end.
+	parse_atcf(Log, Metadata, ATCFRecord).
 
 -spec parse_scscf(Log, Metadata, SCSCFRecord) -> Result
 	when

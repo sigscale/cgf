@@ -79,7 +79,10 @@ import2(Log, Metadata, {ok, CDR, Rest}) ->
 	case parse(Log, Metadata, CDR) of
 		ok when byte_size(Rest) == 0 ->
 			ok;
-		_ ->
+		ok ->
+			import1(Log, Metadata, Rest);
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, element(1, CDR)}, {error, Reason}]),
 			import1(Log, Metadata, Rest)
 	end;
 import2(_Log, _Metadata, {error, Reason}) ->
@@ -89,7 +92,6 @@ import2(_Log, _Metadata, {error, Reason}) ->
 %%  The cgf_gprs private API
 %%----------------------------------------------------------------------
 
--dialyzer({no_match, parse/3}).
 -spec parse(Log, Metadata, CDR) -> Result
 	when
 		Log :: disk_log:log(),
@@ -109,141 +111,39 @@ import2(_Log, _Metadata, {error, Reason}) ->
 %% @doc Parse a CDR.
 %% @private
 parse(Log, Metadata, {sgsnPDPRecord, SGSNPDPRecord} = _CDR) ->
-	case parse_sgsn_pdp(Log, Metadata, SGSNPDPRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_sgsn_pdp},
-					{error, Reason}])
-	end;
-parse(Log, Metadata, {ggsnPDPRecord, GGSNPDPRecord} = _CDR) ->
-	case parse_ggsn_pdp(Log, Metadata, GGSNPDPRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_ggsn_pdp},
-					{error, Reason}])
-	end;
+	parse_sgsn_pdp(Log, Metadata, SGSNPDPRecord);
+parse(Log, Metadata, {ggsnPDPRecord, GGSNPDPRecord}) ->
+	parse_ggsn_pdp(Log, Metadata, GGSNPDPRecord);
 parse(Log, Metadata, {sgsnMMRecord, SGSNMMRecord}) ->
-	case parse_sgsn_mmr(Log, Metadata, SGSNMMRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_sgsn_mmr},
-					{error, Reason}])
-	end;
+	parse_sgsn_mmr(Log, Metadata, SGSNMMRecord);
 parse(Log, Metadata, {sgsnSMORecord, SGSNSMORecord}) ->
-	case parse_sgsn_smo(Log, Metadata, SGSNSMORecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_sgsn_smo},
-					{error, Reason}])
-	end;
+	parse_sgsn_smo(Log, Metadata, SGSNSMORecord);
 parse(Log, Metadata, {sgsnSMTRecord, SGSNSMTRecord}) ->
-	case parse_sgsn_smt(Log, Metadata, SGSNSMTRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_sgsn_smt},
-					{error, Reason}])
-	end;
+	parse_sgsn_smt(Log, Metadata, SGSNSMTRecord);
 parse(Log, Metadata, {sgsnMTLCSRecord, SGSNMTLCSRecord}) ->
-	case parse_sgsn_mt_lcs(Log, Metadata, SGSNMTLCSRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_sgsn_mt_lcs},
-					{error, Reason}])
-	end;
+	parse_sgsn_mt_lcs(Log, Metadata, SGSNMTLCSRecord);
 parse(Log, Metadata, {sgsnMOLCSRecord, SGSNMOLCSRecord}) ->
-	case parse_sgsn_mo_lcs(Log, Metadata, SGSNMOLCSRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_sgsn_mo_lcs},
-					{error, Reason}])
-	end;
+	parse_sgsn_mo_lcs(Log, Metadata, SGSNMOLCSRecord);
 parse(Log, Metadata, {sgsnNILCSRecord, SGSNNILCSRecord}) ->
-	case parse_sgsn_ni_lcs(Log, Metadata, SGSNNILCSRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_sgsn_ni_lcs},
-					{error, Reason}])
-	end;
+	parse_sgsn_ni_lcs(Log, Metadata, SGSNNILCSRecord);
 parse(Log, Metadata, {sgsnMBMSRecord, SGSNMBMSRecord}) ->
-	case parse_sgsn_mbms(Log, Metadata, SGSNMBMSRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_sgsn_mbms},
-					{error, Reason}])
-	end;
+	parse_sgsn_mbms(Log, Metadata, SGSNMBMSRecord);
 parse(Log, Metadata, {ggsnMBMSRecord, GGSNMBMSRecord}) ->
-	case parse_ggsn_mbms(Log, Metadata, GGSNMBMSRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_ggsn_mbms},
-					{error, Reason}])
-	end;
+	parse_ggsn_mbms(Log, Metadata, GGSNMBMSRecord);
 parse(Log, Metadata, {sGWRecord, SGWRecord}) ->
-	case parse_sgw(Log, Metadata, SGWRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_sgw},
-					{error, Reason}])
-	end;
+	parse_sgw(Log, Metadata, SGWRecord);
 parse(Log, Metadata, {pGWRecord, PGWRecord}) ->
-	case parse_pgw(Log, Metadata, PGWRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_pgw},
-					{error, Reason}])
-	end;
+	parse_pgw(Log, Metadata, PGWRecord);
 parse(Log, Metadata, {gwMBMSRecord, GWMBMSRecord}) ->
-	case parse_gw_mbms(Log, Metadata, GWMBMSRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_gw_mbms},
-					{error, Reason}])
-	end;
+	parse_gw_mbms(Log, Metadata, GWMBMSRecord);
 parse(Log, Metadata, {tDFRecord, TDFRecord}) ->
-	case parse_tdf(Log, Metadata, TDFRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_tdf},
-					{error, Reason}])
-	end;
+	parse_tdf(Log, Metadata, TDFRecord);
 parse(Log, Metadata, {iPERecord, IPERecord}) ->
-	case parse_ipe(Log, Metadata, IPERecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_ipe},
-					{error, Reason}])
-	end;
+	parse_ipe(Log, Metadata, IPERecord);
 parse(Log, Metadata, {ePDGRecord, EPDGRecord}) ->
-	case parse_epdg(Log, Metadata, EPDGRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_epdg},
-					{error, Reason}])
-	end;
+	parse_epdg(Log, Metadata, EPDGRecord);
 parse(Log, Metadata, {tWAGRecord, TWAGRecord}) ->
-	case parse_twag(Log, Metadata, TWAGRecord) of
-		ok ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, parse_twag},
-					{error, Reason}])
-	end.
+	parse_twag(Log, Metadata, TWAGRecord).
 
 %%----------------------------------------------------------------------
 %%  Internal functions
