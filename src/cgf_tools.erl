@@ -1,7 +1,7 @@
 %%% cgf_tools.erl
 %%% vim: ts=3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% @copyright 2024 SigScale Global Inc.
+%%% @copyright 2024 - 2025 SigScale Global Inc.
 %%% @end
 %%% Licensed under the Apache License, Version 2.0 (the "License");
 %%% you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 %%%   module starts and stops the {@link //cgf. cgf} application.
 %%%
 -module(cgf_tools).
--copyright('Copyright (c) 2024 SigScale Global Inc.').
+-copyright('Copyright (c) 2024 - 2025 SigScale Global Inc.').
 -author('Vance Shipley <vances@sigscale.org>').
 
 -export([transpile/1, transpile/2]).

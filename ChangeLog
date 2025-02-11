@@ -1,3 +1,46 @@
+2025-02-11   Vance Shipley <vances@sigscale.org>
+
+	* import fsm behaviour callback modules for tap,cs,gprs,ims and huawei cs
+	* refactor action handler api for import fsm behaviour
+	* refactor cs,gprs,ims,tap parse/3 for error return
+	* correct private api label
+	* set modules to dynamic for release handling
+	* import fsm workers are temporary
+	* supervision tree with event handler fsm
+	* event action table with management api
+	* refactor event supervision
+	* remove deprecated callback, default handler now formats status
+	* info log file close event
+	* include root in file close event notification
+	* correct pending transfer data handling in sftpd
+	* include file for 3gpp ts 32.297 file format
+	* relative path in sftpd event notification
+	* clarify sftp root directory configuration
+	* test suite for cdr file import
+	* test lib: generate random call duration values
+	* test lib: generate random imsi and imei values
+	* correct test case for bcd dn
+	* parse 3gpp ts 32.297 cdr file headers
+	* test library functions to generate random ip addresses
+	* make huawei charging data record types extensible
+	* import module for huawei cs
+	* fixed typo causing endless loop
+	* huawei mobile originated call forward call record
+	* correct sequence of; all optional; missing; unknown
+	* import huawei msoftx3000 msc asn.1 cdr
+	* modernize documentation metadata in test suite
+	* test lib utilities for loading and starting applications
+	* overidable default dialyzer option to ignore unknow functions and types
+	* ssh_sftpd:init/1 and handle_msg/2 always ok
+	* remove unused domain argument from ecs_user/3
+	* remove unreachable function clause
+	* dialyzer: ignore unused function
+	* dialyzer: ignore no match for unimplemented functions
+	* Update configure.ac - add more deps (#31)
+	* add 3gpp architecture diagram to readme
+	* debian package installation instruction links
+	* debian package installation instructions
+
 2024-12-20   Vance Shipley <vances@sigscale.org>
 
 	* simplify finding release package

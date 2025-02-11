@@ -1,7 +1,7 @@
 %%% cgf_ims.erl
 %%% vim: ts=3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% @copyright 2024 SigScale Global Inc.
+%%% @copyright 2024 - 2025 SigScale Global Inc.
 %%% @end
 %%% Licensed under the Apache License, Version 2.0 (the "License");
 %%% you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 %%% 	>32.298</a> Charging Data Record (CDR) Parameter Description.
 %%%
 -module(cgf_ims).
--copyright('Copyright (c) 2024 SigScale Global Inc.').
+-copyright('Copyright (c) 2024 - 2025 SigScale Global Inc.').
 
 %% export the public API
 -export([import/2, import/3]).

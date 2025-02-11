@@ -1,7 +1,7 @@
 %%% cgf_cs_huawei.erl
 %%% vim: ts=3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% @copyright 2024-2025 SigScale Global Inc.
+%%% @copyright 2024 - 2025 SigScale Global Inc.
 %%% @end
 %%% Licensed under the Apache License, Version 2.0 (the "License");
 %%% you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 %%% @reference MSOFTX3000 Mobile SoftSwitch Center ASN.1 CDR Description
 %%%
 -module(cgf_cs_huawei).
--copyright('Copyright (c) 2024-2025 SigScale Global Inc.').
+-copyright('Copyright (c) 2024 - 2025 SigScale Global Inc.').
 
 %% export the public API
 -export([import/2, import/3]).

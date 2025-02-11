@@ -1,7 +1,7 @@
 %%% cgf_sftpd.erl
 %%% vim: ts=3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% @copyright 2024 SigScale Global Inc.
+%%% @copyright 2024 - 2025 SigScale Global Inc.
 %%% @end
 %%% Licensed under the Apache License, Version 2.0 (the "License");
 %%% you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@
 %%% 	sent with {@link //cgf/cgf_event:notify/2. cgf_event:notify/2}.
 %%%
 -module(cgf_sftpd).
--copyright('Copyright (c) 2024 SigScale Global Inc.').
+-copyright('Copyright (c) 2024 - 2025 SigScale Global Inc.').
 -author('Vance Shipley <vances@sigscale.org>').
 
 -behaviour(ssh_server_channel).

@@ -1,7 +1,7 @@
 %%% cgf_log_server.erl
 %%% vim: ts=3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% @copyright 2021-2024 SigScale Global Inc.
+%%% @copyright 2021 - 2025 SigScale Global Inc.
 %%% @author Vance Shipley <vances@sigscale.org> [http://www.sigscale.org]
 %%% @end
 %%% Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +21,7 @@
 %%% 	{@link //cgf. cgf} application.
 %%%
 -module(cgf_log_server).
--copyright('Copyright (c) 2021-2024 SigScale Global Inc.').
+-copyright('Copyright (c) 2021 - 2025 SigScale Global Inc.').
 -author('Vance Shipley <vances@sigscale.org>').
 
 -behaviour(gen_server).

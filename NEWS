@@ -1,3 +1,13 @@
+February 11, 2025
+-----------------
+	- Event action handler table and API
+	- Import FSM behaviour pattern
+	- Supervised FSMs for batch import jobs
+	- 3GPP TS 32.297 file format handling
+	- Correct large file SFTP server handling
+	- Test libraries for generating random data files
+	- Huawei CS ASN.1 CODEC
+
 December 20, 2024
 -----------------
 	- Import 3GPP CS, PS, IMS, SMS CDR
