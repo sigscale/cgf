@@ -55,13 +55,82 @@ beam_DATA = cgf.beam \
 		cgf_cs_huawei.beam \
 		cgf_cs_huawei_fsm.beam
 
-%.beam:$(top_builddir)/src/%.erl
+%.beam:$(top_srcdir)/src/%.erl
+	$(ERLC) $(ERLCFLAGS) $<
+
+GenericChargingDataTypes.beam:$(top_builddir)/src/GenericChargingDataTypes.erl
 	$(ERLC) $(ERLCFLAGS) -I $(top_builddir)/src $<
 
-cgf_3gpp_file.beam:$(top_builddir)/src/cgf_3gpp_file.erl $(top_srcdir)/include/cgf_3gpp_file.hrl
+IMSChargingDataTypes.beam:$(top_builddir)/src/IMSChargingDataTypes.erl
+	$(ERLC) $(ERLCFLAGS) -I $(top_builddir)/src $<
+
+CSChargingDataTypes.beam:$(top_builddir)/src/CSChargingDataTypes.erl
+	$(ERLC) $(ERLCFLAGS) -I $(top_builddir)/src $<
+
+GPRSChargingDataTypes.beam:$(top_builddir)/src/GPRSChargingDataTypes.erl
+	$(ERLC) $(ERLCFLAGS) -I $(top_builddir)/src $<
+
+MMTelChargingDataTypes.beam:$(top_builddir)/src/MMTelChargingDataTypes.erl
+	$(ERLC) $(ERLCFLAGS) -I $(top_builddir)/src $<
+
+SMSChargingDataTypes.beam:$(top_builddir)/src/SMSChargingDataTypes.erl
+	$(ERLC) $(ERLCFLAGS) -I $(top_builddir)/src $<
+
+MMSChargingDataTypes.beam:$(top_builddir)/src/MMSChargingDataTypes.erl
+	$(ERLC) $(ERLCFLAGS) -I $(top_builddir)/src $<
+
+CPDTChargingDataTypes.beam:$(top_builddir)/src/CPDTChargingDataTypes.erl
+	$(ERLC) $(ERLCFLAGS) -I $(top_builddir)/src $<
+
+MBMSChargingDataTypes.beam:$(top_builddir)/src/MBMSChargingDataTypes.erl
+	$(ERLC) $(ERLCFLAGS) -I $(top_builddir)/src $<
+
+POCChargingDataTypes.beam:$(top_builddir)/src/POCChargingDataTypes.erl
+	$(ERLC) $(ERLCFLAGS) -I $(top_builddir)/src $<
+
+LCSChargingDataTypes.beam:$(top_builddir)/src/LCSChargingDataTypes.erl
+	$(ERLC) $(ERLCFLAGS) -I $(top_builddir)/src $<
+
+ProSeChargingDataTypes.beam:$(top_builddir)/src/ProSeChargingDataTypes.erl
+	$(ERLC) $(ERLCFLAGS) -I $(top_builddir)/src $<
+
+MONTEChargingDataTypes.beam:$(top_builddir)/src/MONTEChargingDataTypes.erl
+	$(ERLC) $(ERLCFLAGS) -I $(top_builddir)/src $<
+
+CHFChargingDataTypes.beam:$(top_builddir)/src/CHFChargingDataTypes.erl
+	$(ERLC) $(ERLCFLAGS) -I $(top_builddir)/src $<
+
+ExposureFunctionAPIChargingDataTypes.beam:$(top_builddir)/src/ExposureFunctionAPIChargingDataTypes.erl
+	$(ERLC) $(ERLCFLAGS) -I $(top_builddir)/src $<
+
+TAP-0312.beam:$(top_builddir)/src/TAP-0312.erl
+	$(ERLC) $(ERLCFLAGS) -I $(top_builddir)/src $<
+
+Huawei-CS.beam:$(top_builddir)/src/Huawei-CS.erl
+	$(ERLC) $(ERLCFLAGS) -I $(top_builddir)/src $<
+
+cgf_sftpd.beam:$(top_srcdir)/src/cgf_sftpd.erl	$(top_builddir)/src/ssh_sftpd.hrl
+	$(ERLC) $(ERLCFLAGS) -I $(top_builddir)/src $<
+
+cgf_3gpp_file.beam:$(top_srcdir)/src/cgf_3gpp_file.erl $(top_srcdir)/include/cgf_3gpp_file.hrl
 	$(ERLC) $(ERLCFLAGS) -I $(top_srcdir)/include -I $(top_builddir)/src $<
 
-%.app:   %.app-in
+cgf_tap_fsm.beam:$(top_srcdir)/src/cgf_tap_fsm.erl	$(top_builddir)/ebin/cgf_import_fsm.beam
+	$(ERLC) $(ERLCFLAGS) -pa $(top_builddir)/ebin $<
+
+cgf_gprs_fsm.beam:$(top_srcdir)/src/cgf_gprs_fsm.erl	$(top_builddir)/ebin/cgf_import_fsm.beam
+	$(ERLC) $(ERLCFLAGS) -pa $(top_builddir)/ebin $<
+
+cgf_ims_fsm.beam:$(top_srcdir)/src/cgf_ims_fsm.erl	$(top_builddir)/ebin/cgf_import_fsm.beam
+	$(ERLC) $(ERLCFLAGS) -pa $(top_builddir)/ebin $<
+
+cgf_cs_fsm.beam:$(top_srcdir)/src/cgf_cs_fsm.erl	$(top_builddir)/ebin/cgf_import_fsm.beam
+	$(ERLC) $(ERLCFLAGS) -pa $(top_builddir)/ebin $<
+
+cgf_cs_huawei_fsm.beam:$(top_srcdir)/src/cgf_cs_huawei_fsm.erl	$(top_builddir)/ebin/cgf_import_fsm.beam
+	$(ERLC) $(ERLCFLAGS) -pa $(top_builddir)/ebin $<
+
+%.app:	%.app-in
 	sed -e 's/%APP_NAME%/$(PACKAGE_NAME)/' \
 			-e 's/%APP_VERSION%/$(PACKAGE_VERSION)/' < $< > $@ 
 
