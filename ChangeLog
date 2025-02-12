@@ -1,3 +1,11 @@
+2025-02-12   Vance Shipley <vances@sigscale.org>
+
+	* dispatch event to event server; start import fsm
+	* correct start function import fsm supervisor
+	* correct return value of match_event/2
+	* correct dependencies and rules in ebin makefile
+	* update copyright year
+
 2025-02-11   Vance Shipley <vances@sigscale.org>
 
 	* import fsm behaviour callback modules for tap,cs,gprs,ims and huawei cs
