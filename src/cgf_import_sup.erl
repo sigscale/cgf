@@ -43,9 +43,9 @@
 %%
 init([] = _Args) ->
 	StartMod = cgf_import_fsm,
-	StartFunc = {supervisor, start_link, [StartMod]},
+	StartFunc = {StartMod, start_link, []},
 	ChildSpec = #{id => StartMod, start => StartFunc,
-			restart => temporary, modules => [StartMod]},
+			restart => temporary, modules => dynamic},
 	SupFlags = #{strategy => simple_one_for_one},
 	{ok, {SupFlags, [ChildSpec]}}.
 
