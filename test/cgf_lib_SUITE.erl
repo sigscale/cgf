@@ -43,7 +43,8 @@
 %%
 suite() ->
 	Description = "Test suite for the public API of the cgf application.",
-   [{userdata, [{doc, Description}]}, {timetrap, {minutes, 1}}].
+   [{userdata, [{doc, Description}]},
+			{timetrap, {minutes, 1}}].
 
 -spec init_per_suite(Config :: [tuple()]) -> Config :: [tuple()].
 %% Initiation before the whole suite.
