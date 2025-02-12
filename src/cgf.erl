@@ -348,7 +348,7 @@ match_event(file_close = _Event,
 			F({error, Reason}, _Acc) ->
 				{error, Reason};
 			F({Matched, Cont}, Acc) ->
-				Actions = [Action || {_, _, Action} <- Matched],
+				Actions = [{Match, Action} || {_, Match, Action} <- Matched],
 				F(mnesia:select(Cont), [Actions | Acc])
 	end,
 	case mnesia:ets(F, [start, []]) of
