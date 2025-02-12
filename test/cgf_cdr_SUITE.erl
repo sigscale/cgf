@@ -27,7 +27,8 @@
 -export([init_per_testcase/2, end_per_testcase/2]).
 
 %% export test cases
--export([import_cs/0, import_cs/1]).
+-export([import_cs/0, import_cs/1,
+		import_cs_32297/0, import_cs_32297/1]).
 
 -include_lib("common_test/include/ct.hrl").
 -include("cgf_3gpp_file.hrl").
@@ -43,7 +44,35 @@
 %%
 suite() ->
 	Description = "Test suite for CDR parsing in the cgf application.",
-	[{userdata, [{doc, Description}]}, {timetrap, {minutes, 1}}].
+	[{userdata, [{doc, Description}]},
+			{require, log},
+			{default_config, log,
+					[{logs,
+							[{bx_tap,
+									[{file, "Bx_TAP"},
+									{codec, {cgf_log_codec_ecs, bx}},
+									{format, external},
+									{type, wrap},
+									{size, {1048576, 10}}]},
+							{bx_ps,
+									[{file, "Bx_PS"},
+									{codec, {cgf_log_codec_ecs, bx}},
+									{format, external},
+									{type, wrap},
+									{size, {1048576, 10}}]},
+							{bx_cs,
+									[{file, "Bx_CS"},
+									{codec, {cgf_log_codec_ecs, bx}},
+									{format, external},
+									{type, wrap},
+									{size, {1048576, 10}}]},
+							{bx_ims,
+									[{file, "Bx_IMS"},
+									{codec, {cgf_log_codec_ecs, bx}},
+									{format, external},
+									{type, wrap},
+									{size, {1048576, 10}}]}]}]},
+			{timetrap, {minutes, 1}}].
 
 -spec init_per_suite(Config) -> NewConfig
 	when
@@ -55,6 +84,19 @@ suite() ->
 %% @doc Initialization before the whole suite.
 %%
 init_per_suite(Config) ->
+	DataDir = proplists:get_value(data_dir, Config),
+	PrivDir = proplists:get_value(priv_dir, Config),
+	ok = cgf_test_lib:unload(mnesia),
+	ok = cgf_test_lib:load(mnesia),
+	ok = application:set_env(mnesia, dir, PrivDir),
+	ok = cgf_test_lib:init_tables(),
+	ok = cgf_test_lib:unload(cgf),
+	ok = cgf_test_lib:load(cgf),
+	LogDir = ct:get_config({log, log_dir}, PrivDir),
+	ok = application:set_env(cgf, bx_log_dir, LogDir),
+	Logs = ct:get_config({log, logs}, []),
+	ok = application:set_env(cgf, logs, Logs),
+	ok = cgf_test_lib:start(),
 	Config.
 
 -spec end_per_suite(Config) -> Result
@@ -100,7 +142,7 @@ end_per_testcase(_TestCase, _Config) ->
 %% Returns a list of all test cases in this test suite.
 %%
 all() ->
-	[import_cs].
+	[import_cs, import_cs_32297].
 
 %%---------------------------------------------------------------------
 %%  Test cases
@@ -114,26 +156,36 @@ import_cs() ->
 import_cs(Config) ->
 	PrivDir = proplists:get_value(priv_dir, Config),
 	Log = bx_cs,
+	{ok, CDR1} = 'CSChargingDataTypes':encode('CSRecord', mo_call_record()),
+	{ok, CDR2} = 'CSChargingDataTypes':encode('CSRecord', mo_call_record()),
+	{ok, CDR3} = 'CSChargingDataTypes':encode('CSRecord', mo_call_record()),
+	FilePath = filename:join(PrivDir, cdr_filename(1)),
+	ok = file:write_file(FilePath, <<CDR1/binary, CDR2/binary, CDR3/binary>>),
+	ok = cgf_cs:import(FilePath, Log).
+
+import_cs_32297() ->
+	Description = "Import a CS CDR file in 3GPP 32.297 format.",
+	ct:comment(Description),
+	[{userdata, [{doc, Description}]}].
+
+import_cs_32297(Config) ->
+	PrivDir = proplists:get_value(priv_dir, Config),
+	Log = bx_cs,
 	FileHeader = file_header(),
 	FileHeader1 = FileHeader#cdr_file_header{count = 1},
 	FileHeaderB = cgf_3gpp_file:file_header(FileHeader1),
-	FileHeaderL = byte_size(FileHeaderB),
+	FileHeaderL = byte_size(FileHeaderB) + 8,
 	CdrHeader = cdr_header(32250),
 	CdrHeaderB = cgf_3gpp_file:cdr_header(CdrHeader),
-	CdrHeaderL = byte_size(CdrHeaderB),
+	CdrHeaderL = byte_size(CdrHeaderB) + 2,
 	{ok, CDR} = 'CSChargingDataTypes':encode('CSRecord', mo_call_record()),
 	CdrLength = byte_size(CDR),
-	FileLength = 8 + FileHeaderL + CdrHeaderL + 2 + CdrLength,
+	FileLength = FileHeaderL + CdrHeaderL + CdrLength,
 	FileB = <<FileLength:32, FileHeaderL:32, FileHeaderB/binary,
 			CdrLength:16, CdrHeaderB/binary, CDR/binary>>,
 	FilePath = filename:join(PrivDir, cdr_filename(1)),
 	ok = file:write_file(FilePath, FileB),
-	% ok = cgf_cs:import(FilePath, Log).
-	% implement the below in cgf_cs:import/2,3
-	{ok, B} = file:read_file(FilePath),
-	<<FileLength:32, FileHeaderL:32, FileHeaderB:FileHeaderL/binary,
-			CdrLength:16, CdrHeader:3/binary, CDR:CdrLength/binary>> = B,
-	'CSChargingDataTypes':decode('CSRecord', CDR).
+	ok = cgf_cs:import(FilePath, Log).
 
 %%---------------------------------------------------------------------
 %%  Internal functions

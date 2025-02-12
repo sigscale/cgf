@@ -31,6 +31,7 @@
 %% export the private API
 -export([parse/3]).
 
+-include("cgf_3gpp_file.hrl").
 -include_lib("kernel/include/logger.hrl").
 
 %%----------------------------------------------------------------------
@@ -60,31 +61,47 @@ import(File, Log) ->
 import(File, Log, Metadata) when is_list(File) ->
 	case file:read_file(File) of
 		{ok, Bin} ->
-			import1(Log, Metadata, Bin);
+			import1(Log, Metadata, undefined, Bin);
 		{error, Reason} ->
 			{error, Reason}
 	end;
 import(Bin, Log, Metadata)
 		when is_binary(Bin), is_list(Metadata) ->
-	import1(Log, Metadata, Bin).
+	import1(Log, Metadata, undefined, Bin).
 
 %% @hidden
-import1(Log, Metadata, Bin) ->
-	import2(Log, Metadata,
+import1(Log, Metadata, undefined = _Flag,
+		<<FileLength:32, HeaderLength:32,
+				Header:(HeaderLength - 8)/binary,
+				Rest:(FileLength - HeaderLength)/binary>>) ->
+	#cdr_file_header{} = cgf_3gpp_file:file_header(Header),
+	import1(Log, Metadata, true, Rest);
+import1(Log, Metadata, undefined = _Flag, Bin) ->
+	import1(Log, Metadata, false, Bin);
+import1(Log, Metadata, true = Flag,
+		<<_:16, 7:3, _:21, Rest/binary>>) ->
+	import2(Log, Metadata, Flag,
+			'CSChargingDataTypes':decode('CSRecord', Rest));
+import1(Log, Metadata, true = Flag,
+		<<_:32, Rest/binary>>) ->
+	import2(Log, Metadata, Flag,
+			'CSChargingDataTypes':decode('CSRecord', Rest));
+import1(Log, Metadata, false = Flag, Bin) ->
+	import2(Log, Metadata, Flag,
 			'CSChargingDataTypes':decode('CSRecord', Bin)).
 
 %% @hidden
-import2(Log, Metadata, {ok, CDR, Rest}) ->
+import2(Log, Metadata, Flag, {ok, CDR, Rest}) ->
 	case parse(Log, Metadata, CDR) of
 		ok when byte_size(Rest) == 0 ->
 			ok;
 		ok ->
-			import1(Log, Metadata, Rest);
+			import1(Log, Metadata, Flag, Rest);
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, element(1, CDR)}, {error, Reason}]),
-			import1(Log, Metadata, Rest)
+			import1(Log, Metadata, Flag, Rest)
 	end;
-import2(_Log, _Metadata, {error, Reason}) ->
+import2(_Log, _Metadata, _Flag, {error, Reason}) ->
 	{error, Reason}.
 
 %%----------------------------------------------------------------------

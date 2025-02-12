@@ -113,19 +113,28 @@ cgf_sftpd.beam:$(top_srcdir)/src/cgf_sftpd.erl	$(top_builddir)/src/ssh_sftpd.hrl
 	$(ERLC) $(ERLCFLAGS) -I $(top_builddir)/src $<
 
 cgf_3gpp_file.beam:$(top_srcdir)/src/cgf_3gpp_file.erl $(top_srcdir)/include/cgf_3gpp_file.hrl
-	$(ERLC) $(ERLCFLAGS) -I $(top_srcdir)/include -I $(top_builddir)/src $<
+	$(ERLC) $(ERLCFLAGS) -I $(top_srcdir)/include $<
 
 cgf_tap_fsm.beam:$(top_srcdir)/src/cgf_tap_fsm.erl	$(top_builddir)/ebin/cgf_import_fsm.beam
 	$(ERLC) $(ERLCFLAGS) -pa $(top_builddir)/ebin $<
 
-cgf_gprs_fsm.beam:$(top_srcdir)/src/cgf_gprs_fsm.erl	$(top_builddir)/ebin/cgf_import_fsm.beam
-	$(ERLC) $(ERLCFLAGS) -pa $(top_builddir)/ebin $<
+cgf_gprs.beam:$(top_srcdir)/src/cgf_gprs.erl	$(top_srcdir)/include/cgf_3gpp_file.hrl
+	$(ERLC) $(ERLCFLAGS) -I $(top_srcdir)/include $<
 
-cgf_ims_fsm.beam:$(top_srcdir)/src/cgf_ims_fsm.erl	$(top_builddir)/ebin/cgf_import_fsm.beam
-	$(ERLC) $(ERLCFLAGS) -pa $(top_builddir)/ebin $<
+cgf_gprs_fsm.beam:$(top_srcdir)/src/cgf_gprs_fsm.erl	$(top_builddir)/ebin/cgf_import_fsm.beam $(top_srcdir)/include/cgf_3gpp_file.hrl
+	$(ERLC) $(ERLCFLAGS) -pa $(top_builddir)/ebin -I $(top_srcdir)/include $<
 
-cgf_cs_fsm.beam:$(top_srcdir)/src/cgf_cs_fsm.erl	$(top_builddir)/ebin/cgf_import_fsm.beam
-	$(ERLC) $(ERLCFLAGS) -pa $(top_builddir)/ebin $<
+cgf_ims.beam:$(top_srcdir)/src/cgf_ims.erl	$(top_srcdir)/include/cgf_3gpp_file.hrl
+	$(ERLC) $(ERLCFLAGS) -I $(top_srcdir)/include $<
+
+cgf_ims_fsm.beam:$(top_srcdir)/src/cgf_ims_fsm.erl	$(top_builddir)/ebin/cgf_import_fsm.beam $(top_srcdir)/include/cgf_3gpp_file.hrl
+	$(ERLC) $(ERLCFLAGS) -pa $(top_builddir)/ebin -I $(top_srcdir)/include $<
+
+cgf_cs.beam:$(top_srcdir)/src/cgf_cs.erl	$(top_srcdir)/include/cgf_3gpp_file.hrl
+	$(ERLC) $(ERLCFLAGS) -I $(top_srcdir)/include $<
+
+cgf_cs_fsm.beam:$(top_srcdir)/src/cgf_cs_fsm.erl	$(top_builddir)/ebin/cgf_import_fsm.beam $(top_srcdir)/include/cgf_3gpp_file.hrl
+	$(ERLC) $(ERLCFLAGS) -pa $(top_builddir)/ebin -I $(top_srcdir)/include $<
 
 cgf_cs_huawei_fsm.beam:$(top_srcdir)/src/cgf_cs_huawei_fsm.erl	$(top_builddir)/ebin/cgf_import_fsm.beam
 	$(ERLC) $(ERLCFLAGS) -pa $(top_builddir)/ebin $<
