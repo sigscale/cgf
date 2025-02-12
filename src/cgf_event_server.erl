@@ -64,8 +64,16 @@ init([] = _Args) ->
 				| {stop, Reason :: term(), NewState :: state()}.
 %% @see //stdlib/gen_server:handle_call/3
 %% @private
-handle_call(_Request, _From, State) ->
-	{noreply, State}.
+handle_call({file_close = Event, Content} = _Request, _From, State) ->
+	case cgf:match_event(Event, Content) of
+		{ok, Actions} ->
+			{reply, start_action(Event, Content, Actions), State};
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, Reason},
+					{event, Event},
+					{content, Content}]),
+			{reply, {error, Reason}, State}
+	end.
 
 -spec handle_cast(Request, State) -> Result
 	when
@@ -136,4 +144,43 @@ code_change(_OldVersion, State, _Extra) ->
 %%----------------------------------------------------------------------
 %%  The cgf_event_server private API
 %%----------------------------------------------------------------------
+
+%% @hidden
+start_action(Event, #{root := Root, path := Path} = Content,
+		[{Match, {Module, Log} = Action} | T]) ->
+	Filename = <<Root/binary, Path/binary>>,
+	StartArgs = [Module, [Filename, Log], []],
+	start_action1(Event, Content, Match, Action, T, StartArgs);
+start_action(Event, #{root := Root, path := Path} = Content,
+		[{Match, {Module, Log, Metadata} = Action} | T]) ->
+	Filename = <<Root/binary, Path/binary>>,
+	StartArgs = [Module, [Filename, Log, Metadata], []],
+	start_action1(Event, Content, Match, Action, T, StartArgs);
+start_action(Event, #{root := Root, path := Path} = Content,
+		[{Match, {Module, Log, Metadata, ExtraArgs} = Action} | T]) ->
+	Filename = <<Root/binary, Path/binary>>,
+	StartArgs = [Module, [Filename, Log, Metadata] ++ ExtraArgs, []],
+	start_action1(Event, Content, Match, Action, T, StartArgs);
+start_action(Event, #{root := Root, path := Path} = Content,
+		[{Match, {Module, Log, Metadata, ExtraArgs, Opts} = Action} | T]) ->
+	Filename = <<Root/binary, Path/binary>>,
+	StartArgs = [Module, [Filename, Log, Metadata] ++ ExtraArgs, Opts],
+	start_action1(Event, Content, Match, Action, T, StartArgs);
+start_action(_Event, _Content, []) ->
+	ok.
+%% @hidden
+start_action1(Event, Content, Match, Action, T, StartArgs) ->
+	case supervisor:start_child(cgf_import_sup, StartArgs) of
+		{ok, _Child} ->
+			ok;
+		{ok, _Child, _Info} ->
+			ok;
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, Reason},
+					{event, Event},
+					{content, Content},
+					{match, Match},
+					{action, Action}])
+	end,
+	start_action(Event, Content, T).
 

@@ -109,12 +109,11 @@ init([] = _Args) ->
 %% 	gen_event:notify/2, gen_event:sync_notify/2}.
 %% @private
 %%
-handle_event({file_close,
-		#{module := Module, user := User, root := _Root, path := Path}} = _Event,
-		State) ->
-	?LOG_INFO([{Module, file_close}, {user, User}, {path, Path}]),
+handle_event({file_close, #{}} = Event, State) ->
+	gen_server:call(cgf_event_server, Event),
 	{ok, State};
-handle_event(_Event, State) ->
+handle_event(Event, State) ->
+	?LOG_WARNING([{?MODULE, unknown_event}, {event, Event}]),
 	{ok, State}.
 
 -spec handle_call(Request, State) -> Result
