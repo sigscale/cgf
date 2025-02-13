@@ -148,22 +148,22 @@ code_change(_OldVersion, State, _Extra) ->
 %% @hidden
 start_action(Event, #{root := Root, path := Path} = Content,
 		[{Match, {Module, Log} = Action} | T]) ->
-	Filename = <<Root/binary, Path/binary>>,
+	Filename = filename:join(Root, Path),
 	StartArgs = [Module, [Filename, Log], []],
 	start_action1(Event, Content, Match, Action, T, StartArgs);
 start_action(Event, #{root := Root, path := Path} = Content,
 		[{Match, {Module, Log, Metadata} = Action} | T]) ->
-	Filename = <<Root/binary, Path/binary>>,
+	Filename = filename:join(Root, Path),
 	StartArgs = [Module, [Filename, Log, Metadata], []],
 	start_action1(Event, Content, Match, Action, T, StartArgs);
 start_action(Event, #{root := Root, path := Path} = Content,
 		[{Match, {Module, Log, Metadata, ExtraArgs} = Action} | T]) ->
-	Filename = <<Root/binary, Path/binary>>,
+	Filename = filename:join(Root, Path),
 	StartArgs = [Module, [Filename, Log, Metadata] ++ ExtraArgs, []],
 	start_action1(Event, Content, Match, Action, T, StartArgs);
 start_action(Event, #{root := Root, path := Path} = Content,
 		[{Match, {Module, Log, Metadata, ExtraArgs, Opts} = Action} | T]) ->
-	Filename = <<Root/binary, Path/binary>>,
+	Filename = filename:join(Root, Path),
 	StartArgs = [Module, [Filename, Log, Metadata] ++ ExtraArgs, Opts],
 	start_action1(Event, Content, Match, Action, T, StartArgs);
 start_action(_Event, _Content, []) ->
