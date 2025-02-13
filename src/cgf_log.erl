@@ -39,7 +39,7 @@
 
 -spec open(LogName, Options) -> Result
    when
-      LogName :: LocalName | {local, LogName} | {global, GlobalName},
+      LogName :: LocalName | {local, LocalName} | {global, GlobalName},
 		LocalName :: atom(),
 		GlobalName :: term(),
       Options :: [log_option()],
