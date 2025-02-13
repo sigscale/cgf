@@ -28,7 +28,8 @@
 
 %% export test cases
 -export([import_cs/0, import_cs/1,
-		import_cs_32297/0, import_cs_32297/1]).
+		import_cs_32297/0, import_cs_32297/1,
+		sftp_cs/0, sftp_cs/1]).
 
 -include_lib("common_test/include/ct.hrl").
 -include("cgf_3gpp_file.hrl").
@@ -45,8 +46,8 @@
 suite() ->
 	Description = "Test suite for CDR parsing in the cgf application.",
 	[{userdata, [{doc, Description}]},
-			{require, log},
-			{default_config, log,
+			{require, cgf_log},
+			{default_config, cgf_log,
 					[{logs,
 							[{bx_tap,
 									[{file, "Bx_TAP"},
@@ -72,6 +73,17 @@ suite() ->
 									{format, external},
 									{type, wrap},
 									{size, {1048576, 10}}]}]}]},
+			{require, cgf_ssh},
+			{default_config, cgf_ssh,
+					[{system_dir, "ssh/system"},
+					{server_options,
+							[{shell, disabled},
+							{exec, disabled},
+							{subsystems, []}]}]},
+			{require, cgf_sftp},
+			{default_config, cgf_sftp,
+					[{sftp, {127,0,0,1}},
+					{user, "ct"}]},
 			{timetrap, {minutes, 1}}].
 
 -spec init_per_suite(Config) -> NewConfig
@@ -92,12 +104,30 @@ init_per_suite(Config) ->
 	ok = cgf_test_lib:init_tables(),
 	ok = cgf_test_lib:unload(cgf),
 	ok = cgf_test_lib:load(cgf),
-	LogDir = ct:get_config({log, log_dir}, PrivDir),
+	LogDir = ct:get_config({cgf_log, log_dir}, PrivDir),
 	ok = application:set_env(cgf, bx_log_dir, LogDir),
-	Logs = ct:get_config({log, logs}, []),
+	Logs = ct:get_config({cgf_log, logs}, []),
 	ok = application:set_env(cgf, logs, Logs),
+	ok = cgf_test_lib:unload(ssh),
+	ok = cgf_test_lib:load(ssh),
+	SshSystemDir = filename:join([DataDir, ssh, system]),
+	ok = application:set_env(ssh, system_dir, SshSystemDir),
+	SshServerOptions = ct:get_config({cgf_ssh, server_options}, []),
+	ok = application:set_env(ssh, server_options, SshServerOptions),
+	SftpdRoot = filename:join(PrivDir, sftpd),
+	ok = file:make_dir(SftpdRoot),
+	SshUser = ct:get_config({cgf_sftp, user}, "ct"),
+	SshUserDir = filename:join([DataDir, ssh, user, SshUser]),
+	SftpdUserDir = filename:join(SftpdRoot, SshUser),
+	ok = file:make_dir(SftpdUserDir),
+	SftpdOptions = [{root, SftpdRoot}],
+	SftpdAddress = ct:get_config({cfg_sftp, sftp}, {127,0,0,1}),
+	SftpdPort = ct:get_config({cfg_sftp, port}, rand:uniform(16384) + 49151),
+	ok = application:set_env(cgf, sftpd,
+			[{SftpdAddress, SftpdPort, [], SftpdOptions}]),
 	ok = cgf_test_lib:start(),
-	Config.
+	[{sftpd_port, SftpdPort}, {ssh_user, SshUser},
+			{ssh_user_dir, SshUserDir} | Config].
 
 -spec end_per_suite(Config) -> Result
 	when
@@ -118,6 +148,18 @@ end_per_suite(_Config) ->
 		Reason :: term().
 %% Initialization before each test case.
 %%
+init_per_testcase(sftp_cs = TestCase, Config) ->
+	Port = proplists:get_value(sftpd_port, Config),
+	User = proplists:get_value(ssh_user, Config),
+	UserDir = proplists:get_value(ssh_user_dir, Config),
+	SshOptions = [{port, Port}, {user, User}, {user_dir, UserDir},
+			{silently_accept_hosts, true}, {save_accepted_host, true},
+			{auth_methods, "publickey"}],
+	{ok, Handle} = ct_ssh:connect(cgf_sftp, sftp, SshOptions),
+	LogOptions = [{format, external},
+			{codec, {cgf_log_codec_ecs, bx}}],
+	ok = cgf_log:open(TestCase, LogOptions),
+	[{handle, Handle} | Config];
 init_per_testcase(_TestCase, Config) ->
    Config.
 
@@ -131,6 +173,8 @@ init_per_testcase(_TestCase, Config) ->
 		Reason :: term().
 %% Cleanup after each test case.
 %%
+end_per_testcase(sftp_cs = TestCase, _Config) ->
+	ok = cgf_log:close(TestCase);
 end_per_testcase(_TestCase, _Config) ->
 	ok.
 
@@ -142,7 +186,7 @@ end_per_testcase(_TestCase, _Config) ->
 %% Returns a list of all test cases in this test suite.
 %%
 all() ->
-	[import_cs, import_cs_32297].
+	[import_cs, import_cs_32297, sftp_cs].
 
 %%---------------------------------------------------------------------
 %%  Test cases
@@ -186,6 +230,28 @@ import_cs_32297(Config) ->
 	FilePath = filename:join(PrivDir, cdr_filename(1)),
 	ok = file:write_file(FilePath, FileB),
 	ok = cgf_cs:import(FilePath, Log).
+
+sftp_cs() ->
+	Description = "End-to-end test of SFTP to Bx (CS).",
+	ct:comment(Description),
+	[{userdata, [{doc, Description}]},
+			{require, cgf_ssh},
+			{require, cgf_sftp}].
+
+sftp_cs(Config) ->
+	User = proplists:get_value(ssh_user, Config),
+	Handle = proplists:get_value(handle, Config),
+	{ok, CDR1} = 'CSChargingDataTypes':encode('CSRecord', mo_call_record()),
+	{ok, CDR2} = 'CSChargingDataTypes':encode('CSRecord', mo_call_record()),
+	{ok, CDR3} = 'CSChargingDataTypes':encode('CSRecord', mo_call_record()),
+	Data = <<CDR1/binary, CDR2/binary, CDR3/binary>>,
+	Filename = cdr_filename(1),
+	Match = {User, [], Filename, []},
+	Action = {cgf_cs_fsm, ?FUNCTION_NAME},
+	ok = cgf:add_action(file_close, Match, Action),
+	ok = ct_ssh:write_file(Handle, Filename, Data),
+	ct:sleep(1000),
+	3 = proplists:get_value(no_written_items, disk_log:info(?FUNCTION_NAME)).
 
 %%---------------------------------------------------------------------
 %%  Internal functions

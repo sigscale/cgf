@@ -20,10 +20,35 @@ CT_ARGS = -spec test.spec
 	$(ERLC) $(ERLCFLAGS) -I $(top_srcdir)/include $<
 
 .common_test_ok:	$(addsuffix .beam, $(testmods))
-	@if [ ! -d log ]; then mkdir log; fi
-	@if [ ! -f ct.cfg ]; then cp $(top_srcdir)/test/ct.cfg .; fi
-	@if [ ! -f test.spec ]; then cp $(top_srcdir)/test/test.spec .; fi
-	@if [ ! -d cgf_lib_SUITE_data ]; then mkdir cgf_lib_SUITE_data; fi
+	@if [ ! -d log ]; then \
+		mkdir log; \
+	fi
+	@if [ ! -f ct.cfg ]; then \
+		cp $(top_srcdir)/test/ct.cfg .; \
+	fi
+	@if [ ! -f test.spec ]; then \
+		cp $(top_srcdir)/test/test.spec .; \
+	fi
+	@if [ ! -d cgf_lib_SUITE_data ]; then \
+		mkdir cgf_lib_SUITE_data; \
+	fi
+	@if [ ! -d cgf_cdr_SUITE_data ]; then \
+		mkdir cgf_cdr_SUITE_data; \
+	fi
+	@if [ ! -d cgf_cdr_SUITE_data/ssh ]; then \
+		mkdir cgf_cdr_SUITE_data/ssh; \
+	fi
+	@if [ ! -d cgf_cdr_SUITE_data/ssh/system ]; then \
+		mkdir cgf_cdr_SUITE_data/ssh/system; \
+		$(top_srcdir)/scripts/ssh_keys.sh --system-dir cgf_cdr_SUITE_data/ssh/system; \
+	fi
+	@if [ ! -d cgf_cdr_SUITE_data/ssh/user ]; then \
+		mkdir cgf_cdr_SUITE_data/ssh/user; \
+	fi
+	@if [ ! -d cgf_cdr_SUITE_data/ssh/user/ct ]; then \
+		mkdir cgf_cdr_SUITE_data/ssh/user/ct; \
+		$(top_srcdir)/scripts/ssh_keys.sh --user-dir cgf_cdr_SUITE_data/ssh/user ct; \
+	fi
 	ct_run -no_auto_compile \
 			-pa $(top_builddir)/ebin \
 			$(CT_ARGS) \
