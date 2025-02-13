@@ -100,7 +100,7 @@ start2(TopSup, []) ->
 	PathComponents = filename:split(SystemDir),
 	BaseDir = lists:droplast(PathComponents),
 	undefined = application:get_env(ssh, user_dir),
-	UserDir = filename:join([BaseDir, "user"]),
+	UserDir = filename:join(BaseDir ++ ["user"]),
 	UserDirFun = case application:get_env(ssh, user_dir_fun) of
 		{ok, Fun} ->
 			Fun;
