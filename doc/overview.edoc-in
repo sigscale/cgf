@@ -48,9 +48,9 @@ the public key (i.e. `id_rsa.pub') in which case you should copy it
 to the user's diectory (e.g. `~/ssh/user/alice/id_rsa.pub') and add
 it to the `authorized_keys' file:
 ```
-otp@host:~$ mkdir ssh/users/alice
-otp@host:~$ mv id_rsa.pub ssh/users/alice/
-otp@host:~$ cat ssh/users/alice/id_rsa.pub >> ssh/users/alice/authorized_keys
+otp@host:~$ mkdir ssh/user/alice
+otp@host:~$ mv id_rsa.pub ssh/user/alice/
+otp@host:~$ cat ssh/user/alice/id_rsa.pub >> ssh/user/alice/authorized_keys
 '''
 In either case you will also need to create a subdirectory, of the
 `root' directory defined for `sftpd', with the same name as the
