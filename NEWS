@@ -1,3 +1,8 @@
+February 13, 2025
+-----------------
+	- 3GPP TS 32.297 file format support for CS, PS and IMS
+	- Fixed filename paths in action event server
+
 February 11, 2025
 -----------------
 	- Event action handler table and API

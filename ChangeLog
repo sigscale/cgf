@@ -1,3 +1,12 @@
+2025-02-13   Vance Shipley <vances@sigscale.org>
+
+	* test end-to-end sftp->bx
+	* fix path construction for action handler fsm
+	* test lib: start inets application
+	* fix user_dir path contruction when fully qualified
+	* correct path in ssh_keys.sh examples in user guide
+	* support 3gpp ts 32.297 in cs, gprs and ims modules
+
 2025-02-12   Vance Shipley <vances@sigscale.org>
 
 	* dispatch event to event server; start import fsm
