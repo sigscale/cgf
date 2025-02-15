@@ -1,3 +1,10 @@
+2025-02-15   Vance Shipley <vances@sigscale.org>
+
+	* scripts for cluster operation
+	* document action type specification
+	* correct type specification in read/2 callbacks
+	* user guide: install tables, provision event actions
+
 2025-02-13   Vance Shipley <vances@sigscale.org>
 
 	* test end-to-end sftp->bx
