@@ -29,6 +29,14 @@ the functions:
 		src="3gpp-architecture.svg" />
 
 ==Installation==
+It is necessary to initialize {@link //mnesia. mnesia} tables prior
+to starting the application:
+```
+user@host:~$ sudo -iu otp
+otp@host:~$ ERL_LIBS=lib erl -sname cgf -config releases/cgf-%VERSION%/sys
+(cgf@host)1> cgf_app:install().
+(cgf@host)2> q().
+'''
 
 ==Operation==
 
@@ -48,6 +56,7 @@ the public key (i.e. `id_rsa.pub') in which case you should copy it
 to the user's diectory (e.g. `~/ssh/user/alice/id_rsa.pub') and add
 it to the `authorized_keys' file:
 ```
+user@host:~$ sudo -iu otp
 otp@host:~$ mkdir ssh/user/alice
 otp@host:~$ mv id_rsa.pub ssh/user/alice/
 otp@host:~$ cat ssh/user/alice/id_rsa.pub >> ssh/user/alice/authorized_keys
@@ -55,6 +64,21 @@ otp@host:~$ cat ssh/user/alice/id_rsa.pub >> ssh/user/alice/authorized_keys
 In either case you will also need to create a subdirectory, of the
 `root' directory defined for `sftpd', with the same name as the
 username.
+
+===Automation===
+Automated pipeline processing of CDR files received through SFTP
+is enabled through event notifications with a managed table of event
+matching patterns and associated actions. The following example will
+provision event handlers for received ASN.1 format CDR files where
+the directory name (i.e. "TAP") is matched for selecting the import
+module (i.e. `cgf_tap_fsm') which will parse and log the CDRs.
+```
+(cgf@host)1> cgf:add_action(file_close, {"", "/TAP", "", ""}, {cgf_tap_fsm, bx_tap}).
+(cgf@host)2> cgf:add_action(file_close, {"", "/SGSN", "", ""}, {cgf_gprs_fsm, bx_ps}).
+(cgf@host)3> cgf:add_action(file_close, {"", "/MSC", "", ""}, {cgf_cs_fsm, bx_cs}).
+(cgf@host)4> cgf:add_action(file_close, {"", "/IMS", "", ""}, {cgf_ims_fsm, bx_ims}).
+(cgf@host)5> q().
+'''
 
 ==Configuration==
 System wide settings in the {@link //cgf. cgf} application may be
