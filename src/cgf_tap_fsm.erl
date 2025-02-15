@@ -109,7 +109,7 @@ open(Filename, StateData) ->
 		Result :: {continue, CDR, Cont, StateData}
 				| {error, Reason, Cont, StateData}
 				| {close, Reason, Cont, StateData}
-				| {stop, Reason, Cont, StateData},
+				| {stop, Reason, StateData},
 		CDR :: tuple(),
 		Reason :: asn1_decode | normal | shutdown | term().
 %% @doc Handles events received in the <em>read</em> state.
