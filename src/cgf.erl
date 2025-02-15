@@ -35,6 +35,18 @@
 		| {Module :: erlang:module(), Log :: disk_log:log(),
 				Metadata :: map(), ExtraArgs :: [term()],
 				Opts :: [gen_statem:start_opt()]}.
+%% An `Action' performed to handle a matched event.
+%%	<ul class="definitions">
+%% 	<li><tt>Action = {Module, Log}
+%% 			| {Module, Log, Metadata}
+%% 			| {Module, Log, Metadata, ExtraArgs}
+%% 			| {Module, Log, Metadata, ExtraArgs, Opts}</tt></li>
+%% 	<li><tt>Module = erlang:module()</tt></li>
+%% 	<li><tt>Log = disk_log:log()</tt></li>
+%% 	<li><tt>Metadata = map()</tt></li>
+%% 	<li><tt>ExtraArgs = [term()]</tt></li>
+%% 	<li><tt>Opts = [gen_statem:start_opt()]</tt></li>
+%% </ul>
 
 -define(CHUNKSIZE, 100).
 
