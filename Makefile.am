@@ -12,7 +12,10 @@ env_DATA = scripts/cgf
 endif
 
 script_SCRIPTS = scripts/ssh_keys.sh \
-		scripts/install_release.sh
+		scripts/install_release.sh \
+		scripts/install_tables.escript \
+		scripts/join_cluster.escript \
+		scripts/snapshot.escript
 
 RELEASE_NAME = $(PACKAGE_NAME)-$(PACKAGE_VERSION)
 

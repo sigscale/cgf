@@ -29,7 +29,7 @@
 %% optional callbacks for application behaviour
 -export([prep_stop/1, start_phase/3]).
 %% export the cgf private API for installation
--export([install/0, install/1]).
+-export([install/0, install/1, join/1]).
 
 -include_lib("kernel/include/logger.hrl").
 
@@ -317,6 +317,116 @@ install4(Nodes, Tables) ->
 install5(_Nodes, Tables) ->
 	{ok, Tables}.
 
+-spec join(Node) -> Result
+	when
+		Node :: atom(),
+		Result :: {ok, Tables} | {error, Reason},
+		Tables :: [atom()],
+		Reason :: term().
+%% @doc Join an existing cluster.
+%%
+%% 	Tables will be copied from the given `Node'.
+%%
+join(Node) when is_atom(Node)  ->
+	case mnesia:system_info(is_running) of
+		no ->
+			join1(Node);
+		Running ->
+			error_logger:error_report(["mnesia running", {is_running, Running}]),
+			{error, mnesia_running}
+	end.
+%% @hidden
+join1(Node) ->
+	case net_kernel:connect_node(Node) of
+		true ->
+			join2(Node);
+		Connect ->
+			error_logger:error_report(["Failed to connect node",
+					{result, Connect}]),
+			{error, Connect}
+	end.
+%% @hidden
+join2(Node) ->
+	case rpc:call(Node, mnesia, add_table_copy, [schema, node(), ram_copies]) of
+		{atomic, ok} ->
+			join3(Node);
+		{aborted, {already_exists, schema, _}} ->
+			error_logger:info_msg("Found existing schema table on ~s.~n", [Node]),
+			join3(Node);
+		{aborted, Reason} ->
+			error_logger:error_report([mnesia:error_description(Reason),
+				{error, Reason}]),
+			{error, Reason}
+	end.
+%% @hidden
+join3(Node) ->
+	case application:start(mnesia) of
+		ok ->
+			join4(Node);
+		{error, Reason} ->
+			error_logger:error_report([mnesia:error_description(Reason),
+					{error, Reason}]),
+			{error, Reason}
+	end.
+%% @hidden
+join4(Node) ->
+	case mnesia:change_config(extra_db_nodes, [Node]) of
+		{ok, _Nodes} ->
+			join5(Node);
+		{error, Reason} ->
+			error_logger:error_report([mnesia:error_description(Reason),
+					{error, Reason}]),
+			{error, Reason}
+	end.
+%% @hidden
+join5(Node) ->
+	case mnesia:change_table_copy_type(schema, node(), disc_copies) of
+		{atomic, ok} ->
+			error_logger:info_msg("Copied schema table from ~s.~n", [Node]),
+			join6(Node, mnesia:system_info(db_nodes), [schema]);
+		{aborted, {already_exists, schema, _, disc_copies}} ->
+			error_logger:info_msg("Found existing schema table on ~s.~n", [Node]),
+			join6(Node, mnesia:system_info(db_nodes), [schema]);
+		{aborted, Reason} ->
+			error_logger:error_report([mnesia:error_description(Reason),
+				{error, Reason}]),
+			{error, Reason}
+	end.
+%% @hidden
+join6(Node, Nodes, Acc) ->
+	case rpc:call(Node, mnesia, add_table_copy, [cgf_action, node(), disc_copies]) of
+		{atomic, ok} ->
+			error_logger:info_msg("Copied cgf_action table from ~s.~n", [Node]),
+			join7(Node, Nodes, [cgf_action | Acc]);
+		{aborted, {already_exists, cgf_action, _}} ->
+			error_logger:info_msg("Found existing cgf_action table on ~s.~n", [Node]),
+			join7(Node, Nodes, [cgf_action | Acc]);
+		{aborted, {no_exists, {cgf_action, _}}} ->
+			case create_table(cgf_action, Nodes) of
+				ok ->
+					join7(Node, Nodes, [cgf_action | Acc]);
+				{error, Reason} ->
+					{error, Reason}
+			end;
+		{aborted, Reason} ->
+			error_logger:error_report([mnesia:error_description(Reason),
+				{error, Reason}]),
+			{error, Reason}
+	end.
+%% @hidden
+join7(_Node, _Nodes, Tables) ->
+	case mnesia:wait_for_tables(Tables, ?WAITFORTABLES) of
+		ok ->
+			{ok, Tables};
+		{timeout, BadTables} ->
+			error_logger:error_report(["Timeout waiting for tables",
+					{tables, BadTables}]),
+			{error, timeout};
+		{error, Reason} ->
+			error_logger:error_report([mnesia:error_description(Reason),
+					{error, Reason}]),
+			{error, Reason}
+	end.
 
 %%----------------------------------------------------------------------
 %%  Internal functions
