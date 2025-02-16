@@ -61,9 +61,9 @@ suite() ->
 %% @doc Initialization before the whole suite.
 %%
 init_per_suite(Config) ->
-	catch application:unload(mnesia),
 	PrivDir = proplists:get_value(priv_dir, Config),
-	application:load(mnesia),
+	ok = cgf_test_lib:unload(mnesia),
+	ok = cgf_test_lib:load(mnesia),
 	ok = application:set_env(mnesia, dir, PrivDir),
 	ok = cgf_test_lib:init_tables(),
 	ok = cgf_test_lib:start(),

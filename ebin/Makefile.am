@@ -12,6 +12,8 @@ beam_DATA = cgf.beam \
 		cgf_app.beam \
 		cgf_sup.beam \
 		cgf_server.beam \
+		cgf_statistics_sup.beam \
+		cgf_statistics_server.beam \
 		cgf_sftpd.beam \
 		cgf_event_sup.beam \
 		cgf_event.beam \
@@ -26,6 +28,11 @@ beam_DATA = cgf.beam \
 		cgf_log_codec_ecs.beam \
 		cgf_lib.beam \
 		cgf_tools.beam \
+		cgf_rest.beam \
+		cgf_rest_res_health.beam \
+		mod_cgf_rest_accepted_content.beam \
+		mod_cgf_rest_get.beam \
+		mod_cgf_rest_head.beam \
 		GenericChargingDataTypes.beam \
 		IMSChargingDataTypes.beam \
 		CSChargingDataTypes.beam \

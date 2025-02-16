@@ -7,6 +7,8 @@ modhtml = cgf.html \
 		cgf_app.html \
 		cgf_sup.html \
 		cgf_server.html \
+		cgf_statistics_sup.html \
+		cgf_statistics_server.html \
 		cgf_sftpd.html
 		cgf_event_sup.html\
 		cgf_event.html \
@@ -21,6 +23,11 @@ modhtml = cgf.html \
 		cgf_log_codec_ecs.html \
 		cgf_lib.html \
 		cgf_tools.html \
+		cgf_rest.html \
+		cgf_rest_res_health.html \
+		mod_cgf_rest_accepted_content.beam \
+		mod_cgf_rest_get.beam \
+		mod_cgf_rest_head.html \
 		cgf_tap.html \
 		cgf_tap_fsm.html \
 		cgf_3gpp_file.html \

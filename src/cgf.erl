@@ -24,6 +24,7 @@
 
 -export([add_action/3, find_action/2, get_action/2,
 		get_actions/1, delete_action/2, match_event/2]).
+-export([statistics/1]).
 -export([plmn/1]).
 
 -export_type([action/0]).
@@ -369,6 +370,40 @@ match_event(file_close = _Event,
 		{ok, Acc} when is_list(Acc) ->
 			{ok, lists:flatten(lists:reverse(Acc))}
 	end.
+
+-spec statistics(Item) -> Result
+   when
+      Item :: scheduler_utilization,
+      Result :: {ok, {Etag, Interval, Report}} | {error, Reason},
+      Etag :: string(),
+      Interval :: pos_integer(),
+      Report :: [ItemResult],
+      ItemResult :: {SchedulerId, Utilization},
+      SchedulerId :: pos_integer(),
+      Utilization :: non_neg_integer(),
+      Reason :: term().
+%% @doc Get system statistics.
+statistics(Item) ->
+   case catch gen_server:call(cgf_statistics, Item) of
+      {Etag, Interval, Report} ->
+         {ok, {Etag, Interval, Report}};
+      {error, Reason} ->
+         {error, Reason};
+      {'EXIT', {noproc,_}} ->
+         case catch supervisor:start_child(cgf_statistics_sup, []) of
+            {ok, Child} ->
+               case catch gen_server:call(Child, Item) of
+                  {Etag, Interval, Report} ->
+                     {ok, {Etag, Interval, Report}};
+                  {error, Reason} ->
+                     {error, Reason}
+               end;
+            {error, Reason} ->
+               {error, Reason};
+            {'EXIT', {noproc,_}} ->
+               {error, cgf_down}
+         end
+   end.
 
 -spec plmn(String) -> Result
 	when
