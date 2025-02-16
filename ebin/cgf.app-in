@@ -27,6 +27,7 @@
 				mod_cgf_rest_accepted_content,
 				mod_cgf_rest_get,
 				mod_cgf_rest_head,
+				user_default,
 				'GenericChargingDataTypes',
 				'IMSChargingDataTypes',
 				'CSChargingDataTypes',

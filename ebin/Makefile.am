@@ -33,6 +33,7 @@ beam_DATA = cgf.beam \
 		mod_cgf_rest_accepted_content.beam \
 		mod_cgf_rest_get.beam \
 		mod_cgf_rest_head.beam \
+		user_default.beam \
 		GenericChargingDataTypes.beam \
 		IMSChargingDataTypes.beam \
 		CSChargingDataTypes.beam \

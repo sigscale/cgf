@@ -28,6 +28,7 @@ modhtml = cgf.html \
 		mod_cgf_rest_accepted_content.beam \
 		mod_cgf_rest_get.beam \
 		mod_cgf_rest_head.html \
+		user_default.html \
 		cgf_tap.html \
 		cgf_tap_fsm.html \
 		cgf_3gpp_file.html \
