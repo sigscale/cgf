@@ -12,6 +12,7 @@ env_DATA = scripts/cgf
 endif
 
 script_SCRIPTS = scripts/ssh_keys.sh \
+		scripts/install_certs.sh \
 		scripts/install_release.sh \
 		scripts/install_tables.escript \
 		scripts/join_cluster.escript \
