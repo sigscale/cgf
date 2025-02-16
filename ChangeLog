@@ -1,5 +1,8 @@
 2025-02-16   Vance Shipley <vances@sigscale.org>
 
+	* install tls certificates script
+	* white background on line labels
+	* update project page
 	* devops shell commands
 	* statistics api; health rest api
 
