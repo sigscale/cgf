@@ -49,7 +49,7 @@
         <line x1="1369.75" y1="438.38477" x2="1491.1496" y2="438.38477" stroke="#0048aa" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
       </g>
       <g id="Graphic_50">
-        <rect x="1413.7862" y="422.38477" width="33.184" height="32" fill="#d6d6d6"/>
+        <rect x="1413.7862" y="422.38477" width="33.184" height="32" fill="white"/>
         <text transform="translate(1418.7862 427.38477)" fill="black">
           <tspan font-family="Montserrat" font-size="18" fill="black" x="55422333e-20" y="17" xml:space="preserve">Bx</tspan>
         </text>
@@ -58,7 +58,7 @@
         <line x1="1162.2266" y1="438.38477" x2="1269.75" y2="438.38477" stroke="#0048aa" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
       </g>
       <g id="Graphic_52">
-        <rect x="1188.0199" y="422.38477" width="55.81" height="32" fill="#d6d6d6"/>
+        <rect x="1188.0199" y="422.38477" width="55.81" height="32" fill="white"/>
         <text transform="translate(1193.0199 427.38477)" fill="black">
           <tspan font-family="Montserrat" font-size="18" fill="black" x="6536993e-19" y="17" xml:space="preserve">SFTP</tspan>
         </text>
