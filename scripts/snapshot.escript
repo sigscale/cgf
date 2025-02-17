@@ -9,7 +9,7 @@ main(Args) ->
 		#{node := Node} = Options ->
 			connect(list_to_atom(Node), Options);
 		#{hostname := Hostname} = Options ->
-			connect(list_to_atom("cse@" ++ Hostname), Options)
+			connect(list_to_atom("cgf@" ++ Hostname), Options)
 	end.
 
 connect(Node, Options) when is_atom(Node) ->

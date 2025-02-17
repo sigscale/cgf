@@ -16,7 +16,7 @@ main([]) ->
 		0 ->
 			ok
 	end,
-	CseTables = case cse_app:install() of
+	CgfTables = case cgf_app:install() of
 		{ok, Tables1} ->
 			Tables1;
 		{error, Reason2} ->
@@ -26,7 +26,7 @@ main([]) ->
 	end,
 	case mnesia:stop() of
 		stopped ->
-			io:fwrite("{ok, ~p}~n", [CseTables]);
+			io:fwrite("{ok, ~p}~n", [CgfTables]);
 		{error, Reason3} ->
 			io:fwrite("error: ~w~n", [Reason3]),
 			erlang:halt(1)
