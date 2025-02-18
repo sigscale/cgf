@@ -29,7 +29,8 @@
 %% export test cases
 -export([import_cs/0, import_cs/1,
 		import_cs_32297/0, import_cs_32297/1,
-		sftp_cs/0, sftp_cs/1]).
+		sftp_cs/0, sftp_cs/1,
+		import_mt_call/0, import_mt_call/1]).
 
 -include_lib("common_test/include/ct.hrl").
 -include("cgf_3gpp_file.hrl").
@@ -186,7 +187,7 @@ end_per_testcase(_TestCase, _Config) ->
 %% Returns a list of all test cases in this test suite.
 %%
 all() ->
-	[import_cs, import_cs_32297, sftp_cs].
+	[import_cs, import_cs_32297, sftp_cs, import_mt_call].
 
 %%---------------------------------------------------------------------
 %%  Test cases
@@ -252,6 +253,30 @@ sftp_cs(Config) ->
 	ok = ct_ssh:write_file(Handle, Filename, Data),
 	ct:sleep(1000),
 	3 = proplists:get_value(no_written_items, disk_log:info(?FUNCTION_NAME)).
+
+import_mt_call() ->
+	Description = "Import a mobile terminated (MT) CDR file.",
+	ct:comment(Description),
+	[{userdata, [{doc, Description}]}].
+
+import_mt_call(Config) ->
+	PrivDir = proplists:get_value(priv_dir, Config),
+	Log = bx_cs,
+	FileHeader = file_header(),
+	FileHeader1 = FileHeader#cdr_file_header{count = 1},
+	FileHeaderB = cgf_3gpp_file:file_header(FileHeader1),
+	FileHeaderL = byte_size(FileHeaderB) +8,
+	CdrHeader = cdr_header(32250),
+	CdrHeaderB = cgf_3gpp_file:cdr_header(CdrHeader),
+	CdrHeaderL = byte_size(CdrHeaderB) + 2,
+	{ok, CDR} = 'CSChargingDataTypes':encode('CSRecord', mt_call_record()),
+	CdrLength = byte_size(CDR),
+	FileLength = FileHeaderL + CdrHeaderL + CdrLength,
+	FileB = <<FileLength:32, FileHeaderL:32, FileHeaderB/binary,
+			CdrLength:16, CdrHeaderB/binary, CDR/binary>>,
+	FilePath = filename:join(PrivDir, cdr_filename(1)),
+	ok = file:write_file(FilePath, FileB),
+	ok = cgf_cs:import(FilePath, Log).
 
 %%---------------------------------------------------------------------
 %%  Internal functions
@@ -373,4 +398,43 @@ cdr_filename(RC) ->
 	Time = io_lib:fwrite("~2.10.0b~2.10.0b~c~2.10.0b~2.10.0b",
 			[Hour, Minute, Sign, Tz div 60, Tz rem 60]),
 	lists:concat([NodeID, "_-_", RC, ".", Date, "_-_", Time]).
+
+mt_call_record() ->
+	MSISDN = cgf_test_lib:rand_dn(),
+	IMSI = cgf_test_lib:rand_imsi(),
+	IMEI = cgf_test_lib:rand_imei(),
+	TON = 1,
+	NPI = 1,
+	CalledPartyBCD = cgf_lib:tbcd(MSISDN),
+	CalledPartyAddress = <<1:1, TON:3, NPI:4, CalledPartyBCD/binary>>,
+	CallingPartyDN = cgf_test_lib:rand_dn(),
+	CallingPartyBCD = cgf_lib:tbcd(CallingPartyDN),
+	CallingPartyAddress = <<1:1, TON:3, NPI:4, CallingPartyBCD/binary>>,
+	MscAddressDN = cgf_test_lib:rand_dn(),
+	MscAddressBCD = cgf_lib:tbcd(MscAddressDN),
+	MscAddress = <<1:1, TON:3, NPI:4, MscAddressBCD/binary>>,
+	LocalTime = calendar:local_time(),
+	LocalSeconds = calendar:datetime_to_gregorian_seconds(LocalTime),
+	Duration = cgf_test_lib:rand_duration(),
+	StartSeconds = LocalSeconds - Duration,
+	StartTime = calendar:gregorian_seconds_to_datetime(StartSeconds),
+	CallReference = binary:encode_unsigned(rand:uniform(4294967295)),
+	BasicService = {teleservice, <<11>>},
+	MTCallRecord = #{recordType => mtCallRecord,
+		servedIMSI => cgf_lib:tbcd(IMSI),
+		servedIMEI => cgf_lib:tbcd(IMEI),
+		servedMSISDN => cgf_lib:tbcd(MSISDN),
+		callingNumber => CallingPartyAddress,
+		calledNumber => CalledPartyAddress,
+		recordingEntity => MscAddress,
+		mscIncomingTKGP => {tkgpNumber, rand:uniform(99)},
+		basicService => BasicService,
+		seizureTime => bcd_date_time(StartTime),
+		releaseTime => bcd_date_time(LocalTime),
+		callDuration => Duration,
+		causeForTerm => normalRelease,
+		callReference => CallReference,
+		roaming => false,
+		chargingID => binary:encode_unsigned(rand:uniform(4294967295))},
+	{mtCallRecord, MTCallRecord}.
 
