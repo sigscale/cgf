@@ -146,6 +146,10 @@ code_change(_OldVersion, State, _Extra) ->
 %%----------------------------------------------------------------------
 
 %% @hidden
+start_action(Event, #{root := Root,
+		path := <<$/, Path/binary>>} = Content, Actions)
+		when byte_size(Root) > 0 ->
+	start_action(Event, Content#{path := Path}, Actions);
 start_action(Event, #{root := Root, path := Path} = Content,
 		[{Match, {Module, Log} = Action} | T]) ->
 	Filename = filename:join(Root, Path),
