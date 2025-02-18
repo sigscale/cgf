@@ -30,7 +30,8 @@
 -export([import_cs/0, import_cs/1,
 		import_cs_32297/0, import_cs_32297/1,
 		sftp_cs/0, sftp_cs/1,
-		import_mt_call/0, import_mt_call/1]).
+		import_mt_call/0, import_mt_call/1,
+		import_mo_sms/0, import_mo_sms/1]).
 
 -include_lib("common_test/include/ct.hrl").
 -include("cgf_3gpp_file.hrl").
@@ -187,7 +188,8 @@ end_per_testcase(_TestCase, _Config) ->
 %% Returns a list of all test cases in this test suite.
 %%
 all() ->
-	[import_cs, import_cs_32297, sftp_cs, import_mt_call].
+	[import_cs, import_cs_32297, sftp_cs, import_mt_call,
+		import_mo_sms].
 
 %%---------------------------------------------------------------------
 %%  Test cases
@@ -265,11 +267,35 @@ import_mt_call(Config) ->
 	FileHeader = file_header(),
 	FileHeader1 = FileHeader#cdr_file_header{count = 1},
 	FileHeaderB = cgf_3gpp_file:file_header(FileHeader1),
-	FileHeaderL = byte_size(FileHeaderB) +8,
+	FileHeaderL = byte_size(FileHeaderB) + 8,
 	CdrHeader = cdr_header(32250),
 	CdrHeaderB = cgf_3gpp_file:cdr_header(CdrHeader),
 	CdrHeaderL = byte_size(CdrHeaderB) + 2,
 	{ok, CDR} = 'CSChargingDataTypes':encode('CSRecord', mt_call_record()),
+	CdrLength = byte_size(CDR),
+	FileLength = FileHeaderL + CdrHeaderL + CdrLength,
+	FileB = <<FileLength:32, FileHeaderL:32, FileHeaderB/binary,
+			CdrLength:16, CdrHeaderB/binary, CDR/binary>>,
+	FilePath = filename:join(PrivDir, cdr_filename(1)),
+	ok = file:write_file(FilePath, FileB),
+	ok = cgf_cs:import(FilePath, Log).
+
+import_mo_sms() ->
+	Description = "Import a circuit switched (CS) MO SMS record CDR file.",
+	ct:comment(Description),
+	[{userdata, [{doc, Description}]}].
+
+import_mo_sms(Config) ->
+	PrivDir = proplists:get_value(priv_dir, Config),
+	Log = bx_cs,
+	FileHeader = file_header(),
+	FileHeader1 = FileHeader#cdr_file_header{count = 1},
+	FileHeaderB = cgf_3gpp_file:file_header(FileHeader1),
+	FileHeaderL = byte_size(FileHeaderB) + 8,
+	CdrHeader = cdr_header(32250),
+	CdrHeaderB = cgf_3gpp_file:cdr_header(CdrHeader),
+	CdrHeaderL = byte_size(CdrHeaderB) + 2,
+	{ok, CDR} = 'CSChargingDataTypes':encode('CSRecord', mo_sms_record()),
 	CdrLength = byte_size(CDR),
 	FileLength = FileHeaderL + CdrHeaderL + CdrLength,
 	FileB = <<FileLength:32, FileHeaderL:32, FileHeaderB/binary,
@@ -437,4 +463,33 @@ mt_call_record() ->
 		roaming => false,
 		chargingID => binary:encode_unsigned(rand:uniform(4294967295))},
 	{mtCallRecord, MTCallRecord}.
+
+mo_sms_record() ->
+	MSISDN = cgf_test_lib:rand_dn(),
+	IMSI = cgf_test_lib:rand_imsi(),
+	IMEI = cgf_test_lib:rand_imei(),
+	TON = 2,
+	NPI = 1,
+	MSISDNBCD = cgf_lib:tbcd(MSISDN),
+	MSISDNAddress = <<1:1, TON:3, NPI:4, MSISDNBCD/binary>>,
+	CalledPartyDN = cgf_test_lib:rand_dn(),
+	CalledPartyBCD = cgf_lib:tbcd(CalledPartyDN),
+	CalledPartyAddress = <<1:1, TON:3, NPI:4, CalledPartyBCD/binary>>,
+	ServiceCentreDN = cgf_test_lib:rand_dn(),
+	ServiceCentreBCD = cgf_lib:tbcd(ServiceCentreDN),
+	ServiceCentreAddress = <<1:1, TON:3, NPI:4, ServiceCentreBCD/binary>>,
+	OriginationTime = calendar:local_time(),
+	MessageReference = binary:encode_unsigned(rand:uniform(255)),
+	SmsResult = {gsm0408Cause, rand:uniform(256)},
+	MOSMSRecord = #{recordType => moSMSRecord,
+		servedIMSI => cgf_lib:tbcd(IMSI),
+		servedIMEI => cgf_lib:tbcd(IMEI),
+		servedMSISDN => MSISDNAddress,
+		serviceCentre => ServiceCentreAddress,
+		destinationNumber => CalledPartyAddress,
+		recordingEntity => ServiceCentreAddress,
+		originationTime => bcd_date_time(OriginationTime),
+		messageReference => MessageReference,
+		smsResult => SmsResult},
+	{moSMSRecord, MOSMSRecord}.
 
