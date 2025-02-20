@@ -31,7 +31,10 @@
 		import_cs_32297/0, import_cs_32297/1,
 		sftp_cs/0, sftp_cs/1,
 		import_mt_call/0, import_mt_call/1,
-		import_mo_sms/0, import_mo_sms/1]).
+		import_mo_sms/0, import_mo_sms/1,
+		file_close_copy/0, file_close_copy/1,
+		file_close_move/0, file_close_move/1,
+		file_close_delete/0, file_close_delete/1]).
 
 -include_lib("common_test/include/ct.hrl").
 -include("cgf_3gpp_file.hrl").
@@ -128,8 +131,8 @@ init_per_suite(Config) ->
 	ok = application:set_env(cgf, sftpd,
 			[{SftpdAddress, SftpdPort, [], SftpdOptions}]),
 	ok = cgf_test_lib:start(),
-	[{sftpd_port, SftpdPort}, {ssh_user, SshUser},
-			{ssh_user_dir, SshUserDir} | Config].
+	[{sftpd_port, SftpdPort}, {sftpd_user_dir, SftpdUserDir},
+			{ssh_user, SshUser}, {ssh_user_dir, SshUserDir} | Config].
 
 -spec end_per_suite(Config) -> Result
 	when
@@ -150,7 +153,8 @@ end_per_suite(_Config) ->
 		Reason :: term().
 %% Initialization before each test case.
 %%
-init_per_testcase(sftp_cs = TestCase, Config) ->
+init_per_testcase(TestCase, Config)
+		when TestCase == sftp_cs ->
 	Port = proplists:get_value(sftpd_port, Config),
 	User = proplists:get_value(ssh_user, Config),
 	UserDir = proplists:get_value(ssh_user_dir, Config),
@@ -161,6 +165,18 @@ init_per_testcase(sftp_cs = TestCase, Config) ->
 	LogOptions = [{format, external},
 			{codec, {cgf_log_codec_ecs, bx}}],
 	ok = cgf_log:open(TestCase, LogOptions),
+	[{handle, Handle} | Config];
+init_per_testcase(TestCase, Config)
+		when TestCase == file_close_copy;
+		TestCase == file_close_move;
+		TestCase == file_close_delete ->
+	Port = proplists:get_value(sftpd_port, Config),
+	User = proplists:get_value(ssh_user, Config),
+	UserDir = proplists:get_value(ssh_user_dir, Config),
+	SshOptions = [{port, Port}, {user, User}, {user_dir, UserDir},
+			{silently_accept_hosts, true}, {save_accepted_host, true},
+			{auth_methods, "publickey"}],
+	{ok, Handle} = ct_ssh:connect(cgf_sftp, sftp, SshOptions),
 	[{handle, Handle} | Config];
 init_per_testcase(_TestCase, Config) ->
    Config.
@@ -189,7 +205,8 @@ end_per_testcase(_TestCase, _Config) ->
 %%
 all() ->
 	[import_cs, import_cs_32297, sftp_cs, import_mt_call,
-		import_mo_sms].
+		import_mo_sms,
+		file_close_copy, file_close_move, file_close_delete].
 
 %%---------------------------------------------------------------------
 %%  Test cases
@@ -303,6 +320,79 @@ import_mo_sms(Config) ->
 	FilePath = filename:join(PrivDir, cdr_filename(1)),
 	ok = file:write_file(FilePath, FileB),
 	ok = cgf_cs:import(FilePath, Log).
+
+file_close_copy() ->
+	Description = "SFTP put a file with a copy action.",
+	ct:comment(Description),
+	[{userdata, [{doc, Description}]},
+			{require, cgf_ssh},
+			{require, cgf_sftp}].
+
+file_close_copy(Config) ->
+	User = proplists:get_value(ssh_user, Config),
+	SftpdUserDir = proplists:get_value(sftpd_user_dir, Config),
+	Handle = proplists:get_value(handle, Config),
+	Data = rand:bytes(rand:uniform(1048576)),
+	Filename = cdr_filename(1),
+	Match = {User, [], Filename, []},
+	RE = <<"^CGF">>,
+	Replacement = <<"copy/&">>,
+	Action = {copy, {RE, Replacement}},
+	ok = cgf:add_action(file_close, Match, Action),
+	CopyDir = filename:join(SftpdUserDir, copy),
+erlang:display({?MODULE, ?FUNCTION_NAME, ?LINE, CopyDir}),
+	ok = file:make_dir(CopyDir),
+	ok = ct_ssh:write_file(Handle, Filename, Data),
+	ct:sleep(1000),
+	CopyPath = filename:join(CopyDir, Filename),
+	{ok, _} = file:read_file_info(CopyPath).
+
+file_close_move() ->
+	Description = "SFTP put a file with a move action.",
+	ct:comment(Description),
+	[{userdata, [{doc, Description}]},
+			{require, cgf_ssh},
+			{require, cgf_sftp}].
+
+file_close_move(Config) ->
+	User = proplists:get_value(ssh_user, Config),
+	SftpdUserDir = proplists:get_value(sftpd_user_dir, Config),
+	Handle = proplists:get_value(handle, Config),
+	Data = rand:bytes(rand:uniform(1048576)),
+	Filename = cdr_filename(1),
+	Match = {User, [], Filename, []},
+	RE = <<"^CGF">>,
+	Replacement = <<"move/&">>,
+	Action = {copy, {RE, Replacement}},
+	ok = cgf:add_action(file_close, Match, Action),
+	MoveDir = filename:join(SftpdUserDir, "move"),
+	ok = file:make_dir(MoveDir),
+	ok = ct_ssh:write_file(Handle, Filename, Data),
+	ct:sleep(1000),
+	MovePath = filename:join(MoveDir, Filename),
+	{ok, _} = file:read_file_info(MovePath).
+
+file_close_delete() ->
+	Description = "SFTP put a file with a delete action.",
+	ct:comment(Description),
+	[{userdata, [{doc, Description}]},
+			{require, cgf_ssh},
+			{require, cgf_sftp}].
+
+file_close_delete(Config) ->
+	User = proplists:get_value(ssh_user, Config),
+	SftpdUserDir = proplists:get_value(sftpd_user_dir, Config),
+	Handle = proplists:get_value(handle, Config),
+	Data = rand:bytes(rand:uniform(1048576)),
+	Filename = cdr_filename(1),
+	Match = {User, [], Filename, []},
+	RE = <<"^CGF">>,
+	Action = {delete, RE},
+	ok = cgf:add_action(file_close, Match, Action),
+	ok = ct_ssh:write_file(Handle, Filename, Data),
+	ct:sleep(1000),
+	FilePath = filename:join(SftpdUserDir, Filename),
+	{error, enoent} = file:read_file_info(FilePath).
 
 %%---------------------------------------------------------------------
 %%  Internal functions

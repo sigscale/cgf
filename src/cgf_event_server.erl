@@ -154,26 +154,100 @@ start_action(Event, #{root := Root, path := Path} = Content,
 		[{Match, {import, {Module, Log}} = Action} | T]) ->
 	Filename = filename:join(Root, Path),
 	StartArgs = [Module, [Filename, Log], []],
-	start_action1(Event, Content, Match, Action, T, StartArgs);
+	start_import(Event, Content, Match, Action, StartArgs),
+	start_action(Event, Content, T);
 start_action(Event, #{root := Root, path := Path} = Content,
 		[{Match, {import, {Module, Log, Metadata}} = Action} | T]) ->
 	Filename = filename:join(Root, Path),
 	StartArgs = [Module, [Filename, Log, Metadata], []],
-	start_action1(Event, Content, Match, Action, T, StartArgs);
+	start_import(Event, Content, Match, Action, StartArgs),
+	start_action(Event, Content, T);
 start_action(Event, #{root := Root, path := Path} = Content,
 		[{Match, {import, {Module, Log, Metadata, ExtraArgs}} = Action} | T]) ->
 	Filename = filename:join(Root, Path),
 	StartArgs = [Module, [Filename, Log, Metadata] ++ ExtraArgs, []],
-	start_action1(Event, Content, Match, Action, T, StartArgs);
+	start_import(Event, Content, Match, Action, StartArgs),
+	start_action(Event, Content, T);
 start_action(Event, #{root := Root, path := Path} = Content,
 		[{Match, {import, {Module, Log, Metadata, ExtraArgs, Opts}} = Action} | T]) ->
 	Filename = filename:join(Root, Path),
 	StartArgs = [Module, [Filename, Log, Metadata] ++ ExtraArgs, Opts],
-	start_action1(Event, Content, Match, Action, T, StartArgs);
+	start_import(Event, Content, Match, Action, StartArgs),
+	start_action(Event, Content, T);
+start_action(Event, #{root := Root, path := Path} = Content,
+		[{Match, {Op, {RE, Replacement}} = Action} | T])
+		when is_binary(RE), is_binary(Replacement),
+		((Op == copy) orelse (Op == move)) ->
+	Filename = filename:join(Root, Path),
+	Subject = filename:basename(Path),
+	try re:replace(Subject, RE, Replacement, [{return, binary}]) of
+		Subject ->
+			ok;
+		NewPath when Op == copy ->
+			FilePath = filename:join(Root, NewPath),
+			case file:copy(Filename, FilePath) of
+				{ok, _} ->
+					ok;
+				{error, Reason1} ->
+					?LOG_ERROR([{?MODULE, Reason1},
+							{event, Event},
+							{content, Content},
+							{match, Match},
+							{action, Action}])
+			end;
+		NewPath when Op == move ->
+			FilePath = filename:join(Root, NewPath),
+			case file:rename(Filename, FilePath) of
+				ok ->
+					ok;
+				{error, Reason1} ->
+					?LOG_ERROR([{?MODULE, Reason1},
+							{event, Event},
+							{content, Content},
+							{match, Match},
+							{action, Action}])
+			end
+	catch
+		_:Reason2 ->
+			?LOG_ERROR([{?MODULE, Reason2},
+					{event, Event},
+					{content, Content},
+					{match, Match},
+					{action, Action}])
+	end,
+	start_action(Event, Content, T);
+start_action(Event, #{root := Root, path := Path} = Content,
+		[{Match, {delete, RE} = Action} | T]) ->
+	Filename = filename:join(Root, Path),
+	Subject = filename:basename(Path),
+	try re:run(Subject, RE) of
+		{match, _} ->
+			case file:delete(Filename) of
+				ok ->
+					ok;
+				{error, Reason1} ->
+					?LOG_ERROR([{?MODULE, Reason1},
+							{event, Event},
+							{content, Content},
+							{match, Match},
+							{action, Action}])
+			end;
+		nomatch ->
+			ok
+	catch
+		_:Reason2 ->
+			?LOG_ERROR([{?MODULE, Reason2},
+					{event, Event},
+					{content, Content},
+					{match, Match},
+					{action, Action}])
+	end,
+	start_action(Event, Content, T);
 start_action(_Event, _Content, []) ->
 	ok.
+
 %% @hidden
-start_action1(Event, Content, Match, Action, T, StartArgs) ->
+start_import(Event, Content, Match, Action, StartArgs) ->
 	case supervisor:start_child(cgf_import_sup, StartArgs) of
 		{ok, _Child} ->
 			ok;
@@ -185,6 +259,5 @@ start_action1(Event, Content, Match, Action, T, StartArgs) ->
 					{content, Content},
 					{match, Match},
 					{action, Action}])
-	end,
-	start_action(Event, Content, T).
+	end.
 

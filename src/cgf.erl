@@ -36,10 +36,18 @@
 				Metadata :: map(), ExtraArgs :: [term()]}}
 		| {import, {Module :: erlang:module(), Log :: disk_log:log(),
 				Metadata :: map(), ExtraArgs :: [term()],
-				Opts :: [gen_statem:start_opt()]}}.
+				Opts :: [gen_statem:start_opt()]}}
+		| {copy, {RE :: string() | binary(),
+				Replacement :: string() | binary()}}
+		| {move, {RE :: string() | binary(),
+				Replacement :: string() | binary()}}
+		| {delete, RE :: string() | binary()}.
 %% An `Action' performed to handle a matched event.
 %%	<ul class="definitions">
-%% 	<li><tt>Action = {import, Import}</tt></li>
+%% 	<li><tt>Action = {import, Import}
+%% 			| {copy, {RE, Replacement}}
+%% 			| {move, {RE, Replacement}}
+%% 			| {delete, RE}</tt></li>
 %% 	<li><tt>Import = {Module, Log}
 %% 			| {Module, Log, Metadata}
 %% 			| {Module, Log, Metadata, ExtraArgs}
@@ -49,6 +57,8 @@
 %% 	<li><tt>Metadata = map()</tt></li>
 %% 	<li><tt>ExtraArgs = [term()]</tt></li>
 %% 	<li><tt>Opts = [gen_statem:start_opt()]</tt></li>
+%% 	<li><tt>RE = string() | binary()</tt></li>
+%% 	<li><tt>Replacement = string() | binary()</tt></li>
 %% </ul>
 
 -define(CHUNKSIZE, 100).
@@ -77,10 +87,10 @@
 %% 	are compared as prefixes and if all are a match the `Action'
 %% 	is selected. A zero length prefix always matches.
 %%
-%% 	A supervised {@link //cgf/cgf_import_fsm. cgf_import_fsm}
-%% 	behaviour process is started to perform the `Action' with
-%% 	the callback `Module:init/1' called as follows:
-%%
+%% 	When an `Action' of the form `{import, Import}' is matched
+%% 	a supervised {@link //cgf/cgf_import_fsm. cgf_import_fsm}
+%% 	behaviour process is started with the callback `Module:init/1'
+%% 	called as follows:
 %% 	<dl>
 %% 		<dt>`{import, {Module, Log}}'</dt>
 %% 			<dd>The action handler is initialized with:
@@ -99,6 +109,18 @@
 %% 			process will be started with `Opts'
 %% 			(e.g. `[{debug, [trace]}]').</dd>
 %% 	</dl>
+%%
+%% 	When an `Action' is of the form `{copy | move, {RE, Replacement}}'
+%% 	the regular expression `RE' is matched against the `Filename' and
+%% 	if successful (see {@link //stdlib/re:replace/3. re:replace/3})
+%% 	the matched portion of `Filename' is replaced with `Replacement'
+%% 	to form a destination path for a copy or move operation on the
+%% 	`Filename'.
+%%
+%% 	When an `Action' is of the form `{delete, RE}' the regular
+%% 	expression `RE' is matched against the `Filename' and if
+%% 	successful (see {@link //stdlib/re:run/2. re:run/2}) the file
+%% 	is deleted.
 %%
 add_action(Event, {User, Directory, Filename, Suffix},
 		Action) when is_list(User) ->
@@ -123,7 +145,10 @@ add_action(file_close = _Event, Match, Action)
 		is_binary(element(3, Match)),
 		is_binary(element(4, Match)),
 		tuple_size(Action) == 2,
-		element(1, Action) == import ->
+		((element(1, Action) == import)
+				orelse (element(1, Action) == copy)
+				orelse (element(1, Action) == move)
+				orelse (element(1, Action) == delete)) ->
 	F = fun() ->
 			mnesia:write({cgf_action, Match, Action})
 	end,

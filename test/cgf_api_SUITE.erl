@@ -238,12 +238,23 @@ rand_match() ->
 
 %% @doc Returns random `Action'.
 rand_action() ->
-	Actions = [import],
+	Actions = [import, copy, move, delete],
 	Action = lists:nth(rand:uniform(length(Actions)), Actions),
 	rand_action(Action).
 
 rand_action(import) ->
-	{import, rand_import()}.
+	{import, rand_import()};
+rand_action(copy) ->
+	RE = "^([A-Z]{5})",
+	Replacement = "&.bak",
+	{copy, {RE, Replacement}};
+rand_action(move) ->
+	RE = "^[0-9]{8}-MSC-",
+	Replacement = "MSC/&",
+	{move, {RE, Replacement}};
+rand_action(delete) ->
+	RE = "^[A-Z0-9]{6,8}.tmp$",
+	{delete, RE}.
 
 %% @doc Returns random `Import'.
 rand_import() ->
