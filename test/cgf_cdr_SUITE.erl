@@ -340,7 +340,6 @@ file_close_copy(Config) ->
 	Action = {copy, {RE, Replacement}},
 	ok = cgf:add_action(file_close, Match, Action),
 	CopyDir = filename:join(SftpdUserDir, copy),
-erlang:display({?MODULE, ?FUNCTION_NAME, ?LINE, CopyDir}),
 	ok = file:make_dir(CopyDir),
 	ok = ct_ssh:write_file(Handle, Filename, Data),
 	ct:sleep(1000),
