@@ -235,6 +235,8 @@ ts_number(6) ->
 	32250;
 ts_number(7) ->
 	32251;
+ts_number(8) -> % discontinued
+	32260;
 ts_number(9) ->
 	32260;
 ts_number(10) ->
