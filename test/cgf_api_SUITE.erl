@@ -238,25 +238,34 @@ rand_match() ->
 
 %% @doc Returns random `Action'.
 rand_action() ->
-	Arity = rand:uniform(4) + 1,
-	rand_action(Arity).
+	Actions = [import],
+	Action = lists:nth(rand:uniform(length(Actions)), Actions),
+	rand_action(Action).
 
-rand_action(2) ->
+rand_action(import) ->
+	{import, rand_import()}.
+
+%% @doc Returns random `Import'.
+rand_import() ->
+	Arity = rand:uniform(4) + 1,
+	rand_import(Arity).
+
+rand_import(2) ->
 	Module = rand_mod(),
 	Log = log_name(Module),
 	{Module, Log};
-rand_action(3) ->
+rand_import(3) ->
 	Module = rand_mod(),
 	Log = log_name(Module),
 	Metadata = #{foo => 42},
 	{Module, Log, Metadata};
-rand_action(4) ->
+rand_import(4) ->
 	Module = rand_mod(),
 	Log = log_name(Module),
 	Metadata = #{foo => 42},
 	ExtraArgs = [bar],
 	{Module, Log, Metadata, ExtraArgs};
-rand_action(5) ->
+rand_import(5) ->
 	Module = rand_mod(),
 	Log = log_name(Module),
 	Metadata = #{foo => 42},

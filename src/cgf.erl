@@ -28,17 +28,19 @@
 -export([plmn/1]).
 
 -export_type([action/0]).
--type action() :: {Module :: erlang:module(), Log :: disk_log:log()}
-		| {Module :: erlang:module(), Log :: disk_log:log(),
-				Metadata :: map()}
-		| {Module :: erlang:module(), Log :: disk_log:log(),
-				Metadata :: map(), ExtraArgs :: [term()]}
-		| {Module :: erlang:module(), Log :: disk_log:log(),
+-type action() :: {import, Import :: {Module :: erlang:module(),
+				Log :: disk_log:log()}}
+		| {import, {Module :: erlang:module(), Log :: disk_log:log(),
+				Metadata :: map()}}
+		| {import, {Module :: erlang:module(), Log :: disk_log:log(),
+				Metadata :: map(), ExtraArgs :: [term()]}}
+		| {import, {Module :: erlang:module(), Log :: disk_log:log(),
 				Metadata :: map(), ExtraArgs :: [term()],
-				Opts :: [gen_statem:start_opt()]}.
+				Opts :: [gen_statem:start_opt()]}}.
 %% An `Action' performed to handle a matched event.
 %%	<ul class="definitions">
-%% 	<li><tt>Action = {Module, Log}
+%% 	<li><tt>Action = {import, Import}</tt></li>
+%% 	<li><tt>Import = {Module, Log}
 %% 			| {Module, Log, Metadata}
 %% 			| {Module, Log, Metadata, ExtraArgs}
 %% 			| {Module, Log, Metadata, ExtraArgs, Opts}</tt></li>
@@ -80,19 +82,19 @@
 %% 	the callback `Module:init/1' called as follows:
 %%
 %% 	<dl>
-%% 		<dt>`{Module, Log}'</dt>
+%% 		<dt>`{import, {Module, Log}}'</dt>
 %% 			<dd>The action handler is initialized with:
 %% 			`Module:init(Path, Log)'. The `Path' is contructed
 %% 			from the notification received from the SFTP server.</dd>
-%% 		<dt>`{Module, Log, Metadata}'</dt>
+%% 		<dt>`{import, {Module, Log, Metadata}}'</dt>
 %% 			<dd>The action handler is initialized with:
 %% 			`Module:init(Path, Log, Metadata)'. The `Metadata' is
 %% 			merged with that from the SFTP server notification.</dd>
-%% 		<dt>`{Module, Log, Metadata, ExtraArgs}'</dt>
+%% 		<dt>`{import, {Module, Log, Metadata, ExtraArgs}}'</dt>
 %% 			<dd>The action handler is initialized with
 %% 			extra arguments:
 %% 			`Module:init(Path, Log, Metadata, ...).'</dd>
-%% 		<dt>`{Module, Log, Metadata, ExtraArgs, Opts}'</dt>
+%% 		<dt>`{import, {Module, Log, Metadata, ExtraArgs, Opts}}'</dt>
 %% 			<dd>The {@link //cgf/cgf_import_fsm. cgf_import_fsm}
 %% 			process will be started with `Opts'
 %% 			(e.g. `[{debug, [trace]}]').</dd>
@@ -120,20 +122,8 @@ add_action(file_close = _Event, Match, Action)
 		is_binary(element(2, Match)),
 		is_binary(element(3, Match)),
 		is_binary(element(4, Match)),
-		(((tuple_size(Action) == 2)
-						andalso is_atom(element(1, Action)))
-				orelse ((tuple_size(Action) == 3) 
-						andalso is_atom(element(1, Action))
-						andalso is_map(element(3, Action)))
-				orelse ((tuple_size(Action) == 4) 
-						andalso is_atom(element(1, Action))
-						andalso is_map(element(3, Action))
-						andalso is_list(element(4, Action)))
-				orelse ((tuple_size(Action) == 5) 
-						andalso is_atom(element(1, Action))
-						andalso is_map(element(3, Action))
-						andalso is_list(element(4, Action))
-						andalso is_list(element(5, Action)))) ->
+		tuple_size(Action) == 2,
+		element(1, Action) == import ->
 	F = fun() ->
 			mnesia:write({cgf_action, Match, Action})
 	end,

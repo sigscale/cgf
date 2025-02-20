@@ -250,7 +250,7 @@ sftp_cs(Config) ->
 	Data = <<CDR1/binary, CDR2/binary, CDR3/binary>>,
 	Filename = cdr_filename(1),
 	Match = {User, [], Filename, []},
-	Action = {cgf_cs_fsm, ?FUNCTION_NAME},
+	Action = {import, {cgf_cs_fsm, ?FUNCTION_NAME}},
 	ok = cgf:add_action(file_close, Match, Action),
 	ok = ct_ssh:write_file(Handle, Filename, Data),
 	ct:sleep(1000),
