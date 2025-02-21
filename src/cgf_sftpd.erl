@@ -260,14 +260,10 @@ handle_op(?SSH_FXP_LSTAT, ReqId, _Data,
 		{_CgfState, #state{xf = XF} = _SftpdState} = State) ->
 	ssh_xfer:xf_send_status(XF, ReqId, ?SSH_FX_PERMISSION_DENIED, "Prohibited."),
 	{prohibit, State};
-handle_op(?SSH_FXP_STAT, ReqId, _Data,
-		{_CgfState, #state{xf = XF} = _SftpdState} = State) ->
-	ssh_xfer:xf_send_status(XF, ReqId, ?SSH_FX_PERMISSION_DENIED, "Prohibited."),
-	{prohibit, State};
-handle_op(?SSH_FXP_FSTAT, ReqId, _Data,
-		{_CgfState, #state{xf = XF} = _SftpdState} = State) ->
-	ssh_xfer:xf_send_status(XF, ReqId, ?SSH_FX_PERMISSION_DENIED, "Prohibited."),
-	{prohibit, State};
+handle_op(?SSH_FXP_STAT, _ReqId, _Data, State) ->
+	{ok, State};
+handle_op(?SSH_FXP_FSTAT, _ReqId, _Data, State) ->
+	{ok, State};
 handle_op(?SSH_FXP_OPEN, _ReqId, _Data, State) ->
 	{ok, State};
 handle_op(?SSH_FXP_READ, ReqId, _Data,
