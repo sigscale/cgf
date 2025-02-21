@@ -1,3 +1,15 @@
+2025-02-21   Vance Shipley <vances@sigscale.org>
+
+	* refactor directory maching as full absolute path
+	* sftpd notify absolute path
+	* allow sftp client to request file status
+	* allow sftp user to make a directory
+	* handle file_close actions for copy, move delete
+	* release identifier 8 discontinued in release 12
+	* change cgf:action() to a tagged tuple
+	* white background on line labels
+	* Create Test Cases for MTCall and MOSMS (#33)
+
 2025-02-18   Vance Shipley <vances@sigscale.org>
 
 	* handle joining root and path when path has leading /
