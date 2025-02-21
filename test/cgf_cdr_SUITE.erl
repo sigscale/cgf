@@ -158,18 +158,39 @@ init_per_testcase(TestCase, Config)
 	Port = proplists:get_value(sftpd_port, Config),
 	User = proplists:get_value(ssh_user, Config),
 	UserDir = proplists:get_value(ssh_user_dir, Config),
+	SftpSubDir = "MSC",
 	SshOptions = [{port, Port}, {user, User}, {user_dir, UserDir},
 			{silently_accept_hosts, true}, {save_accepted_host, true},
 			{auth_methods, "publickey"}],
 	{ok, Handle} = ct_ssh:connect(cgf_sftp, sftp, SshOptions),
+	ok = ct_ssh:make_dir(Handle, SftpSubDir),
+	LogName = TestCase,
 	LogOptions = [{format, external},
 			{codec, {cgf_log_codec_ecs, bx}}],
 	ok = cgf_log:open(TestCase, LogOptions),
-	[{handle, Handle} | Config];
-init_per_testcase(TestCase, Config)
-		when TestCase == file_close_copy;
-		TestCase == file_close_move;
-		TestCase == file_close_delete ->
+	[{bx_log, LogName}, {handle, Handle},
+			{sftp_subdir, SftpSubDir} | Config];
+init_per_testcase(file_close_copy = _TestCase, Config) ->
+	Port = proplists:get_value(sftpd_port, Config),
+	User = proplists:get_value(ssh_user, Config),
+	UserDir = proplists:get_value(ssh_user_dir, Config),
+	SftpSubDir = "BAK",
+	SshOptions = [{port, Port}, {user, User}, {user_dir, UserDir},
+			{silently_accept_hosts, true}, {save_accepted_host, true},
+			{auth_methods, "publickey"}],
+	{ok, Handle} = ct_ssh:connect(cgf_sftp, sftp, SshOptions),
+	[{handle, Handle}, {sftp_subdir, SftpSubDir} | Config];
+init_per_testcase(file_close_move = _TestCase, Config) ->
+	Port = proplists:get_value(sftpd_port, Config),
+	User = proplists:get_value(ssh_user, Config),
+	UserDir = proplists:get_value(ssh_user_dir, Config),
+	SftpSubDir = "NEW",
+	SshOptions = [{port, Port}, {user, User}, {user_dir, UserDir},
+			{silently_accept_hosts, true}, {save_accepted_host, true},
+			{auth_methods, "publickey"}],
+	{ok, Handle} = ct_ssh:connect(cgf_sftp, sftp, SshOptions),
+	[{handle, Handle}, {sftp_subdir, SftpSubDir} | Config];
+init_per_testcase(file_close_delete = _TestCase, Config) ->
 	Port = proplists:get_value(sftpd_port, Config),
 	User = proplists:get_value(ssh_user, Config),
 	UserDir = proplists:get_value(ssh_user_dir, Config),
@@ -223,7 +244,7 @@ import_cs(Config) ->
 	{ok, CDR1} = 'CSChargingDataTypes':encode('CSRecord', mo_call_record()),
 	{ok, CDR2} = 'CSChargingDataTypes':encode('CSRecord', mo_call_record()),
 	{ok, CDR3} = 'CSChargingDataTypes':encode('CSRecord', mo_call_record()),
-	FilePath = filename:join(PrivDir, cdr_filename(1)),
+	FilePath = filename:join(PrivDir, cdr_filename(rand:uniform(999))),
 	ok = file:write_file(FilePath, <<CDR1/binary, CDR2/binary, CDR3/binary>>),
 	ok = cgf_cs:import(FilePath, Log).
 
@@ -247,7 +268,7 @@ import_cs_32297(Config) ->
 	FileLength = FileHeaderL + CdrHeaderL + CdrLength,
 	FileB = <<FileLength:32, FileHeaderL:32, FileHeaderB/binary,
 			CdrLength:16, CdrHeaderB/binary, CDR/binary>>,
-	FilePath = filename:join(PrivDir, cdr_filename(1)),
+	FilePath = filename:join(PrivDir, cdr_filename(rand:uniform(999))),
 	ok = file:write_file(FilePath, FileB),
 	ok = cgf_cs:import(FilePath, Log).
 
@@ -261,17 +282,21 @@ sftp_cs() ->
 sftp_cs(Config) ->
 	User = proplists:get_value(ssh_user, Config),
 	Handle = proplists:get_value(handle, Config),
+	SftpSubDir = proplists:get_value(sftp_subdir, Config),
+	LogName = proplists:get_value(bx_log, Config),
 	{ok, CDR1} = 'CSChargingDataTypes':encode('CSRecord', mo_call_record()),
 	{ok, CDR2} = 'CSChargingDataTypes':encode('CSRecord', mo_call_record()),
 	{ok, CDR3} = 'CSChargingDataTypes':encode('CSRecord', mo_call_record()),
 	Data = <<CDR1/binary, CDR2/binary, CDR3/binary>>,
-	Filename = cdr_filename(1),
-	Match = {User, [], Filename, []},
-	Action = {import, {cgf_cs_fsm, ?FUNCTION_NAME}},
+	Filename = cdr_filename(rand:uniform(999)),
+	FilePath = filename:join(SftpSubDir, Filename),
+	MatchDir = filename:absname_join("/", SftpSubDir),
+	Match = {User, MatchDir, Filename, []},
+	Action = {import, {cgf_cs_fsm, LogName}},
 	ok = cgf:add_action(file_close, Match, Action),
-	ok = ct_ssh:write_file(Handle, Filename, Data),
+	ok = ct_ssh:write_file(Handle, FilePath, Data),
 	ct:sleep(1000),
-	3 = proplists:get_value(no_written_items, disk_log:info(?FUNCTION_NAME)).
+	3 = proplists:get_value(no_written_items, disk_log:info(LogName)).
 
 import_mt_call() ->
 	Description = "Import a mobile terminated (MT) CDR file.",
@@ -293,7 +318,7 @@ import_mt_call(Config) ->
 	FileLength = FileHeaderL + CdrHeaderL + CdrLength,
 	FileB = <<FileLength:32, FileHeaderL:32, FileHeaderB/binary,
 			CdrLength:16, CdrHeaderB/binary, CDR/binary>>,
-	FilePath = filename:join(PrivDir, cdr_filename(1)),
+	FilePath = filename:join(PrivDir, cdr_filename(rand:uniform(999))),
 	ok = file:write_file(FilePath, FileB),
 	ok = cgf_cs:import(FilePath, Log).
 
@@ -317,7 +342,7 @@ import_mo_sms(Config) ->
 	FileLength = FileHeaderL + CdrHeaderL + CdrLength,
 	FileB = <<FileLength:32, FileHeaderL:32, FileHeaderB/binary,
 			CdrLength:16, CdrHeaderB/binary, CDR/binary>>,
-	FilePath = filename:join(PrivDir, cdr_filename(1)),
+	FilePath = filename:join(PrivDir, cdr_filename(rand:uniform(999))),
 	ok = file:write_file(FilePath, FileB),
 	ok = cgf_cs:import(FilePath, Log).
 
@@ -331,15 +356,17 @@ file_close_copy() ->
 file_close_copy(Config) ->
 	User = proplists:get_value(ssh_user, Config),
 	SftpdUserDir = proplists:get_value(sftpd_user_dir, Config),
+	SftpSubDir = proplists:get_value(sftp_subdir, Config),
+	CopyDir = filename:join(SftpdUserDir, SftpSubDir),
 	Handle = proplists:get_value(handle, Config),
 	Data = rand:bytes(rand:uniform(1048576)),
-	Filename = cdr_filename(1),
-	Match = {User, [], Filename, []},
+	Filename = cdr_filename(rand:uniform(999)),
+	Match = {User, "/", Filename, []},
 	RE = <<"^CGF">>,
-	Replacement = <<"copy/&">>,
+	ReplacementDir = list_to_binary(SftpSubDir),
+	Replacement = <<ReplacementDir/binary, $/, $&>>,
 	Action = {copy, {RE, Replacement}},
 	ok = cgf:add_action(file_close, Match, Action),
-	CopyDir = filename:join(SftpdUserDir, copy),
 	ok = file:make_dir(CopyDir),
 	ok = ct_ssh:write_file(Handle, Filename, Data),
 	ct:sleep(1000),
@@ -356,15 +383,17 @@ file_close_move() ->
 file_close_move(Config) ->
 	User = proplists:get_value(ssh_user, Config),
 	SftpdUserDir = proplists:get_value(sftpd_user_dir, Config),
+	SftpSubDir = proplists:get_value(sftp_subdir, Config),
+	MoveDir = filename:join(SftpdUserDir, SftpSubDir),
 	Handle = proplists:get_value(handle, Config),
 	Data = rand:bytes(rand:uniform(1048576)),
-	Filename = cdr_filename(1),
-	Match = {User, [], Filename, []},
+	Filename = cdr_filename(rand:uniform(999)),
+	Match = {User, "/", Filename, []},
 	RE = <<"^CGF">>,
-	Replacement = <<"move/&">>,
-	Action = {copy, {RE, Replacement}},
+	ReplacementDir = list_to_binary(SftpSubDir),
+	Replacement = <<ReplacementDir/binary, $/, $&>>,
+	Action = {move, {RE, Replacement}},
 	ok = cgf:add_action(file_close, Match, Action),
-	MoveDir = filename:join(SftpdUserDir, "move"),
 	ok = file:make_dir(MoveDir),
 	ok = ct_ssh:write_file(Handle, Filename, Data),
 	ct:sleep(1000),
@@ -383,8 +412,8 @@ file_close_delete(Config) ->
 	SftpdUserDir = proplists:get_value(sftpd_user_dir, Config),
 	Handle = proplists:get_value(handle, Config),
 	Data = rand:bytes(rand:uniform(1048576)),
-	Filename = cdr_filename(1),
-	Match = {User, [], Filename, []},
+	Filename = cdr_filename(rand:uniform(999)),
+	Match = {User, "/", Filename, []},
 	RE = <<"^CGF">>,
 	Action = {delete, RE},
 	ok = cgf:add_action(file_close, Match, Action),

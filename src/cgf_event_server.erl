@@ -174,7 +174,7 @@ start_action(Event, #{root := Root, path := Path} = Content,
 	StartArgs = [Module, [Filename, Log, Metadata] ++ ExtraArgs, Opts],
 	start_import(Event, Content, Match, Action, StartArgs),
 	start_action(Event, Content, T);
-start_action(Event, #{root := Root, path := Path} = Content,
+start_action(Event, #{root := Root, user := Username, path := Path} = Content,
 		[{Match, {Op, {RE, Replacement}} = Action} | T])
 		when is_binary(RE), is_binary(Replacement),
 		((Op == copy) orelse (Op == move)) ->
@@ -184,10 +184,15 @@ start_action(Event, #{root := Root, path := Path} = Content,
 		Subject ->
 			ok;
 		NewPath when Op == copy ->
-			FilePath = filename:join(Root, NewPath),
+			UserPath = filename:join(<<"/">>, NewPath),
+			FilePath = <<Root/binary, UserPath/binary>>,
 			case file:copy(Filename, FilePath) of
 				{ok, _} ->
-					ok;
+					EventPayload = #{module => ?MODULE,
+							user => Username,
+							root => Root,
+							path => UserPath},
+					cgf_event:notify(file_close, EventPayload);
 				{error, Reason1} ->
 					?LOG_ERROR([{?MODULE, Reason1},
 							{event, Event},
@@ -196,10 +201,15 @@ start_action(Event, #{root := Root, path := Path} = Content,
 							{action, Action}])
 			end;
 		NewPath when Op == move ->
-			FilePath = filename:join(Root, NewPath),
+			UserPath = filename:join(<<"/">>, NewPath),
+			FilePath = <<Root/binary, UserPath/binary>>,
 			case file:rename(Filename, FilePath) of
 				ok ->
-					ok;
+					EventPayload = #{module => ?MODULE,
+							user => Username,
+							root => Root,
+							path => UserPath},
+					cgf_event:notify(file_close, EventPayload);
 				{error, Reason1} ->
 					?LOG_ERROR([{?MODULE, Reason1},
 							{event, Event},

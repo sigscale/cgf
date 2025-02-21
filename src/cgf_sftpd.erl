@@ -232,27 +232,35 @@ handle_op(?SSH_FXP_READDIR, ReqId, _Data,
 		{_CgfState, #state{xf = XF} = _SftpdState} = State) ->
 	ssh_xfer:xf_send_status(XF, ReqId, ?SSH_FX_PERMISSION_DENIED, "Prohibited."),
 	{prohibit, State};
-handle_op(?SSH_FXP_CLOSE, _ReqId,
+handle_op(?SSH_FXP_CLOSE, ReqId,
 		<<?UINT32(HLen), BinHandle:HLen/binary>> = _Data,
 		{#{write_handles := CgfHandles, user := Username} = CgfState,
-		#state{root = Root, handles = SftpdHandles} = SftpdState} = State) ->
+		#state{xf = XF, root = Root,
+				handles = SftpdHandles} = SftpdState} = State) ->
 	Handle = binary_to_integer(BinHandle),
 	case lists:keysearch(Handle, 1, SftpdHandles) of
 		{value, {Handle, file, {Path, _IoDevice}}} ->
-			case ordsets:is_element(Handle, CgfHandles) of
-				true ->
-					AbsName = filename:absname(Path),
-					EventPayload = #{module => ?MODULE,
-							user => list_to_binary(Username),
-							root => list_to_binary(Root),
-							path => list_to_binary(AbsName)},
-					cgf_event:notify(file_close, EventPayload),
-					CgfHandles1 = ordsets:del_element(Handle, CgfHandles),
-					CgfState1 = CgfState#{write_handles => CgfHandles1},
-					State1 = {CgfState1, SftpdState},
-					{ok, State1};
+			case lists:member("..", filename:split(Path)) of
 				false ->
-					{ok, State}
+					case ordsets:is_element(Handle, CgfHandles) of
+						true ->
+							AbsName = filename:absname_join("/", Path),
+							EventPayload = #{module => ?MODULE,
+									user => list_to_binary(Username),
+									root => list_to_binary(Root),
+									path => list_to_binary(AbsName)},
+							cgf_event:notify(file_close, EventPayload),
+							CgfHandles1 = ordsets:del_element(Handle, CgfHandles),
+							CgfState1 = CgfState#{write_handles => CgfHandles1},
+							State1 = {CgfState1, SftpdState},
+							{ok, State1};
+						false ->
+							{ok, State}
+					end;
+				true ->
+					ssh_xfer:xf_send_status(XF, ReqId,
+							?SSH_FX_PERMISSION_DENIED, "Prohibited."),
+					{prohibit, State}
 			end;
 		_ ->
 			{ok, State}
