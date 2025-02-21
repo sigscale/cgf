@@ -99,7 +99,6 @@ get_health(Config) ->
 	Accept = {"accept", "application/health+json"},
 	Request = {Host ++ "/health", [Accept]},
 	{ok, Result} = httpc:request(get, Request, [], []),
-erlang:display(Result),
 	{{"HTTP/1.1", 200, _OK}, Headers, Body} = Result,
 	{_, "application/health+json"} = lists:keyfind("content-type", 1, Headers),
 	{ok, #{"serviceId" := _Node,
