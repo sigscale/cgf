@@ -186,6 +186,9 @@ start_action(Event, Content, [{Match, {delete, _} = Action} | T]) ->
 start_action(Event, Content, [{Match, {unzip, _} = Action} | T]) ->
 	handle_unzip(Event, Content, Match, Action),
 	start_action(Event, Content, T);
+start_action(Event, Content, [{Match, {untar, _} = Action} | T]) ->
+	handle_untar(Event, Content, Match, Action),
+	start_action(Event, Content, T);
 start_action(_Event, _Content, []) ->
 	ok.
 
@@ -221,8 +224,8 @@ handle_copy(Event,
 					handle_copy(Event, Content, Match, Action, SafePath)
 			end
 	catch
-		_:Reason2 ->
-			?LOG_ERROR([{?MODULE, Reason2},
+		_:Reason ->
+			?LOG_ERROR([{?MODULE, Reason},
 					{event, Event},
 					{content, Content},
 					{match, Match},
@@ -242,8 +245,8 @@ handle_copy(Event,
 					root => Root,
 					path => UserPath},
 			cgf_event:notify(file_close, EventPayload);
-		{error, Reason1} ->
-			?LOG_ERROR([{?MODULE, Reason1},
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, Reason},
 					{event, Event},
 					{content, Content},
 					{match, Match},
@@ -267,8 +270,8 @@ handle_move(Event,
 					handle_move(Event, Content, Match, Action, SafePath)
 			end
 	catch
-		_:Reason2 ->
-			?LOG_ERROR([{?MODULE, Reason2},
+		_:Reason ->
+			?LOG_ERROR([{?MODULE, Reason},
 					{event, Event},
 					{content, Content},
 					{match, Match},
@@ -288,8 +291,8 @@ handle_move(Event,
 					root => Root,
 					path => UserPath},
 			cgf_event:notify(file_close, EventPayload);
-		{error, Reason1} ->
-			?LOG_ERROR([{?MODULE, Reason1},
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, Reason},
 					{event, Event},
 					{content, Content},
 					{match, Match},
@@ -342,8 +345,8 @@ handle_unzip(Event,
 					handle_unzip(Event, Content, Match, Action, SafePath)
 			end
 	catch
-		_:Reason2 ->
-			?LOG_ERROR([{?MODULE, Reason2},
+		_:Reason ->
+			?LOG_ERROR([{?MODULE, Reason},
 					{event, Event},
 					{content, Content},
 					{match, Match},
@@ -370,8 +373,112 @@ handle_unzip(Event,
 					end
 			end,
 			lists:foreach(F, Files);
-		{error, Reason1} ->
-			?LOG_ERROR([{?MODULE, Reason1},
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, Reason},
+					{event, Event},
+					{content, Content},
+					{match, Match},
+					{action, Action}])
+	end.
+
+%% @hidden
+handle_untar(Event,
+		#{root := Root, path := Path} = Content,
+		Match, {untar, {RE, Replacement}} = Action)
+		when is_binary(RE), is_binary(Replacement) ->
+	Subject = filename:basename(Path),
+	try re:replace(Subject, RE, Replacement, [{return, binary}]) of
+		Subject ->
+			ok;
+		NewPath ->
+			case filelib:safe_relative_path(NewPath, Root) of
+				unsafe ->
+					throw(unsafe_path);
+				SafePath ->
+					UserPath = filename:join(<<"/">>, SafePath),
+					handle_untar(Event, Content, Match, Action, UserPath)
+			end
+	catch
+		_:Reason ->
+			?LOG_ERROR([{?MODULE, Reason},
+					{event, Event},
+					{content, Content},
+					{match, Match},
+					{action, Action}])
+	end.
+%% @hidden
+handle_untar(Event,
+		#{root := Root, path := Path} = Content,
+		Match, Action, UserPath) ->
+	Filename = binary_to_list(filename:join(Root, Path)),
+	Options = [read, binary, compressed],
+	case file:open(Filename, Options) of
+		{ok, File} ->
+			handle_untar(Event, Content, Match, Action,
+					UserPath, Filename, Options, File);
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, Reason},
+					{event, Event},
+					{content, Content},
+					{match, Match},
+					{action, Action}])
+	end.
+%% @hidden
+handle_untar(Event, Content, Match, Action,
+		UserPath, Filename, FileOptions, File) ->
+	Options = [verbose],
+	case erl_tar:table({file, File}, Options) of
+		{ok, TarEntries} ->
+			ok = file:close(File),
+			F = fun({Name, regular, _, _, _, _, _}) ->
+						{true, Name};
+					(_) ->
+						false
+			end,
+			Files = lists:filtermap(F, TarEntries),
+			handle_untar1(Event, Content, Match, Action,
+					UserPath, Filename, FileOptions, Files);
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, Reason},
+					{event, Event},
+					{content, Content},
+					{match, Match},
+					{action, Action}])
+	end.
+%% @hidden
+handle_untar1(Event, Content, Match, Action,
+		UserPath, Filename, Options, Files) ->
+	case file:open(Filename, Options) of
+		{ok, File} ->
+			handle_untar2(Event, Content, Match, Action,
+					UserPath, File, Files);
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, Reason},
+					{event, Event},
+					{content, Content},
+					{match, Match},
+					{action, Action}])
+	end.
+%% @hidden
+handle_untar2(Event,
+		#{root := Root, user := Username} = Content,
+		Match, Action, UserPath, File, Files) ->
+	DirPath = <<Root/binary, UserPath/binary>>,
+	Options = [{files, Files}, {cwd, binary_to_list(DirPath)}],
+	case erl_tar:extract({file, File}, Options) of
+		ok ->
+			ok = file:close(File),
+			F = fun(Filename) ->
+					FilePath = filename:join(UserPath, Filename),
+					EventPayload = #{module => ?MODULE,
+							user => Username,
+							root => Root,
+							path => FilePath},
+					cgf_event:notify(file_close, EventPayload)
+			end,
+			lists:foreach(F, Files);
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, Reason},
 					{event, Event},
 					{content, Content},
 					{match, Match},

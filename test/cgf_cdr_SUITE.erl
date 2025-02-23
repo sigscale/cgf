@@ -35,7 +35,8 @@
 		file_close_copy/0, file_close_copy/1,
 		file_close_move/0, file_close_move/1,
 		file_close_delete/0, file_close_delete/1,
-		file_close_unzip/0, file_close_unzip/1]).
+		file_close_unzip/0, file_close_unzip/1,
+		file_close_untar/0, file_close_untar/1]).
 
 -include_lib("common_test/include/ct.hrl").
 -include("cgf_3gpp_file.hrl").
@@ -133,6 +134,7 @@ init_per_suite(Config) ->
 	ok = application:set_env(cgf, sftpd,
 			[{SftpdAddress, SftpdPort, [], SftpdOptions}]),
 	ok = cgf_test_lib:start(),
+sys:trace(cgf_event, true),
 	[{sftpd_port, SftpdPort}, {sftpd_user_dir, SftpdUserDir},
 			{ssh_user, SshUser}, {ssh_user_dir, SshUserDir} | Config].
 
@@ -211,6 +213,16 @@ init_per_testcase(file_close_unzip = _TestCase, Config) ->
 			{auth_methods, "publickey"}],
 	{ok, Handle} = ct_ssh:connect(cgf_sftp, sftp, SshOptions),
 	[{handle, Handle}, {sftp_subdir, SftpSubDir} | Config];
+init_per_testcase(file_close_untar = _TestCase, Config) ->
+	Port = proplists:get_value(sftpd_port, Config),
+	User = proplists:get_value(ssh_user, Config),
+	UserDir = proplists:get_value(ssh_user_dir, Config),
+	SftpSubDir = "UNTAR",
+	SshOptions = [{port, Port}, {user, User}, {user_dir, UserDir},
+			{silently_accept_hosts, true}, {save_accepted_host, true},
+			{auth_methods, "publickey"}],
+	{ok, Handle} = ct_ssh:connect(cgf_sftp, sftp, SshOptions),
+	[{handle, Handle}, {sftp_subdir, SftpSubDir} | Config];
 init_per_testcase(_TestCase, Config) ->
    Config.
 
@@ -240,7 +252,7 @@ all() ->
 	[import_cs, import_cs_32297, sftp_cs,
 		import_mt_call, import_mo_sms,
 		file_close_copy, file_close_move, file_close_delete,
-		file_close_unzip].
+		file_close_unzip, file_close_untar].
 
 %%---------------------------------------------------------------------
 %%  Test cases
@@ -474,6 +486,46 @@ file_close_unzip(Config) ->
 	{ok, _} = file:read_file_info(UnzipPath2),
 	UnzipPath3 = filename:join(UnzipDir, File3),
 	{ok, _} = file:read_file_info(UnzipPath3).
+
+file_close_untar() ->
+	Description = "SFTP put a file with an untar action.",
+	ct:comment(Description),
+	[{userdata, [{doc, Description}]},
+			{require, cgf_ssh},
+			{require, cgf_sftp}].
+
+file_close_untar(Config) ->
+	User = proplists:get_value(ssh_user, Config),
+	SftpdUserDir = proplists:get_value(sftpd_user_dir, Config),
+	SftpSubDir = proplists:get_value(sftp_subdir, Config),
+	UntarRoot = filename:join(SftpdUserDir, SftpSubDir),
+	Handle = proplists:get_value(handle, Config),
+	Data1 = rand:bytes(rand:uniform(1048576)),
+	Data2 = rand:bytes(rand:uniform(1048576)),
+	Data3 = rand:bytes(rand:uniform(1048576)),
+	File1 = cdr_filename(rand:uniform(999)),
+	File2 = cdr_filename(rand:uniform(999)),
+	File3 = cdr_filename(rand:uniform(999)),
+	TarFile = lists:concat(["CGF", rand:uniform(999), ".tgz"]),
+	FileList = [{File1, Data1}, {File2, Data2}, {File3, Data3}],
+	ok = erl_tar:create(TarFile, FileList, [compressed]),
+	Match = {User, "/", [], "tgz"},
+	RE = <<"(^CGF.*).tgz$">>,
+	ReplacementDir = list_to_binary(SftpSubDir),
+	Replacement = <<ReplacementDir/binary, $/, $\\, $1>>,
+	Action = {untar, {RE, Replacement}},
+	ok = cgf:add_action(file_close, Match, Action),
+	ok = file:make_dir(UntarRoot),
+	{ok, Data} = file:read_file(TarFile),
+	ok = ct_ssh:write_file(Handle, TarFile, Data),
+	ct:sleep(1000),
+	UntarDir = filename:join(UntarRoot, filename:rootname(TarFile)),
+	UntarPath1 = filename:join(UntarDir, File1),
+	{ok, _} = file:read_file_info(UntarPath1),
+	UntarPath2 = filename:join(UntarDir, File2),
+	{ok, _} = file:read_file_info(UntarPath2),
+	UntarPath3 = filename:join(UntarDir, File3),
+	{ok, _} = file:read_file_info(UntarPath3).
 
 %%---------------------------------------------------------------------
 %%  Internal functions
