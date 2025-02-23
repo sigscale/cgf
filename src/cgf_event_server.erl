@@ -203,30 +203,19 @@ start_import(Event, Content, Match, Action, StartArgs) ->
 
 %% @hidden
 handle_copy(Event,
-		#{root := Root, user := Username, path := Path} = Content,
+		#{root := Root, path := Path} = Content,
 		Match, {copy, {RE, Replacement}} = Action)
 		when is_binary(RE), is_binary(Replacement) ->
-	Filename = filename:join(Root, Path),
 	Subject = filename:basename(Path),
 	try re:replace(Subject, RE, Replacement, [{return, binary}]) of
 		Subject ->
 			ok;
 		NewPath ->
-			UserPath = filename:join(<<"/">>, NewPath),
-			FilePath = <<Root/binary, UserPath/binary>>,
-			case file:copy(Filename, FilePath) of
-				{ok, _} ->
-					EventPayload = #{module => ?MODULE,
-							user => Username,
-							root => Root,
-							path => UserPath},
-					cgf_event:notify(file_close, EventPayload);
-				{error, Reason1} ->
-					?LOG_ERROR([{?MODULE, Reason1},
-							{event, Event},
-							{content, Content},
-							{match, Match},
-							{action, Action}])
+			case filelib:safe_relative_path(NewPath, Root) of
+				unsafe ->
+					throw(unsafe_path);
+				SafePath ->
+					handle_copy(Event, Content, Match, Action, SafePath)
 			end
 	catch
 		_:Reason2 ->
@@ -236,37 +225,68 @@ handle_copy(Event,
 					{match, Match},
 					{action, Action}])
 	end.
+%% @hidden
+handle_copy(Event,
+		#{root := Root, user := Username, path := Path} = Content,
+		Match, Action, NewPath) ->
+	Filename = filename:join(Root, Path),
+	UserPath = filename:join(<<"/">>, NewPath),
+	FilePath = <<Root/binary, UserPath/binary>>,
+	case file:copy(Filename, FilePath) of
+		{ok, _} ->
+			EventPayload = #{module => ?MODULE,
+					user => Username,
+					root => Root,
+					path => UserPath},
+			cgf_event:notify(file_close, EventPayload);
+		{error, Reason1} ->
+			?LOG_ERROR([{?MODULE, Reason1},
+					{event, Event},
+					{content, Content},
+					{match, Match},
+					{action, Action}])
+	end.
 
 %% @hidden
 handle_move(Event,
-		#{root := Root, user := Username, path := Path} = Content,
+		#{root := Root, path := Path} = Content,
 		Match, {move, {RE, Replacement}} = Action)
 		when is_binary(RE), is_binary(Replacement) ->
-	Filename = filename:join(Root, Path),
 	Subject = filename:basename(Path),
 	try re:replace(Subject, RE, Replacement, [{return, binary}]) of
 		Subject ->
 			ok;
 		NewPath ->
-			UserPath = filename:join(<<"/">>, NewPath),
-			FilePath = <<Root/binary, UserPath/binary>>,
-			case file:rename(Filename, FilePath) of
-				ok ->
-					EventPayload = #{module => ?MODULE,
-							user => Username,
-							root => Root,
-							path => UserPath},
-					cgf_event:notify(file_close, EventPayload);
-				{error, Reason1} ->
-					?LOG_ERROR([{?MODULE, Reason1},
-							{event, Event},
-							{content, Content},
-							{match, Match},
-							{action, Action}])
+			case filelib:safe_relative_path(NewPath, Root) of
+				unsafe ->
+					throw(unsafe_path);
+				SafePath ->
+					handle_move(Event, Content, Match, Action, SafePath)
 			end
 	catch
 		_:Reason2 ->
 			?LOG_ERROR([{?MODULE, Reason2},
+					{event, Event},
+					{content, Content},
+					{match, Match},
+					{action, Action}])
+	end.
+%% @hidden
+handle_move(Event,
+		#{root := Root, user := Username, path := Path} = Content,
+		Match, Action, NewPath) ->
+	Filename = filename:join(Root, Path),
+	UserPath = filename:join(<<"/">>, NewPath),
+	FilePath = <<Root/binary, UserPath/binary>>,
+	case file:rename(Filename, FilePath) of
+		ok ->
+			EventPayload = #{module => ?MODULE,
+					user => Username,
+					root => Root,
+					path => UserPath},
+			cgf_event:notify(file_close, EventPayload);
+		{error, Reason1} ->
+			?LOG_ERROR([{?MODULE, Reason1},
 					{event, Event},
 					{content, Content},
 					{match, Match},
