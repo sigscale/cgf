@@ -34,7 +34,8 @@
 		import_mo_sms/0, import_mo_sms/1,
 		file_close_copy/0, file_close_copy/1,
 		file_close_move/0, file_close_move/1,
-		file_close_delete/0, file_close_delete/1]).
+		file_close_delete/0, file_close_delete/1,
+		file_close_unzip/0, file_close_unzip/1]).
 
 -include_lib("common_test/include/ct.hrl").
 -include("cgf_3gpp_file.hrl").
@@ -199,6 +200,16 @@ init_per_testcase(file_close_delete = _TestCase, Config) ->
 			{auth_methods, "publickey"}],
 	{ok, Handle} = ct_ssh:connect(cgf_sftp, sftp, SshOptions),
 	[{handle, Handle} | Config];
+init_per_testcase(file_close_unzip = _TestCase, Config) ->
+	Port = proplists:get_value(sftpd_port, Config),
+	User = proplists:get_value(ssh_user, Config),
+	UserDir = proplists:get_value(ssh_user_dir, Config),
+	SftpSubDir = "UNZIP",
+	SshOptions = [{port, Port}, {user, User}, {user_dir, UserDir},
+			{silently_accept_hosts, true}, {save_accepted_host, true},
+			{auth_methods, "publickey"}],
+	{ok, Handle} = ct_ssh:connect(cgf_sftp, sftp, SshOptions),
+	[{handle, Handle}, {sftp_subdir, SftpSubDir} | Config];
 init_per_testcase(_TestCase, Config) ->
    Config.
 
@@ -225,9 +236,10 @@ end_per_testcase(_TestCase, _Config) ->
 %% Returns a list of all test cases in this test suite.
 %%
 all() ->
-	[import_cs, import_cs_32297, sftp_cs, import_mt_call,
-		import_mo_sms,
-		file_close_copy, file_close_move, file_close_delete].
+	[import_cs, import_cs_32297, sftp_cs,
+		import_mt_call, import_mo_sms,
+		file_close_copy, file_close_move, file_close_delete,
+		file_close_unzip].
 
 %%---------------------------------------------------------------------
 %%  Test cases
@@ -421,6 +433,46 @@ file_close_delete(Config) ->
 	ct:sleep(1000),
 	FilePath = filename:join(SftpdUserDir, Filename),
 	{error, enoent} = file:read_file_info(FilePath).
+
+file_close_unzip() ->
+	Description = "SFTP put a file with an unzip action.",
+	ct:comment(Description),
+	[{userdata, [{doc, Description}]},
+			{require, cgf_ssh},
+			{require, cgf_sftp}].
+
+file_close_unzip(Config) ->
+	User = proplists:get_value(ssh_user, Config),
+	SftpdUserDir = proplists:get_value(sftpd_user_dir, Config),
+	SftpSubDir = proplists:get_value(sftp_subdir, Config),
+	UnzipRoot = filename:join(SftpdUserDir, SftpSubDir),
+	Handle = proplists:get_value(handle, Config),
+	Data1 = rand:bytes(rand:uniform(1048576)),
+	Data2 = rand:bytes(rand:uniform(1048576)),
+	Data3 = rand:bytes(rand:uniform(1048576)),
+	File1 = cdr_filename(rand:uniform(999)),
+	File2 = cdr_filename(rand:uniform(999)),
+	File3 = cdr_filename(rand:uniform(999)),
+	ZipFile = lists:concat(["CGF", rand:uniform(999), ".zip"]),
+	{ok, {ZipFile, Data}} = zip:zip(ZipFile,
+			[{File1, Data1}, {File2, Data2}, {File3, Data3}],
+			[memory]),
+	Match = {User, "/", [], "zip"},
+	RE = <<"(^CGF.*).zip$">>,
+	ReplacementDir = list_to_binary(SftpSubDir),
+	Replacement = <<ReplacementDir/binary, $/, $\\, $1>>,
+	Action = {unzip, {RE, Replacement}},
+	ok = cgf:add_action(file_close, Match, Action),
+	ok = file:make_dir(UnzipRoot),
+	ok = ct_ssh:write_file(Handle, ZipFile, Data),
+	ct:sleep(1000),
+	UnzipDir = filename:join(UnzipRoot, filename:rootname(ZipFile)),
+	UnzipPath1 = filename:join(UnzipDir, File1),
+	{ok, _} = file:read_file_info(UnzipPath1),
+	UnzipPath2 = filename:join(UnzipDir, File2),
+	{ok, _} = file:read_file_info(UnzipPath2),
+	UnzipPath3 = filename:join(UnzipDir, File3),
+	{ok, _} = file:read_file_info(UnzipPath3).
 
 %%---------------------------------------------------------------------
 %%  Internal functions

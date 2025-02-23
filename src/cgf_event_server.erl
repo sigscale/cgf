@@ -183,6 +183,9 @@ start_action(Event, Content, [{Match, {move, _} = Action} | T]) ->
 start_action(Event, Content, [{Match, {delete, _} = Action} | T]) ->
 	handle_delete(Event, Content, Match, Action),
 	start_action(Event, Content, T);
+start_action(Event, Content, [{Match, {unzip, _} = Action} | T]) ->
+	handle_unzip(Event, Content, Match, Action),
+	start_action(Event, Content, T);
 start_action(_Event, _Content, []) ->
 	ok.
 
@@ -316,6 +319,59 @@ handle_delete(Event,
 	catch
 		_:Reason2 ->
 			?LOG_ERROR([{?MODULE, Reason2},
+					{event, Event},
+					{content, Content},
+					{match, Match},
+					{action, Action}])
+	end.
+
+%% @hidden
+handle_unzip(Event,
+		#{root := Root, path := Path} = Content,
+		Match, {unzip, {RE, Replacement}} = Action)
+		when is_binary(RE), is_binary(Replacement) ->
+	Subject = filename:basename(Path),
+	try re:replace(Subject, RE, Replacement, [{return, binary}]) of
+		Subject ->
+			ok;
+		NewPath ->
+			case filelib:safe_relative_path(NewPath, Root) of
+				unsafe ->
+					throw(unsafe_path);
+				SafePath ->
+					handle_unzip(Event, Content, Match, Action, SafePath)
+			end
+	catch
+		_:Reason2 ->
+			?LOG_ERROR([{?MODULE, Reason2},
+					{event, Event},
+					{content, Content},
+					{match, Match},
+					{action, Action}])
+	end.
+%% @hidden
+handle_unzip(Event,
+		#{root := Root, user := Username, path := Path} = Content,
+		Match, Action, NewPath) ->
+	Filename = binary_to_list(filename:join(Root, Path)),
+	UserPath = filename:join(<<"/">>, NewPath),
+	DirPath = <<Root/binary, UserPath/binary>>,
+	Options = [{cwd, binary_to_list(DirPath)}],
+	case zip:unzip(Filename, Options) of
+		{ok, Files} ->
+			F = fun(File) ->
+					case string:prefix(File, binary_to_list(Root)) of
+						UnzipPath when is_list(UnzipPath) ->
+							EventPayload = #{module => ?MODULE,
+									user => Username,
+									root => Root,
+									path => filename:join(<<"/">>, UnzipPath)},
+							cgf_event:notify(file_close, EventPayload)
+					end
+			end,
+			lists:foreach(F, Files);
+		{error, Reason1} ->
+			?LOG_ERROR([{?MODULE, Reason1},
 					{event, Event},
 					{content, Content},
 					{match, Match},
