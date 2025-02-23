@@ -174,16 +174,44 @@ start_action(Event, #{root := Root, path := Path} = Content,
 	StartArgs = [Module, [Filename, Log, Metadata] ++ ExtraArgs, Opts],
 	start_import(Event, Content, Match, Action, StartArgs),
 	start_action(Event, Content, T);
-start_action(Event, #{root := Root, user := Username, path := Path} = Content,
-		[{Match, {Op, {RE, Replacement}} = Action} | T])
-		when is_binary(RE), is_binary(Replacement),
-		((Op == copy) orelse (Op == move)) ->
+start_action(Event, Content, [{Match, {copy, _} = Action} | T]) ->
+	handle_copy(Event, Content, Match, Action),
+	start_action(Event, Content, T);
+start_action(Event, Content, [{Match, {move, _} = Action} | T]) ->
+	handle_move(Event, Content, Match, Action),
+	start_action(Event, Content, T);
+start_action(Event, Content, [{Match, {delete, _} = Action} | T]) ->
+	handle_delete(Event, Content, Match, Action),
+	start_action(Event, Content, T);
+start_action(_Event, _Content, []) ->
+	ok.
+
+%% @hidden
+start_import(Event, Content, Match, Action, StartArgs) ->
+	case supervisor:start_child(cgf_import_sup, StartArgs) of
+		{ok, _Child} ->
+			ok;
+		{ok, _Child, _Info} ->
+			ok;
+		{error, Reason} ->
+			?LOG_ERROR([{?MODULE, Reason},
+					{event, Event},
+					{content, Content},
+					{match, Match},
+					{action, Action}])
+	end.
+
+%% @hidden
+handle_copy(Event,
+		#{root := Root, user := Username, path := Path} = Content,
+		Match, {copy, {RE, Replacement}} = Action)
+		when is_binary(RE), is_binary(Replacement) ->
 	Filename = filename:join(Root, Path),
 	Subject = filename:basename(Path),
 	try re:replace(Subject, RE, Replacement, [{return, binary}]) of
 		Subject ->
 			ok;
-		NewPath when Op == copy ->
+		NewPath ->
 			UserPath = filename:join(<<"/">>, NewPath),
 			FilePath = <<Root/binary, UserPath/binary>>,
 			case file:copy(Filename, FilePath) of
@@ -199,8 +227,27 @@ start_action(Event, #{root := Root, user := Username, path := Path} = Content,
 							{content, Content},
 							{match, Match},
 							{action, Action}])
-			end;
-		NewPath when Op == move ->
+			end
+	catch
+		_:Reason2 ->
+			?LOG_ERROR([{?MODULE, Reason2},
+					{event, Event},
+					{content, Content},
+					{match, Match},
+					{action, Action}])
+	end.
+
+%% @hidden
+handle_move(Event,
+		#{root := Root, user := Username, path := Path} = Content,
+		Match, {move, {RE, Replacement}} = Action)
+		when is_binary(RE), is_binary(Replacement) ->
+	Filename = filename:join(Root, Path),
+	Subject = filename:basename(Path),
+	try re:replace(Subject, RE, Replacement, [{return, binary}]) of
+		Subject ->
+			ok;
+		NewPath ->
 			UserPath = filename:join(<<"/">>, NewPath),
 			FilePath = <<Root/binary, UserPath/binary>>,
 			case file:rename(Filename, FilePath) of
@@ -224,10 +271,12 @@ start_action(Event, #{root := Root, user := Username, path := Path} = Content,
 					{content, Content},
 					{match, Match},
 					{action, Action}])
-	end,
-	start_action(Event, Content, T);
-start_action(Event, #{root := Root, path := Path} = Content,
-		[{Match, {delete, RE} = Action} | T]) ->
+	end.
+
+%% @hidden
+handle_delete(Event,
+		#{root := Root, path := Path} = Content,
+		Match, {delete, RE} = Action) ->
 	Filename = filename:join(Root, Path),
 	Subject = filename:basename(Path),
 	try re:run(Subject, RE) of
@@ -247,24 +296,6 @@ start_action(Event, #{root := Root, path := Path} = Content,
 	catch
 		_:Reason2 ->
 			?LOG_ERROR([{?MODULE, Reason2},
-					{event, Event},
-					{content, Content},
-					{match, Match},
-					{action, Action}])
-	end,
-	start_action(Event, Content, T);
-start_action(_Event, _Content, []) ->
-	ok.
-
-%% @hidden
-start_import(Event, Content, Match, Action, StartArgs) ->
-	case supervisor:start_child(cgf_import_sup, StartArgs) of
-		{ok, _Child} ->
-			ok;
-		{ok, _Child, _Info} ->
-			ok;
-		{error, Reason} ->
-			?LOG_ERROR([{?MODULE, Reason},
 					{event, Event},
 					{content, Content},
 					{match, Match},
