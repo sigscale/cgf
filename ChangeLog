@@ -1,3 +1,11 @@
+2025-02-24   Vance Shipley <vances@sigscale.org>
+
+	* untar action handler
+	* suppress ssh connection log messages
+	* unzip action handler
+	* jail destination directory in copy/move action
+	* refactor event server for seperate action handler functions
+ 
 2025-02-21   Vance Shipley <vances@sigscale.org>
 
 	* refactor directory maching as full absolute path
