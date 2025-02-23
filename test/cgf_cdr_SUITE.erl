@@ -90,6 +90,7 @@ suite() ->
 			{default_config, cgf_sftp,
 					[{sftp, {127,0,0,1}},
 					{user, "ct"}]},
+			{silent_connections, [ssh]},
 			{timetrap, {minutes, 1}}].
 
 -spec init_per_suite(Config) -> NewConfig
