@@ -56,26 +56,9 @@
 		Reason :: term().
 %% @doc Initialize the {@module} finite state machine.
 init([Filename, Log] = _Args) ->
-	MimeType = "application/octet-stream",
-	FileMetadata = #{"name" => Filename, "mime_type" => MimeType},
-	LogMetadata = #{"file" => FileMetadata},
-	Metadata = #{"log" => LogMetadata}, 
-	StateData = #{filename => Filename, log => Log,
-			metadata => maps:to_list(Metadata)},
-	{ok, StateData};
-init([Filename, Log, Metadata] = _Args) ->
-	MimeType = "application/octet-stream",
-	FileMetadata = #{"name" => Filename, "mime_type" => MimeType},
-	LogMetadata = #{"file" => FileMetadata},
-	NewMetadata = maps:merge(#{"log" => LogMetadata}, Metadata), 
-	StateData = #{filename => Filename, log => Log,
-			metadata => maps:to_list(NewMetadata)},
-	{ok, StateData};
+	init([Filename, Log, #{}]);
 init([Filename, Log, Metadata | ExtraArgs] = _Args) ->
-	MimeType = "application/octet-stream",
-	FileMetadata = #{"name" => Filename, "mime_type" => MimeType},
-	LogMetadata = #{"file" => FileMetadata},
-	NewMetadata = maps:merge(#{"log" => LogMetadata}, Metadata), 
+	NewMetadata = metadata(Filename, Metadata),
 	StateData = #{filename => Filename, log => Log,
 			metadata => maps:to_list(NewMetadata),
 			extra_args => ExtraArgs},
@@ -171,4 +154,22 @@ close(_Cont, StateData) ->
 %%----------------------------------------------------------------------
 %%  Internal functions
 %%----------------------------------------------------------------------
+
+%% @hidden
+metadata(Filename, Metadata) ->
+	MimeType = "application/octet-stream",
+	FileMap = #{"name" => filename:basename(Filename),
+			"mime_type" => MimeType},
+	metadata1(FileMap, Metadata).
+%% @hidden
+metadata1(FileMap, #{"log" := MetaLog} = Metadata) ->
+	F = fun("file", MetaValue, FileValue) ->
+				maps:merge(MetaValue, FileValue);
+			(_, MetaValue, _) ->
+				MetaValue
+	end,
+	MetaLog1 = maps:merge_with(F, MetaLog, #{"file" => FileMap}),
+	Metadata#{"log" => MetaLog1};
+metadata1(FileMap, Metadata) ->
+	Metadata#{"log" => #{"file" => FileMap}}.
 
