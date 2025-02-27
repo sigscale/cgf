@@ -118,8 +118,10 @@ handle_continue(init = _Continue, State) ->
 %% @doc Handle a received message.
 %% @@see //stdlib/gen_server:handle_info/2
 %% @private
-handle_info({gen_event_EXIT, _Handler, Reason} = _Info, State) ->
-	{stop, Reason, State}.
+handle_info({gen_event_EXIT, ?MODULE = _Handler, Reason} = _Info, State) ->
+	{stop, Reason, State};
+handle_info({gen_event_EXIT, _Handler, _Reason} = _Info, State) ->
+	{noreply, State}.
 
 -spec terminate(Reason, State) -> any()
 	when
