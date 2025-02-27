@@ -41,6 +41,7 @@
 		file_close_untar/0, file_close_untar/1]).
 
 -include_lib("common_test/include/ct.hrl").
+-include_lib("kernel/include/file.hrl").
 -include("cgf_3gpp_file.hrl").
 
 %%---------------------------------------------------------------------
@@ -401,13 +402,17 @@ sftp_close() ->
 			{require, cgf_sftp}].
 
 sftp_close(Config) ->
+	SftpdUserDir = proplists:get_value(sftpd_user_dir, Config),
 	ConnHandle = proplists:get_value(handle, Config),
+	Filename = cdr_filename(rand:uniform(999)),
+	FilePath = filename:join(SftpdUserDir, Filename),
 	Data = rand:bytes(rand:uniform(1048576)),
-	File = cdr_filename(rand:uniform(999)),
-	Path = list_to_binary([$/, File]),
-	{ok, FileHandle} = ct_ssh:open(ConnHandle, File, [write, binary]),
+	FileSize = byte_size(Data),
+	Path = list_to_binary([$/, Filename]),
+	{ok, FileHandle} = ct_ssh:open(ConnHandle, Filename, [write, binary]),
 	ok = ct_ssh:write(ConnHandle, FileHandle, Data),
 	ok = ct_ssh:close(ConnHandle, FileHandle),
+	{ok, #file_info{size = FileSize}} = file:read_file_info(FilePath),
 	{file_close, #{path := Path}} = cgf_test_event:get_event().
 
 sftp_no_close() ->
@@ -418,12 +423,16 @@ sftp_no_close() ->
 			{require, cgf_sftp}].
 
 sftp_no_close(Config) ->
+	SftpdUserDir = proplists:get_value(sftpd_user_dir, Config),
 	ConnHandle = proplists:get_value(handle, Config),
+	Filename = cdr_filename(rand:uniform(999)),
+	FilePath = filename:join(SftpdUserDir, Filename),
 	Data = rand:bytes(rand:uniform(1048576)),
-	File = cdr_filename(rand:uniform(999)),
-	{ok, FileHandle} = ct_ssh:open(ConnHandle, File, [write, binary]),
+	FileSize = byte_size(Data),
+	{ok, FileHandle} = ct_ssh:open(ConnHandle, Filename, [write, binary]),
 	ok = ct_ssh:write(ConnHandle, FileHandle, Data),
 	ok = ct_ssh:disconnect(ConnHandle),
+	{ok, #file_info{size = FileSize}} = file:read_file_info(FilePath),
 	receive
 		{cgf_test_event, {file_close, #{}}} ->
 			ct:fail(file_close_event)
