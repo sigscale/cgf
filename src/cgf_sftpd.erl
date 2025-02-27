@@ -32,6 +32,10 @@
 %%% 	When the client closes a file it has written to a notification is
 %%% 	sent with {@link //cgf/cgf_event:notify/2. cgf_event:notify/2}.
 %%%
+%%% @reference <a target="_blank"
+%%% 	href="https://datatracker.ietf.org/doc/html/draft-ietf-secsh-filexfer-13">
+%%% 	SSH File Transfer Protocol (draft-ietf-secsh-filexfer)</a>
+%%%
 -module(cgf_sftpd).
 -copyright('Copyright (c) 2024 - 2025 SigScale Global Inc.').
 -author('Vance Shipley <vances@sigscale.org>').
