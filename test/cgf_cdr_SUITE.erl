@@ -134,7 +134,6 @@ init_per_suite(Config) ->
 	ok = application:set_env(cgf, sftpd,
 			[{SftpdAddress, SftpdPort, [], SftpdOptions}]),
 	ok = cgf_test_lib:start(),
-sys:trace(cgf_event, true),
 	[{sftpd_port, SftpdPort}, {sftpd_user_dir, SftpdUserDir},
 			{ssh_user, SshUser}, {ssh_user_dir, SshUserDir} | Config].
 
