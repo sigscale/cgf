@@ -861,7 +861,7 @@ mo_sms_record8(Record, Acc) ->
 	mo_sms_record9(Record, Acc).
 %% @hidden
 mo_sms_record9(#{smsResult := Diagnostics} = Record, Acc) ->
-	Acc1 = Acc#{<<"smsResult">> => Diagnostics},
+	Acc1 = Acc#{<<"smsResult">> => cgf_lib:diagnostics(Diagnostics)},
 	mo_sms_record10(Record, Acc1);
 mo_sms_record9(Record, Acc) ->
 	mo_sms_record10(Record, Acc).
@@ -1305,7 +1305,7 @@ mt_sms_record(Record) ->
 	mt_sms_record1(Record, #{}).
 %% @hidden
 mt_sms_record1(#{smsResult := Diagnostics} = Record, Acc) ->
-	Acc1 = Acc#{<<"smsResult">> => Diagnostics},
+	Acc1 = Acc#{<<"smsResult">> => cgf_lib:diagnostics(Diagnostics)},
 	mt_sms_record2(Record, Acc1);
 mt_sms_record1(Record, Acc) ->
 	mt_sms_record2(Record, Acc).
