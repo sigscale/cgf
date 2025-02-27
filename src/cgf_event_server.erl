@@ -153,25 +153,29 @@ start_action(Event, #{root := Root,
 start_action(Event, #{root := Root, path := Path} = Content,
 		[{Match, {import, {Module, Log}} = Action} | T]) ->
 	Filename = filename:join(Root, Path),
-	StartArgs = [Module, [Filename, Log], []],
+	Metadata = metadata(Content, #{}),
+	StartArgs = [Module, [Filename, Log, Metadata], []],
 	start_import(Event, Content, Match, Action, StartArgs),
 	start_action(Event, Content, T);
 start_action(Event, #{root := Root, path := Path} = Content,
 		[{Match, {import, {Module, Log, Metadata}} = Action} | T]) ->
 	Filename = filename:join(Root, Path),
-	StartArgs = [Module, [Filename, Log, Metadata], []],
+	Metadata1 = metadata(Content, Metadata),
+	StartArgs = [Module, [Filename, Log, Metadata1], []],
 	start_import(Event, Content, Match, Action, StartArgs),
 	start_action(Event, Content, T);
 start_action(Event, #{root := Root, path := Path} = Content,
 		[{Match, {import, {Module, Log, Metadata, ExtraArgs}} = Action} | T]) ->
 	Filename = filename:join(Root, Path),
-	StartArgs = [Module, [Filename, Log, Metadata] ++ ExtraArgs, []],
+	Metadata1 = metadata(Content, Metadata),
+	StartArgs = [Module, [Filename, Log, Metadata1] ++ ExtraArgs, []],
 	start_import(Event, Content, Match, Action, StartArgs),
 	start_action(Event, Content, T);
 start_action(Event, #{root := Root, path := Path} = Content,
 		[{Match, {import, {Module, Log, Metadata, ExtraArgs, Opts}} = Action} | T]) ->
 	Filename = filename:join(Root, Path),
-	StartArgs = [Module, [Filename, Log, Metadata] ++ ExtraArgs, Opts],
+	Metadata1 = metadata(Content, Metadata),
+	StartArgs = [Module, [Filename, Log, Metadata1] ++ ExtraArgs, Opts],
 	start_import(Event, Content, Match, Action, StartArgs),
 	start_action(Event, Content, T);
 start_action(Event, Content, [{Match, {copy, _} = Action} | T]) ->
@@ -484,4 +488,18 @@ handle_untar2(Event,
 					{match, Match},
 					{action, Action}])
 	end.
+
+%% @hidden
+metadata(#{path := Path, user := User} = _Content, Metadata) ->
+	FileMap = #{"name" => filename:basename(Path)},
+	UserMap = #{"name" => User},
+	Log = #{"file" => FileMap, "user" => UserMap},
+	F = fun("file", MetadataValue, ContentValue) ->
+				maps:merge(MetadataValue, ContentValue);
+			("user", MetadataValue, ContentValue) ->
+				maps:merge(MetadataValue, ContentValue);
+			(_Key, MetadataValue, _ContentValue) ->
+				MetadataValue
+	end,
+	maps:merge_with(F, Metadata, #{"log" => Log}).
 
