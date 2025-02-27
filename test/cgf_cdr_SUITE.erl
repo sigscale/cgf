@@ -32,6 +32,8 @@
 		sftp_cs/0, sftp_cs/1,
 		import_mt_call/0, import_mt_call/1,
 		import_mo_sms/0, import_mo_sms/1,
+		sftp_close/0, sftp_close/1,
+		sftp_no_close/0, sftp_no_close/1,
 		file_close_copy/0, file_close_copy/1,
 		file_close_move/0, file_close_move/1,
 		file_close_delete/0, file_close_delete/1,
@@ -173,6 +175,26 @@ init_per_testcase(TestCase, Config)
 	ok = cgf_log:open(TestCase, LogOptions),
 	[{bx_log, LogName}, {handle, Handle},
 			{sftp_subdir, SftpSubDir} | Config];
+init_per_testcase(sftp_close = _TestCase, Config) ->
+	Port = proplists:get_value(sftpd_port, Config),
+	User = proplists:get_value(ssh_user, Config),
+	UserDir = proplists:get_value(ssh_user_dir, Config),
+	ok = cgf_test_event:add_handler(self()),
+	SshOptions = [{port, Port}, {user, User}, {user_dir, UserDir},
+			{silently_accept_hosts, true}, {save_accepted_host, true},
+			{auth_methods, "publickey"}],
+	{ok, Handle} = ct_ssh:connect(cgf_sftp, sftp, SshOptions),
+	[{handle, Handle} | Config];
+init_per_testcase(sftp_no_close = _TestCase, Config) ->
+	Port = proplists:get_value(sftpd_port, Config),
+	User = proplists:get_value(ssh_user, Config),
+	UserDir = proplists:get_value(ssh_user_dir, Config),
+	ok = cgf_test_event:add_handler(self()),
+	SshOptions = [{port, Port}, {user, User}, {user_dir, UserDir},
+			{silently_accept_hosts, true}, {save_accepted_host, true},
+			{auth_methods, "publickey"}],
+	{ok, Handle} = ct_ssh:connect(cgf_sftp, sftp, SshOptions),
+	[{handle, Handle} | Config];
 init_per_testcase(file_close_copy = _TestCase, Config) ->
 	Port = proplists:get_value(sftpd_port, Config),
 	User = proplists:get_value(ssh_user, Config),
@@ -250,6 +272,7 @@ end_per_testcase(_TestCase, _Config) ->
 all() ->
 	[import_cs, import_cs_32297, sftp_cs,
 		import_mt_call, import_mo_sms,
+		sftp_close, sftp_no_close,
 		file_close_copy, file_close_move, file_close_delete,
 		file_close_unzip, file_close_untar].
 
@@ -369,6 +392,45 @@ import_mo_sms(Config) ->
 	FilePath = filename:join(PrivDir, cdr_filename(rand:uniform(999))),
 	ok = file:write_file(FilePath, FileB),
 	ok = cgf_cs:import(FilePath, Log).
+
+sftp_close() ->
+	Description = "SFTP write and close a file.",
+	ct:comment(Description),
+	[{userdata, [{doc, Description}]},
+			{require, cgf_ssh},
+			{require, cgf_sftp}].
+
+sftp_close(Config) ->
+	ConnHandle = proplists:get_value(handle, Config),
+	Data = rand:bytes(rand:uniform(1048576)),
+	File = cdr_filename(rand:uniform(999)),
+	Path = list_to_binary([$/, File]),
+	{ok, FileHandle} = ct_ssh:open(ConnHandle, File, [write, binary]),
+	ok = ct_ssh:write(ConnHandle, FileHandle, Data),
+	ok = ct_ssh:close(ConnHandle, FileHandle),
+	{file_close, #{path := Path}} = cgf_test_event:get_event().
+
+sftp_no_close() ->
+	Description = "SFTP write a file, disconnect without close.",
+	ct:comment(Description),
+	[{userdata, [{doc, Description}]},
+			{require, cgf_ssh},
+			{require, cgf_sftp}].
+
+sftp_no_close(Config) ->
+	ConnHandle = proplists:get_value(handle, Config),
+	Data = rand:bytes(rand:uniform(1048576)),
+	File = cdr_filename(rand:uniform(999)),
+	{ok, FileHandle} = ct_ssh:open(ConnHandle, File, [write, binary]),
+	ok = ct_ssh:write(ConnHandle, FileHandle, Data),
+	ok = ct_ssh:disconnect(ConnHandle),
+	receive
+		{cgf_test_event, {file_close, #{}}} ->
+			ct:fail(file_close_event)
+	after
+		1000 ->
+			ok
+	end.
 
 file_close_copy() ->
 	Description = "SFTP put a file with a copy action.",
