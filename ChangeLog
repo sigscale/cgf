@@ -1,3 +1,11 @@
+2025-02-27   Vance Shipley <vances@sigscale.org>
+
+	* import fsms add file metadata
+	* event handler adds file/user name to import metadata
+	* correct sms result codec
+	* link to published edoc in readme
+	* installing docker image and helm chart instructions
+
 2025-02-24   Vance Shipley <vances@sigscale.org>
 
 	* untar action handler
