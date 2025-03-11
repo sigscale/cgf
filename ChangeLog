@@ -1,3 +1,12 @@
+2025-03-11   Vance Shipley <vances@sigscale.org>
+
+	* gunzip action
+	* include reference to sftp ietf draft in edoc
+	* test cases fot sftp file (no)close verify file transferred
+	* test cases for file_close notification
+	* event handler for test cases
+	* event server ignores other handler exits
+
 2025-02-27   Vance Shipley <vances@sigscale.org>
 
 	* import fsms add file metadata
