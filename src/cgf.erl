@@ -44,6 +44,8 @@
 		| {delete, RE :: string() | binary()}
 		| {unzip, {RE :: string() | binary(),
 				Replacement :: string() | binary()}}
+		| {gunzip, {RE :: string() | binary(),
+				Replacement :: string() | binary()}}
 		| {untar, {RE :: string() | binary(),
 				Replacement :: string() | binary()}}.
 %% An `Action' performed to handle a matched event.
@@ -53,6 +55,7 @@
 %% 			| {move, {RE, Replacement}}
 %% 			| {delete, RE}
 %% 			| {unzip, {RE, Replacement}}
+%% 			| {gunzip, {RE, Replacement}}
 %% 			| {untar, {RE, Replacement}}</tt></li>
 %% 	<li><tt>Import = {Module, Log}
 %% 			| {Module, Log, Metadata}
@@ -129,7 +132,8 @@
 %% 	expression `RE' is matched against `Filename' and if successful
 %% 	(see {@link //stdlib/re:run/2. re:run/2}) the file is deleted.
 %%
-%% 	When an `Action' is of the form `{unzip | untar, {RE, Replacement}}'
+%% 	When an `Action' is of the form
+%% 	`{unzip | gunzip | untar, {RE, Replacement}}'
 %% 	the regular expression `RE' is matched against the `Filename' and
 %% 	if successful (see {@link //stdlib/re:replace/3. re:replace/3})
 %% 	the matched portion of `Filename' is replaced with `Replacement'
@@ -164,6 +168,7 @@ add_action(file_close = _Event, Match, Action)
 				orelse (element(1, Action) == move)
 				orelse (element(1, Action) == delete)
 				orelse (element(1, Action) == unzip)
+				orelse (element(1, Action) == gunzip)
 				orelse (element(1, Action) == untar)) ->
 	F = fun() ->
 			mnesia:write({cgf_action, Match, Action})

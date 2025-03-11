@@ -38,6 +38,7 @@
 		file_close_move/0, file_close_move/1,
 		file_close_delete/0, file_close_delete/1,
 		file_close_unzip/0, file_close_unzip/1,
+		file_close_gunzip/0, file_close_gunzip/1,
 		file_close_untar/0, file_close_untar/1]).
 
 -include_lib("common_test/include/ct.hrl").
@@ -235,6 +236,16 @@ init_per_testcase(file_close_unzip = _TestCase, Config) ->
 			{auth_methods, "publickey"}],
 	{ok, Handle} = ct_ssh:connect(cgf_sftp, sftp, SshOptions),
 	[{handle, Handle}, {sftp_subdir, SftpSubDir} | Config];
+init_per_testcase(file_close_gunzip = _TestCase, Config) ->
+	Port = proplists:get_value(sftpd_port, Config),
+	User = proplists:get_value(ssh_user, Config),
+	UserDir = proplists:get_value(ssh_user_dir, Config),
+	SftpSubDir = "GUNZIP",
+	SshOptions = [{port, Port}, {user, User}, {user_dir, UserDir},
+			{silently_accept_hosts, true}, {save_accepted_host, true},
+			{auth_methods, "publickey"}],
+	{ok, Handle} = ct_ssh:connect(cgf_sftp, sftp, SshOptions),
+	[{handle, Handle}, {sftp_subdir, SftpSubDir} | Config];
 init_per_testcase(file_close_untar = _TestCase, Config) ->
 	Port = proplists:get_value(sftpd_port, Config),
 	User = proplists:get_value(ssh_user, Config),
@@ -275,7 +286,7 @@ all() ->
 		import_mt_call, import_mo_sms,
 		sftp_close, sftp_no_close,
 		file_close_copy, file_close_move, file_close_delete,
-		file_close_unzip, file_close_untar].
+		file_close_unzip, file_close_gunzip, file_close_untar].
 
 %%---------------------------------------------------------------------
 %%  Test cases
@@ -556,6 +567,36 @@ file_close_unzip(Config) ->
 	{ok, _} = file:read_file_info(UnzipPath2),
 	UnzipPath3 = filename:join(UnzipDir, File3),
 	{ok, _} = file:read_file_info(UnzipPath3).
+
+file_close_gunzip() ->
+	Description = "SFTP put a file with a gunzip action.",
+	ct:comment(Description),
+	[{userdata, [{doc, Description}]},
+			{require, cgf_ssh},
+			{require, cgf_sftp}].
+
+file_close_gunzip(Config) ->
+	User = proplists:get_value(ssh_user, Config),
+	SftpdUserDir = proplists:get_value(sftpd_user_dir, Config),
+	SftpSubDir = proplists:get_value(sftp_subdir, Config),
+	GunzipDir = filename:join(SftpdUserDir, SftpSubDir),
+	Handle = proplists:get_value(handle, Config),
+	Data1 = rand:bytes(rand:uniform(1048576)),
+	File = cdr_filename(rand:uniform(999)),
+	GzipFile = lists:concat([File, ".gz"]),
+	ok = file:write_file(GzipFile, Data1, [write, binary, compressed]),
+	Match = {User, "/", [], "gz"},
+	RE = <<"(^CGF.*).gz$">>,
+	ReplacementDir = list_to_binary(SftpSubDir),
+	Replacement = <<ReplacementDir/binary, $/, $\\, $1>>,
+	Action = {gunzip, {RE, Replacement}},
+	ok = cgf:add_action(file_close, Match, Action),
+	ok = file:make_dir(GunzipDir),
+	{ok, Data2} = file:read_file(GzipFile),
+	ok = ct_ssh:write_file(Handle, GzipFile, Data2),
+	ct:sleep(1000),
+	GunzipPath = filename:join(GunzipDir, File),
+	{ok, _} = file:read_file_info(GunzipPath).
 
 file_close_untar() ->
 	Description = "SFTP put a file with an untar action.",

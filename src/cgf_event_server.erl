@@ -192,6 +192,9 @@ start_action(Event, Content, [{Match, {delete, _} = Action} | T]) ->
 start_action(Event, Content, [{Match, {unzip, _} = Action} | T]) ->
 	handle_unzip(Event, Content, Match, Action),
 	start_action(Event, Content, T);
+start_action(Event, Content, [{Match, {gunzip, _} = Action} | T]) ->
+	handle_gunzip(Event, Content, Match, Action),
+	start_action(Event, Content, T);
 start_action(Event, Content, [{Match, {untar, _} = Action} | T]) ->
 	handle_untar(Event, Content, Match, Action),
 	start_action(Event, Content, T);
@@ -386,6 +389,83 @@ handle_unzip(Event,
 					{match, Match},
 					{action, Action}])
 	end.
+
+%% @hidden
+handle_gunzip(Event,
+		#{root := Root, path := Path} = Content,
+		Match, {gunzip, {RE, Replacement}} = Action)
+		when is_binary(RE), is_binary(Replacement) ->
+	Subject = filename:basename(Path),
+	try re:replace(Subject, RE, Replacement, [{return, binary}]) of
+		Subject ->
+			ok;
+		NewPath ->
+			case filelib:safe_relative_path(NewPath, Root) of
+				unsafe ->
+					throw(unsafe_path);
+				SafePath ->
+					handle_gunzip(Event, Content, Match, Action, SafePath)
+			end
+	catch
+		_:Reason ->
+			?LOG_ERROR([{?MODULE, Reason},
+					{event, Event},
+					{content, Content},
+					{match, Match},
+					{action, Action}])
+	end.
+%% @hidden
+handle_gunzip(Event,
+		#{root := Root, path := Path} = Content,
+		Match, Action, NewPath) ->
+	Filename = binary_to_list(filename:join(Root, Path)),
+	Options = [read, binary, compressed],
+	handle_gunzip(Event, Content, Match, Action, NewPath,
+			file:open(Filename, Options)).
+%% @hidden
+handle_gunzip(Event,
+		#{root := Root} = Content,
+		Match, Action, NewPath, {ok, IoDevice1}) ->
+	UserPath = filename:join(<<"/">>, NewPath),
+	DirPath = <<Root/binary, UserPath/binary>>,
+	Filename = binary_to_list(DirPath),
+	Options = [write, binary],
+	handle_gunzip(Event, Content, Match, Action, UserPath,
+			IoDevice1, file:open(Filename, Options));
+handle_gunzip(Event, Content, Match, Action, _NewPath, {error, Reason}) ->
+	?LOG_ERROR([{?MODULE, Reason},
+			{event, Event},
+			{content, Content},
+			{match, Match},
+			{action, Action}]).
+%% @hidden
+handle_gunzip(Event,
+		#{root := Root, user := Username} = Content,
+		Match, Action, UserPath, IoDevice1, {ok, IoDevice2}) ->
+	case file:copy(IoDevice1, IoDevice2) of
+		{ok, _BytesCopied} ->
+			EventPayload = #{module => ?MODULE,
+					user => Username,
+					root => Root,
+					path => UserPath},
+			cgf_event:notify(file_close, EventPayload);
+		{error, Reason} ->
+			file:close(IoDevice1),
+			file:close(IoDevice2),
+			?LOG_ERROR([{?MODULE, Reason},
+					{event, Event},
+					{content, Content},
+					{match, Match},
+					{action, Action}])
+	end;
+handle_gunzip(Event, Content, Match, Action, _UserPath,
+		IoDevice1, {error, Reason}) ->
+	file:close(IoDevice1),
+	?LOG_ERROR([{?MODULE, Reason},
+			{event, Event},
+			{content, Content},
+			{match, Match},
+			{action, Action}]).
 
 %% @hidden
 handle_untar(Event,
