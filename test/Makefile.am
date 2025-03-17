@@ -17,7 +17,7 @@ CT_ARGS := ${CT_RUN_ARGS}
 CT_ARGS += -spec test.spec
 
 .dialyzer_ok:	$(addsuffix .beam, $(testmods))
-	dialyzer $(DIA_ARGS) --src $(top_srcdir)/src -I $(top_builddir)/src
+	dialyzer $(DIA_ARGS) --src -I $(top_builddir)/src $(top_srcdir)/src $(top_builddir)/src
 
 %.beam:$(top_srcdir)/test/%.erl $(top_srcdir)/include/cgf_3gpp_file.hrl
 	$(ERLC) $(ERLCFLAGS) -I $(top_srcdir)/include $<
