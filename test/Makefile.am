@@ -58,7 +58,7 @@ CT_ARGS += -spec test.spec
 			-logdir log \
 			-config ct.cfg \
 			-dir . \
-			-erl_args -noshell -sname $(LOGNAME)-ct
+			-erl_args -noshell -sname ct$$$$
 
 clean-local:
 	-rm -r *.beam log/*
