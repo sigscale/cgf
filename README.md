@@ -9,7 +9,9 @@ and
 
 See the
 [developers guide](https://storage.googleapis.com/cgf.sigscale.org/debian-bookworm/lib/cgf/doc/index.html)
-for detailed information.
+for detailed information and the most recent
+[test report](https://storage.googleapis.com/cgf.sigscale.org/debian-bookworm/test/index.html)
+for functional verification.
 
 This application provides the Charging Gateway Function (CGF) of the
 3GPP reference architecture (TS 32.240).
