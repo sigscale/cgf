@@ -37,6 +37,10 @@
 
 -behaviour(cgf_import_fsm).
 
+-export_type([cont/0]).
+
+-opaque cont() :: binary() | map().
+
 -type statedata() ::
 		#{filename := file:filename() | binary(),
 		log := disk_log:log(),
@@ -71,7 +75,7 @@ init([Filename, Log, Metadata | ExtraArgs] = _Args) ->
 		StateData :: statedata(),
 		Result :: {continue, Cont, StateData}
 				| {error, Reason},
-		Cont :: binary(),
+		Cont :: cont(),
 		Reason :: term().
 %% @doc Handles events received in the <em>open</em> state.
 %%
@@ -87,7 +91,7 @@ open(Filename, StateData) ->
 
 -spec read(Cont, StateData) -> Result
 	when
-		Cont :: binary() | map(),
+		Cont :: cont(),
 		StateData :: statedata(),
 		Result :: {continue, CDR, Cont, StateData}
 				| {error, Reason, Cont, StateData}
@@ -137,7 +141,7 @@ parse(CDR, Log,
 
 -spec close(Cont, StateData) -> Result
 	when
-		Cont :: binary() | map(),
+		Cont :: cont(),
 		StateData :: statedata(),
 		Result :: {stop, StateData}
 				| {error, Reason, StateData},

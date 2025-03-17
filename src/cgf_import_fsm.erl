@@ -75,8 +75,7 @@
 %%% 			<li><tt>StateData = term()</tt></li>
 %%% 			<li><tt>Result = {continue, Cont, StateData}
 %%% 					| {error, Reason}</tt></li>
-%%% 			<li><tt>Cont = {@link //kernel/file:io_device(). file:io_device()}
-%%% 					| binary() | list()</tt></li>
+%%% 			<li><tt>Cont = any()</tt></li>
 %%% 			<li><tt>Reason = term()</tt></li>
 %%% 		</ul>
 %%% 	</div>
@@ -92,8 +91,7 @@
 %%% 			<tt>read(Cont, StateData) -&gt; Result</tt>
 %%% 		</p>
 %%% 		<ul class="definitions">
-%%% 			<li><tt>Cont = {@link //kernel/file:io_device(). file:io_device()}
-%%% 					| binary() | list()</tt></li>
+%%% 			<li><tt>Cont = any()</tt></li>
 %%% 			<li><tt>StateData = term()</tt></li>
 %%% 			<li><tt>Result = {continue, CDR, Cont, StateData}
 %%% 					| {error, Reason, Cont, StateData}
@@ -132,8 +130,7 @@
 %%% 			<tt>close(Cont, StateData) -&gt; Result</tt>
 %%% 		</p>
 %%% 		<ul class="definitions">
-%%% 			<li><tt>Cont = {@link //kernel/file:io_device(). file:io_device()}
-%%% 					| binary() | list()</tt></li>
+%%% 			<li><tt>Cont = any()</tt></li>
 %%% 			<li><tt>StateData = term()</tt></li>
 %%% 			<li><tt>Result = {stop, StateData}
 %%% 					| {error, Reason, StateData}</tt></li>
@@ -170,11 +167,11 @@
 		StateData :: term(),
 		Result :: {continue, Cont, StateData}
 				| {error, Reason},
-		Cont :: file:io_device() | binary() | list(),
+		Cont :: any(),
 		Reason :: term().
 -callback read(Cont, StateData) -> Result
 	when
-		Cont :: file:io_device() | binary() | list(),
+		Cont :: any(),
 		StateData :: term(),
 		Result :: {continue, CDR, Cont, StateData}
 				| {error, Reason, Cont, StateData}
@@ -194,7 +191,7 @@
 		Reason :: normal | shutdown | term().
 -callback close(Cont, StateData) -> Result
 	when
-		Cont :: file:io_device() | binary() | list(),
+		Cont :: any(),
 		StateData :: term(),
 		Result :: {stop, StateData}
 				| {error, Reason, StateData},
