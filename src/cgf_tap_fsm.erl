@@ -91,8 +91,7 @@ open(Filename, StateData) ->
 		StateData :: statedata(),
 		Result :: {continue, CDR, Cont, StateData}
 				| {error, Reason, Cont, StateData}
-				| {close, Reason, Cont, StateData}
-				| {stop, Reason, StateData},
+				| {close, Reason, Cont, StateData},
 		CDR :: tuple(),
 		Reason :: asn1_decode | normal | shutdown | term().
 %% @doc Handles events received in the <em>read</em> state.
@@ -104,8 +103,8 @@ read(Cont, StateData)
 	case decode_tap(Cont, StateData) of
 		{ok, TransferBatch, NewStateData} ->
 			read(TransferBatch, NewStateData);
-		{error, Reason} ->
-			{close, Reason, <<>>, StateData}
+		{error, {asn1, _Description}} ->
+			{close, asn1_decode, <<>>, StateData}
 	end;
 read(#{callEventDetails := []} = TransferBatch, StateData) ->
 	{close, normal, TransferBatch, StateData};
@@ -174,7 +173,7 @@ decode_tap(Bin, StateData) ->
 	case 'TAP-0312':decode('DataInterChange', Bin) of
 		{ok, {transferBatch, TransferBatch}, <<>>} ->
 			decode_tap1(TransferBatch, StateData);
-		{ok, {notification, _Notification}} ->
+		{ok, {notification, _Notification}, _Rest} ->
 			{error, not_implemented};
 		{error, Reason} ->
 			{error, Reason}

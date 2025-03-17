@@ -90,8 +90,7 @@ open(Filename, StateData) ->
 		StateData :: statedata(),
 		Result :: {continue, CDR, Cont, StateData}
 				| {error, Reason, Cont, StateData}
-				| {close, Reason, Cont, StateData}
-				| {stop, Reason, StateData},
+				| {close, Reason, Cont, StateData},
 		CDR :: term(),
 		Reason :: asn1_decode | normal | shutdown | term().
 %% @doc Handles events received in the <em>read</em> state.
@@ -105,9 +104,7 @@ read(Cont, StateData) ->
 		{ok, CDR, Cont1} ->
 			{continue, CDR, Cont1, StateData};
 		{error, {asn1, _Description}} ->
-			{close, asn1_decode, <<>>, StateData};
-		{error, Reason} ->
-			{stop, Reason, StateData}
+			{close, asn1_decode, <<>>, StateData}
 	end.
 
 -spec parse(CDR, Log, StateData) -> Result

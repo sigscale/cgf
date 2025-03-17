@@ -90,7 +90,7 @@ import1(Log, Metadata, State, Bin) ->
 					{reason, ignored},
 					{size, byte_size(Rest)}]),
 			import2(Log, Metadata, State, TransferBatch);
-		{ok, {notification, _Notification}} ->
+		{ok, {notification, _Notification}, _Rest} ->
 			{error, not_implemented};
 		{error, Reason} ->
 			{error, Reason}
