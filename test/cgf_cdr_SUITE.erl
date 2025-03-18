@@ -680,7 +680,7 @@ stop_looping(Config) ->
 	ok = ct_ssh:write_file(Handle, Filename, Data),
 	ct:sleep(1000),
 	{ok, MaxAction} = application:get_env(cgf, max_action),
-	LoopFilename = Filename ++ lists:duplicate(MaxAction, $+),
+	LoopFilename = Filename ++ lists:duplicate(MaxAction - 1, $+),
 	LoopPath = filename:join(LoopDir, LoopFilename),
 	{ok, _} = file:read_file_info(LoopPath).
 

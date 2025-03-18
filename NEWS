@@ -1,3 +1,7 @@
+March 18 2025
+-------------
+	- Action backtrace with maxium depth (loop prevention)
+
 March 11 2025
 -------------
 	- Event action: gunzip

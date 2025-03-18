@@ -1,3 +1,15 @@
+2025-03-18   Vance Shipley <vances@sigscale.org>
+
+	* match specifications with binary_part/3 requires erts-13.0
+	* event notifications include backrace stack wih maximum depth
+	* use random number, instead of username, in nodename
+	* continuity is any() in behaviour, opaque() in callbacks
+	* readme link to common test report
+	* include generated asn1 modules in dialyzer analysis
+	* correct expected return value from asn1 decode
+	* start ssh application
+	* make check: environment variables for extra args
+
 2025-03-11   Vance Shipley <vances@sigscale.org>
 
 	* gunzip action
