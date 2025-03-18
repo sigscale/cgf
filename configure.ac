@@ -83,6 +83,8 @@ AC_SUBST(envdir)
 ## Libraries:  check for libraries
 ##
 AC_ERLANG_SUBST_ERTS_VER
+AS_VERSION_COMPARE([$ERLANG_ERTS_VER], ["13.0"],
+		[AC_MSG_ERROR([>= erts-13.0 required!])])
 AC_ERLANG_CHECK_LIB([kernel], [], [AC_MSG_ERROR([kernel was not found!])])
 AC_ERLANG_CHECK_LIB([stdlib],
 		[AS_VERSION_COMPARE([$ERLANG_LIB_VER_stdlib], ["3.5"],
@@ -97,11 +99,10 @@ AC_ERLANG_CHECK_LIB([public_key], [], [AC_MSG_ERROR([public_keywas not found!])]
 AC_ERLANG_CHECK_LIB([ssh], [], [AC_MSG_ERROR([ssh was not found!])])
 AC_ERLANG_CHECK_LIB([map], [], [AC_MSG_ERROR([map was not found!])])
 AC_ERLANG_CHECK_LIB([cap], [], [AC_MSG_ERROR([cap was not found!])])
-AC_ERLANG_CHECK_LIB([zj], [], [AC_MSG_ERROR([zj was not found!])])
 AC_ERLANG_CHECK_LIB([inap], [], [AC_MSG_ERROR([inap was not found!])])
 AC_ERLANG_CHECK_LIB([sccp], [], [AC_MSG_ERROR([sccp was not found!])])
 AC_ERLANG_CHECK_LIB([tcap], [], [AC_MSG_ERROR([tcap was not found!])])
-AC_ERLANG_CHECK_LIB([jesse], [], [AC_MSG_WARN([jesse was not found!])])
+AC_ERLANG_CHECK_LIB([zj], [], [AC_MSG_ERROR([zj was not found!])])
 
 
 ##
