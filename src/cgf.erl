@@ -27,7 +27,14 @@
 -export([statistics/1]).
 -export([plmn/1]).
 
--export_type([action/0]).
+-export_type([event/0, match/0, action/0]).
+
+-type event() :: file_close.
+-type match() :: {
+		User :: string() | binary(),
+		Directory :: string() | binary(),
+		Filename :: string() | binary(),
+		Suffix :: string() | binary()}.
 -type action() :: {import, Import :: {Module :: erlang:module(),
 				Log :: disk_log:log()}}
 		| {import, {Module :: erlang:module(), Log :: disk_log:log(),
@@ -78,12 +85,8 @@
 
 -spec add_action(Event, Match, Action) -> Result
 	when
-		Event :: file_close,
-		Match :: {User, Directory, Filename, Suffix},
-		User :: string() | binary(),
-		Directory :: string() | binary(),
-		Filename :: string() | binary(),
-		Suffix :: string() | binary(),
+		Event :: event(),
+		Match :: match(),
 		Action :: action(),
 		Result :: ok | {error, Reason},
 		Reason :: term().
@@ -182,12 +185,8 @@ add_action(file_close = _Event, Match, Action)
 
 -spec find_action(Event, Match) -> Result
 	when
-		Event :: file_close,
-		Match :: {User, Directory, Filename, Suffix},
-		User :: string() | binary(),
-		Directory :: string() | binary(),
-		Filename :: string() | binary(),
-		Suffix :: string() | binary(),
+		Event :: event(),
+		Match :: match(),
 		Result :: {ok, Action} | {error, Reason},
 		Action :: action(),
 		Reason :: not_found | term().
@@ -228,12 +227,8 @@ find_action(file_close = _Event, Match)
 
 -spec get_action(Event, Match) -> Action
 	when
-		Event :: file_close,
-		Match :: {User, Directory, Filename, Suffix},
-		User :: string() | binary(),
-		Directory :: string() | binary(),
-		Filename :: string() | binary(),
-		Suffix :: string() | binary(),
+		Event :: event(),
+		Match :: match(),
 		Action :: action().
 %% @doc Get an event action.
 get_action(Event, {User, Directory, Filename, Suffix} = _Match)
@@ -272,13 +267,9 @@ get_action(file_close = _Event, Match)
 
 -spec get_actions(Event) -> Actions
 	when
-		Event :: file_close,
+		Event :: event(),
 		Actions :: [{Match, Action}],
-		Match :: {User, Directory, Filename, Suffix},
-		User :: binary(),
-		Directory :: binary(),
-		Filename :: binary(),
-		Suffix :: binary(),
+		Match :: match(),
 		Action :: action().
 %% @doc Get all event actions.
 get_actions(file_close = _Event) ->
@@ -304,12 +295,8 @@ get_actions(file_close = _Event) ->
 
 -spec delete_action(Event, Match) -> Result
 	when
-		Event :: file_close,
-		Match :: {User, Directory, Filename, Suffix},
-		User :: string() | binary(),
-		Directory :: string() | binary(),
-		Filename :: string() | binary(),
-		Suffix :: string() | binary(),
+		Event :: event(),
+		Match :: match(),
 		Result :: ok | {error, Reason},
 		Reason :: term().
 %% @doc Delete an event action.
@@ -347,15 +334,11 @@ delete_action(file_close = _Event, Match)
 
 -spec match_event(Event, Content) -> Result
 	when
-		Event :: file_close,
+		Event :: event(),
 		Content :: cgf_event:file_close(),
 		Result :: {ok, Actions} | {error, Reason},
 		Actions :: [{Match, Action}],
-		Match :: {User, Directory, Filename, Suffix},
-		User :: binary(),
-		Directory :: binary(),
-		Filename :: binary(),
-		Suffix :: binary(),
+		Match :: match(),
 		Action :: action(),
 		Reason :: term().
 %% @doc Find actions matching event.

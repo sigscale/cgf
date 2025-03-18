@@ -39,7 +39,8 @@
 		file_close_delete/0, file_close_delete/1,
 		file_close_unzip/0, file_close_unzip/1,
 		file_close_gunzip/0, file_close_gunzip/1,
-		file_close_untar/0, file_close_untar/1]).
+		file_close_untar/0, file_close_untar/1,
+		stop_looping/0, stop_looping/1]).
 
 -include_lib("common_test/include/ct.hrl").
 -include_lib("kernel/include/file.hrl").
@@ -256,6 +257,16 @@ init_per_testcase(file_close_untar = _TestCase, Config) ->
 			{auth_methods, "publickey"}],
 	{ok, Handle} = ct_ssh:connect(cgf_sftp, sftp, SshOptions),
 	[{handle, Handle}, {sftp_subdir, SftpSubDir} | Config];
+init_per_testcase(stop_looping = _TestCase, Config) ->
+	Port = proplists:get_value(sftpd_port, Config),
+	User = proplists:get_value(ssh_user, Config),
+	UserDir = proplists:get_value(ssh_user_dir, Config),
+	SftpSubDir = "LOOP",
+	SshOptions = [{port, Port}, {user, User}, {user_dir, UserDir},
+			{silently_accept_hosts, true}, {save_accepted_host, true},
+			{auth_methods, "publickey"}],
+	{ok, Handle} = ct_ssh:connect(cgf_sftp, sftp, SshOptions),
+	[{handle, Handle}, {sftp_subdir, SftpSubDir} | Config];
 init_per_testcase(_TestCase, Config) ->
    Config.
 
@@ -286,7 +297,8 @@ all() ->
 		import_mt_call, import_mo_sms,
 		sftp_close, sftp_no_close,
 		file_close_copy, file_close_move, file_close_delete,
-		file_close_unzip, file_close_gunzip, file_close_untar].
+		file_close_unzip, file_close_gunzip, file_close_untar,
+		stop_looping].
 
 %%---------------------------------------------------------------------
 %%  Test cases
@@ -637,6 +649,40 @@ file_close_untar(Config) ->
 	{ok, _} = file:read_file_info(UntarPath2),
 	UntarPath3 = filename:join(UntarDir, File3),
 	{ok, _} = file:read_file_info(UntarPath3).
+
+stop_looping() ->
+	Description = "SFTP put a file with endless looping actions.",
+	ct:comment(Description),
+	[{userdata, [{doc, Description}]},
+			{require, cgf_ssh},
+			{require, cgf_sftp}].
+
+stop_looping(Config) ->
+	User = proplists:get_value(ssh_user, Config),
+	SftpdUserDir = proplists:get_value(sftpd_user_dir, Config),
+	SftpSubDir = proplists:get_value(sftp_subdir, Config),
+	LoopDir = filename:join(SftpdUserDir, SftpSubDir),
+	Handle = proplists:get_value(handle, Config),
+	Data = rand:bytes(rand:uniform(1048576)),
+	Filename = cdr_filename(rand:uniform(999)),
+	Match1 = {User, "/", Filename, []},
+	RE1 = <<"^CGF">>,
+	ReplacementDir = list_to_binary(SftpSubDir),
+	Replacement1 = <<ReplacementDir/binary, $/, $&>>,
+	Action1 = {move, {RE1, Replacement1}},
+	ok = cgf:add_action(file_close, Match1, Action1),
+	Match2 = {User, "/" ++ SftpSubDir, Filename, []},
+	RE2 = <<"^(CGF.*)$">>,
+	Replacement2 = <<ReplacementDir/binary, $/, $\\, $1, $+>>,
+	Action2 = {move, {RE2, Replacement2}},
+	ok = cgf:add_action(file_close, Match2, Action2),
+	ok = file:make_dir(LoopDir),
+	ok = ct_ssh:write_file(Handle, Filename, Data),
+	ct:sleep(1000),
+	{ok, MaxAction} = application:get_env(cgf, max_action),
+	LoopFilename = Filename ++ lists:duplicate(MaxAction, $+),
+	LoopPath = filename:join(LoopDir, LoopFilename),
+	{ok, _} = file:read_file_info(LoopPath).
 
 %%---------------------------------------------------------------------
 %%  Internal functions

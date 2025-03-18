@@ -114,3 +114,11 @@ broken out for convenience (e.g. `[{root, "/var/spool/cgf"}]'):
 				(default: `0' which is unlimited).</dd>
 </dl>
 
+===Mediation===
+Application environment variables configuring mediation of CDR files:
+<dl>
+	<dt>`max_action'</dt>
+		<dd>Sets the maximum number of actions resulting from
+				an initial event to prevent looping. (default: `5')</dd>
+</dl>
+

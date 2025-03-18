@@ -73,6 +73,7 @@
 		{env,
 				[{wait_tables, 10000},
 				{statistics_interval, 60},
+				{max_action, 5},
 				{bx_log_dir, "log/bx"},
 				{logs,
 						[

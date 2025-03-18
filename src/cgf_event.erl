@@ -34,15 +34,20 @@
 
 -include_lib("kernel/include/logger.hrl").
 
--record(state, {}).
--type state() :: #state{}.
+-export_type([file_close/0]).
 
+-type stack() :: [{Event :: cgf:event(),
+		{Match :: cgf:match(), Action :: cgf:action()}}].
 -type file_close() ::
 		#{module := Module :: atom(),
 		user := User :: binary(),
 		root := Root :: binary(),
-		path := Path :: binary()}.
--export_type([file_close/0]).
+		path := Path :: binary(),
+		stack := Stack :: stack()}.
+
+-record(state,
+		{max_stack :: pos_integer()}).
+-type state() :: #state{}.
 
 %%----------------------------------------------------------------------
 %%  The cgf_event API
@@ -89,7 +94,8 @@ notify(EventType, EventPayLoad) ->
 %% @private
 %%
 init([] = _Args) ->
-	{ok, #state{}}.
+	{ok, MaxStack} = application:get_env(max_action),
+	{ok, #state{max_stack = MaxStack}}.
 
 -spec handle_event(Event, State) -> Result
 	when
@@ -109,6 +115,11 @@ init([] = _Args) ->
 %% 	gen_event:notify/2, gen_event:sync_notify/2}.
 %% @private
 %%
+handle_event({_, #{stack := Stack}} = Event,
+		#state{max_stack = MaxStack} = State)
+		when length(Stack) >= MaxStack ->
+	?LOG_ERROR([{?MODULE, max_action}, {event, Event}]),
+	{ok, State};
 handle_event({file_close, #{}} = Event, State) ->
 	gen_server:call(cgf_event_server, Event),
 	{ok, State};

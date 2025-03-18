@@ -242,17 +242,20 @@ handle_copy(Event,
 	end.
 %% @hidden
 handle_copy(Event,
-		#{root := Root, user := Username, path := Path} = Content,
+		#{root := Root, user := Username,
+				path := Path, stack := Stack} = Content,
 		Match, Action, NewPath) ->
 	Filename = filename:join(Root, Path),
 	UserPath = filename:join(<<"/">>, NewPath),
 	FilePath = <<Root/binary, UserPath/binary>>,
 	case file:copy(Filename, FilePath) of
 		{ok, _} ->
+			Stack1 = [{Event, Match, Action} | Stack],
 			EventPayload = #{module => ?MODULE,
 					user => Username,
 					root => Root,
-					path => UserPath},
+					path => UserPath,
+					stack => Stack1},
 			cgf_event:notify(file_close, EventPayload);
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, Reason},
@@ -288,17 +291,20 @@ handle_move(Event,
 	end.
 %% @hidden
 handle_move(Event,
-		#{root := Root, user := Username, path := Path} = Content,
+		#{root := Root, user := Username,
+				path := Path, stack := Stack} = Content,
 		Match, Action, NewPath) ->
 	Filename = filename:join(Root, Path),
 	UserPath = filename:join(<<"/">>, NewPath),
 	FilePath = <<Root/binary, UserPath/binary>>,
 	case file:rename(Filename, FilePath) of
 		ok ->
+			Stack1 = [{Event, Match, Action} | Stack],
 			EventPayload = #{module => ?MODULE,
 					user => Username,
 					root => Root,
-					path => UserPath},
+					path => UserPath,
+					stack => Stack1},
 			cgf_event:notify(file_close, EventPayload);
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, Reason},
@@ -363,7 +369,8 @@ handle_unzip(Event,
 	end.
 %% @hidden
 handle_unzip(Event,
-		#{root := Root, user := Username, path := Path} = Content,
+		#{root := Root, user := Username,
+				path := Path, stack := Stack} = Content,
 		Match, Action, NewPath) ->
 	Filename = binary_to_list(filename:join(Root, Path)),
 	UserPath = filename:join(<<"/">>, NewPath),
@@ -374,10 +381,12 @@ handle_unzip(Event,
 			F = fun(File) ->
 					case string:prefix(File, binary_to_list(Root)) of
 						UnzipPath when is_list(UnzipPath) ->
+							Stack1 = [{Event, Match, Action} | Stack],
 							EventPayload = #{module => ?MODULE,
 									user => Username,
 									root => Root,
-									path => filename:join(<<"/">>, UnzipPath)},
+									path => filename:join(<<"/">>, UnzipPath),
+									stack => Stack1},
 							cgf_event:notify(file_close, EventPayload)
 					end
 			end,
@@ -440,14 +449,16 @@ handle_gunzip(Event, Content, Match, Action, _NewPath, {error, Reason}) ->
 			{action, Action}]).
 %% @hidden
 handle_gunzip(Event,
-		#{root := Root, user := Username} = Content,
+		#{root := Root, user := Username, stack := Stack} = Content,
 		Match, Action, UserPath, IoDevice1, {ok, IoDevice2}) ->
 	case file:copy(IoDevice1, IoDevice2) of
 		{ok, _BytesCopied} ->
+			Stack1 = [{Event, Match, Action} | Stack],
 			EventPayload = #{module => ?MODULE,
 					user => Username,
 					root => Root,
-					path => UserPath},
+					path => UserPath,
+					stack => Stack1},
 			cgf_event:notify(file_close, EventPayload);
 		{error, Reason} ->
 			file:close(IoDevice1),
@@ -547,7 +558,7 @@ handle_untar1(Event, Content, Match, Action,
 	end.
 %% @hidden
 handle_untar2(Event,
-		#{root := Root, user := Username} = Content,
+		#{root := Root, user := Username, stack := Stack} = Content,
 		Match, Action, UserPath, File, Files) ->
 	DirPath = <<Root/binary, UserPath/binary>>,
 	Options = [{files, Files}, {cwd, binary_to_list(DirPath)}],
@@ -556,10 +567,12 @@ handle_untar2(Event,
 			ok = file:close(File),
 			F = fun(Filename) ->
 					FilePath = filename:join(UserPath, Filename),
+					Stack1 = [{Event, Match, Action} | Stack],
 					EventPayload = #{module => ?MODULE,
 							user => Username,
 							root => Root,
-							path => FilePath},
+							path => FilePath,
+							stack => Stack1},
 					cgf_event:notify(file_close, EventPayload)
 			end,
 			lists:foreach(F, Files);
