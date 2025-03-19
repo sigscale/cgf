@@ -44,6 +44,7 @@
 				'CHFChargingDataTypes',
 				'ExposureFunctionAPIChargingDataTypes',
 				'TAP-0312',
+				'Huawei-CS',
 				cgf_tap,
 				cgf_tap_fsm,
 				cgf_3gpp_file,
