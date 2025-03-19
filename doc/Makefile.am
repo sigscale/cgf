@@ -25,8 +25,8 @@ modhtml = cgf.html \
 		cgf_tools.html \
 		cgf_rest.html \
 		cgf_rest_res_health.html \
-		mod_cgf_rest_accepted_content.beam \
-		mod_cgf_rest_get.beam \
+		mod_cgf_rest_accepted_content.html \
+		mod_cgf_rest_get.html \
 		mod_cgf_rest_head.html \
 		user_default.html \
 		cgf_tap.html \
