@@ -14,12 +14,12 @@ beam_DATA = cgf.beam \
 		cgf_server.beam \
 		cgf_statistics_sup.beam \
 		cgf_statistics_server.beam \
-		cgf_sftpd.beam \
 		cgf_event_sup.beam \
 		cgf_event.beam \
 		cgf_event_server.beam \
 		cgf_import_sup.beam \
 		cgf_import_fsm.beam \
+		cgf_sftpd.beam \
 		cgf_log_sup.beam \
 		cgf_log_server_sup.beam \
 		cgf_log_server.beam \
