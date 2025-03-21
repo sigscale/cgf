@@ -23,11 +23,11 @@
 -copyright('Copyright (c) 2024 - 2025 SigScale Global Inc.').
 -author('Vance Shipley <vances@sigscale.org>').
 
-%% export the cgf_log_codec_ecs  public API
+%% export the cgf_log_codec_ecs public API
 -export([bx/1]).
 -export([ecs_base/1, ecs_server/4, ecs_client/4, ecs_network/2,
 		ecs_source/5, ecs_destination/1, ecs_service/2, ecs_event/7,
-		ecs_url/1]).
+		ecs_user/1, ecs_url/1]).
 
 %%----------------------------------------------------------------------
 %%  The cgf_log_codec_ecs public API
