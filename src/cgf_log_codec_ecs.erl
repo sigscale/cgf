@@ -27,7 +27,7 @@
 -export([bx/1]).
 -export([ecs_base/1, ecs_server/4, ecs_client/4, ecs_network/2,
 		ecs_source/5, ecs_destination/1, ecs_service/2, ecs_event/7,
-		ecs_user/1, ecs_url/1]).
+		ecs_user/2, ecs_url/1]).
 
 %%----------------------------------------------------------------------
 %%  The cgf_log_codec_ecs public API
@@ -72,7 +72,7 @@ bx([{moCall = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_service("bx", "cgf"), $,,
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(StartTime, StopTime, Duration,
-					"event", "session", ["connection"], Outcome), $,,
+					"event", ["session"], ["connection"], Outcome), $,,
 			$", "Bx_moCall", $", $:, zj:encode(Parameters)]);
 bx([{mtCall = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
@@ -90,7 +90,7 @@ bx([{mtCall = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_service("bx", "cgf"), $,,
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(StartTime, StopTime, Duration,
-					"event", "session", ["connection"], Outcome), $,,
+					"event", ["session"], ["connection"], Outcome), $,,
 			$", "Bx_mtCall", $", $:, zj:encode(Parameters)]);
 bx([{moSMS = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
@@ -107,7 +107,7 @@ bx([{moSMS = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_service("bx", "cgf"), $,,
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(Timestamp, [], [],
-					"event", "session", ["connection"], Outcome), $,,
+					"event", ["session"], ["connection"], Outcome), $,,
 			$", "Bx_moSMS", $", $:, zj:encode(Parameters)]);
 bx([{mtSMS = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
@@ -124,7 +124,7 @@ bx([{mtSMS = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_service("bx", "cgf"), $,,
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(Timestamp, [], [],
-					"event", "session", ["connection"], Outcome), $,,
+					"event", ["session"], ["connection"], Outcome), $,,
 			$", "Bx_mtSMS", $", $:, zj:encode(Parameters)]);
 bx([{ssAction = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
@@ -141,7 +141,7 @@ bx([{ssAction = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_service("bx", "cgf"), $,,
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(Timestamp, [], [],
-					"event", "session", ["connection"], Outcome), $,,
+					"event", ["session"], ["connection"], Outcome), $,,
 			$", "Bx_ssAction", $", $:, zj:encode(Parameters)]);
 bx([{incGateway = _RecordType, Parameters} | T] = _CDR) ->
 	Timestamp = case maps:find(<<"eventtimestamp">>, Parameters) of
@@ -155,7 +155,7 @@ bx([{incGateway = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_base(Timestamp), $,,
 			ecs_service("bx", "cgf"), $,,
 			ecs_event(Timestamp, [], [],
-					"event", "session", ["connection"], Outcome), $,,
+					"event", ["session"], ["connection"], Outcome), $,,
 			$", "Bx_incGateway", $", $:, zj:encode(Parameters)]);
 bx([{outGateway = _RecordType, Parameters} | T] = _CDR) ->
 	Timestamp = case maps:find(<<"eventtimestamp">>, Parameters) of
@@ -169,7 +169,7 @@ bx([{outGateway = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_base(Timestamp), $,,
 			ecs_service("bx", "cgf"), $,,
 			ecs_event(Timestamp, [], [],
-					"event", "session", ["connection"], Outcome), $,,
+					"event", ["session"], ["connection"], Outcome), $,,
 			$", "Bx_outGateway", $", $:, zj:encode(Parameters)]);
 bx([{transit = _RecordType, Parameters} | T] = _CDR) ->
 	Timestamp = case maps:find(<<"eventtimestamp">>, Parameters) of
@@ -183,7 +183,7 @@ bx([{transit = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_base(Timestamp), $,,
 			ecs_service("bx", "cgf"), $,,
 			ecs_event(Timestamp, [], [],
-					"event", "session", ["connection"], Outcome), $,,
+					"event", ["session"], ["connection"], Outcome), $,,
 			$", "Bx_transit", $", $:, zj:encode(Parameters)]);
 bx([{roaming = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
@@ -201,7 +201,7 @@ bx([{roaming = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_service("bx", "cgf"), $,,
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(StartTime, StopTime, Duration,
-					"event", "session", ["connection"], Outcome), $,,
+					"event", ["session"], ["connection"], Outcome), $,,
 			$", "Bx_roaming", $", $:, zj:encode(Parameters)]);
 bx([{sgsnPDP = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
@@ -219,7 +219,7 @@ bx([{sgsnPDP = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_service("bx", "cgf"), $,,
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(Timestamp, StopTime, Duration,
-					"event", "session", ["connection"], Outcome), $,,
+					"event", ["session"], ["connection"], Outcome), $,,
 			$", "Bx_sgsnPDP", $", $:, zj:encode(Parameters)]);
 bx([{ggsnPDP = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
@@ -237,7 +237,7 @@ bx([{ggsnPDP = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_service("bx", "cgf"), $,,
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(Timestamp, StopTime, Duration,
-					"event", "session", ["connection"], Outcome), $,,
+					"event", ["session"], ["connection"], Outcome), $,,
 			$", "Bx_ggsnPDP", $", $:, zj:encode(Parameters)]);
 bx([{sgsnSMO = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
@@ -254,7 +254,7 @@ bx([{sgsnSMO = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_service("bx", "cgf"), $,,
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(Timestamp, [], [],
-					"event", "session", ["connection"], Outcome), $,,
+					"event", ["session"], ["connection"], Outcome), $,,
 			$", "Bx_sgsnSMO", $", $:, zj:encode(Parameters)]);
 bx([{sgsnSMT = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
@@ -271,7 +271,7 @@ bx([{sgsnSMT = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_service("bx", "cgf"), $,,
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(Timestamp, [], [],
-					"event", "session", ["connection"], Outcome), $,,
+					"event", ["session"], ["connection"], Outcome), $,,
 			$", "Bx_sgsnSMT", $", $:, zj:encode(Parameters)]);
 bx([{sgw = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
@@ -289,7 +289,7 @@ bx([{sgw = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_service("bx", "cgf"), $,,
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(Timestamp, StopTime, Duration,
-					"event", "session", ["connection"], Outcome), $,,
+					"event", ["session"], ["connection"], Outcome), $,,
 			$", "Bx_sgw", $", $:, zj:encode(Parameters)]);
 bx([{vas = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
@@ -306,7 +306,7 @@ bx([{vas = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_service("bx", "cgf"), $,,
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(Timestamp, [], [],
-					"event", "session", ["connection"], Outcome), $,,
+					"event", ["session"], ["connection"], Outcome), $,,
 			$", "Bx_vas", $", $:, zj:encode(Parameters)]);
 bx([{abmf = _RecordType, Parameters} | T] = _CDR) ->
 	MSISDN = msisdn(Parameters),
@@ -322,7 +322,7 @@ bx([{abmf = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_service("bx", "cgf"), $,,
 			ecs_user(MSISDN, []), $,,
 			ecs_event(Timestamp, [], [],
-					"event", "session", ["connection"], Outcome), $,,
+					"event", ["session"], ["connection"], Outcome), $,,
 			$", "Bx_balance", $", $:, zj:encode(Parameters)]);
 bx([{roam_moCall = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
@@ -334,7 +334,7 @@ bx([{roam_moCall = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_service("bx", "cgf"), $,,
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(StartTime, [], Duration,
-					"event", "session", ["connection"], Outcome), $,,
+					"event", ["session"], ["connection"], Outcome), $,,
 			$", "Bx_roam_moCall", $", $:, zj:encode(Parameters)]);
 bx([{roam_mtCall = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
@@ -346,7 +346,7 @@ bx([{roam_mtCall = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_service("bx", "cgf"), $,,
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(StartTime, [], Duration,
-					"event", "session", ["connection"], Outcome), $,,
+					"event", ["session"], ["connection"], Outcome), $,,
 			$", "Bx_roam_mtCall", $", $:, zj:encode(Parameters)]);
 bx([{roam_gprs = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
@@ -358,7 +358,7 @@ bx([{roam_gprs = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_service("bx", "cgf"), $,,
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(StartTime, [], Duration,
-					"event", "session", ["connection"], Outcome), $,,
+					"event", ["session"], ["connection"], Outcome), $,,
 			$", "Bx_roam_gprsCall", $", $:, zj:encode(Parameters)]);
 bx([{RecordType, Parameters} | T] = _CDR)
 		when is_list(RecordType) ->
@@ -613,7 +613,7 @@ ecs_service(Name, Type) ->
 		End:: string(),
 		Duration :: string(),
 		Kind :: string(),
-		Category :: string(),
+		Category :: [string()],
 		Type :: [string()],
 		Outcome :: string().
 %% @doc Elastic Common Schema (ECS): Event attributes.
@@ -644,7 +644,15 @@ ecs_event(Start, End, Duration, Kind, Category, Type, Outcome) ->
 		_ ->
 			[$,, $", "kind", $", $:, $", Kind, $"]
 	end,
-	Ecategory = case Category of
+	Ecategories = case Category of
+		[] ->
+			[];
+		[H1] ->
+			[$", H1, $"];
+		[H1 | T1] ->
+			[$", H1, $" | [[$,, $", E, $"] || E <- T1]]
+	end,
+	Ecategory = case Ecategories of
 		[] ->
 			[];
 		_ ->
@@ -653,10 +661,10 @@ ecs_event(Start, End, Duration, Kind, Category, Type, Outcome) ->
 	Etypes = case Type of
 		[] ->
 			[];
-		[H] ->
-			[$", H, $"];
-		[H | T] ->
-			[$", H, $" | [[$,, $", E, $"] || E <- T]]
+		[H2] ->
+			[$", H2, $"];
+		[H2 | T2] ->
+			[$", H2, $" | [[$,, $", E, $"] || E <- T2]]
 	end,
 	Etype = case Etypes of
 		[] ->
