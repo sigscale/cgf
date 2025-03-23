@@ -25,9 +25,6 @@
 
 %% export the cgf_log_codec_ecs public API
 -export([bx/1]).
--export([ecs_base/1, ecs_server/4, ecs_client/4, ecs_network/2,
-		ecs_source/5, ecs_destination/1, ecs_service/2, ecs_event/7,
-		ecs_user/2, ecs_url/1]).
 
 %%----------------------------------------------------------------------
 %%  The cgf_log_codec_ecs public API
@@ -385,6 +382,10 @@ bx1([{AttributeName, AttributeValue} | T], Acc)
 bx1([], Acc) ->
 	[Acc | [$}]].
 
+%%----------------------------------------------------------------------
+%%  internal functions
+%%----------------------------------------------------------------------
+
 -spec ecs_base(Timestamp) -> iodata()
 	when
 		Timestamp :: string().
@@ -392,7 +393,7 @@ bx1([], Acc) ->
 %%
 %% 	`Timestamp' is milliseconds since the epoch
 %% 	(e.g. `erlang:system_time(millisecond)').
-%%
+%% @private
 ecs_base(Timestamp) ->
 	TS = [$", "@timestamp", $", $:, $", Timestamp, $"],
 	Labels = [$", "labels", $", $:, ${,
@@ -408,6 +409,7 @@ ecs_base(Timestamp) ->
 		IP :: inet:ip_address() | string(),
 		Port :: non_neg_integer() | string().
 %% @doc Elastic Common Schema (ECS): Server attributes.
+%% @private
 ecs_server(Address, Domain, IP, Port) when is_tuple(IP) ->
 	ecs_server(Address, Domain, inet:ntoa(IP), Port);
 ecs_server(Address, Domain, IP, Port) when is_integer(Port) ->
@@ -459,6 +461,7 @@ ecs_server4(Acc) ->
 		IP :: inet:ip_address() | string(),
 		Port :: non_neg_integer() | string().
 %% @doc Elastic Common Schema (ECS): Client attributes.
+%% @private
 ecs_client(Address, Domain, IP, Port) when is_tuple(IP) ->
 	ecs_client(Address, Domain, inet:ntoa(IP), Port);
 ecs_client(Address, Domain, IP, Port) when is_integer(Port) ->
@@ -508,6 +511,7 @@ ecs_client4(Acc) ->
 		Application :: string(),
 		Protocol :: string().
 %% @doc Elastic Common Schema (ECS): Network attributes.
+%% @private
 ecs_network([] = _Application, Protocol) ->
 	ecs_network1(Protocol, []);
 ecs_network(Application, Protocol) ->
@@ -531,6 +535,7 @@ ecs_network1(Protocol, Napplication) ->
 		UserName :: binary() | string(),
 		UserIds :: [string()].
 %% @doc Elastic Common Schema (ECS): Source attributes.
+%% @private
 ecs_source([] = _Address, Domain, SubDomain, UserName, UserIds) ->
 	ecs_source1(Domain, SubDomain, UserName, UserIds, []);
 ecs_source(Address, Domain, SubDomain, UserName, UserIds) ->
@@ -578,6 +583,7 @@ ecs_source5(Acc) ->
 	when
 		SubDomain :: binary() | string().
 %% @doc Elastic Common Schema (ECS): Destination attributes.
+%% @private
 ecs_destination([] = _SubDomain) ->
 	[];
 ecs_destination(SubDomain) ->
@@ -589,6 +595,7 @@ ecs_destination(SubDomain) ->
 		Name :: string(),
 		Type :: string().
 %% @doc Elastic Common Schema (ECS): Service attributes.
+%% @private
 ecs_service(Name, Type) ->
 	Sname = case Name of
 		[] ->
@@ -617,6 +624,7 @@ ecs_service(Name, Type) ->
 		Type :: [string()],
 		Outcome :: string().
 %% @doc Elastic Common Schema (ECS): Event attributes.
+%% @private
 ecs_event(Start, End, Duration, Kind, Category, Type, Outcome) ->
 	Now = cgf_log:iso8601(erlang:system_time(millisecond)),
 	Ecreated = [$", "created", $", $:, $", Now, $"],
@@ -686,6 +694,7 @@ ecs_event(Start, End, Duration, Kind, Category, Type, Outcome) ->
 		Name :: string(),
 		Id :: string().
 %% @doc Elastic Common Schema (ECS): User attributes.
+%% @private
 ecs_user([] = _Name, Id) ->
 	ecs_user1(Id, []);
 ecs_user(Name, Id) ->
@@ -709,6 +718,7 @@ ecs_user2(Acc) ->
 	when
 		URL :: uri_string:uri_string() | uri_string:uri_map().
 %% @doc Elastic Common Schema (ECS): URL attributes.
+%% @private
 ecs_url([] = _URL) ->
 	[];
 ecs_url(URL) when is_list(URL) ->
@@ -762,10 +772,6 @@ ecs_url(URL) when is_map(URL) ->
 		[H | T] ->
 			[[$", "url", $", $:, ${, H | [[$,, E] || E <- T]], $}]
 	end.
-
-%%----------------------------------------------------------------------
-%%  internal functions
-%%----------------------------------------------------------------------
 
 -spec imsi(Parameters) -> IMSI
 	when
