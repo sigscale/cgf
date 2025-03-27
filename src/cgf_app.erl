@@ -460,7 +460,7 @@ force([]) ->
 %% @private
 create_table(cgf_action, Nodes) when is_list(Nodes) ->
 	create_table1(cgf_action, mnesia:create_table(cgf_action,
-			[{disc_copies, Nodes},
+			[{type, bag}, {disc_copies, Nodes},
 			{user_properties, [{cgf, true}]}])).
 %% @hidden
 create_table1(Table, {atomic, ok}) ->
