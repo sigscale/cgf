@@ -13,6 +13,7 @@ testmods = cgf_test_lib \
 		cgf_cdr_SUITE
 
 DIA_ARGS := ${DIALYZER_ARGS}
+DIA_ARGS += -Wno_unknown
 CT_ARGS := ${CT_RUN_ARGS}
 CT_ARGS += -spec test.spec
 
