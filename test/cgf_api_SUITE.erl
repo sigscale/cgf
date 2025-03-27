@@ -62,6 +62,9 @@ suite() ->
 %%
 init_per_suite(Config) ->
 	PrivDir = proplists:get_value(priv_dir, Config),
+	ok = cgf_test_lib:unload(cgf),
+	ok = cgf_test_lib:load(cgf),
+	ok = application:set_env(cgf, bx_log_dir, PrivDir),
 	ok = cgf_test_lib:unload(mnesia),
 	ok = cgf_test_lib:load(mnesia),
 	ok = application:set_env(mnesia, dir, PrivDir),
