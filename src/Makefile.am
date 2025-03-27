@@ -7,7 +7,11 @@ ASNCFLAGS = $(ERLCFLAGS) \
 		-I ${ERLANG_LIB_DIR_cap}/asn_src \
 		-bber +maps +noobj +undec_rest
 
-noinst_DATA = GenericChargingDataTypes.erl \
+noinst_DATA = ACSE-1.erl \
+		Attribute-ASN1Module.erl \
+		CMIP-1.erl \
+		InformationFramework.erl \
+		GenericChargingDataTypes.erl \
 		IMSChargingDataTypes.erl \
 		CSChargingDataTypes.erl \
 		GPRSChargingDataTypes.erl \

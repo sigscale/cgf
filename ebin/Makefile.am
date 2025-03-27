@@ -34,6 +34,10 @@ beam_DATA = cgf.beam \
 		mod_cgf_rest_get.beam \
 		mod_cgf_rest_head.beam \
 		user_default.beam \
+		ACSE-1.beam \
+		Attribute-ASN1Module.beam \
+		CMIP-1.beam \
+		InformationFramework.beam \
 		GenericChargingDataTypes.beam \
 		IMSChargingDataTypes.beam \
 		CSChargingDataTypes.beam \
@@ -65,6 +69,18 @@ beam_DATA = cgf.beam \
 
 %.beam:$(top_srcdir)/src/%.erl
 	$(ERLC) $(ERLCFLAGS) $<
+
+ACSE-1.beam:$(top_builddir)/src/ACSE-1.erl
+	$(ERLC) $(ERLCFLAGS) -I $(top_builddir)/src $<
+
+Attribute-ASN1Module.beam:$(top_builddir)/src/Attribute-ASN1Module.erl
+	$(ERLC) $(ERLCFLAGS) -I $(top_builddir)/src $<
+
+CMIP-1.beam:$(top_builddir)/src/CMIP-1.erl
+	$(ERLC) $(ERLCFLAGS) -I $(top_builddir)/src $<
+
+InformationFramework.beam:$(top_builddir)/src/InformationFramework.erl
+	$(ERLC) $(ERLCFLAGS) -I $(top_builddir)/src $<
 
 GenericChargingDataTypes.beam:$(top_builddir)/src/GenericChargingDataTypes.erl
 	$(ERLC) $(ERLCFLAGS) -I $(top_builddir)/src $<
