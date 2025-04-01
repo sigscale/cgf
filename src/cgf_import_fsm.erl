@@ -133,7 +133,9 @@
 %%% 			<li><tt>Cont = any()</tt></li>
 %%% 			<li><tt>StateData = term()</tt></li>
 %%% 			<li><tt>Result = {stop, StateData}
+%%% 					| {stop, Report, StateData}
 %%% 					| {error, Reason, StateData}</tt></li>
+%%% 			<li><tt>Report = map()</tt></li>
 %%% 			<li><tt>Reason = normal | shutdown | term()</tt></li>
 %%% 		</ul>
 %%% 	</div>
@@ -194,7 +196,9 @@
 		Cont :: any(),
 		StateData :: term(),
 		Result :: {stop, StateData}
+				| {stop, Report, StateData}
 				| {error, Reason, StateData},
+		Report :: map(),
 		Reason :: normal | shutdown | term().
 
 -type state() :: open | read | parse | close.
@@ -203,7 +207,9 @@
 		#{module := erlang:module(),
 		filename := file:filename() | binary(),
 		log := disk_log:log(),
-		metadata =>  map(),
+		metadata :=  map(),
+		import_log := disk_log:log(),
+		start := pos_integer(),
 		args => [term()],
 		cb_statedata => term(),
 		cont => file:io_device() | binary() | list() | map()}.
@@ -283,9 +289,13 @@ callback_mode() ->
 init([Module, Filename, Log])
 		when is_atom(Module),
 		(is_list(Filename) orelse is_binary(Filename)) ->
+	{ok, ImportLog} = application:get_env(import_log),
 	Data = #{module => Module,
 			filename => Filename,
-			log => Log},
+			log => Log,
+			metadata => #{},
+			import_log => ImportLog,
+			start => erlang:system_time(millisecond)},
 	case Module:init([Filename, Log]) of
 		{ok, CbStateData} ->
 			NewData = Data#{cb_statedata => CbStateData},
@@ -300,10 +310,13 @@ init([Module, Filename, Log, Metadata])
 		when is_atom(Module),
 		(is_list(Filename) orelse is_binary(Filename)),
 		is_map(Metadata) ->
+	{ok, ImportLog} = application:get_env(import_log),
 	Data = #{module => Module,
 			filename => Filename,
 			log => Log,
-			metadata => Metadata},
+			metadata => Metadata,
+			import_log => ImportLog,
+			start => erlang:system_time(millisecond)},
 	case Module:init([Filename, Log, Metadata]) of
 		{ok, CbStateData} ->
 			NewData = Data#{cb_statedata => CbStateData},
@@ -318,10 +331,13 @@ init([Module, Filename, Log, Metadata | ExtraArgs])
 		when is_atom(Module),
 		(is_list(Filename) orelse is_binary(Filename)),
 		is_map(Metadata), is_list(ExtraArgs) ->
+	{ok, ImportLog} = application:get_env(import_log),
 	Data = #{module => Module,
 			filename => Filename,
 			log => Log,
 			metadata => Metadata,
+			import_log => ImportLog,
+			start => erlang:system_time(millisecond),
 			extra_args => ExtraArgs},
 	case Module:init([Filename, Log, Metadata | ExtraArgs]) of
 		{ok, CbStateData} ->
@@ -351,10 +367,12 @@ open(state_timeout = _EventType, internal = _EventContent,
 				cb_statedata := CbStateData} = Data) ->
 	case Module:open(Filename, CbStateData) of
 		{continue, Cont, CbStateData1} ->
+			log_open(<<"success">>, Data),
 			NewData = Data#{cont => Cont,
 					cb_statedata => CbStateData1},
 			{next_state, read, NewData};
 		{error, Reason} ->
+			log_open(<<"failure">>, Data),
 			?LOG_ERROR([{Module, Reason},
 					{state, ?FUNCTION_NAME},
 					{filename, Filename},
@@ -461,6 +479,12 @@ close(internal = _EventType, Reason = _EventContent,
 		{stop, CbStateData1} ->
 			Data1 = maps:remove(cont, Data),
 			NewData = Data1#{cb_statedata => CbStateData1},
+			log_close(Reason, #{}, NewData),
+			{stop, Reason, NewData};
+		{stop, Report, CbStateData1} ->
+			Data1 = maps:remove(cont, Data),
+			NewData = Data1#{cb_statedata => CbStateData1},
+			log_close(Reason, Report, NewData),
 			{stop, Reason, NewData};
 		{error, Reason1, CbStateData1} ->
 			?LOG_WARNING([{Module, Reason},
@@ -469,6 +493,7 @@ close(internal = _EventType, Reason = _EventContent,
 					{log, Log}]),
 			Data1 = maps:remove(cont, Data),
 			NewData = Data1#{cb_statedata => CbStateData1},
+			log_close(Reason1, #{}, NewData),
 			{stop, Reason1, NewData}
 	end.
 
@@ -518,4 +543,57 @@ code_change(_OldVsn, OldState, OldData, _Extra) ->
 %%----------------------------------------------------------------------
 %%  internal functions
 %%----------------------------------------------------------------------
+
+-spec log_open(Outcome, Data) -> ok
+	when
+		Outcome :: binary(),
+		Data :: statedata().
+%% @doc Log after file open.
+%% @hidden
+log_open(Outcome,
+		#{module := Module, log := BxLog, import_log := ImportLog,
+				start := Start, metadata := Metadata} = _Data) ->
+	MetadataLog = maps:get("log", Metadata, #{}),
+	Metadata1 = maps:with(["file", "user"], MetadataLog),
+	Event = #{"outcome" => Outcome},
+	Process = #{"entity_id" => pid_to_list(self()),
+			"start" => cgf_log:iso8601(Start)},
+	Log = #{"logger" => atom_to_list(BxLog)},
+	ImportCDR = #{"moduleName" => atom_to_list(Module)},
+	OpenEvent = Metadata1#{"event" => Event,
+			"process" => Process,
+			"log" => Log,
+			"Import_CDR" => ImportCDR},
+	cgf_log:blog(ImportLog, OpenEvent).
+
+-spec log_close(Reason, Report, Data) -> ok
+	when
+		Reason :: normal | shutdown | term(),
+		Report :: map(),
+		Data :: statedata().
+%% @doc Log after file close.
+%% @hidden
+log_close(Reason, Report, Data)
+		when Reason == normal; Reason == shutdown ->
+	log_close1(<<"success">>, Report, Data);
+log_close(_Reason, Report, Data) ->
+	log_close1(<<"failure">>, Report, Data).
+%% @hidden
+log_close1(Outcome, Report,
+		#{module := Module, log := BxLog, import_log := ImportLog,
+				start := Start, metadata := Metadata} = _Data)
+		when is_map(Report) ->
+	MetadataLog = maps:get("log", Metadata, #{}),
+	Metadata1 = maps:with(["file", "user"], MetadataLog),
+	Event = #{"outcome" => Outcome},
+	Process = #{"entity_id" => pid_to_list(self()),
+			"start" => cgf_log:iso8601(Start),
+			"stop" => cgf_log:now()},
+	Log = #{"logger" => atom_to_list(BxLog)},
+	ImportCDR = Report#{"moduleName" => atom_to_list(Module)},
+	CloseEvent = Metadata1#{"event" => Event,
+			"process" => Process,
+			"log" => Log,
+			"Import_CDR" => ImportCDR},
+	cgf_log:blog(ImportLog, CloseEvent).
 
