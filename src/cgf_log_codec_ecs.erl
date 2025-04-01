@@ -24,7 +24,7 @@
 -author('Vance Shipley <vances@sigscale.org>').
 
 %% export the cgf_log_codec_ecs public API
--export([bx/1]).
+-export([bx/1, import/1]).
 
 %%----------------------------------------------------------------------
 %%  The cgf_log_codec_ecs public API
@@ -377,10 +377,55 @@ bx1([{roam_accountingInfo, AccountingInfo} | T], Acc) ->
 	bx1(T, [Acc1 | Acc]);
 bx1([{AttributeName, AttributeValue} | T], Acc)
 		when is_list(AttributeName) ->
+erlang:display({?MODULE, ?FUNCTION_NAME, ?LINE, AttributeName, AttributeValue}),
 	Acc1 = [[$,, $", AttributeName, $", $:, zj:encode(AttributeValue)]],
 	bx1(T, [Acc1 | Acc]);
 bx1([], Acc) ->
 	[lists:reverse(Acc) | [$}]].
+
+-spec import(Report) -> iodata()
+	when
+		Report :: map().
+%% @doc Import report CODEC for Elastic Stack logs.
+%%
+%% 	Formats events reporting on import process execution
+%% 	for consumption by Elastic Stack by providing a JSON
+%% 	format aligned with The Elastic Common Schema (ECS).
+%%
+%% 	Use this CODEC function with the {@link //cgf/cgf_log. cgf_log}
+%% 	logging functions with the
+%% 	{@link //cgf/cgf_log:log_option(). cgf_log:log_option()}
+%% 	`{codec, {{@module}, import}}'.
+%%
+import(Report) ->
+	Event = maps:get("event", Report),
+	Outcome = maps:get("outcome", Event),
+	Process = maps:get("process", Report),
+	StartTime = maps:get("start", Process),
+	StopTime = maps:get("end", Process, []),
+	{Timestamp, Duration, Type} = case length(StopTime) of
+		0 ->
+			{StartTime, [], ["access", "start"]};
+		_ ->
+			StartMs = cgf_log:iso8601(StartTime),
+			StopMs = cgf_log:iso8601(StopTime),
+			Nanos = (StopMs - StartMs) * 1000000,
+			{StopTime, integer_to_list(Nanos), ["access", "end"]}
+	end,
+	User = maps:get("user", Report),
+	File = maps:get("file", Report),
+	ImportCDR  = maps:get("Import_CDR", Report),
+	Kind = "event",
+	Category = ["file", "process"],
+	[${,
+			ecs_base(Timestamp), $,,
+			ecs_service("bx", "cgf"), $,,
+			ecs_event(StartTime, StopTime, Duration,
+					Kind, Category, Type, Outcome), $,,
+			$", "user", $", $:, zj:encode(User), $,,
+			$", "file", $", $:, zj:encode(File), $,,
+			$", "process", $", $:, zj:encode(Process), $,,
+			$", "Import_CDR", $", $:, zj:encode(ImportCDR), $}].
 
 %%----------------------------------------------------------------------
 %%  internal functions
@@ -402,194 +447,6 @@ ecs_base(Timestamp) ->
 			$", "version", $", $:, $", "8.5", $", $}],
 	[TS, $,, Labels, $,, Version].
 
--spec ecs_server(Address, Domain, IP, Port) -> iodata()
-	when
-		Address :: binary() | string(),
-		Domain :: binary() | string(),
-		IP :: inet:ip_address() | string(),
-		Port :: non_neg_integer() | string().
-%% @doc Elastic Common Schema (ECS): Server attributes.
-%% @private
-ecs_server(Address, Domain, IP, Port) when is_tuple(IP) ->
-	ecs_server(Address, Domain, inet:ntoa(IP), Port);
-ecs_server(Address, Domain, IP, Port) when is_integer(Port) ->
-	ecs_server(Address, Domain, IP, integer_to_list(Port));
-ecs_server(Address, Domain, IP, Port)
-		when ((length(Address) > 0) or (size(Address) > 0)) ->
-	Acc = [$", "address", $", $:, $", Address, $"],
-	ecs_server1(Domain, IP, Port, Acc);
-ecs_server(_Address, Domain, IP, Port)
-		when ((length(Domain) > 0) or (size(Domain) > 0)) ->
-	Acc = [$", "address", $", $:, $", Domain, $"],
-	ecs_server1(Domain, IP, Port, Acc);
-ecs_server(_Address, Domain, IP, Port) when length(IP) > 0 ->
-	Acc = [$", "address", $", $:, $", IP, $"],
-	ecs_server1(Domain, IP, Port, Acc);
-ecs_server(_Address, _Domain, _IP, Port) ->
-	ecs_server3(Port, []).
-%% @hidden
-ecs_server1(Domain, IP, Port, Acc)
-		when ((length(Domain) > 0) or (size(Domain) > 0)) ->
-	NewAcc = [Acc, $,, $", "domain", $", $:, $", Domain, $"],
-	ecs_server2(IP, Port, NewAcc);
-ecs_server1(_Domain, IP, Port, Acc) ->
-	ecs_server2(IP, Port, Acc).
-%% @hidden
-ecs_server2(IP, Port, Acc) when length(IP) > 0 ->
-	NewAcc = [Acc, $,, $", "ip", $", $:, $", IP, $"],
-	ecs_server3(Port, NewAcc);
-ecs_server2(_IP, Port, Acc) ->
-	ecs_server3(Port, Acc).
-%% @hidden
-ecs_server3([$0], Acc) ->
-	ecs_server4(Acc);
-ecs_server3(Port, Acc) when length(Port) > 0 ->
-	NewAcc = [Acc, $,, $", "port", $", $:, Port],
-	ecs_server4(NewAcc);
-ecs_server3(_Port, Acc) ->
-	ecs_server4(Acc).
-%% @hidden
-ecs_server4([]) ->
-	[];
-ecs_server4(Acc) ->
-	[$,, $", "server", $", $:, ${, Acc, $}].
-
--spec ecs_client(Address, Domain, IP, Port) -> iodata()
-	when
-		Address :: binary() | string(),
-		Domain :: binary() | string(),
-		IP :: inet:ip_address() | string(),
-		Port :: non_neg_integer() | string().
-%% @doc Elastic Common Schema (ECS): Client attributes.
-%% @private
-ecs_client(Address, Domain, IP, Port) when is_tuple(IP) ->
-	ecs_client(Address, Domain, inet:ntoa(IP), Port);
-ecs_client(Address, Domain, IP, Port) when is_integer(Port) ->
-	ecs_client(Address, Domain, IP, integer_to_list(Port));
-ecs_client(Address, Domain, IP, Port)
-		when ((length(Address) > 0) or (size(Address) > 0)) ->
-	Acc = [$", "address", $", $:, $", Address, $"],
-	ecs_client1(Domain, IP, Port, Acc);
-ecs_client(_Address, Domain, IP, Port)
-		when ((length(Domain) > 0) or (size(Domain) > 0)) ->
-	Acc = [$", "address", $", $:, $", Domain, $"],
-	ecs_client1(Domain, IP, Port, Acc);
-ecs_client(_Address, Domain, IP, Port) when length(IP) > 0 ->
-	Acc = [$", "address", $", $:, $", IP, $"],
-	ecs_client1(Domain, IP, Port, Acc);
-ecs_client(_Address, _Domain, _IP, Port) ->
-	ecs_client3(Port, []).
-%% @hidden
-ecs_client1(Domain, IP, Port, Acc)
-		when ((length(Domain) > 0) or (size(Domain) > 0)) ->
-	NewAcc = [Acc, $,, $", "domain", $", $:, $", Domain, $"],
-	ecs_client2(IP, Port, NewAcc);
-ecs_client1(_Domain, IP, Port, Acc) ->
-	ecs_client2(IP, Port, Acc).
-%% @hidden
-ecs_client2(IP, Port, Acc) when length(IP) > 0 ->
-	NewAcc = [Acc, $,, $", "ip", $", $:, $", IP, $"],
-	ecs_client3(Port, NewAcc);
-ecs_client2(_IP, Port, Acc) ->
-	ecs_client3(Port, Acc).
-%% @hidden
-ecs_client3([$0], Acc) ->
-	ecs_client4(Acc);
-ecs_client3(Port, Acc) when length(Port) > 0 ->
-	NewAcc = [Acc, $,, $", "port", $", $:, Port],
-	ecs_client4(NewAcc);
-ecs_client3(_Port, Acc) ->
-	ecs_client4(Acc).
-%% @hidden
-ecs_client4([]) ->
-	[];
-ecs_client4(Acc) ->
-	[$,, $", "client", $", $:, ${, Acc, $}].
-
--spec ecs_network(Application, Protocol) -> iodata()
-	when
-		Application :: string(),
-		Protocol :: string().
-%% @doc Elastic Common Schema (ECS): Network attributes.
-%% @private
-ecs_network([] = _Application, Protocol) ->
-	ecs_network1(Protocol, []);
-ecs_network(Application, Protocol) ->
-	Napplication = [$", "application", $", $:, $", Application, $"],
-	ecs_network1(Protocol, Napplication).
-%% @hidden
-ecs_network1([] = _Protocol, [] = _Napplication) ->
-	[];
-ecs_network1([], Napplication) ->
-	[$", "network", $", $:, ${, Napplication, $}];
-ecs_network1(Protocol, Napplication) ->
-	Nprotocol = [$", "protocol", $", $:, $", Protocol, $"],
-	[$", "network", $", $:, ${, Napplication, $,, Nprotocol, $}].
-
--spec ecs_source(Address, Domain, SubDomain,
-		UserName, UserIds) -> iodata()
-	when
-		Address :: binary() | string(),
-		Domain :: binary() | string(),
-		SubDomain :: binary() | string(),
-		UserName :: binary() | string(),
-		UserIds :: [string()].
-%% @doc Elastic Common Schema (ECS): Source attributes.
-%% @private
-ecs_source([] = _Address, Domain, SubDomain, UserName, UserIds) ->
-	ecs_source1(Domain, SubDomain, UserName, UserIds, []);
-ecs_source(Address, Domain, SubDomain, UserName, UserIds) ->
-	Saddress = [$", "address", $", $:, $", Address, $"],
-	ecs_source1(Domain, SubDomain, UserName, UserIds, [Saddress]).
-%% @hidden
-ecs_source1([], SubDomain, UserName, UserIds, Acc) ->
-	ecs_source2(SubDomain, UserName, UserIds, Acc);
-ecs_source1(Domain, SubDomain, UserName, UserIds, Acc) ->
-	Sdomain = [$", "domain", $", $:, $", Domain, $"],
-	ecs_source2(SubDomain, UserName, UserIds, [Sdomain | Acc]).
-%% @hidden
-ecs_source2([], UserName, UserIds, Acc) ->
-	ecs_source3(UserName, UserIds, Acc);
-ecs_source2(SubDomain, UserName, UserIds, Acc) ->
-	Ssubdomain = [$", "subdomain", $", $:, $", SubDomain, $"],
-	ecs_source3(UserName, UserIds, [Ssubdomain | Acc]).
-%% @hidden
-ecs_source3([], [], Acc) ->
-	ecs_source5(Acc);
-ecs_source3([], [H | _] = UserIds, Acc) ->
-	User = [$", "user", $", $:, ${,
-			$", "id", $", $:, $", H, $", $}],
-	ecs_source4(UserIds, [User | Acc]);
-ecs_source3(UserName, [H | _] = UserIds, Acc) ->
-	User = [$", "user", $", $:, ${,
-			$", "name", $", $:, $", UserName, $", $,,
-			$", "id", $", $:, $", H, $", $}],
-	ecs_source4(UserIds, [User | Acc]).
-%% @hidden
-ecs_source4([H | T] = _UserIds, Acc) ->
-	Related = [$", "related", $", $:, ${,
-			$", "user", $", $:, $[, $", H, $",
-			[[$,, $", R, $"] || R <- T], $], $}],
-	ecs_source5([Related | Acc]).
-%% @hidden
-ecs_source5([]) ->
-	[];
-ecs_source5(Acc) ->
-	[H | T] = lists:reverse(Acc),
-	Rest = [[$,, Field] || Field <- T],
-	[$", "source", $", $:, ${, H, Rest, $}].
-
--spec ecs_destination(SubDomain) -> iodata()
-	when
-		SubDomain :: binary() | string().
-%% @doc Elastic Common Schema (ECS): Destination attributes.
-%% @private
-ecs_destination([] = _SubDomain) ->
-	[];
-ecs_destination(SubDomain) ->
-	Dsubdomain = [$", "subdomain", $", $:, $", SubDomain, $"],
-	[$", "destination", $", $:, ${, Dsubdomain, $}].
-
 -spec ecs_service(Name, Type) -> iodata()
 	when
 		Name :: string(),
@@ -597,18 +454,8 @@ ecs_destination(SubDomain) ->
 %% @doc Elastic Common Schema (ECS): Service attributes.
 %% @private
 ecs_service(Name, Type) ->
-	Sname = case Name of
-		[] ->
-			[];
-		_ ->
-			[$,, $", "name", $", $:, $", Name, $"]
-	end,
-	Stype = case Type of
-		[] ->
-			[];
-		_ ->
-			[$,, $", "type", $", $:, $", Type, $"]
-	end,
+	Sname = [$,, $", "name", $", $:, $", Name, $"],
+	Stype = [$,, $", "type", $", $:, $", Type, $"],
 	Snode = [$", "node", $", $:, ${,
 			$", "name", $", $:, $", atom_to_list(node()), $", $}],
 	[$", "service", $", $:, ${, Snode, Sname, Stype, $}].
@@ -646,46 +493,22 @@ ecs_event(Start, End, Duration, Kind, Category, Type, Outcome) ->
 		_ ->
 			[$,, $", "duration", $", $:, $", Duration, $"]
 	end,
-	Ekind = case Kind of
-		[] ->
-			[];
-		_ ->
-			[$,, $", "kind", $", $:, $", Kind, $"]
-	end,
+	Ekind = [$,, $", "kind", $", $:, $", Kind, $"],
 	Ecategories = case Category of
-		[] ->
-			[];
 		[H1] ->
 			[$", H1, $"];
 		[H1 | T1] ->
 			[$", H1, $" | [[$,, $", E, $"] || E <- T1]]
 	end,
-	Ecategory = case Ecategories of
-		[] ->
-			[];
-		_ ->
-			[$,, $", "category", $", $:, $[, $", Category, $", $]]
-	end,
+	Ecategory = [$,, $", "category", $", $:, $[, Ecategories, $]],
 	Etypes = case Type of
-		[] ->
-			[];
 		[H2] ->
 			[$", H2, $"];
 		[H2 | T2] ->
 			[$", H2, $" | [[$,, $", E, $"] || E <- T2]]
 	end,
-	Etype = case Etypes of
-		[] ->
-			[];
-		_ ->
-			[$,, $", "type", $", $:, $[, Etypes, $]]
-	end,
-	Eoutcome = case Outcome of
-		[] ->
-			[];
-		_ ->
-			[$,, $", "outcome", $", $:, $", Outcome, $"]
-	end,
+	Etype = [$,, $", "type", $", $:, $[, Etypes, $]],
+	Eoutcome = [$,, $", "outcome", $", $:, $", Outcome, $"],
 	[$", "event", $", $:, ${, Ecreated, Estart, Eend,
 			Eduration, Ekind, Ecategory, Etype, Eoutcome, $}].
 
@@ -713,65 +536,6 @@ ecs_user2(Acc) ->
 	[H | T] = lists:reverse(Acc),
 	Rest = [[$,, Field] || Field <- T],
 	[$", "user", $", $:, ${, H, Rest, $}].
-
--spec ecs_url(URL) -> iodata()
-	when
-		URL :: uri_string:uri_string() | uri_string:uri_map().
-%% @doc Elastic Common Schema (ECS): URL attributes.
-%% @private
-ecs_url([] = _URL) ->
-	[];
-ecs_url(URL) when is_list(URL) ->
-	ecs_url(uri_string:parse(URL));
-ecs_url(URL) when is_map(URL) ->
-	Acc1 = case maps:get(host, URL, undefined)  of
-		undefined ->
-			[];
-		Host ->
-			[[$", "domain", $", $:, $", Host, $"]]
-	end,
-	Acc2 = case maps:get(port, URL, undefined) of
-		undefined ->
-			Acc1;
-		Port ->
-			[[$", "port", $", $:, integer_to_list(Port)] | Acc1]
-	end,
-	Acc3 = case maps:get(path, URL, undefined) of
-		undefined ->
-			Acc2;
-		Path ->
-			[[$", "path", $", $:, $", Path, $"] | Acc2]
-	end,
-	Acc4 = case maps:get(query, URL, undefined) of
-		undefined ->
-			Acc3;
-		Query ->
-			[[$", "query", $", $:, $", Query, $"] | Acc3]
-	end,
-	Acc5 = case maps:get(scheme, URL, undefined) of
-		undefined ->
-			Acc4;
-		Scheme ->
-			[[$", "scheme", $", $:, $", Scheme, $"] | Acc4]
-	end,
-	Acc6 = case maps:get(fragment, URL, undefined) of
-		undefined ->
-			Acc5;
-		Fragment ->
-			[[$", "fragment", $", $:, $", Fragment, $"] | Acc5]
-	end,
-	Acc7 = case maps:get(userinfo, URL, undefined) of
-		undefined ->
-			Acc6;
-		Userinfo ->
-			[[$", "username", $", $:, $", Userinfo, $"] | Acc6]
-	end,
-	case Acc7 of
-		[H] ->
-			[$", "url", $", $:, ${, H, $}];
-		[H | T] ->
-			[[$", "url", $", $:, ${, H | [[$,, E] || E <- T]], $}]
-	end.
 
 -spec imsi(Parameters) -> IMSI
 	when
