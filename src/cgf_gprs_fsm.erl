@@ -41,12 +41,21 @@
 
 -opaque cont() :: binary().
 
+-type record_type() :: sgsnPDPRecord | ggsnPDPRecord
+		| sgsnMMRecord | sgsnSMORecord | sgsnSMTRecord
+		| sgsnMTLCSRecord | sgsnMOLCSRecord | sgsnNILCSRecord
+		| sgsnMBMSRecord | ggsnMBMSRecord | gwMBMSRecord
+		| sGWRecord | pGWRecord | tDFRecord | iPERecord
+		| ePDGRecord | tWAGRecord.
+
 -type statedata() ::
 		#{filename := file:filename() | binary(),
 		log := disk_log:log(),
 		metadata => [{AttributeName :: string(),
 				AttributeValue :: term()}],
-		extra_args => [term()]}.
+		extra_args => [term()],
+		read := non_neg_integer(),
+		parsed := #{RecordType :: record_type() => non_neg_integer()}}.
 
 %%----------------------------------------------------------------------
 %%  The cgf_import_fsm callback API
@@ -65,7 +74,8 @@ init([Filename, Log, Metadata | ExtraArgs] = _Args) ->
 	NewMetadata = metadata(Filename, Metadata),
 	StateData = #{filename => Filename, log => Log,
 			metadata => maps:to_list(NewMetadata),
-			extra_args => ExtraArgs},
+			extra_args => ExtraArgs,
+			read => 0, parsed => #{}},
 	{ok, StateData}.
 
 -spec open(Filename, StateData) -> Result
@@ -106,14 +116,18 @@ read(<<>> = Cont, StateData) ->
 read(Cont, StateData) ->
 	case 'GPRSChargingDataTypes':decode('GPRSRecord', Cont) of
 		{ok, CDR, Cont1} ->
-			{continue, CDR, Cont1, StateData};
+			F = fun(Count) -> Count + 1 end,
+			NewStateData = maps:update_with(read, F, StateData),
+			{continue, CDR, Cont1, NewStateData};
 		{error, {asn1, _Description}} ->
 			{close, asn1_decode, <<>>, StateData}
 	end.
 
 -spec parse(CDR, Log, StateData) -> Result
 	when
-		CDR :: term(),
+		CDR :: {RecordType, Record},
+		RecordType :: record_type(),
+		Record :: map(),
 		Log :: disk_log:log(),
 		StateData :: statedata(),
 		Result :: {continue, StateData}
@@ -125,10 +139,14 @@ read(Cont, StateData) ->
 %%
 %% 	Parse and log a charging data record (CDR).
 %%
-parse(CDR, Log, #{metadata := Metadata} = StateData) ->
+parse({RecordType, _Record} = CDR, Log,
+		#{metadata := Metadata, parsed := Parsed} = StateData) ->
 	case cgf_gprs:parse(Log, Metadata, CDR) of
 		ok ->
-			{continue, StateData};
+			F = fun(Count) -> Count + 1 end,
+			Parsed1 = maps:update_with(RecordType, F, 1, Parsed),
+			NewStateData = StateData#{parsed => Parsed1},
+			{continue, NewStateData};
 		{error, Reason} ->
 			{close, Reason, StateData}
 	end.
@@ -137,12 +155,13 @@ parse(CDR, Log, #{metadata := Metadata} = StateData) ->
 	when
 		Cont :: cont(),
 		StateData :: statedata(),
-		Result :: {stop, StateData}
+		Result :: {stop, Report, StateData}
 				| {error, Reason, StateData},
+		Report :: map(),
 		Reason :: normal | shutdown | term().
 %% @doc Handles events received in the <em>close</em> state.
 close(_Cont, StateData) ->
-	{stop, StateData}.
+	{stop, report(StateData), StateData}.
 
 %%----------------------------------------------------------------------
 %%  Internal functions
@@ -165,4 +184,44 @@ metadata1(FileMap, #{"log" := MetaLog} = Metadata) ->
 	Metadata#{"log" => MetaLog1};
 metadata1(FileMap, Metadata) ->
 	Metadata#{"log" => #{"file" => FileMap}}.
+
+%% @hidden
+report(#{read := Read, parsed := Parsed} = _Statedata) ->
+	F = fun(sgsnPDPRecord, Count, Acc) ->
+				Acc#{<<"sgsnPDP">> => Count};
+			(ggsnPDPRecord, Count, Acc) ->
+				Acc#{<<"ggsnPDP">> => Count};
+			(sgsnMMRecord, Count, Acc) ->
+				Acc#{<<"sgsnMM">> => Count};
+			(sgsnSMORecord, Count, Acc) ->
+				Acc#{<<"sgsnSMO">> => Count};
+			(sgsnSMTRecord, Count, Acc) ->
+				Acc#{<<"sgsnSMT">> => Count};
+			(sgsnMTLCSRecord, Count, Acc) ->
+				Acc#{<<"sgsnMTLCS">> => Count};
+			(sgsnMOLCSRecord, Count, Acc) ->
+				Acc#{<<"sgsnMOLCS">> => Count};
+			(sgsnNILCSRecord, Count, Acc) ->
+				Acc#{<<"sgsnNILCS">> => Count};
+			(sgsnMBMSRecord, Count, Acc) ->
+				Acc#{<<"sgsnMBMS">> => Count};
+			(ggsnMBMSRecord, Count, Acc) ->
+				Acc#{<<"ggsnMBMS">> => Count};
+			(gwMBMSRecord, Count, Acc) ->
+				Acc#{<<"gwMBMS">> => Count};
+			(sGWRecord, Count, Acc) ->
+				Acc#{<<"sGW">> => Count};
+			(pGWRecord, Count, Acc) ->
+				Acc#{<<"pGW">> => Count};
+			(tDFRecord, Count, Acc) ->
+				Acc#{<<"tDF">> => Count};
+			(iPERecord, Count, Acc) ->
+				Acc#{<<"iPE">> => Count};
+			(ePDGRecord, Count, Acc) ->
+				Acc#{<<"ePDG">> => Count};
+			(tWAGRecord, Count, Acc) ->
+				Acc#{<<"tWAG">> => Count}
+	end,
+	Counts = maps:fold(F, #{}, Parsed),
+	#{<<"totalRecords">> => Read, <<"loggedCount">> => Counts}.
 
