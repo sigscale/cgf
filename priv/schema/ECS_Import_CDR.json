@@ -1,0 +1,41 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "http://sigscale.org/schema/cgf/ECS_Import_CDR",
+	"title": "SigScale CGF: CDR file import report",
+	"oneOf": [
+		{
+			"type": "object",
+			"properties": {
+				"Import_CDR": {
+					"$ref": "#/$defs/CDRReport"
+				}
+			},
+			"required": ["Import_CDR"]
+		}
+	],
+	"$defs": {
+		"CDRReport": {
+			"description": "Report on CDR file import process.",
+			"type": "object",
+			"properties": {
+				"moduleName": {
+					"description": "The name of the module providing the import function.",
+					"type": "string"
+				},
+				"totalRecords": {
+					"description": "The number of CDR records imported.",
+					"type": "integer"
+				}
+			},
+			"examples": [
+				{
+					"moduleName": "cgf_cs_fsm"
+				},
+				{
+					"moduleName": "cgf_cs_fsm",
+					"totalRecords": 17340
+				}
+			]
+		}
+	}
+}

@@ -1,0 +1,47 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "http://sigscale.org/schema/cgf/ECS_process",
+	"title": "Elastic Common Schema (ECS) Process",
+	"description": ".",
+	"type": "object",
+	"properties": {
+		"process": {
+			"type": "object",
+			"properties": {
+				"entity_id": {
+					"description": "Unique identifier for the process.",
+					"type": "string",
+					"examples": [
+						"<0.113.0>"
+					]
+				},
+				"start": {
+					"description": "The time the process started.",
+					"type": "string",
+					"format": "date-time",
+					"examples": [
+						"2025-03-25T11:16:10.441Z"
+					]
+				},
+				"end": {
+					"description": "The time the process ended.",
+					"type": "string",
+					"format": "date-time",
+					"examples": [
+						"2025-03-25T11:16:12.l14Z"
+					]
+				}
+			},
+			"examples": [
+				{
+					"entity_id": "<0.113.0>",
+					"start": "2025-03-25T11:16:10.441Z",
+					"end": "2025-03-25T11:16:12.l14Z"
+				}
+			]
+		}
+	},
+	"required": [
+		"process"
+	]
+}

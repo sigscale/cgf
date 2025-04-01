@@ -10,6 +10,7 @@ schema_DATA = $(abs_builddir)/ECS_base.json \
 		$(abs_builddir)/ECS_service.json \
 		$(abs_builddir)/ECS_user.json \
 		$(abs_builddir)/ECS_file.json \
+		$(abs_builddir)/ECS_process.json \
 		$(abs_builddir)/ECS_log.json \
 		$(abs_builddir)/ECS_Bx_CS.json \
 		$(abs_builddir)/ECS_Bx_PS.json \
@@ -21,7 +22,9 @@ schema_DATA = $(abs_builddir)/ECS_base.json \
 		$(abs_builddir)/ECS_Bx_RF.json \
 		$(abs_builddir)/ECS_Bx_ABMF.json \
 		$(abs_builddir)/ECS_Bx_TAP.json \
-		$(abs_builddir)/ECS_Bx.json
+		$(abs_builddir)/ECS_Bx.json \
+		$(abs_builddir)/ECS_Import_CDR.json \
+		$(abs_builddir)/ECS_Import.json
 
 check_DATA = .validation_ok
 
@@ -45,6 +48,8 @@ $(abs_builddir)/%.json:	$(srcdir)/%.json
 		if ! ajv -c ajv-formats compile -s ECS_user.json; \
 			then exit 1; fi; \
 		if ! ajv -c ajv-formats compile -s ECS_file.json; \
+			then exit 1; fi; \
+		if ! ajv -c ajv-formats compile -s ECS_process.json; \
 			then exit 1; fi; \
 		if ! ajv -c ajv-formats compile \
 			-r ECS_file.json \
@@ -92,6 +97,21 @@ $(abs_builddir)/%.json:	$(srcdir)/%.json
 			-r ECS_Bx_ABMF.json \
 			-r ECS_Bx_TAP.json \
 			-s ECS_Bx.json; \
+		then exit 1; fi; \
+		if ! ajv -c ajv-formats compile -s ECS_Import_CDR.json; \
+			then exit 1; fi; \
+		if ! ajv -c ajv-formats compile \
+			-r ECS_base.json \
+			-r ECS_ecs.json \
+			-r ECS_service.json \
+			-r ECS_event.json \
+			-r ECS_file.json \
+			-r ECS_user.json \
+			-r ECS_process.json \
+			-r ECS_log.json \
+			-r ECS_data_stream.json \
+			-r ECS_Import_CDR.json \
+			-s ECS_Import.json; \
 		then exit 1; fi; \
 	else \
 		echo "ajv-cli needed to validate JSON Schema"; \

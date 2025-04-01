@@ -1,0 +1,143 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "http://sigscale.org/schema/cgf/ECS_Import",
+	"title": "SigScale CGF: ECS file import reports",
+	"description": "Elastic Stack log for charging data record (CDR) file imports.",
+	"type": "object",
+	"allOf": [
+		{
+			"$ref": "/schema/cgf/ECS_base"
+		},
+		{
+			"$ref": "/schema/cgf/ECS_ecs"
+		},
+		{
+			"$ref": "/schema/cgf/ECS_service"
+		},
+		{
+			"$ref": "/schema/cgf/ECS_event"
+		},
+		{
+			"$ref": "/schema/cgf/ECS_file"
+		},
+		{
+			"$ref": "/schema/cgf/ECS_user"
+		},
+		{
+			"$ref": "/schema/cgf/ECS_process"
+		},
+		{
+			"$ref": "/schema/cgf/ECS_log"
+		},
+		{
+			"$ref": "/schema/cgf/ECS_data_stream"
+		},
+		{
+			"$ref": "/schema/cgf/ECS_Import_CDR"
+		}
+	],
+	"examples": [
+		{
+			"@timestamp": "2025-03-19T19:10:32.142Z",
+			"labels": {
+				"application": "sigscale-cgf"
+			},
+			"ecs": {
+				"version": "8.5"
+			},
+			"service": {
+				"type": "cgf",
+				"node": {
+					"name": "cgf@host.example.net"
+				}
+			},
+			"file": {
+				"name": "CGFNodeId_-_1234.20050401_-_2315+0200",
+				"directory": "/var/spool/cgf/user1",
+				"path": "/var/spool/cgf/user1/CGFNodeId_-_1234.20050401_-_2315+0200",
+				"size": 5248821
+			},
+			"user": {
+				"name": "billing"
+			},
+			"process": {
+				"entity_id": "<0.113.0>"
+			},
+			"log": {
+				"logger": "bx_cs"
+			},
+			"event": {
+				"start": "2025-03-19T19:10:32.142Z",
+				"kind": "event",
+				"category": [
+					"file",
+					"process"
+				],
+				"type": [
+					"access",
+					"start"
+				],
+				"outcome": "success"
+			},
+			"data_stream": {
+				"type": "logs",
+				"dataset": "cdr"
+			},
+			"Import_CDR": {
+				"moduleName": "cgf_cs_fsm"
+			}
+		},
+		{
+			"@timestamp": "2025-03-19T19:10:32.142Z",
+			"labels": {
+				"application": "sigscale-cgf"
+			},
+			"ecs": {
+				"version": "8.5"
+			},
+			"service": {
+				"type": "cgf",
+				"node": {
+					"name": "cgf@host.example.net"
+				}
+			},
+			"file": {
+				"name": "CGFNodeId_-_1234.20050401_-_2315+0200",
+				"directory": "/var/spool/cgf/user1",
+				"path": "/var/spool/cgf/user1/CGFNodeId_-_1234.20050401_-_2315+0200",
+				"size": 5248821
+			},
+			"user": {
+				"name": "billing"
+			},
+			"process": {
+				"entity_id": "<0.113.0>"
+			},
+			"log": {
+				"logger": "bx_cs"
+			},
+			"event": {
+				"start": "2025-03-19T19:10:32.142Z",
+				"end": "2025-03-19T19:10:32.783Z",
+				"duration": "641000000",
+				"kind": "event",
+				"category": [
+					"file",
+					"process"
+				],
+				"type": [
+					"end"
+				],
+				"outcome": "success"
+			},
+			"data_stream": {
+				"type": "logs",
+				"dataset": "cdr"
+			},
+			"Import_CDR": {
+				"moduleName": "cgf_cs_fsm",
+				"totalRecords": 17340
+			}
+		}
+	]
+}

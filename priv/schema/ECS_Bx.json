@@ -31,6 +31,9 @@
 			"$ref": "/schema/cgf/ECS_data_stream"
 		},
 		{
+			"$ref": "/schema/cgf/ECS_log"
+		},
+		{
 			"oneOf": [
 				{
 					"$ref": "/schema/cgf/ECS_Bx_CS"
