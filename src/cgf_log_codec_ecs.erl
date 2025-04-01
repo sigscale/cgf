@@ -857,35 +857,31 @@ call_duration(Parameters) ->
 			maps:find(<<"releaseTime">>, Parameters),
 			maps:find(<<"callDuration">>, Parameters)} of
 		{_, {ok, Answer}, {ok, Release}, {ok, Seconds}}
-				when is_binary(Answer), is_binary(Release),
-				is_integer(Seconds) ->
+				when is_integer(Seconds) ->
 			{Answer, Release, integer_to_list(Seconds * 1000000000)};
-		{_, {ok, Answer}, {ok, Release}, error}
-				when is_binary(Answer), is_binary(Release) ->
+		{_, {ok, Answer}, {ok, Release}, error} ->
 			Ms = cgf_log:iso8601(Release) - cgf_log:iso8601(Answer),
 			{Answer, Release, integer_to_list(Ms * 1000000)};
 		{{ok, Seizure}, error, {ok, Release}, {ok, Seconds}}
-				when is_binary(Seizure), is_binary(Release),
-				is_integer(Seconds) ->
+				when is_integer(Seconds) ->
 			{Seizure, Release, integer_to_list(Seconds * 1000000000)};
-		{{ok, Seizure}, error, {ok, Release}, error}
-				when is_binary(Seizure), is_binary(Release) ->
+		{{ok, Seizure}, error, {ok, Release}, error} ->
 			Ms = cgf_log:iso8601(Release) - cgf_log:iso8601(Seizure),
 			{Seizure, Release, integer_to_list(Ms * 1000000)};
 		{{ok, Seizure}, error, error, {ok, Seconds}}
-				when is_binary(Seizure), is_integer(Seconds) ->
+				when is_integer(Seconds) ->
 			{Seizure, [], integer_to_list(Seconds * 1000000000)};
-		{{ok, Seizure}, error, error, error} when is_binary(Seizure) ->
+		{{ok, Seizure}, error, error, error} ->
 			{Seizure, [], []};
 		{_, {ok, Answer}, error, {ok, Seconds}}
-				when is_binary(Answer), is_integer(Seconds) ->
+				when is_integer(Seconds) ->
 			{Answer, [], integer_to_list(Seconds * 1000000000)};
-		{_, {ok, Answer}, error, error} when is_binary(Answer) ->
+		{_, {ok, Answer}, error, error} ->
 			{Answer, [], []};
 		{_, _, {ok, Release}, {ok, Seconds}}
-				when is_binary(Release), is_integer(Seconds) ->
+				when is_integer(Seconds) ->
 			{[], Release, integer_to_list(Seconds * 1000000000)};
-		{_, _, {ok, Release}, error} when is_binary(Release) ->
+		{_, _, {ok, Release}, error} ->
 			{[], Release, []};
 		_ ->
 			{[], [], []}
@@ -904,25 +900,22 @@ session_duration(Parameters) ->
 			maps:find(<<"stopTime">>, Parameters),
 			maps:find(<<"duration">>, Parameters)} of
 		{{ok, Start}, {ok, Stop}, {ok, Seconds}}
-				when is_binary(Start), is_binary(Stop),
-				is_integer(Seconds) ->
+				when is_integer(Seconds) ->
 			{Start, Stop, integer_to_list(Seconds * 1000000000)};
-		{{ok, Start}, {ok, Stop}, error}
-				when is_binary(Start), is_binary(Stop) ->
+		{{ok, Start}, {ok, Stop}, error} ->
 			Ms = cgf_log:iso8601(Start) - cgf_log:iso8601(Stop),
 			{Start, Stop, integer_to_list(Ms * 1000000)};
 		{{ok, Start}, _, {ok, Seconds}}
-				when is_binary(Start), is_integer(Seconds) ->
+				when is_integer(Seconds) ->
 			{Start, [], integer_to_list(Seconds * 1000000000)};
 		{_, {ok, Stop}, {ok, Seconds}}
-				when is_binary(Stop), is_integer(Seconds) ->
+				when is_integer(Seconds) ->
 			{[], Stop, integer_to_list(Seconds * 1000000000)};
-		{{ok, Start}, {ok, Stop}, _}
-				when is_binary(Start), is_binary(Stop) ->
+		{{ok, Start}, {ok, Stop}, _} ->
 			{Start, Stop, []};
-		{{ok, Start}, _, _} when is_binary(Start) ->
+		{{ok, Start}, _, _} ->
 			{Start, [], []};
-		{_, {ok, Stop}, _} when is_binary(Stop) ->
+		{_, {ok, Stop}, _} ->
 			{[], Stop, []};
 		_ ->
 			{[], [], []}
