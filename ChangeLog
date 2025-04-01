@@ -1,3 +1,31 @@
+2025-04-2   Vance Shipley <vances@sigscale.org>
+
+	* tap import fsm reports total read and logged record type counts
+	* cs huawei import fsm reports total read and logged record type counts
+	* ims import fsm reports total read and logged record type counts
+	* gprs import fsm reports total read and logged record type counts
+	* cs import fsm reports total read and logged record type counts
+	* log reports in import cdr behaviour
+	* log codec function for import cdr report with ecs
+	* schema for import cdr report
+	* application environment variable for import log name; default logs defined
+	* test lib: random duration in range
+	* relative directory, absolute path, in metadata derived from event
+	* test case includes seizure time in mo call
+	* optimize log ecs bx codec
+	* handle call/session times as string or binary
+	* disconnect sftp after each test case
+	* test: use priv_dir for bx log dir
+	* allow multiple actions for the same match
+	* do not stop 'make check' for dialyzer warning on unknown funcions/types
+	* install codec modules for osi cmip, acse, rose
+	* make ecs log functions private
+	* change category argument in ecs_event/7 to [string()]
+	* missing export in ecs log codec
+	* deprecated ubuntu jammy package (no binary_part/3)
+	* fix typo preventing many edoc modules getting installed
+	* include huawei-cs asn1 codec module in application specification
+
 2025-03-18   Vance Shipley <vances@sigscale.org>
 
 	* match specifications with binary_part/3 requires erts-13.0
@@ -34,7 +62,7 @@
 	* unzip action handler
 	* jail destination directory in copy/move action
 	* refactor event server for seperate action handler functions
- 
+
 2025-02-21   Vance Shipley <vances@sigscale.org>
 
 	* refactor directory maching as full absolute path
