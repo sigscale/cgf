@@ -280,8 +280,20 @@ init_per_testcase(_TestCase, Config) ->
 		Reason :: term().
 %% Cleanup after each test case.
 %%
-end_per_testcase(sftp_cs = TestCase, _Config) ->
+end_per_testcase(sftp_cs = TestCase, Config) ->
+	Handle = proplists:get_value(handle, Config),
+	ok = ct_ssh:disconnect(Handle),
 	ok = cgf_log:close(TestCase);
+end_per_testcase(TestCase, Config)
+		when TestCase == file_close_copy;
+		TestCase == file_close_move;
+		TestCase == file_close_delete;
+		TestCase == file_close_unzip;
+		TestCase == file_close_gunzip;
+		TestCase == file_close_untar;
+		TestCase == stop_looping ->
+	Handle = proplists:get_value(handle, Config),
+	ok = ct_ssh:disconnect(Handle);
 end_per_testcase(_TestCase, _Config) ->
 	ok.
 
