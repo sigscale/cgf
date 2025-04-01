@@ -41,13 +41,20 @@
 
 -opaque cont() :: binary() | map().
 
+-type record_type() :: mobileOriginatedCall | mobileTerminatedCall
+		| supplServiceEvent | serviceCentreUsage | gprsCall
+		| contentTransaction | locationService | messagingEvent
+		| mobileSession.
+
 -type statedata() ::
 		#{filename := file:filename() | binary(),
 		log := disk_log:log(),
 		metadata => [{AttributeName :: string(),
 				AttributeValue :: term()}],
 		extra_args => [term()],
-		tap_state => cgf_tap:state()}.
+		tap_state => cgf_tap:state(),
+		read := non_neg_integer(),
+		parsed := #{RecordType :: record_type() => non_neg_integer()}}.
 
 %%----------------------------------------------------------------------
 %%  The cgf_import_fsm callback API
@@ -66,7 +73,8 @@ init([Filename, Log, Metadata | ExtraArgs] = _Args) ->
 	NewMetadata = metadata(Filename, Metadata),
 	StateData = #{filename => Filename, log => Log,
 			metadata => maps:to_list(NewMetadata),
-			extra_args => ExtraArgs},
+			extra_args => ExtraArgs,
+			read => 0, parsed => #{}},
 	{ok, StateData}.
 
 -spec open(Filename, StateData) -> Result
@@ -114,11 +122,15 @@ read(#{callEventDetails := []} = TransferBatch, StateData) ->
 	{close, normal, TransferBatch, StateData};
 read(#{callEventDetails := [H | T]} = TransferBatch, StateData) ->
 	Cont1 = TransferBatch#{callEventDetails => T},
-	{continue, H, Cont1, StateData}.
+	F = fun(Count) -> Count + 1 end,
+	NewStateData = maps:update_with(read, F, StateData),
+	{continue, H, Cont1, NewStateData}.
 
 -spec parse(CDR, Log, StateData) -> Result
 	when
-		CDR :: tuple(),
+		CDR :: {RecordType, Record},
+		RecordType :: record_type(),
+		Record :: map(),
 		Log :: disk_log:log(),
 		StateData :: statedata(),
 		Result :: {continue, StateData}
@@ -130,11 +142,15 @@ read(#{callEventDetails := [H | T]} = TransferBatch, StateData) ->
 %%
 %% 	Parse and log a charging data record (CDR).
 %%
-parse(CDR, Log,
-		#{metadata := Metadata, tap_state := TapState} = StateData) ->
+parse({RecordType, _Record} = CDR, Log,
+		#{metadata := Metadata, tap_state := TapState,
+				parsed := Parsed} = StateData) ->
 	case cgf_tap:parse(Log, Metadata, TapState, CDR) of
 		ok ->
-			{continue, StateData};
+			F = fun(Count) -> Count + 1 end,
+			Parsed1 = maps:update_with(RecordType, F, 1, Parsed),
+			NewStateData = StateData#{parsed => Parsed1},
+			{continue, NewStateData};
 		{error, Reason} ->
 			{error, Reason, StateData}
 	end.
@@ -143,12 +159,13 @@ parse(CDR, Log,
 	when
 		Cont :: cont(),
 		StateData :: statedata(),
-		Result :: {stop, StateData}
+		Result :: {stop, Report, StateData}
 				| {error, Reason, StateData},
+		Report :: map(),
 		Reason :: normal | shutdown | term().
 %% @doc Handles events received in the <em>close</em> state.
 close(_Cont, StateData) ->
-	{stop, StateData}.
+	{stop, report(StateData), StateData}.
 
 %%----------------------------------------------------------------------
 %%  Internal functions
@@ -217,4 +234,28 @@ decode_tap3(#{networkInfo := NetworkInfo} = TransferBatch,
 	{ok, TransferBatch, NewStateData};
 decode_tap3(TransferBatch, StateData) ->
 	{ok, TransferBatch, StateData}.
+
+%% @hidden
+report(#{read := Read, parsed := Parsed} = _Statedata) ->
+	F = fun(mobileOriginatedCall, Count, Acc) ->
+				Acc#{<<"mobileOriginatedCall">> => Count};
+			(mobileTerminatedCall, Count, Acc) ->
+				Acc#{<<"mobileTerminatedCall">> => Count};
+			(supplServiceEvent, Count, Acc) ->
+				Acc#{<<"supplServiceEvent">> => Count};
+			(serviceCentreUsage, Count, Acc) ->
+				Acc#{<<"serviceCentreUsage">> => Count};
+			(gprsCall, Count, Acc) ->
+				Acc#{<<"gprsCall">> => Count};
+			(contentTransaction, Count, Acc) ->
+				Acc#{<<"contentTransaction">> => Count};
+			(locationService, Count, Acc) ->
+				Acc#{<<"locationService">> => Count};
+			(messagingEvent, Count, Acc) ->
+				Acc#{<<"messagingEvent">> => Count};
+			(mobileSession, Count, Acc) ->
+				Acc#{<<"mobileSession">> => Count}
+	end,
+	Counts = maps:fold(F, #{}, Parsed),
+	#{<<"totalRecords">> => Read, <<"loggedCount">> => Counts}.
 
