@@ -10,7 +10,7 @@
 -export([rand_imsi/0, rand_imsi/1]).
 -export([rand_imei/0, rand_imei/1]).
 -export([rand_ip/0, rand_ipv4/0, rand_ipv6/0]).
--export([rand_duration/0]).
+-export([rand_duration/0, rand_duration/1]).
 
 applications() ->
 	[crypto, mnesia, asn1, public_key, inets, ssh, cgf].
