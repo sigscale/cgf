@@ -585,8 +585,12 @@ handle_untar2(Event,
 	end.
 
 %% @hidden
-metadata(#{path := Path, user := User} = _Content, Metadata) ->
-	FileMap = #{"name" => filename:basename(Path)},
+metadata(#{root := Root, path := Path,
+		user := User} = _Content, Metadata) ->
+	Filename = filename:join(Root, Path),
+	FileMap = #{"name" => filename:basename(Path),
+			"directory" => filename:dirname(Path),
+			"path" => Filename},
 	UserMap = #{"name" => User},
 	Log = #{"file" => FileMap, "user" => UserMap},
 	F = fun("file", MetadataValue, ContentValue) ->
