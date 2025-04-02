@@ -1,5 +1,6 @@
 2025-04-2   Vance Shipley <vances@sigscale.org>
 
+	* conditionally disable dialyzer warning on unknown funcions/types
 	* correct and extend huawei cs cdr import reporting
 	* tap import fsm reports total read and logged record type counts
 	* cs huawei import fsm reports total read and logged record type counts
