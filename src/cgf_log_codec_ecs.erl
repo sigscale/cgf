@@ -377,7 +377,6 @@ bx1([{roam_accountingInfo, AccountingInfo} | T], Acc) ->
 	bx1(T, [Acc1 | Acc]);
 bx1([{AttributeName, AttributeValue} | T], Acc)
 		when is_list(AttributeName) ->
-erlang:display({?MODULE, ?FUNCTION_NAME, ?LINE, AttributeName, AttributeValue}),
 	Acc1 = [[$,, $", AttributeName, $", $:, zj:encode(AttributeValue)]],
 	bx1(T, [Acc1 | Acc]);
 bx1([], Acc) ->
