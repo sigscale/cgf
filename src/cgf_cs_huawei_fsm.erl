@@ -53,6 +53,8 @@
 		metadata => [{AttributeName :: string(),
 				AttributeValue :: term()}],
 		extra_args => [term()],
+		header => map(),
+		trailer => map(),
 		read := non_neg_integer(),
 		parsed := #{RecordType :: record_type() => non_neg_integer()}}.
 
@@ -114,17 +116,21 @@ read(<<>> = Cont, StateData) ->
 	{close, normal, Cont, StateData};
 read(Cont, StateData) ->
 	case 'Huawei-CS':decode('CallEventDataFile', Cont) of
-		{ok, CDR, Cont1} ->
-			F = fun(Count) -> Count + 1 end,
-			NewStateData = maps:update_with(read, F, StateData),
-			{continue, CDR, Cont1, NewStateData};
+		{ok, #{headerRecord := HeaderRecord,
+				trailerRecord := TrailerRecord,
+				callEventRecords := CallEventRecords} = _CallEventDataFile,
+				Cont1} ->
+			NewStateData = StateData#{read => length(CallEventRecords),
+					header => HeaderRecord,
+					trailer => TrailerRecord},
+			{continue, CallEventRecords, Cont1, NewStateData};
 		{error, {asn1, _Description}} ->
 			{close, asn1_decode, <<>>, StateData}
 	end.
 
 -spec parse(CDR, Log, StateData) -> Result
 	when
-		CDR :: {RecordType, Record},
+		CDR :: [{RecordType, Record}],
 		RecordType :: record_type(),
 		Record :: map(),
 		Log :: disk_log:log(),
@@ -138,28 +144,30 @@ read(Cont, StateData) ->
 %%
 %% 	Parse and log a charging data record (CDR).
 %%
-parse({forwardCallRecord, FCR} = _CDR, Log,
+parse([{forwardCallRecord, FCR} = _H | T] = _CDR, Log,
 		#{metadata := Metadata, parsed := Parsed} = StateData) ->
 	case cgf_cs:parse(Log, Metadata, {moCallRecord, FCR}) of
 		ok ->
 			F = fun(Count) -> Count + 1 end,
 			Parsed1 = maps:update_with(forwardCallRecord, F, 1, Parsed),
 			NewStateData = StateData#{parsed => Parsed1},
-			{continue, NewStateData};
+			parse(T, Log, NewStateData);
 		{error, Reason} ->
 			{error, Reason, StateData}
 	end;
-parse({RecordType, _Record} = CDR, Log,
+parse([{RecordType, _Record} = H | T] = _CDR, Log,
 		#{metadata := Metadata, parsed := Parsed} = StateData) ->
-	case cgf_cs:parse(Log, Metadata, CDR) of
+	case cgf_cs:parse(Log, Metadata, H) of
 		ok ->
 			F = fun(Count) -> Count + 1 end,
 			Parsed1 = maps:update_with(RecordType, F, 1, Parsed),
 			NewStateData = StateData#{parsed => Parsed1},
-			{continue, NewStateData};
+			parse(T, Log, NewStateData);
 		{error, Reason} ->
 			{error, Reason, StateData}
-	end.
+	end;
+parse([] = _CDR, _Log, StateData) ->
+	{continue, StateData}.
 
 -spec close(Cont, StateData) -> Result
 	when
@@ -196,7 +204,8 @@ metadata1(FileMap, Metadata) ->
 	Metadata#{"log" => #{"file" => FileMap}}.
 
 %% @hidden
-report(#{read := Read, parsed := Parsed} = _Statedata) ->
+report(#{read := Read, parsed := Parsed,
+			header := Header, trailer := Trailer} = _Statedata) ->
 	F = fun(moCallRecord, Count, Acc) ->
 				Acc#{<<"moCall">> => Count};
 			(mtCallRecord, Count, Acc) ->
@@ -218,6 +227,21 @@ report(#{read := Read, parsed := Parsed} = _Statedata) ->
 			(forwardCallRecord, Count, Acc) ->
 				Acc#{<<"forwardCall">> => Count}
 	end,
-	Counts = maps:fold(F, #{}, Parsed),
-	#{<<"totalRecords">> => Read, <<"loggedCount">> => Counts}.
+	F1 = fun(productionDateTime, TimeStamp, Acc) ->
+				Acc#{<<"productionDateTime">> => cgf_lib:bcd_date_time(TimeStamp)};
+			(recordingEntity, RecordingEntity, Acc) ->
+				Acc#{<<"recordingEntity">> => cgf_lib:bcd_dn(RecordingEntity)};
+			(firstCallDateTime, TimeStamp, Acc) ->
+				Acc#{<<"firstCallDateTime">> => cgf_lib:bcd_date_time(TimeStamp)};
+			(lastCallDateTime, TimeStamp, Acc) ->
+				Acc#{<<"lastCallDateTime">> => cgf_lib:bcd_date_time(TimeStamp)};
+			(noOfRecords, N, Acc) ->
+				Acc#{<<"noOfRecords">> => N};
+			(extensions, _, Acc) ->
+				Acc
+	end,
+	#{<<"totalRecords">> => Read,
+			<<"loggedCount">> => maps:fold(F, #{}, Parsed),
+			<<"huaweiHeader">> => maps:fold(F1, #{}, Header),
+			<<"huaweiTrailer">> => maps:fold(F1, #{}, Trailer)}.
 
