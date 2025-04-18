@@ -31,7 +31,7 @@
 -define(BASE_PATH, "/schema/cgf/").
 
 -ifdef(OTP_RELEASE).
-	-if(?OTP_RELEASE >= 28).
+	-if(?OTP_RELEASE >= 27).
 		-define(JSON, json).
 	-else.
 		-define(JSON, zj).

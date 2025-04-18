@@ -32,7 +32,7 @@
 		get_application/2, head_application/2]).
 
 -ifdef(OTP_RELEASE).
-	-if(?OTP_RELEASE >= 28).
+	-if(?OTP_RELEASE >= 27).
 		-define(JSON, json).
 	-else.
 		-define(JSON, zj).
