@@ -31,16 +31,6 @@
 		get_applications/2, head_applications/2,
 		get_application/2, head_application/2]).
 
--ifdef(OTP_RELEASE).
-	-if(?OTP_RELEASE >= 27).
-		-define(JSON, json).
-	-else.
-		-define(JSON, zj).
-	-endif.
--else.
-	-define(JSON, zj).
--endif.
-
 -spec content_types_accepted() -> ContentTypes
 	when
 		ContentTypes :: [string()].
@@ -97,7 +87,7 @@ get_health([] = _Query, _RequestHeaders) ->
 					"serviceId" => atom_to_list(node()),
 					"description" => "Health of SigScale CGF",
 					"checks" => Checks},
-			ResponseBody = ?JSON:encode(Health),
+			ResponseBody = zj:encode(Health),
 			ResponseHeaders = [{content_type, "application/health+json"}
 					| CacheControl],
 			{ok, ResponseHeaders, ResponseBody};
@@ -106,7 +96,7 @@ get_health([] = _Query, _RequestHeaders) ->
 					"serviceId" => atom_to_list(node()),
 					"description" => "Health of SigScale CGF",
 					"checks" => Checks},
-			ResponseBody = ?JSON:encode(Health),
+			ResponseBody = zj:encode(Health),
 			ResponseHeaders = [{content_type, "application/health+json"}],
 			{error, 503, ResponseHeaders, ResponseBody}
 	catch
@@ -181,7 +171,7 @@ get_applications([] = _Query, _RequestHeaders) ->
 							"serviceId" => atom_to_list(node()),
 							"description" => "OTP applications",
 							"checks" => [#{"application" => Applications}]},
-					ResponseBody = ?JSON:encode(Application),
+					ResponseBody = zj:encode(Application),
 					ResponseHeaders = [{content_type, "application/health+json"}],
 					{ok, ResponseHeaders, ResponseBody};
 				true ->
@@ -189,7 +179,7 @@ get_applications([] = _Query, _RequestHeaders) ->
 							"serviceId" => atom_to_list(node()),
 							"description" => "OTP applications",
 							"checks" => [#{"application" => Applications}]},
-					ResponseBody = ?JSON:encode(Application),
+					ResponseBody = zj:encode(Application),
 					ResponseHeaders = [{content_type, "application/health+json"}],
 					{error, 503, ResponseHeaders, ResponseBody}
 			end
@@ -250,12 +240,12 @@ get_application(Id, _RequestHeaders) ->
 			true ->
 				Application = #{"status" => "up", "serviceId" => Id},
 				ResponseHeaders = [{content_type, "application/health+json"}],
-				ResponseBody = ?JSON:encode(Application),
+				ResponseBody = zj:encode(Application),
 				{ok, ResponseHeaders, ResponseBody};
 			false ->
 				Application = #{"status" => "down", "serviceId" => Id},
 				ResponseHeaders = [{content_type, "application/health+json"}],
-				ResponseBody = ?JSON:encode(Application),
+				ResponseBody = zj:encode(Application),
 				{error, 503, ResponseHeaders, ResponseBody}
 		end
 	catch

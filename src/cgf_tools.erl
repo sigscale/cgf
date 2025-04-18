@@ -30,16 +30,6 @@
 -define(BASE_AUTHORITY, "http://sigscale.org").
 -define(BASE_PATH, "/schema/cgf/").
 
--ifdef(OTP_RELEASE).
-	-if(?OTP_RELEASE >= 27).
-		-define(JSON, json).
-	-else.
-		-define(JSON, zj).
-	-endif.
--else.
-	-define(JSON, zj).
--endif.
-
 %%----------------------------------------------------------------------
 %%  The cgf_tools public API
 %%----------------------------------------------------------------------
@@ -76,7 +66,7 @@ transpile(Asn1Filename, JsonSchemaFilename) ->
 					?BASE_PATH, atom_to_list(Name)]),
 			Schema = #{"$schema" => "http://json-schema.org/draft-07/schema#",
 					"$id" => ID, "$defs" => Defs},
-			file:write_file(JsonSchemaFilename, ?JSON:encode(Schema));
+			file:write_file(JsonSchemaFilename, zj:encode(Schema));
 		{error, Reason} ->
 			{error, Reason}
 	end.
