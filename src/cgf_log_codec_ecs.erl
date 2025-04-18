@@ -26,6 +26,16 @@
 %% export the cgf_log_codec_ecs public API
 -export([bx/1, import/1]).
 
+-ifdef(OTP_RELEASE).
+	-if(?OTP_RELEASE >= 28).
+		-define(JSON, json).
+	-else.
+		-define(JSON, zj).
+	-endif.
+-else.
+	-define(JSON, zj).
+-endif.
+
 %%----------------------------------------------------------------------
 %%  The cgf_log_codec_ecs public API
 %%----------------------------------------------------------------------
@@ -70,7 +80,7 @@ bx([{moCall = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(StartTime, StopTime, Duration,
 					"event", ["session"], ["connection"], Outcome), $,,
-			$", "Bx_moCall", $", $:, zj:encode(Parameters)]]);
+			$", "Bx_moCall", $", $:, ?JSON:encode(Parameters)]]);
 bx([{mtCall = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
 	MSISDN = msisdn(Parameters),
@@ -88,7 +98,7 @@ bx([{mtCall = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(StartTime, StopTime, Duration,
 					"event", ["session"], ["connection"], Outcome), $,,
-			$", "Bx_mtCall", $", $:, zj:encode(Parameters)]]);
+			$", "Bx_mtCall", $", $:, ?JSON:encode(Parameters)]]);
 bx([{moSMS = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
 	MSISDN = msisdn(Parameters),
@@ -105,7 +115,7 @@ bx([{moSMS = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(Timestamp, [], [],
 					"event", ["session"], ["connection"], Outcome), $,,
-			$", "Bx_moSMS", $", $:, zj:encode(Parameters)]]);
+			$", "Bx_moSMS", $", $:, ?JSON:encode(Parameters)]]);
 bx([{mtSMS = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
 	MSISDN = msisdn(Parameters),
@@ -122,7 +132,7 @@ bx([{mtSMS = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(Timestamp, [], [],
 					"event", ["session"], ["connection"], Outcome), $,,
-			$", "Bx_mtSMS", $", $:, zj:encode(Parameters)]]);
+			$", "Bx_mtSMS", $", $:, ?JSON:encode(Parameters)]]);
 bx([{ssAction = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
 	MSISDN = msisdn(Parameters),
@@ -139,7 +149,7 @@ bx([{ssAction = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(Timestamp, [], [],
 					"event", ["session"], ["connection"], Outcome), $,,
-			$", "Bx_ssAction", $", $:, zj:encode(Parameters)]]);
+			$", "Bx_ssAction", $", $:, ?JSON:encode(Parameters)]]);
 bx([{incGateway = _RecordType, Parameters} | T] = _CDR) ->
 	Timestamp = case maps:find(<<"eventtimestamp">>, Parameters) of
 		{ok, Ts} ->
@@ -153,7 +163,7 @@ bx([{incGateway = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_service("bx", "cgf"), $,,
 			ecs_event(Timestamp, [], [],
 					"event", ["session"], ["connection"], Outcome), $,,
-			$", "Bx_incGateway", $", $:, zj:encode(Parameters)]]);
+			$", "Bx_incGateway", $", $:, ?JSON:encode(Parameters)]]);
 bx([{outGateway = _RecordType, Parameters} | T] = _CDR) ->
 	Timestamp = case maps:find(<<"eventtimestamp">>, Parameters) of
 		{ok, Ts} ->
@@ -167,7 +177,7 @@ bx([{outGateway = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_service("bx", "cgf"), $,,
 			ecs_event(Timestamp, [], [],
 					"event", ["session"], ["connection"], Outcome), $,,
-			$", "Bx_outGateway", $", $:, zj:encode(Parameters)]]);
+			$", "Bx_outGateway", $", $:, ?JSON:encode(Parameters)]]);
 bx([{transit = _RecordType, Parameters} | T] = _CDR) ->
 	Timestamp = case maps:find(<<"eventtimestamp">>, Parameters) of
 		{ok, Ts} ->
@@ -181,7 +191,7 @@ bx([{transit = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_service("bx", "cgf"), $,,
 			ecs_event(Timestamp, [], [],
 					"event", ["session"], ["connection"], Outcome), $,,
-			$", "Bx_transit", $", $:, zj:encode(Parameters)]]);
+			$", "Bx_transit", $", $:, ?JSON:encode(Parameters)]]);
 bx([{roaming = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
 	MSISDN = msisdn(Parameters),
@@ -199,7 +209,7 @@ bx([{roaming = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(StartTime, StopTime, Duration,
 					"event", ["session"], ["connection"], Outcome), $,,
-			$", "Bx_roaming", $", $:, zj:encode(Parameters)]]);
+			$", "Bx_roaming", $", $:, ?JSON:encode(Parameters)]]);
 bx([{sgsnPDP = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
 	MSISDN = msisdn(Parameters),
@@ -217,7 +227,7 @@ bx([{sgsnPDP = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(Timestamp, StopTime, Duration,
 					"event", ["session"], ["connection"], Outcome), $,,
-			$", "Bx_sgsnPDP", $", $:, zj:encode(Parameters)]]);
+			$", "Bx_sgsnPDP", $", $:, ?JSON:encode(Parameters)]]);
 bx([{ggsnPDP = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
 	MSISDN = msisdn(Parameters),
@@ -235,7 +245,7 @@ bx([{ggsnPDP = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(Timestamp, StopTime, Duration,
 					"event", ["session"], ["connection"], Outcome), $,,
-			$", "Bx_ggsnPDP", $", $:, zj:encode(Parameters)]]);
+			$", "Bx_ggsnPDP", $", $:, ?JSON:encode(Parameters)]]);
 bx([{sgsnSMO = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
 	MSISDN = msisdn(Parameters),
@@ -252,7 +262,7 @@ bx([{sgsnSMO = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(Timestamp, [], [],
 					"event", ["session"], ["connection"], Outcome), $,,
-			$", "Bx_sgsnSMO", $", $:, zj:encode(Parameters)]]);
+			$", "Bx_sgsnSMO", $", $:, ?JSON:encode(Parameters)]]);
 bx([{sgsnSMT = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
 	MSISDN = msisdn(Parameters),
@@ -269,7 +279,7 @@ bx([{sgsnSMT = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(Timestamp, [], [],
 					"event", ["session"], ["connection"], Outcome), $,,
-			$", "Bx_sgsnSMT", $", $:, zj:encode(Parameters)]]);
+			$", "Bx_sgsnSMT", $", $:, ?JSON:encode(Parameters)]]);
 bx([{sgw = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
 	MSISDN = msisdn(Parameters),
@@ -287,7 +297,7 @@ bx([{sgw = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(Timestamp, StopTime, Duration,
 					"event", ["session"], ["connection"], Outcome), $,,
-			$", "Bx_sgw", $", $:, zj:encode(Parameters)]]);
+			$", "Bx_sgw", $", $:, ?JSON:encode(Parameters)]]);
 bx([{vas = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
 	MSISDN = msisdn(Parameters),
@@ -304,7 +314,7 @@ bx([{vas = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(Timestamp, [], [],
 					"event", ["session"], ["connection"], Outcome), $,,
-			$", "Bx_vas", $", $:, zj:encode(Parameters)]]);
+			$", "Bx_vas", $", $:, ?JSON:encode(Parameters)]]);
 bx([{abmf = _RecordType, Parameters} | T] = _CDR) ->
 	MSISDN = msisdn(Parameters),
 	Timestamp = case maps:find(<<"timestamp">>, Parameters) of
@@ -320,7 +330,7 @@ bx([{abmf = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_user(MSISDN, []), $,,
 			ecs_event(Timestamp, [], [],
 					"event", ["session"], ["connection"], Outcome), $,,
-			$", "Bx_balance", $", $:, zj:encode(Parameters)]]);
+			$", "Bx_balance", $", $:, ?JSON:encode(Parameters)]]);
 bx([{roam_moCall = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
 	MSISDN = msisdn(Parameters),
@@ -332,7 +342,7 @@ bx([{roam_moCall = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(StartTime, [], Duration,
 					"event", ["session"], ["connection"], Outcome), $,,
-			$", "Bx_roam_moCall", $", $:, zj:encode(Parameters)]]);
+			$", "Bx_roam_moCall", $", $:, ?JSON:encode(Parameters)]]);
 bx([{roam_mtCall = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
 	MSISDN = msisdn(Parameters),
@@ -344,7 +354,7 @@ bx([{roam_mtCall = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(StartTime, [], Duration,
 					"event", ["session"], ["connection"], Outcome), $,,
-			$", "Bx_roam_mtCall", $", $:, zj:encode(Parameters)]]);
+			$", "Bx_roam_mtCall", $", $:, ?JSON:encode(Parameters)]]);
 bx([{roam_gprs = _RecordType, Parameters} | T] = _CDR) ->
 	IMSI = imsi(Parameters),
 	MSISDN = msisdn(Parameters),
@@ -356,28 +366,28 @@ bx([{roam_gprs = _RecordType, Parameters} | T] = _CDR) ->
 			ecs_user(MSISDN, IMSI), $,,
 			ecs_event(StartTime, [], Duration,
 					"event", ["session"], ["connection"], Outcome), $,,
-			$", "Bx_roam_gprsCall", $", $:, zj:encode(Parameters)]]);
+			$", "Bx_roam_gprsCall", $", $:, ?JSON:encode(Parameters)]]);
 bx([{RecordType, Parameters} | T] = _CDR)
 		when is_list(RecordType) ->
 	Now = cgf_log:iso8601(erlang:system_time(millisecond)),
 	bx1(T, [[${,
 			ecs_base(Now), $,,
 			ecs_service("bx", "cgf"), $,,
-			$", RecordType, $", $:, zj:encode(Parameters)]]).
+			$", RecordType, $", $:, ?JSON:encode(Parameters)]]).
 %% @hidden
 bx1([{rated, Rated} | T], Acc) ->
-	Acc1 = [[$,, $", "Bx_rated", $", $:, zj:encode(Rated)]],
+	Acc1 = [[$,, $", "Bx_rated", $", $:, ?JSON:encode(Rated)]],
 	bx1(T, [Acc1 | Acc]);
 bx1([{roam_batchControlInfo, BatchControlInfo} | T], Acc) ->
 	Acc1 = [[$,, $", "Bx_roam_batchControlInfo", $", $:,
-			zj:encode(BatchControlInfo)]],
+			?JSON:encode(BatchControlInfo)]],
 	bx1(T, [Acc1 | Acc]);
 bx1([{roam_accountingInfo, AccountingInfo} | T], Acc) ->
-	Acc1 = [[$,, $", "Bx_roam_accountingInfo", $", $:, zj:encode(AccountingInfo)]],
+	Acc1 = [[$,, $", "Bx_roam_accountingInfo", $", $:, ?JSON:encode(AccountingInfo)]],
 	bx1(T, [Acc1 | Acc]);
 bx1([{AttributeName, AttributeValue} | T], Acc)
 		when is_list(AttributeName) ->
-	Acc1 = [[$,, $", AttributeName, $", $:, zj:encode(AttributeValue)]],
+	Acc1 = [[$,, $", AttributeName, $", $:, ?JSON:encode(AttributeValue)]],
 	bx1(T, [Acc1 | Acc]);
 bx1([], Acc) ->
 	[lists:reverse(Acc) | [$}]].
@@ -421,10 +431,10 @@ import(Report) ->
 			ecs_service("bx", "cgf"), $,,
 			ecs_event(StartTime, StopTime, Duration,
 					Kind, Category, Type, Outcome), $,,
-			$", "user", $", $:, zj:encode(User), $,,
-			$", "file", $", $:, zj:encode(File), $,,
-			$", "process", $", $:, zj:encode(Process), $,,
-			$", "Import_CDR", $", $:, zj:encode(ImportCDR), $}].
+			$", "user", $", $:, ?JSON:encode(User), $,,
+			$", "file", $", $:, ?JSON:encode(File), $,,
+			$", "process", $", $:, ?JSON:encode(Process), $,,
+			$", "Import_CDR", $", $:, ?JSON:encode(ImportCDR), $}].
 
 %%----------------------------------------------------------------------
 %%  internal functions
