@@ -42,7 +42,7 @@ AC_ERLANG_NEED_ERLC
 if test -z "${ERLCFLAGS}" ; then
 	ERLCFLAGS="-W -v"
 fi
-if test "x$enable_debug" == xyes ; then
+if test "x$disable_debug" != xyes ; then
 	ERLCFLAGS="$ERLCFLAGS +debug_info"
 fi
 AC_ERLANG_SUBST_LIB_DIR
