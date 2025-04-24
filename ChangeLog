@@ -1,3 +1,8 @@
+2025-04-24   Vance Shipley <vances@sigscale.org>
+
+	* unpack only if another application is permanent
+	* build with debug info
+
 2025-04-19   Vance Shipley <vances@sigscale.org>
 
 	* parameterize release install script with application name

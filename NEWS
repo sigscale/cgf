@@ -1,3 +1,8 @@
+April 24, 2025
+--------------
+	- Unpack release only if another (delivery) application is permanent
+	- Build with debug to support dialyzer analysis
+ 
 April 2, 2025
 -------------
 	- Import CDR report logging 
