@@ -1,3 +1,7 @@
+May 9, 2025
+-----------
+	- Include zj JSON CODEC in release
+
 April 24, 2025
 --------------
 	- Unpack release only if another (delivery) application is permanent

@@ -1,3 +1,7 @@
+2025-05-09   Vance Shipley <vances@sigscale.org>
+
+	* include zj in release specification
+
 2025-04-24   Vance Shipley <vances@sigscale.org>
 
 	* unpack only if another application is permanent
