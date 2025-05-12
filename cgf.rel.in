@@ -8,5 +8,7 @@
 	{asn1, "@ERLANG_LIB_VER_asn1@"},
 	{public_key, "@ERLANG_LIB_VER_public_key@"},
 	{ssh, "@ERLANG_LIB_VER_ssh@"},
+	{map, "@ERLANG_LIB_VER_map@", load},
+	{cap, "@ERLANG_LIB_VER_cap@", load},
 	{zj, "@ERLANG_LIB_VER_zj@"},
 	{@PACKAGE@, "@VERSION@"}]}.
