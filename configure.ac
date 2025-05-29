@@ -4,7 +4,7 @@
 ##
 ## Boilerplate:  standard boilerplate code
 ##
-AC_INIT([cgf], [1.2.18], [issues@sigscale.org])
+AC_INIT([cgf], [1.2.19], [issues@sigscale.org])
 AC_COPYRIGHT([Copyright (c) 2025 SigScale Global Inc.])
 AC_PREREQ(2.64)
 AC_CONFIG_SRCDIR([src/cgf_app.erl])

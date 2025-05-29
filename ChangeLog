@@ -1,3 +1,9 @@
+2025-05-29   Vance Shipley <vances@sigscale.org>
+
+	* spawn process for file operation
+	* debug flag in install_release script
+	* correct install_release option
+
 2025-05-14   Vance Shipley <vances@sigscale.org>
 
 	* option to overide permanent release
