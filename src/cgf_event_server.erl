@@ -29,6 +29,9 @@
 % export the gen_server call backs
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
 		terminate/2, handle_continue/2, code_change/3]).
+% export the private api
+-export([handle_copy/4, handle_move/4, handle_delete/4, handle_unzip/4,
+		handle_gunzip/4, handle_untar/4]).
 
 -include_lib("kernel/include/logger.hrl").
 
@@ -181,22 +184,22 @@ start_action(Event, #{root := Root, path := Path} = Content,
 	start_import(Event, Content, Match, Action, StartArgs),
 	start_action(Event, Content, T);
 start_action(Event, Content, [{Match, {copy, _} = Action} | T]) ->
-	handle_copy(Event, Content, Match, Action),
+	spawn(?MODULE, handle_copy, [Event, Content, Match, Action]),
 	start_action(Event, Content, T);
 start_action(Event, Content, [{Match, {move, _} = Action} | T]) ->
-	handle_move(Event, Content, Match, Action),
+	spawn(?MODULE, handle_move, [Event, Content, Match, Action]),
 	start_action(Event, Content, T);
 start_action(Event, Content, [{Match, {delete, _} = Action} | T]) ->
-	handle_delete(Event, Content, Match, Action),
+	spawn(?MODULE, handle_delete, [Event, Content, Match, Action]),
 	start_action(Event, Content, T);
 start_action(Event, Content, [{Match, {unzip, _} = Action} | T]) ->
-	handle_unzip(Event, Content, Match, Action),
+	spawn(?MODULE, handle_unzip, [Event, Content, Match, Action]),
 	start_action(Event, Content, T);
 start_action(Event, Content, [{Match, {gunzip, _} = Action} | T]) ->
-	handle_gunzip(Event, Content, Match, Action),
+	spawn(?MODULE, handle_gunzip, [Event, Content, Match, Action]),
 	start_action(Event, Content, T);
 start_action(Event, Content, [{Match, {untar, _} = Action} | T]) ->
-	handle_untar(Event, Content, Match, Action),
+	spawn(?MODULE, handle_untar, [Event, Content, Match, Action]),
 	start_action(Event, Content, T);
 start_action(_Event, _Content, []) ->
 	ok.
@@ -216,7 +219,7 @@ start_import(Event, Content, Match, Action, StartArgs) ->
 					{action, Action}])
 	end.
 
-%% @hidden
+%% @private
 handle_copy(Event,
 		#{root := Root, path := Path} = Content,
 		Match, {copy, {RE, Replacement}} = Action)
@@ -265,7 +268,7 @@ handle_copy(Event,
 					{action, Action}])
 	end.
 
-%% @hidden
+%% @private
 handle_move(Event,
 		#{root := Root, path := Path} = Content,
 		Match, {move, {RE, Replacement}} = Action)
@@ -314,7 +317,7 @@ handle_move(Event,
 					{action, Action}])
 	end.
 
-%% @hidden
+%% @private
 handle_delete(Event,
 		#{root := Root, path := Path} = Content,
 		Match, {delete, RE} = Action) ->
@@ -343,7 +346,7 @@ handle_delete(Event,
 					{action, Action}])
 	end.
 
-%% @hidden
+%% @private
 handle_unzip(Event,
 		#{root := Root, path := Path} = Content,
 		Match, {unzip, {RE, Replacement}} = Action)
@@ -399,7 +402,7 @@ handle_unzip(Event,
 					{action, Action}])
 	end.
 
-%% @hidden
+%% @private
 handle_gunzip(Event,
 		#{root := Root, path := Path} = Content,
 		Match, {gunzip, {RE, Replacement}} = Action)
@@ -478,7 +481,7 @@ handle_gunzip(Event, Content, Match, Action, _UserPath,
 			{match, Match},
 			{action, Action}]).
 
-%% @hidden
+%% @private
 handle_untar(Event,
 		#{root := Root, path := Path} = Content,
 		Match, {untar, {RE, Replacement}} = Action)
