@@ -301,8 +301,7 @@ code_change(_OldVersion, State, _Extra) ->
 		Module :: atom(),
 		Function :: atom(),
 		Term :: term(),
-		Result :: {stop, normal} | {error, Reason},
-		Reason :: term().
+		Result :: none().
 %% @doc Child worker of the `cgf_log_job_sup' supervisor.
 %% @private
 codec_worker(Log, Operation, Module, Function, Term)
