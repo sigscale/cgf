@@ -1,3 +1,10 @@
+2025-05-30   Vance Shipley <vances@sigscale.org>
+
+	* add examples for untar/unzip/gunzip in user guide
+	* revert change in 47a1449, allow prefix match on directories
+	* correct typespec for result of log codec
+	* correct cgf:add_action/3 examples in user guide
+
 2025-05-29   Vance Shipley <vances@sigscale.org>
 
 	* spawn process for file operation

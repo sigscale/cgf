@@ -1,3 +1,8 @@
+May 3, 2025
+------------
+	- Prefix match directories
+	- Improved examples in Users Guide
+
 May 29, 2025
 ------------
 	- Avoid event handler timeouts waiting on file operations
