@@ -96,10 +96,8 @@
 %% 	a file is finished transferring. The event handler uses
 %% 	{@link //cgf/cgf:match_event/2. match_event/2} to find
 %% 	actions to perform on the received file. The `Match' values
-%% 	are compared and if all are a match the `Action'
-%% 	is selected. The value for `Directory' must be an exact
-%% 	match of the absolute path, while the other `Match' values
-%% 	match as a prefix. A zero length value always matches.
+%% 	are compared as prefixes and if all are a match the `Action'
+%% 	is selected. A zero length prefix always matches.
 %%
 %% 	When an `Action' of the form `{import, Import}' is matched
 %% 	a supervised {@link //cgf/cgf_import_fsm. cgf_import_fsm}
@@ -347,7 +345,9 @@ match_event(file_close = _Event,
 		when is_binary(User), is_binary(Path) ->
 	Directory = case filename:dirname(Path) of
 		<<".">> ->
-			<<"/">>;
+			<<>>;
+		<<>> ->
+			<<>>;
 		Dir ->
 			Dir
 	end,
@@ -362,7 +362,7 @@ match_event(file_close = _Event,
 	UserCond = {'orelse', {'==', '$1', <<>>},
 			{'==', '$1', {binary_part, User, 0, {byte_size, '$1'}}}},
 	DirectoryCond = {'orelse', {'==', '$2', <<>>},
-			{'==', '$2', Directory}},
+			{'==', '$2', {binary_part, Directory, 0, {byte_size, '$2'}}}},
 	FilenameCond = {'orelse', {'==', '$3', <<>>},
 			{'==', '$3', {binary_part, Filename, 0, {byte_size, '$3'}}}},
 	SuffixCond = {'orelse', {'==', '$4', <<>>},
