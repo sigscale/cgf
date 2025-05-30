@@ -73,11 +73,18 @@ provision event handlers for received ASN.1 format CDR files where
 the directory name (i.e. "TAP") is matched for selecting the import
 module (i.e. `cgf_tap_fsm') which will parse and log the CDRs.
 ```
-(cgf@host)1> cgf:add_action(file_close, {"", "/TAP", "", ""}, {import, {cgf_tap_fsm, bx_tap}}).
-(cgf@host)2> cgf:add_action(file_close, {"", "/SGSN", "", ""}, {import, {cgf_gprs_fsm, bx_ps}}).
-(cgf@host)3> cgf:add_action(file_close, {"", "/MSC", "", ""}, {import, {cgf_cs_fsm, bx_cs}}).
-(cgf@host)4> cgf:add_action(file_close, {"", "/IMS", "", ""}, {import, {cgf_ims_fsm, bx_ims}}).
-(cgf@host)5> q().
+(cgf@host)1> cgf:add_action(file_close, {"", "/TAP/", "", ""}, {import, {cgf_tap_fsm, bx_tap}}).
+(cgf@host)2> cgf:add_action(file_close, {"", "/SGSN/", "", ""}, {import, {cgf_gprs_fsm, bx_ps}}).
+(cgf@host)3> cgf:add_action(file_close, {"", "/MSC/", "", ""}, {import, {cgf_cs_fsm, bx_cs}}).
+(cgf@host)4> cgf:add_action(file_close, {"", "/IMS/", "", ""}, {import, {cgf_ims_fsm, bx_ims}}).
+'''
+The CDR may be received in archive and/or compressed files. The
+following example adds preprocessing for some of these use cases.
+```
+(cgf@host)5> cgf:add_action(file_close, {"", "/", "TAP", "tgz"}, {untar, {<<"^(TAP.*)\\.tgz$">>, <<"TAP/\\1">>}}).
+(cgf@host)6> cgf:add_action(file_close, {"", "/", "SGSN", "zip"}, {unzip, {<<"^(SGSN.*)\\.zip$">>, <<"SGSN/\\1">>}}).
+(cgf@host)7> cgf:add_action(file_close, {"", "/", "MSC", "zip"}, {unzip, {<<"^(MSC.*)\\.zip$">>, <<"MSC/\\1">>}}).
+(cgf@host)8> cgf:add_action(file_close, {"", "/", "IMS", "gz"}, {gunzip, {<<"^(IMS.*)\\.gz$">>, <<"IMS/\\1">>}}).
 '''
 
 ==Configuration==
