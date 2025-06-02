@@ -204,8 +204,7 @@ metadata1(FileMap, Metadata) ->
 	Metadata#{"log" => #{"file" => FileMap}}.
 
 %% @hidden
-report(#{read := Read, parsed := Parsed,
-			header := Header, trailer := Trailer} = _Statedata) ->
+report(#{read := Read, parsed := Parsed} = Statedata) ->
 	F = fun(moCallRecord, Count, Acc) ->
 				Acc#{<<"moCall">> => Count};
 			(mtCallRecord, Count, Acc) ->
@@ -240,8 +239,18 @@ report(#{read := Read, parsed := Parsed,
 			(extensions, _, Acc) ->
 				Acc
 	end,
-	#{<<"totalRecords">> => Read,
-			<<"loggedCount">> => maps:fold(F, #{}, Parsed),
-			<<"huaweiHeader">> => maps:fold(F1, #{}, Header),
-			<<"huaweiTrailer">> => maps:fold(F1, #{}, Trailer)}.
+	Report1 = #{<<"totalRecords">> => Read,
+			<<"loggedCount">> => maps:fold(F, #{}, Parsed)},
+	Report2 = case maps:get(header, Statedata, undefined) of
+		Header when is_map(Header) ->
+			Report1#{<<"huaweiHeader">> => maps:fold(F1, #{}, Header)};
+		undefined ->
+			Report1
+	end,
+	case maps:get(trailer, Statedata, undefined) of
+		Trailer when is_map(Trailer) ->
+			Report2#{<<"huaweiTrailer">> => maps:fold(F1, #{}, Trailer)};
+		undefined ->
+			Report2
+	end.
 
