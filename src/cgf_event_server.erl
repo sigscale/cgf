@@ -39,6 +39,7 @@
 
 -record(state,
 		{max_fsm :: non_neg_integer(),
+		max_mem :: non_neg_integer(),
 		eventq :: queue:queue()}).
 -type state() :: #state{}.
 
@@ -56,7 +57,9 @@
 %% @private
 init([] = _Args) ->
 	{ok, MaxFsm} = application:get_env(max_action_import),
-	State = #state{max_fsm = MaxFsm, eventq = queue:new()},
+	{ok, MaxMem} = application:get_env(max_action_memory),
+	State = #state{max_fsm = MaxFsm, max_mem = MaxMem,
+			eventq = queue:new()},
 	{ok, State, {continue, init}}.
 
 -spec handle_call(Request, From, State) -> Result
@@ -227,18 +230,26 @@ start_action(_Event, _Content, [], State) ->
 	{ok, State}.
 
 %% @hidden
-start_import(#state{max_fsm = MaxFsm, eventq = EventQ} = State) ->
+start_import(#state{max_mem = MaxMem} = State) ->
+	case erlang:memory(total) of
+		TotalMemory when TotalMemory < MaxMem ->
+			start_import1(State);
+		_TotalMemory ->
+			State
+	end.
+%% @hidden
+start_import1(#state{max_fsm = MaxFsm, eventq = EventQ} = State) ->
 	Counts = supervisor:count_children(cgf_import_sup),
 	case proplists:get_value(active, Counts) of
 		Active when Active < MaxFsm ->
 			{{value, StartArgs}, EventQ1} = queue:out(EventQ),
 			NewState = State#state{eventq = EventQ1},
-			start_import1(StartArgs, NewState);
+			start_import2(StartArgs, NewState);
 		_Active ->
 			State
 	end.
 %% @hidden
-start_import1(StartArgs, State) ->
+start_import2(StartArgs, State) ->
 	case supervisor:start_child(cgf_import_sup, StartArgs) of
 		{ok, _Child} ->
 			State;
