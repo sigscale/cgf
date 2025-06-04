@@ -1,5 +1,6 @@
 2025-06-04   Vance Shipley <vances@sigscale.org>
 
+	* include os_mon in release
 	* application environment variable for maximum load average
 	* application environment variable for maximum allocated memory
 	* application environment variable for maximum import fsm count
