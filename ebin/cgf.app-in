@@ -72,6 +72,8 @@
 		{applications,
 				[kernel,
 				stdlib,
+				sasl,
+				os_mon,
 				mnesia,
 				asn1,
 				ssh]},
