@@ -13,7 +13,7 @@
 -export([rand_duration/0, rand_duration/1]).
 
 applications() ->
-	[crypto, mnesia, asn1, public_key, inets, ssh, cgf].
+	[crypto, mnesia, asn1, public_key, sasl, os_mon, inets, ssh, cgf].
 
 -spec init_tables() -> Result
 	when
