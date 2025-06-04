@@ -127,5 +127,9 @@ Application environment variables configuring mediation of CDR files:
 	<dt>`max_action'</dt>
 		<dd>Sets the maximum number of actions resulting from
 				an initial event to prevent looping. (default: `5')</dd>
+	<dt>`max_action_import'</dt>
+		<dd>Sets the maximum number of concurrent
+				{@link //cgf/cgf_import_fsm. cgf_import_fsm} workers
+				after which start requests will be queued.  (default: `100')</dd>
 </dl>
 

@@ -35,7 +35,11 @@
 
 -include_lib("kernel/include/logger.hrl").
 
--record(state, {}).
+-define(TIMEOUT, 10000).
+
+-record(state,
+		{max_fsm :: non_neg_integer(),
+		eventq :: queue:queue()}).
 -type state() :: #state{}.
 
 %%----------------------------------------------------------------------
@@ -51,7 +55,8 @@
 %% @see //stdlib/gen_server:init/1
 %% @private
 init([] = _Args) ->
-	State = #state{},
+	{ok, MaxFsm} = application:get_env(max_action_import),
+	State = #state{max_fsm = MaxFsm, eventq = queue:new()},
 	{ok, State, {continue, init}}.
 
 -spec handle_call(Request, From, State) -> Result
@@ -70,12 +75,13 @@ init([] = _Args) ->
 handle_call({file_close = Event, Content} = _Request, _From, State) ->
 	case cgf:match_event(Event, Content) of
 		{ok, Actions} ->
-			{reply, start_action(Event, Content, Actions), State};
+			{Result, NewState} = start_action(Event, Content, Actions, State),
+			{reply, Result, NewState, timeout(NewState)};
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, Reason},
 					{event, Event},
 					{content, Content}]),
-			{reply, {error, Reason}, State}
+			{reply, {error, Reason}, State, timeout(State)}
 	end.
 
 -spec handle_cast(Request, State) -> Result
@@ -91,7 +97,7 @@ handle_call({file_close = Event, Content} = _Request, _From, State) ->
 %% @@see //stdlib/gen_server:handle_cast/2
 %% @private
 handle_cast(_Request, State) ->
-	{noreply, State}.
+	{noreply, State, timeout(State)}.
 
 -spec handle_continue(Continue, State) -> Result
 	when
@@ -121,10 +127,14 @@ handle_continue(init = _Continue, State) ->
 %% @doc Handle a received message.
 %% @@see //stdlib/gen_server:handle_info/2
 %% @private
+%% @hidden
+handle_info(timeout = _Info, State) ->
+	NewState = start_import(State),
+	{noreply, NewState, timeout(NewState)};
 handle_info({gen_event_EXIT, ?MODULE = _Handler, Reason} = _Info, State) ->
-	{stop, Reason, State};
+	{stop, Reason, State, timeout(State)};
 handle_info({gen_event_EXIT, _Handler, _Reason} = _Info, State) ->
-	{noreply, State}.
+	{noreply, State, timeout(State)}.
 
 -spec terminate(Reason, State) -> any()
 	when
@@ -152,71 +162,93 @@ code_change(_OldVersion, State, _Extra) ->
 
 %% @hidden
 start_action(Event, #{root := Root,
-		path := <<$/, Path/binary>>} = Content, Actions)
+		path := <<$/, Path/binary>>} = Content, Actions, State)
 		when byte_size(Root) > 0 ->
-	start_action(Event, Content#{path := Path}, Actions);
+	start_action(Event, Content#{path := Path}, Actions, State);
 start_action(Event, #{root := Root, path := Path} = Content,
-		[{Match, {import, {Module, Log}} = Action} | T]) ->
+		[{_Match, {import, {Module, Log}} = _Action} | T],
+		#state{eventq = EventQ} = State) ->
 	Filename = filename:join(Root, Path),
 	Metadata = metadata(Content, #{}),
 	StartArgs = [Module, [Filename, Log, Metadata], []],
-	start_import(Event, Content, Match, Action, StartArgs),
-	start_action(Event, Content, T);
+	EventQ1 = queue:in(StartArgs, EventQ),
+	State1 = State#state{eventq = EventQ1},
+	NewState = start_import(State1),
+	start_action(Event, Content, T, NewState);
 start_action(Event, #{root := Root, path := Path} = Content,
-		[{Match, {import, {Module, Log, Metadata}} = Action} | T]) ->
+		[{_Match, {import, {Module, Log, Metadata}} = _Action} | T],
+		#state{eventq = EventQ} = State) ->
 	Filename = filename:join(Root, Path),
 	Metadata1 = metadata(Content, Metadata),
 	StartArgs = [Module, [Filename, Log, Metadata1], []],
-	start_import(Event, Content, Match, Action, StartArgs),
-	start_action(Event, Content, T);
+	EventQ1 = queue:in(StartArgs, EventQ),
+	State1 = State#state{eventq = EventQ1},
+	NewState = start_import(State1),
+	start_action(Event, Content, T, NewState);
 start_action(Event, #{root := Root, path := Path} = Content,
-		[{Match, {import, {Module, Log, Metadata, ExtraArgs}} = Action} | T]) ->
+		[{_Match, {import, {Module, Log, Metadata, ExtraArgs}} = _Action} | T],
+		#state{eventq = EventQ} = State) ->
 	Filename = filename:join(Root, Path),
 	Metadata1 = metadata(Content, Metadata),
 	StartArgs = [Module, [Filename, Log, Metadata1] ++ ExtraArgs, []],
-	start_import(Event, Content, Match, Action, StartArgs),
-	start_action(Event, Content, T);
+	EventQ1 = queue:in(StartArgs, EventQ),
+	State1 = State#state{eventq = EventQ1},
+	NewState = start_import(State1),
+	start_action(Event, Content, T, NewState);
 start_action(Event, #{root := Root, path := Path} = Content,
-		[{Match, {import, {Module, Log, Metadata, ExtraArgs, Opts}} = Action} | T]) ->
+		[{_Match, {import, {Module, Log, Metadata, ExtraArgs, Opts}} = _Action} | T],
+		#state{eventq = EventQ} = State) ->
 	Filename = filename:join(Root, Path),
 	Metadata1 = metadata(Content, Metadata),
 	StartArgs = [Module, [Filename, Log, Metadata1] ++ ExtraArgs, Opts],
-	start_import(Event, Content, Match, Action, StartArgs),
-	start_action(Event, Content, T);
-start_action(Event, Content, [{Match, {copy, _} = Action} | T]) ->
+	EventQ1 = queue:in(StartArgs, EventQ),
+	State1 = State#state{eventq = EventQ1},
+	NewState = start_import(State1),
+	start_action(Event, Content, T, NewState);
+start_action(Event, Content, [{Match, {copy, _} = Action} | T], State) ->
 	spawn(?MODULE, handle_copy, [Event, Content, Match, Action]),
-	start_action(Event, Content, T);
-start_action(Event, Content, [{Match, {move, _} = Action} | T]) ->
+	start_action(Event, Content, T, State);
+start_action(Event, Content, [{Match, {move, _} = Action} | T], State) ->
 	spawn(?MODULE, handle_move, [Event, Content, Match, Action]),
-	start_action(Event, Content, T);
-start_action(Event, Content, [{Match, {delete, _} = Action} | T]) ->
+	start_action(Event, Content, T, State);
+start_action(Event, Content, [{Match, {delete, _} = Action} | T], State) ->
 	spawn(?MODULE, handle_delete, [Event, Content, Match, Action]),
-	start_action(Event, Content, T);
-start_action(Event, Content, [{Match, {unzip, _} = Action} | T]) ->
+	start_action(Event, Content, T, State);
+start_action(Event, Content, [{Match, {unzip, _} = Action} | T], State) ->
 	spawn(?MODULE, handle_unzip, [Event, Content, Match, Action]),
-	start_action(Event, Content, T);
-start_action(Event, Content, [{Match, {gunzip, _} = Action} | T]) ->
+	start_action(Event, Content, T, State);
+start_action(Event, Content, [{Match, {gunzip, _} = Action} | T], State) ->
 	spawn(?MODULE, handle_gunzip, [Event, Content, Match, Action]),
-	start_action(Event, Content, T);
-start_action(Event, Content, [{Match, {untar, _} = Action} | T]) ->
+	start_action(Event, Content, T, State);
+start_action(Event, Content, [{Match, {untar, _} = Action} | T], State) ->
 	spawn(?MODULE, handle_untar, [Event, Content, Match, Action]),
-	start_action(Event, Content, T);
-start_action(_Event, _Content, []) ->
-	ok.
+	start_action(Event, Content, T, State);
+start_action(_Event, _Content, [], State) ->
+	{ok, State}.
 
 %% @hidden
-start_import(Event, Content, Match, Action, StartArgs) ->
+start_import(#state{max_fsm = MaxFsm, eventq = EventQ} = State) ->
+	Counts = supervisor:count_children(cgf_import_sup),
+	case proplists:get_value(active, Counts) of
+		Active when Active < MaxFsm ->
+			{{value, StartArgs}, EventQ1} = queue:out(EventQ),
+			NewState = State#state{eventq = EventQ1},
+			start_import1(StartArgs, NewState);
+		_Active ->
+			State
+	end.
+%% @hidden
+start_import1(StartArgs, State) ->
 	case supervisor:start_child(cgf_import_sup, StartArgs) of
 		{ok, _Child} ->
-			ok;
+			State;
 		{ok, _Child, _Info} ->
-			ok;
+			State;
 		{error, Reason} ->
 			?LOG_ERROR([{?MODULE, Reason},
-					{event, Event},
-					{content, Content},
-					{match, Match},
-					{action, Action}])
+					{supervisor, cgf_import_sup},
+					{start_args, StartArgs}]),
+			State
 	end.
 
 %% @private
@@ -604,4 +636,13 @@ metadata(#{root := Root, path := Path,
 				MetadataValue
 	end,
 	maps:merge_with(F, Metadata, #{"log" => Log}).
+
+%% @hidden
+timeout(#state{eventq = EventQ} = _State) ->
+	case queue:is_empty(EventQ) of
+		true ->
+			infinity;
+		false ->
+			?TIMEOUT
+	end.
 
