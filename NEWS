@@ -1,3 +1,12 @@
+June 4, 2025
+------------
+	- Queue import actions when system load over configured maximum:
+		- Concurrent import process count
+		- Total memory allocated to emulator
+		- Operating system load average
+	- Ignore invalid enumeration value in CS additional charge indicator
+	- CS Huawei import report conditionally includes header or trailer
+
 May 3, 2025
 ------------
 	- Prefix match directories

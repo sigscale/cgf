@@ -1,3 +1,11 @@
+2025-06-04   Vance Shipley <vances@sigscale.org>
+
+	* application environment variable for maximum load average
+	* application environment variable for maximum allocated memory
+	* application environment variable for maximum import fsm count
+	* ignore invalid enumeration value in cs additional charge indicator
+	* cs huawei import report conditionally includes header or trailer
+
 2025-05-30   Vance Shipley <vances@sigscale.org>
 
 	* add examples for untar/unzip/gunzip in user guide
