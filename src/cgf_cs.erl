@@ -484,6 +484,11 @@ mo_call_record32(#{sequenceNumber := SequenceNumber} = MOCallRecord, Acc) ->
 mo_call_record32(MOCallRecord, Acc) ->
 	mo_call_record33(MOCallRecord, Acc).
 %% @hidden
+mo_call_record33(#{additionalChgInfo := #{chargeIndicator := ChargeIndicator}
+		= AdditionalChgInfo} = MOCallRecord, Acc) when is_integer(ChargeIndicator) ->
+	AdditionalChgInfo1 = maps:remove(chargeIndicator, AdditionalChgInfo),
+	MOCallRecord1 = maps:update(additionalChgInfo, AdditionalChgInfo1,  MOCallRecord),
+	mo_call_record33(MOCallRecord1, Acc);
 mo_call_record33(#{additionalChgInfo := AdditionalChgInfo} = MOCallRecord, Acc) ->
 	Acc1 = Acc#{<<"additionalChgInfo">> => AdditionalChgInfo},
 	mo_call_record34(MOCallRecord, Acc1);
