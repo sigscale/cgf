@@ -135,5 +135,10 @@ Application environment variables configuring mediation of CDR files:
 		<dd>Sets the maximum total memory size allocated by the
 				Erlang emulator after which start requests will be queued.
 				(default: `68719476736' (64GB))</dd>
+	<dt>`max_action_load'</dt>
+		<dd>Sets the maximum operating system load average after which start
+				requests will be queued. The value type is `{Minutes, Load}'
+				where `Minutes :: 1 | 5 | 15' and `Load :: float()'.
+				See `uptime(1)'.  (default: `{1, 10.00}')</dd>
 </dl>
 

@@ -40,6 +40,7 @@
 -record(state,
 		{max_fsm :: non_neg_integer(),
 		max_mem :: non_neg_integer(),
+		load_avg :: {avg1 | avg5 | avg15, pos_integer()},
 		eventq :: queue:queue()}).
 -type state() :: #state{}.
 
@@ -58,8 +59,16 @@
 init([] = _Args) ->
 	{ok, MaxFsm} = application:get_env(max_action_import),
 	{ok, MaxMem} = application:get_env(max_action_memory),
+	LoadAvg = case application:get_env(max_action_load) of
+		{ok, {1, N}} when is_number(N) ->
+			{avg1, floor(N * 256)};
+		{ok, {5, N}} when is_number(N) ->
+			{avg5, floor(N * 256)};
+		{ok, {15, N}} when is_number(N) ->
+			{avg15, floor(N * 256)}
+	end,
 	State = #state{max_fsm = MaxFsm, max_mem = MaxMem,
-			eventq = queue:new()},
+			load_avg = LoadAvg, eventq = queue:new()},
 	{ok, State, {continue, init}}.
 
 -spec handle_call(Request, From, State) -> Result
@@ -238,18 +247,29 @@ start_import(#state{max_mem = MaxMem} = State) ->
 			State
 	end.
 %% @hidden
-start_import1(#state{max_fsm = MaxFsm, eventq = EventQ} = State) ->
+start_import1(#state{load_avg = {F, MaxLoad}} = State) ->
+	try cpu_sup:F() of
+		LoadAverage when LoadAverage < MaxLoad ->
+			start_import2(State);
+		_LoadAverage ->
+			State
+	catch
+		_:_ ->
+			start_import2(State)
+	end.
+%% @hidden
+start_import2(#state{max_fsm = MaxFsm, eventq = EventQ} = State) ->
 	Counts = supervisor:count_children(cgf_import_sup),
 	case proplists:get_value(active, Counts) of
 		Active when Active < MaxFsm ->
 			{{value, StartArgs}, EventQ1} = queue:out(EventQ),
 			NewState = State#state{eventq = EventQ1},
-			start_import2(StartArgs, NewState);
+			start_import3(StartArgs, NewState);
 		_Active ->
 			State
 	end.
 %% @hidden
-start_import2(StartArgs, State) ->
+start_import3(StartArgs, State) ->
 	case supervisor:start_child(cgf_import_sup, StartArgs) of
 		{ok, _Child} ->
 			State;
