@@ -1199,6 +1199,11 @@ mt_call_record50(#{guaranteedBitRate := GuaranteedBitRate} = Record, Acc) ->
 mt_call_record50(Record, Acc) ->
 	mt_call_record51(Record, Acc).
 %% @hidden
+mt_call_record51(#{additionalChgInfo := #{chargeIndicator := ChargeIndicator}
+		= AdditionalChgInfo} = MTCallRecord, Acc) when is_integer(ChargeIndicator) ->
+	AdditionalChgInfo1 = maps:remove(chargeIndicator, AdditionalChgInfo),
+	MTCallRecord1 = maps:update(additionalChgInfo, AdditionalChgInfo1,  MTCallRecord),
+	mt_call_record51(MTCallRecord1, Acc);
 mt_call_record51(#{additionalChgInfo := AdditionalChgInfo} = Record, Acc) ->
 	Acc1 = Acc#{<<"additionalChgInfo">> => AdditionalChgInfo},
 	mt_call_record52(Record, Acc1);
