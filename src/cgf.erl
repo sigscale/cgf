@@ -35,6 +35,29 @@
 		Directory :: string() | binary(),
 		Filename :: string() | binary(),
 		Suffix :: string() | binary()}.
+%% A `Match' pattern applied to an event.
+%%	<ul class="definitions">
+%% 	<li><tt>Match = {User, Directory, Filename, Suffix}</tt></li>
+%% 	<li><tt>User = string() | binary()</tt></li>
+%% 	<li><tt>Directory = string() | binary()</tt></li>
+%% 	<li><tt>Filename = string() | binary()</tt></li>
+%% 	<li><tt>Suffix = string() | binary()</tt></li>
+%% </ul>
+%%
+%% The `User' associated with an event is the name used
+%% to authenticate an SSH session. A prefix match is applied.
+%%
+%% The `Directory' is the absolute path, rooted in the
+%% `User''s home directory, of the subdirectory containing
+%% the `Filename'. A prefix match is applied.
+%%
+%% The `Filename' is the path of the associated file with
+%% the directory portion, and any suffix, removed. A prefix
+%% match is applied.
+%%
+%% The `Suffix' is the suffix portion of the path, without
+%% the dot (`.').  An exact match is applied.
+%%
 -type action() :: {import, Import :: {Module :: erlang:module(),
 				Log :: disk_log:log()}}
 		| {import, {Module :: erlang:module(), Log :: disk_log:log(),
