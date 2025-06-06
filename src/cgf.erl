@@ -96,8 +96,9 @@
 %% 	a file is finished transferring. The event handler uses
 %% 	{@link //cgf/cgf:match_event/2. match_event/2} to find
 %% 	actions to perform on the received file. The `Match' values
-%% 	are compared as prefixes and if all are a match the `Action'
-%% 	is selected. A zero length prefix always matches.
+%% 	are compared as prefixes, except `Suffix' which must match
+%% 	exactly, and if all are a match the `Action' is selected.
+%% 	An empty value always matches.
 %%
 %% 	When an `Action' of the form `{import, Import}' is matched
 %% 	a supervised {@link //cgf/cgf_import_fsm. cgf_import_fsm}
@@ -366,7 +367,7 @@ match_event(file_close = _Event,
 	FilenameCond = {'orelse', {'==', '$3', <<>>},
 			{'==', '$3', {binary_part, Filename, 0, {byte_size, '$3'}}}},
 	SuffixCond = {'orelse', {'==', '$4', <<>>},
-			{'==', '$4', {binary_part, Suffix, 0, {byte_size, '$4'}}}},
+			{'==', '$4', Suffix}},
 	MatchCond = [{'andalso', UserCond,
 			DirectoryCond, FilenameCond, SuffixCond}],
 	MatchSpec = [{MatchHead, MatchCond, ['$_']}],
