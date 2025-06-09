@@ -1,3 +1,10 @@
+June 9, 2025
+------------
+	- Release handler installs a named OTP release package
+	- Release handler unpacks only when release unchanged
+	- Documented the match() type for Actions
+	- Now uses an exact match on suffix value (not prefix)
+
 June 4, 2025
 ------------
 	- Queue import actions when system load over configured maximum:

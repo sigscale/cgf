@@ -1,3 +1,11 @@
+2025-06-09   Vance Shipley <vances@sigscale.org>
+
+	* install named release; do nothing if unchanged
+	* document (edoc) match() type
+	* exact match on suffix value
+	* ignore invalid enumeration value in cs additional charge indicator
+	* start sasl and os_mon n test suites
+
 2025-06-04   Vance Shipley <vances@sigscale.org>
 
 	* include os_mon in release
