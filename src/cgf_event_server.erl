@@ -120,7 +120,7 @@ handle_cast(_Request, State) ->
 				| {stop, Reason :: term(), NewState :: state()}.
 %% @doc Handle continued execution.
 handle_continue(init = _Continue, State) ->
-	case cgf_event:add_handler(cgf_event, []) of
+	case cgf_event:add_sup_handler(cgf_event, []) of
 		ok ->
 			{noreply, State};
 		{error, Reason} ->
@@ -143,10 +143,8 @@ handle_continue(init = _Continue, State) ->
 handle_info(timeout = _Info, State) ->
 	NewState = start_import(State),
 	{noreply, NewState, timeout(NewState)};
-handle_info({gen_event_EXIT, ?MODULE = _Handler, Reason} = _Info, State) ->
-	{stop, Reason, State, timeout(State)};
-handle_info({gen_event_EXIT, _Handler, _Reason} = _Info, State) ->
-	{noreply, State, timeout(State)}.
+handle_info({gen_event_EXIT, cgf_event = _Handler, Reason} = _Info, State) ->
+	{stop, Reason, State, timeout(State)}.
 
 -spec terminate(Reason, State) -> any()
 	when
