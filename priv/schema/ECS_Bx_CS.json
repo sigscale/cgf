@@ -301,6 +301,10 @@
 					"$ref": "#/$defs/FreeFormatData"
 				},
 				"cAMELCallLegInformation": {
+					"type" : "array",
+					"items" : {
+						"$ref" : "#/$defs/CAMELInformation"
+					}
 				},
 				"freeFormatDataAppend": {
 					"description": "Indicates whether free format data is to be appended to free format data stored in previous partial CDR.",
@@ -1357,6 +1361,65 @@
 			"minimum": 0,
 			"maximum": 18446744073709551615
 		},
+		"CAMELInformation" : {
+			"type" : "object",
+			"properties" : {
+				"answerTime" : {
+					"type": "string",
+					"format": "date-time"
+				},
+				"cAMELDestinationNumber" : {
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"cAMELInitCFIndicator" : {
+					"$ref" : "#/$defs/CAMELInitCFIndicator"
+				},
+				"cAMELModification" : {
+					"$ref" : "#/$defs/ChangedParameters"
+				},
+				"callDuration" : {
+					"type": "integer"
+				},
+				"causeForTerm" : {
+					"$ref" : "#/$defs/CauseForTerm"
+				},
+				"connectedNumber" : {
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"dataVolume" : {
+					"type": "integer"
+				},
+				"diagnostics" : {
+					"$ref": "#/$defs/Diagnostics"
+				},
+				"freeFormatData" : {
+					"$ref" : "#/$defs/FreeFormatData"
+				},
+				"freeFormatData-2" : {
+					"$ref" : "#/$defs/FreeFormatData"
+				},
+				"freeFormatDataAppend" : {
+					"type" : "boolean"
+				},
+				"freeFormatDataAppend-2" : {
+					"type" : "boolean"
+				},
+				"mscOutgoingTKGP" : {
+					"$ref" : "#/$defs/TrunkGroup"
+				},
+				"releaseTime" : {
+					"type": "string",
+					"format": "date-time"
+				},
+				"roamingNumber" : {
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"seizureTime" : {
+					"type": "string",
+					"format": "date-time"
+				}
+			}
+		},
 		"CAMELInitCFIndicator": {
 			"description": "Distinguish CAMEL call forwarding service scenarios from standard GSM call forwarding scenarios.",
 			"type": "string",
@@ -1364,6 +1427,34 @@
 				"noCAMELCallForwarding",
 				"cAMELCallForwarding"
 			]
+		},
+		"CAMELModificationParameters" : {
+			"type" : "object",
+			"properties" : {
+				"callingPartyCategory" : {
+					"type" : "string",
+					"minLength" : 1,
+					"maxLength" : 1,
+					"pattern" : "^([0-9a-f]{2})*$"
+				},
+				"callingPartyNumber" : {
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"genericNumbers" : {
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"originalCalledPartyNumber" : {
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"redirectingPartyNumber" : {
+					"$ref": "#/$defs/PartyAddress"
+				},
+				"redirectionCounter" : {
+					"type": "integer",
+					"minimum": 1,
+					"maximum": 5
+				}
+			}
 		},
 		"CAMELSMSInformation": {
 			"type": "object",
@@ -1413,6 +1504,28 @@
 				"positionMethodFailure",
 				"unknownOrUnreachableLCSClient"
 			]
+		},
+		"ChangedParameters" : {
+			"type" : "object",
+			"properties" : {
+				"changeFlags" : {
+		         "type" : "array",
+		         "items" : {
+		            "type" : "string",
+		            "enum" : [
+		               "callingPartyNumberModified",
+		               "callingPartyCategoryModified",
+		               "originalCalledPartyNumberModified",
+		               "genericNumbersModified",
+		               "redirectingPartyNumberModified",
+		               "redirectionCounterModified"
+		            ]
+		         }
+				},
+				"changeList" : {
+					"$ref" : "#/$defs/CAMELModificationParameters"
+				}
+			}
 		},
 		"ChangeOfService": {
 			"description": "Describes an alteration to the basic service during the connection.",

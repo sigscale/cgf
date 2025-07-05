@@ -603,8 +603,10 @@ mo_call_record51(#{freeFormatData := FreeFormatData} = MOCallRecord, Acc) ->
 mo_call_record51(MOCallRecord, Acc) ->
 	mo_call_record52(MOCallRecord, Acc).
 %% @hidden
-mo_call_record52(#{cAMELCallLegInformation := CAMELCallLegInformation} = MOCallRecord, Acc) ->
-	Acc1 = Acc#{<<"cAMELCallLegInformation">> => CAMELCallLegInformation},
+mo_call_record52(#{cAMELCallLegInformation
+		:= CAMELCallLegInformation} = MOCallRecord, Acc) ->
+	CAMELInformation = [camel_information(I) || I <- CAMELCallLegInformation],
+	Acc1 = Acc#{<<"cAMELCallLegInformation">> => CAMELInformation},
 	mo_call_record53(MOCallRecord, Acc1);
 mo_call_record52(MOCallRecord, Acc) ->
 	mo_call_record53(MOCallRecord, Acc).
@@ -1976,6 +1978,7 @@ level_camel_service([H | T], Acc) ->
 level_camel_service([], Acc) ->
 	lists:reverse(Acc).
 
+%% @hidden
 aoc_params(#{newParameters := NewParameters} = Params) ->
 	Acc = #{<<"newParameters">> => NewParameters},
 	aoc_params1(Params, Acc);
@@ -1987,6 +1990,7 @@ aoc_params1(#{changeTime := ChangeTime} = _Params, Acc) ->
 aoc_params1(_Params, Acc) ->
 	Acc.
 
+%% @hidden
 change_of_params(#{initiatingParty := InitiatingParty} = ChangeOfHSCSDParms) ->
 	Acc = #{<<"initiatingParty">> => InitiatingParty},
 	change_of_params1(ChangeOfHSCSDParms, Acc);
@@ -2050,5 +2054,131 @@ location_area_and_cell1(LocationAreaAndCell, Acc) ->
 location_area_and_cell2(#{'mCC-MNC' := MccMnc}, Acc) ->
 	Acc#{<<"cellId">> => cgf_lib:octet_string(MccMnc)};
 location_area_and_cell2(_LocationAreaAndCell, Acc) ->
+	Acc.
+
+%% @hidden
+camel_information(#{cAMELDestinationNumber
+		:= [CAMELDestinationNumber]} = CamelInformation) ->
+	Acc = #{<<"cAMELDestinationNumber">> => cgf_lib:bcd_dn(CAMELDestinationNumber)},
+	camel_information1(CamelInformation, Acc);
+camel_information(#{cAMELDestinationNumber
+		:= CAMELDestinationNumber} = CamelInformation)
+		when is_binary(CAMELDestinationNumber) ->
+	Acc = #{<<"cAMELDestinationNumber">> => cgf_lib:bcd_dn(CAMELDestinationNumber)},
+	camel_information1(CamelInformation, Acc);
+camel_information(CamelInformation) ->
+	camel_information1(CamelInformation, #{}).
+%% @hidden
+camel_information1(#{connectedNumber
+		:= ConnectedNumber} = CamelInformation, Acc) ->
+	Acc1 = Acc#{<<"connectedNumber">> => cgf_lib:bcd_dn(ConnectedNumber)},
+	camel_information2(CamelInformation, Acc1);
+camel_information1(CamelInformation, Acc) ->
+	camel_information2(CamelInformation, Acc).
+%% @hidden
+camel_information2(#{roamingNumber
+		:= RoamingNumber} = CamelInformation, Acc) ->
+	Acc1 = Acc#{<<"roamingNumber">> => cgf_lib:bcd_dn(RoamingNumber)},
+	camel_information3(CamelInformation, Acc1);
+camel_information2(CamelInformation, Acc) ->
+	camel_information3(CamelInformation, Acc).
+%% @hidden
+camel_information3(#{mscOutgoingTKGP := TrunkGroup} = CamelInformation, Acc) ->
+	Acc1 = Acc#{<<"mscOutgoingTKGP">> => trunk_group(TrunkGroup)},
+	camel_information4(CamelInformation, Acc1);
+camel_information3(CamelInformation, Acc) ->
+	camel_information4(CamelInformation, Acc).
+%% @hidden
+camel_information4(#{seizureTime := TimeStamp } = CamelInformation, Acc) ->
+	Acc1 = Acc#{<<"seizureTime">> => cgf_lib:bcd_date_time(TimeStamp)},
+	camel_information5(CamelInformation, Acc1);
+camel_information4(CamelInformation, Acc) ->
+	camel_information5(CamelInformation, Acc).
+%% @hidden
+camel_information5(#{answerTime := TimeStamp } = CamelInformation, Acc) ->
+	Acc1 = Acc#{<<"answerTime">> => cgf_lib:bcd_date_time(TimeStamp)},
+	camel_information6(CamelInformation, Acc1);
+camel_information5(CamelInformation, Acc) ->
+	camel_information6(CamelInformation, Acc).
+%% @hidden
+camel_information6(#{releaseTime := TimeStamp } = CamelInformation, Acc) ->
+	Acc1 = Acc#{<<"releaseTime">> => cgf_lib:bcd_date_time(TimeStamp)},
+	camel_information7(CamelInformation, Acc1);
+camel_information6(CamelInformation, Acc) ->
+	camel_information7(CamelInformation, Acc).
+%% @hidden
+camel_information7(#{callDuration := Duration} = CamelInformation, Acc) ->
+	Acc1 = Acc#{<<"callDuration">> => Duration},
+	camel_information8(CamelInformation, Acc1);
+camel_information7(CamelInformation, Acc) ->
+	camel_information8(CamelInformation, Acc).
+%% @hidden
+camel_information8(#{dataVolume := DataVolume} = CamelInformation, Acc) ->
+	Acc1 = Acc#{<<"dataVolume">> => DataVolume},
+	camel_information9(CamelInformation, Acc1);
+camel_information8(CamelInformation, Acc) ->
+	camel_information9(CamelInformation, Acc).
+%% @hidden
+camel_information9(#{cAMELInitCFIndicator
+			:= CAMELInitCFIndicator} = CamelInformation, Acc) ->
+	Acc1 = Acc#{<<"cAMELInitCFIndicator">> => CAMELInitCFIndicator},
+	camel_information10(CamelInformation, Acc1);
+camel_information9(CamelInformation, Acc) ->
+	camel_information10(CamelInformation, Acc).
+%% @hidden
+camel_information10(#{causeForTerm := Cause} = CamelInformation, Acc) ->
+	Acc1 = Acc#{<<"causeForTerm">> => atom_to_binary(Cause)},
+	camel_information11(CamelInformation, Acc1);
+camel_information10(CamelInformation, Acc) ->
+	camel_information11(CamelInformation, Acc).
+%% @hidden
+camel_information11(#{cAMELModification
+		:= ChangedParameters} = CamelInformation, Acc) ->
+	Acc1 = Acc#{<<"cAMELModification">> => changed_parameters(ChangedParameters)},
+	camel_information12(CamelInformation, Acc1);
+camel_information11(CamelInformation, Acc) ->
+	camel_information12(CamelInformation, Acc).
+%% @hidden
+camel_information12(#{diagnostics := Diagnostics} = CamelInformation, Acc) ->
+	Acc1 = Acc#{<<"diagnostics">> => cgf_lib:diagnostics(Diagnostics)},
+	camel_information13(CamelInformation, Acc1);
+camel_information12(CamelInformation, Acc) ->
+	camel_information13(CamelInformation, Acc).
+%% @hidden
+camel_information13(#{freeFormatData := FreeFormatData} = CamelInformation, Acc) ->
+	Acc1 = Acc#{<<"freeFormatData">> => cgf_lib:octet_string(FreeFormatData)},
+	camel_information14(CamelInformation, Acc1);
+camel_information13(CamelInformation, Acc) ->
+	camel_information14(CamelInformation, Acc).
+%% @hidden
+camel_information14(#{freeFormatDataAppend
+		:= FreeFormatDataAppend} = CamelInformation, Acc) ->
+	Acc1 = Acc#{<<"freeFormatDataAppend">> => FreeFormatDataAppend},
+	camel_information15(CamelInformation, Acc1);
+camel_information14(CamelInformation, Acc) ->
+	camel_information15(CamelInformation, Acc).
+%% @hidden
+camel_information15(#{'freeFormatData-2'
+		:= FreeFormatData} = CamelInformation, Acc) ->
+	Acc1 = Acc#{<<"freeFormatData-2">> => cgf_lib:octet_string(FreeFormatData)},
+	camel_information16(CamelInformation, Acc1);
+camel_information15(CamelInformation, Acc) ->
+	camel_information16(CamelInformation, Acc).
+%% @hidden
+camel_information16(#{'freeFormatDataAppend-2' := FreeFormatDataAppend}, Acc) ->
+	Acc#{<<"freeFormatDataAppend-2">> => FreeFormatDataAppend};
+camel_information16(_CamelInformation, Acc) ->
+	Acc.
+
+%% @hidden
+changed_parameters(#{changeFlags := ChangeFlags} = ChangedParameters) ->
+	Acc = #{<<"changeFlags">> => ChangeFlags},
+	changed_parameters1(ChangedParameters, Acc);
+changed_parameters(ChangedParameters) ->
+	changed_parameters1(ChangedParameters, #{}).
+%% @hidden
+changed_parameters1(#{changeList := ChangeList}, Acc) ->
+	Acc#{<<"changeList">> => ChangeList};
+changed_parameters1(_ChangedParameters, Acc) ->
 	Acc.
 
