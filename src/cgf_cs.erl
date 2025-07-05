@@ -343,7 +343,7 @@ mo_call_record9(#{mscIncomingTKGP := TrunkGroup} = MOCallRecord, Acc) ->
 	Acc1 = Acc#{<<"mscIncomingTKGP">> => trunk_group(TrunkGroup)},
 	mo_call_record10(MOCallRecord, Acc1);
 mo_call_record9(MOCallRecord, Acc) ->
-mo_call_record10(MOCallRecord, Acc).
+	mo_call_record10(MOCallRecord, Acc).
 %% @hidden
 mo_call_record10(#{mscOutgoingTKGP := TrunkGroup} = MOCallRecord, Acc) ->
 	Acc1 = Acc#{<<"mscOutgoingTKGP">> => trunk_group(TrunkGroup)},
@@ -745,69 +745,6 @@ mo_call_record75(#{privateUserID := PrivateUserID} = _MOCallRecord, Acc) ->
 	Acc#{<<"privateUserID">> => PrivateUserID};
 mo_call_record75(_MOCallRecord, Acc) ->
 	Acc.
-
-%% @hidden
-trunk_group({tkgpNumber, Number}) ->
-	#{<<"tkgpNumber">> => Number};
-trunk_group({tkgpName, Name}) ->
-	#{<<"tkgpName">> => Name}.
-
-%% @hidden
-basic_service_code({bearerService, Code}) ->
-	#{<<"bearerService">> => cgf_lib:octet_string(Code)};
-basic_service_code({teleservice, Code}) ->
-	#{<<"teleservice">> => cgf_lib:octet_string(Code)}.
-
-%% @hidden
-change_of_service(#{transparencyInd := TransparencyInd} = ChangeOfService) ->
-	Acc = #{<<"transparencyInd">> => TransparencyInd},
-	change_of_service1(ChangeOfService, Acc);
-change_of_service(ChangeOfService) ->
-	change_of_service1(ChangeOfService, #{}).
-%% @hidden
-change_of_service1(#{rateIndication := RateIndication} = ChangeOfService, Acc) ->
-	Acc1 = Acc#{<<"rateIndication">> => RateIndication},
-	change_of_service2(ChangeOfService, Acc1);
-change_of_service1(ChangeOfService, Acc) ->
-	change_of_service2(ChangeOfService, Acc).
-%% @hidden
-change_of_service2(#{fnur := Fnur} = ChangeOfService, Acc) ->
-	Acc1 = Acc#{<<"fnur">> => Fnur},
-	change_of_service3(ChangeOfService, Acc1);
-change_of_service2(ChangeOfService, Acc) ->
-	change_of_service3(ChangeOfService, Acc).
-%% @hidden
-change_of_service3(#{changeTime := ChangeTime} = ChangeOfService, Acc) ->
-	Acc1 = Acc#{<<"changeTime">> => cgf_lib:bcd_date_time(ChangeTime)},
-	change_of_service4(ChangeOfService, Acc1);
-change_of_service3(ChangeOfService, Acc) ->
-	change_of_service4(ChangeOfService, Acc).
-%% @hidden
-change_of_service4(#{basicService := BasicService} = _ChangeOfService, Acc) ->
-	Acc#{<<"basicService">> => basic_service_code(BasicService)};
-change_of_service4(_ChangeOfService, Acc) ->
-	Acc.
-
-%% @hidden
-suppl_service_used(#{ssTime := SSTime} = SupplServicesUsed) ->
-	Acc = #{<<"ssTime">> => cgf_lib:bcd_date_time(SSTime)},
-	suppl_service_used1(SupplServicesUsed, Acc);
-suppl_service_used(SupplServicesUsed) ->
-	suppl_service_used1(SupplServicesUsed, #{}).
-%% @hidden
-suppl_service_used1(#{ssCode := Code}, Acc) ->
-	Acc#{<<"ssCode">> => cgf_lib:octet_string(Code)};
-suppl_service_used1(_SupplServicesUsed, Acc) ->
-	Acc.
-
-%% @hidden
-level_camel_service(Level) ->
-	level_camel_service(Level, []).
-%% @hidden
-level_camel_service([H | T], Acc) ->
-	level_camel_service(T, [atom_to_list(H) | Acc]);
-level_camel_service([], Acc) ->
-	lists:reverse(Acc).
 
 %% @hidden
 mo_sms_record(#{servedIMSI := ServedIMSI} = Record) ->
@@ -1257,56 +1194,6 @@ mt_call_record59(#{changeOfRadioChan := ChangeOfRadioChan} = _Record, Acc) ->
 mt_call_record59(_Record, Acc) ->
 	Acc.
 
-aoc_params(#{newParameters := NewParameters} = Params) ->
-	Acc = #{<<"newParameters">> => NewParameters},
-	aoc_params1(Params, Acc);
-aoc_params(Params) ->
-	aoc_params1(Params, #{}).
-%% @hidden
-aoc_params1(#{changeTime := ChangeTime} = _Params, Acc) ->
-	Acc#{<<"changeTime">> => cgf_lib:bcd_date_time(ChangeTime)};
-aoc_params1(_Params, Acc) ->
-	Acc.
-
-change_of_params(#{initiatingParty := InitiatingParty} = ChangeOfHSCSDParms) ->
-	Acc = #{<<"initiatingParty">> => InitiatingParty},
-	change_of_params1(ChangeOfHSCSDParms, Acc);
-change_of_params(ChangeOfHSCSDParms) ->
-	change_of_params1(ChangeOfHSCSDParms, #{}).
-%% @hidden
-change_of_params1(#{hSCSDChanRequested := HSCSDChanRequested} =
-		ChangeOfHSCSDParms, Acc) ->
-	Acc1 = Acc#{<<"hSCSDChanRequested">> => HSCSDChanRequested},
-	change_of_params2(ChangeOfHSCSDParms, Acc1);
-change_of_params1(ChangeOfHSCSDParms, Acc) ->
-	change_of_params2(ChangeOfHSCSDParms, Acc).
-%% @hidden
-change_of_params2(#{hSCSDChanAllocated := HSCSDChanAllocated} =
-		ChangeOfHSCSDParms, Acc) ->
-	Acc1 = Acc#{<<"hSCSDChanAllocated">> => HSCSDChanAllocated},
-	change_of_params3(ChangeOfHSCSDParms, Acc1);
-change_of_params2(ChangeOfHSCSDParms, Acc) ->
-	change_of_params3(ChangeOfHSCSDParms, Acc).
-%% @hidden
-change_of_params3(#{changeTime := ChangeTime} = ChangeOfHSCSDParms, Acc) ->
-	Acc1 = Acc#{<<"changeTime">> => cgf_lib:bcd_date_time(ChangeTime)},
-	change_of_params4(ChangeOfHSCSDParms, Acc1);
-change_of_params3(ChangeOfHSCSDParms, Acc) ->
-	change_of_params4(ChangeOfHSCSDParms, Acc).
-%% @hidden
-change_of_params4(#{chanCodingUsed := ChanCodingUsed} =
-		ChangeOfHSCSDParms, Acc) ->
-	Acc1 = Acc#{<<"chanCodingUsed">> => ChanCodingUsed},
-	change_of_params5(ChangeOfHSCSDParms, Acc1);
-change_of_params4(ChangeOfHSCSDParms, Acc) ->
-	change_of_params5(ChangeOfHSCSDParms, Acc).
-%% @hidden
-change_of_params5(#{aiurRequested := AiurRequested} =
-		_ChangeOfHSCSDParms, Acc) ->
-	Acc#{<<"aiurRequested">> => AiurRequested};
-change_of_params5(_ChangeOfHSCSDParms, Acc) ->
-	Acc.
-
 %% @hidden
 mt_sms_record(#{systemType := SystemType} = Record) ->
 	Acc = #{<<"systemType">> => atom_to_binary(SystemType)},
@@ -1458,32 +1345,6 @@ ss_action_record12(Record, Acc) ->
 ss_action_record13(#{systemType := SystemType}, Acc) ->
 	Acc#{<<"systemType">> => atom_to_binary(SystemType)};
 ss_action_record13(_Record, Acc) ->
-	Acc.
-
-%% @hidden
-ss_parameters({forwardedToNumber, Number}) ->
-	#{<<"forwardedToNumber">> => cgf_lib:bcd_dn(Number)};
-ss_parameters({unstructuredData, Data}) ->
-	#{<<"unstructuredData">> => cgf_lib:octet_string(Data)}.
-
-%% @hidden
-location_area_and_cell(#{locationAreaCode
-		:= <<LAC:16>>} = LocationAreaAndCell) ->
-	Acc = #{<<"locationAreaCode">> => LAC},
-	location_area_and_cell1(LocationAreaAndCell, Acc);
-location_area_and_cell(LocationAreaAndCell) ->
-	location_area_and_cell1(LocationAreaAndCell, #{}).
-%% @hidden
-location_area_and_cell1(#{cellId
-		:= <<CID:16>>} = LocationAreaAndCell, Acc) ->
-	Acc1 = Acc#{<<"cellId">> => CID},
-	location_area_and_cell2(LocationAreaAndCell, Acc1);
-location_area_and_cell1(LocationAreaAndCell, Acc) ->
-	location_area_and_cell2(LocationAreaAndCell, Acc).
-%% @hidden
-location_area_and_cell2(#{'mCC-MNC' := MccMnc}, Acc) ->
-	Acc#{<<"cellId">> => cgf_lib:octet_string(MccMnc)};
-location_area_and_cell2(_LocationAreaAndCell, Acc) ->
 	Acc.
 
 %% @hidden
@@ -2050,5 +1911,144 @@ roaming_record27(Record, Acc) ->
 roaming_record28(#{partialRecordType := PartialRecordType}, Acc) ->
 	Acc#{<<"partialRecordType">> => PartialRecordType};
 roaming_record28(_Record, Acc) ->
+	Acc.
+
+%% @hidden
+trunk_group({tkgpNumber, Number}) ->
+	#{<<"tkgpNumber">> => Number};
+trunk_group({tkgpName, Name}) ->
+	#{<<"tkgpName">> => Name}.
+
+%% @hidden
+basic_service_code({bearerService, Code}) ->
+	#{<<"bearerService">> => cgf_lib:octet_string(Code)};
+basic_service_code({teleservice, Code}) ->
+	#{<<"teleservice">> => cgf_lib:octet_string(Code)}.
+
+%% @hidden
+change_of_service(#{transparencyInd := TransparencyInd} = ChangeOfService) ->
+	Acc = #{<<"transparencyInd">> => TransparencyInd},
+	change_of_service1(ChangeOfService, Acc);
+change_of_service(ChangeOfService) ->
+	change_of_service1(ChangeOfService, #{}).
+%% @hidden
+change_of_service1(#{rateIndication := RateIndication} = ChangeOfService, Acc) ->
+	Acc1 = Acc#{<<"rateIndication">> => RateIndication},
+	change_of_service2(ChangeOfService, Acc1);
+change_of_service1(ChangeOfService, Acc) ->
+	change_of_service2(ChangeOfService, Acc).
+%% @hidden
+change_of_service2(#{fnur := Fnur} = ChangeOfService, Acc) ->
+	Acc1 = Acc#{<<"fnur">> => Fnur},
+	change_of_service3(ChangeOfService, Acc1);
+change_of_service2(ChangeOfService, Acc) ->
+	change_of_service3(ChangeOfService, Acc).
+%% @hidden
+change_of_service3(#{changeTime := ChangeTime} = ChangeOfService, Acc) ->
+	Acc1 = Acc#{<<"changeTime">> => cgf_lib:bcd_date_time(ChangeTime)},
+	change_of_service4(ChangeOfService, Acc1);
+change_of_service3(ChangeOfService, Acc) ->
+	change_of_service4(ChangeOfService, Acc).
+%% @hidden
+change_of_service4(#{basicService := BasicService} = _ChangeOfService, Acc) ->
+	Acc#{<<"basicService">> => basic_service_code(BasicService)};
+change_of_service4(_ChangeOfService, Acc) ->
+	Acc.
+
+%% @hidden
+suppl_service_used(#{ssTime := SSTime} = SupplServicesUsed) ->
+	Acc = #{<<"ssTime">> => cgf_lib:bcd_date_time(SSTime)},
+	suppl_service_used1(SupplServicesUsed, Acc);
+suppl_service_used(SupplServicesUsed) ->
+	suppl_service_used1(SupplServicesUsed, #{}).
+%% @hidden
+suppl_service_used1(#{ssCode := Code}, Acc) ->
+	Acc#{<<"ssCode">> => cgf_lib:octet_string(Code)};
+suppl_service_used1(_SupplServicesUsed, Acc) ->
+	Acc.
+
+%% @hidden
+level_camel_service(Level) ->
+	level_camel_service(Level, []).
+%% @hidden
+level_camel_service([H | T], Acc) ->
+	level_camel_service(T, [atom_to_list(H) | Acc]);
+level_camel_service([], Acc) ->
+	lists:reverse(Acc).
+
+aoc_params(#{newParameters := NewParameters} = Params) ->
+	Acc = #{<<"newParameters">> => NewParameters},
+	aoc_params1(Params, Acc);
+aoc_params(Params) ->
+	aoc_params1(Params, #{}).
+%% @hidden
+aoc_params1(#{changeTime := ChangeTime} = _Params, Acc) ->
+	Acc#{<<"changeTime">> => cgf_lib:bcd_date_time(ChangeTime)};
+aoc_params1(_Params, Acc) ->
+	Acc.
+
+change_of_params(#{initiatingParty := InitiatingParty} = ChangeOfHSCSDParms) ->
+	Acc = #{<<"initiatingParty">> => InitiatingParty},
+	change_of_params1(ChangeOfHSCSDParms, Acc);
+change_of_params(ChangeOfHSCSDParms) ->
+	change_of_params1(ChangeOfHSCSDParms, #{}).
+%% @hidden
+change_of_params1(#{hSCSDChanRequested := HSCSDChanRequested} =
+		ChangeOfHSCSDParms, Acc) ->
+	Acc1 = Acc#{<<"hSCSDChanRequested">> => HSCSDChanRequested},
+	change_of_params2(ChangeOfHSCSDParms, Acc1);
+change_of_params1(ChangeOfHSCSDParms, Acc) ->
+	change_of_params2(ChangeOfHSCSDParms, Acc).
+%% @hidden
+change_of_params2(#{hSCSDChanAllocated := HSCSDChanAllocated} =
+		ChangeOfHSCSDParms, Acc) ->
+	Acc1 = Acc#{<<"hSCSDChanAllocated">> => HSCSDChanAllocated},
+	change_of_params3(ChangeOfHSCSDParms, Acc1);
+change_of_params2(ChangeOfHSCSDParms, Acc) ->
+	change_of_params3(ChangeOfHSCSDParms, Acc).
+%% @hidden
+change_of_params3(#{changeTime := ChangeTime} = ChangeOfHSCSDParms, Acc) ->
+	Acc1 = Acc#{<<"changeTime">> => cgf_lib:bcd_date_time(ChangeTime)},
+	change_of_params4(ChangeOfHSCSDParms, Acc1);
+change_of_params3(ChangeOfHSCSDParms, Acc) ->
+	change_of_params4(ChangeOfHSCSDParms, Acc).
+%% @hidden
+change_of_params4(#{chanCodingUsed := ChanCodingUsed} =
+		ChangeOfHSCSDParms, Acc) ->
+	Acc1 = Acc#{<<"chanCodingUsed">> => ChanCodingUsed},
+	change_of_params5(ChangeOfHSCSDParms, Acc1);
+change_of_params4(ChangeOfHSCSDParms, Acc) ->
+	change_of_params5(ChangeOfHSCSDParms, Acc).
+%% @hidden
+change_of_params5(#{aiurRequested := AiurRequested} =
+		_ChangeOfHSCSDParms, Acc) ->
+	Acc#{<<"aiurRequested">> => AiurRequested};
+change_of_params5(_ChangeOfHSCSDParms, Acc) ->
+	Acc.
+
+%% @hidden
+ss_parameters({forwardedToNumber, Number}) ->
+	#{<<"forwardedToNumber">> => cgf_lib:bcd_dn(Number)};
+ss_parameters({unstructuredData, Data}) ->
+	#{<<"unstructuredData">> => cgf_lib:octet_string(Data)}.
+
+%% @hidden
+location_area_and_cell(#{locationAreaCode
+		:= <<LAC:16>>} = LocationAreaAndCell) ->
+	Acc = #{<<"locationAreaCode">> => LAC},
+	location_area_and_cell1(LocationAreaAndCell, Acc);
+location_area_and_cell(LocationAreaAndCell) ->
+	location_area_and_cell1(LocationAreaAndCell, #{}).
+%% @hidden
+location_area_and_cell1(#{cellId
+		:= <<CID:16>>} = LocationAreaAndCell, Acc) ->
+	Acc1 = Acc#{<<"cellId">> => CID},
+	location_area_and_cell2(LocationAreaAndCell, Acc1);
+location_area_and_cell1(LocationAreaAndCell, Acc) ->
+	location_area_and_cell2(LocationAreaAndCell, Acc).
+%% @hidden
+location_area_and_cell2(#{'mCC-MNC' := MccMnc}, Acc) ->
+	Acc#{<<"cellId">> => cgf_lib:octet_string(MccMnc)};
+location_area_and_cell2(_LocationAreaAndCell, Acc) ->
 	Acc.
 
