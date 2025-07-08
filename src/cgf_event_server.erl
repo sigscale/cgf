@@ -314,7 +314,7 @@ handle_copy(Event,
 	FilePath = <<Root/binary, UserPath/binary>>,
 	case file:copy(Filename, FilePath) of
 		{ok, _} ->
-			Stack1 = [{Event, Match, Action} | Stack],
+			Stack1 = [{Event, {Match, Action}} | Stack],
 			EventPayload = #{module => ?MODULE,
 					user => Username,
 					root => Root,
@@ -363,7 +363,7 @@ handle_move(Event,
 	FilePath = <<Root/binary, UserPath/binary>>,
 	case file:rename(Filename, FilePath) of
 		ok ->
-			Stack1 = [{Event, Match, Action} | Stack],
+			Stack1 = [{Event, {Match, Action}} | Stack],
 			EventPayload = #{module => ?MODULE,
 					user => Username,
 					root => Root,
@@ -445,7 +445,7 @@ handle_unzip(Event,
 			F = fun(File) ->
 					case string:prefix(File, binary_to_list(Root)) of
 						UnzipPath when is_list(UnzipPath) ->
-							Stack1 = [{Event, Match, Action} | Stack],
+							Stack1 = [{Event, {Match, Action}} | Stack],
 							EventPayload = #{module => ?MODULE,
 									user => Username,
 									root => Root,
@@ -517,7 +517,7 @@ handle_gunzip(Event,
 		Match, Action, UserPath, IoDevice1, {ok, IoDevice2}) ->
 	case file:copy(IoDevice1, IoDevice2) of
 		{ok, _BytesCopied} ->
-			Stack1 = [{Event, Match, Action} | Stack],
+			Stack1 = [{Event, {Match, Action}} | Stack],
 			EventPayload = #{module => ?MODULE,
 					user => Username,
 					root => Root,
@@ -631,7 +631,7 @@ handle_untar2(Event,
 			ok = file:close(File),
 			F = fun(Filename) ->
 					FilePath = filename:join(UserPath, Filename),
-					Stack1 = [{Event, Match, Action} | Stack],
+					Stack1 = [{Event, {Match, Action}} | Stack],
 					EventPayload = #{module => ?MODULE,
 							user => Username,
 							root => Root,

@@ -74,7 +74,7 @@ add_sup_handler(Handler, Args) ->
 -spec notify(EventType, EventPayLoad) -> ok
 	when
 		EventType :: file_close,
-		EventPayLoad :: term().
+		EventPayLoad :: file_close().
 %% @doc Send a notification event.
 notify(EventType, EventPayLoad) ->
 	catch gen_event:notify(?MODULE, {EventType, EventPayLoad}),
