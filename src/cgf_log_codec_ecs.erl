@@ -58,6 +58,8 @@ bx([{moCall = _RecordType, Parameters} | T] = _CDR) ->
 	MSISDN = msisdn(Parameters),
 	{StartTime, StopTime, Duration} = call_duration(Parameters),
 	Timestamp = case {StartTime, StopTime} of
+		{[], []} ->
+			cgf_log:iso8601(erlang:system_time(millisecond));
 		{[], StopTime} ->
 			StopTime;
 		{StartTime, _} ->
@@ -76,6 +78,8 @@ bx([{mtCall = _RecordType, Parameters} | T] = _CDR) ->
 	MSISDN = msisdn(Parameters),
 	{StartTime, StopTime, Duration} = call_duration(Parameters),
 	Timestamp = case {StartTime, StopTime} of
+		{[], []} ->
+			cgf_log:iso8601(erlang:system_time(millisecond));
 		{[], StopTime} ->
 			StopTime;
 		{StartTime, _} ->
@@ -187,6 +191,8 @@ bx([{roaming = _RecordType, Parameters} | T] = _CDR) ->
 	MSISDN = msisdn(Parameters),
 	{StartTime, StopTime, Duration} = call_duration(Parameters),
 	Timestamp = case {StartTime, StopTime} of
+		{[], []} ->
+			cgf_log:iso8601(erlang:system_time(millisecond));
 		{[], StopTime} ->
 			StopTime;
 		{StartTime, _} ->
@@ -205,6 +211,8 @@ bx([{sgsnPDP = _RecordType, Parameters} | T] = _CDR) ->
 	MSISDN = msisdn(Parameters),
 	{StartTime, StopTime, Duration} = session_duration(Parameters),
 	Timestamp = case {StartTime, StopTime} of
+		{[], []} ->
+			cgf_log:iso8601(erlang:system_time(millisecond));
 		{[], StopTime} ->
 			StopTime;
 		{StartTime, _} ->
@@ -223,6 +231,8 @@ bx([{ggsnPDP = _RecordType, Parameters} | T] = _CDR) ->
 	MSISDN = msisdn(Parameters),
 	{StartTime, StopTime, Duration} = session_duration(Parameters),
 	Timestamp = case {StartTime, StopTime} of
+		{[], []} ->
+			cgf_log:iso8601(erlang:system_time(millisecond));
 		{[], StopTime} ->
 			StopTime;
 		{StartTime, _} ->
@@ -275,6 +285,8 @@ bx([{sgw = _RecordType, Parameters} | T] = _CDR) ->
 	MSISDN = msisdn(Parameters),
 	{StartTime, StopTime, Duration} = session_duration(Parameters),
 	Timestamp = case {StartTime, StopTime} of
+		{[], []} ->
+			cgf_log:iso8601(erlang:system_time(millisecond));
 		{[], StopTime} ->
 			StopTime;
 		{StartTime, _} ->
@@ -690,7 +702,7 @@ roam_duration(#{<<"basicCallInformation">> := I}) ->
 		{ok, Start} ->
 			Start;
 		error ->
-			[]
+			cgf_log:iso8601(erlang:system_time(millisecond))
 	end,
 	Duration = case maps:find(<<"totalCallEventDuration">>, I) of
 		{ok, Seconds} ->
@@ -704,7 +716,7 @@ roam_duration(#{<<"gprsBasicCallInformation">> := I}) ->
 		{ok, Start} ->
 			Start;
 		error ->
-			[]
+			cgf_log:iso8601(erlang:system_time(millisecond))
 	end,
 	Duration = case maps:find(<<"totalCallEventDuration">>, I) of
 		{ok, Seconds} ->
@@ -714,7 +726,7 @@ roam_duration(#{<<"gprsBasicCallInformation">> := I}) ->
 	end,
 	{StartTime, Duration};
 roam_duration(_) ->
-	{[], []}.
+	{cgf_log:iso8601(erlang:system_time(millisecond)), []}.
 
 -spec call_outcome(Parameters) -> Outcome
 	when
