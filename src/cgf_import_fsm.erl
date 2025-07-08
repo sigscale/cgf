@@ -519,8 +519,20 @@ handle_event(EventType, EventContent, _State, Data) ->
 %% @see //stdlib/gen_statem:terminate/3
 %% @private
 %%
-terminate(_Reason, _State, _Data) ->
-	ok.
+terminate(Reason, State,
+		#{module := Module,
+		filename := Filename,
+		log := Log,
+		metadata := Metadata,
+		start := Start} = _Data) ->
+	EventPayload = #{module => Module,
+		filename => Filename,
+		log => Log,
+		metadata => Metadata,
+		start => Start,
+		state => State,
+		reason => Reason},
+	cgf_event:notify(import_end, EventPayload).
 
 -spec code_change(OldVsn, OldState, OldData, Extra) -> Result
 	when

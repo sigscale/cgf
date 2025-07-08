@@ -94,7 +94,10 @@ handle_call({file_close = Event, Content} = _Request, _From, State) ->
 					{event, Event},
 					{content, Content}]),
 			{reply, {error, Reason}, State, timeout(State)}
-	end.
+	end;
+handle_call({import_end = _Event, _Content} = _Request, _From, State) ->
+	NewState = start_import(State),
+	{reply, ok, NewState, timeout(NewState)}.
 
 -spec handle_cast(Request, State) -> Result
 	when

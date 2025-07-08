@@ -39,11 +39,19 @@
 -type stack() :: [{Event :: cgf:event(),
 		{Match :: cgf:match(), Action :: cgf:action()}}].
 -type file_close() ::
-		#{module := Module :: atom(),
+		#{module := Module :: erlang:module(),
 		user := User :: binary(),
 		root := Root :: binary(),
 		path := Path :: binary(),
 		stack := Stack :: stack()}.
+-type import_end() ::
+		#{module := erlang:module(),
+		filename := Filename :: file:filename() | binary(),
+		log := Log :: disk_log:log(),
+		metadata := Metadata :: map(),
+		start := Start :: pos_integer(),
+		state := State :: atom(),
+		reason := Reason :: term()}.
 
 -record(state,
 		{max_stack :: pos_integer()}).
@@ -73,8 +81,8 @@ add_sup_handler(Handler, Args) ->
 
 -spec notify(EventType, EventPayLoad) -> ok
 	when
-		EventType :: file_close,
-		EventPayLoad :: file_close().
+		EventType :: file_close | import_end,
+		EventPayLoad :: file_close() | import_end().
 %% @doc Send a notification event.
 notify(EventType, EventPayLoad) ->
 	catch gen_event:notify(?MODULE, {EventType, EventPayLoad}),
@@ -121,6 +129,9 @@ handle_event({_, #{stack := Stack}} = Event,
 	?LOG_ERROR([{?MODULE, max_action}, {event, Event}]),
 	{ok, State};
 handle_event({file_close, #{}} = Event, State) ->
+	gen_server:call(cgf_event_server, Event),
+	{ok, State};
+handle_event({import_end, #{}} = Event, State) ->
 	gen_server:call(cgf_event_server, Event),
 	{ok, State};
 handle_event(Event, State) ->
