@@ -38,7 +38,7 @@
 -define(TIMEOUT, 10000).
 
 -record(state,
-		{max_fsm :: non_neg_integer(),
+		{max_fsm :: non_neg_integer() | undefined,
 		max_mem :: non_neg_integer(),
 		load_avg :: {avg1 | avg5 | avg15, pos_integer()},
 		eventq :: queue:queue()}).
@@ -260,9 +260,15 @@ start_import1(#state{load_avg = {F, MaxLoad}} = State) ->
 	end.
 %% @hidden
 start_import2(#state{max_fsm = MaxFsm, eventq = EventQ} = State) ->
+	MaxFsm1 = case MaxFsm of
+		undefined ->
+			erlang:system_info(schedulers_online);
+		MaxFsm when is_integer(MaxFsm), MaxFsm > 0 ->
+			MaxFsm
+	end,
 	Counts = supervisor:count_children(cgf_import_sup),
 	case proplists:get_value(active, Counts) of
-		Active when Active < MaxFsm ->
+		Active when Active < MaxFsm1 ->
 			{{value, StartArgs}, EventQ1} = queue:out(EventQ),
 			NewState = State#state{eventq = EventQ1},
 			start_import3(StartArgs, NewState);

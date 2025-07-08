@@ -84,7 +84,7 @@
 				[{wait_tables, 10000},
 				{statistics_interval, 60},
 				{max_action, 5},
-				{max_action_import, 100},
+				{max_action_import, undefined},
 				{max_action_memory, 68719476736},
 				{max_action_load, {1, 10.00}},
 				{bx_log_dir, "log/bx"},

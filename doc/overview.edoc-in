@@ -130,7 +130,9 @@ Application environment variables configuring mediation of CDR files:
 	<dt>`max_action_import'</dt>
 		<dd>Sets the maximum number of concurrent
 				{@link //cgf/cgf_import_fsm. cgf_import_fsm} workers
-				after which start requests will be queued.  (default: `100')</dd>
+				after which start requests will be queued. If `undefined'
+				the number of online schedulers is used.
+				(default: `undefined')</dd>
 	<dt>`max_action_memory'</dt>
 		<dd>Sets the maximum total memory size allocated by the
 				Erlang emulator after which start requests will be queued.
