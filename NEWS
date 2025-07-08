@@ -1,5 +1,11 @@
-June 12, 2025
--------------
+July 8, 2025
+------------
+	- Notify on import FSM termination to trigger next queued import immediately
+	- Default max_action_import uses number of schedulers online
+	- Ensure @timestamp is set in ECS log events
+
+July 7, 2025
+------------
 	- CAMEL Information in CS CDR
 
 June 12, 2025

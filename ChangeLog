@@ -1,3 +1,10 @@
+2025-07-08   Vance Shipley <vances@sigscale.org>
+
+	* ensure @timestamp is set in ecs logs
+	* change default max_action_import to undefined; use number of schedulers online
+	* add event to notify when import fsm done
+	* correct type for event stack items
+
 2025-07-07   Vance Shipley <vances@sigscale.org>
 
 	* handle cs camel information
