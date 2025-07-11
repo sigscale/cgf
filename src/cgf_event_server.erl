@@ -269,9 +269,13 @@ start_import2(#state{max_fsm = MaxFsm, eventq = EventQ} = State) ->
 	Counts = supervisor:count_children(cgf_import_sup),
 	case proplists:get_value(active, Counts) of
 		Active when Active < MaxFsm1 ->
-			{{value, StartArgs}, EventQ1} = queue:out(EventQ),
-			NewState = State#state{eventq = EventQ1},
-			start_import3(StartArgs, NewState);
+			case queue:out(EventQ) of
+				{{value, StartArgs}, EventQ1} ->
+					NewState = State#state{eventq = EventQ1},
+					start_import3(StartArgs, NewState);
+				{empty, _} ->
+					State
+			end;
 		_Active ->
 			State
 	end.
