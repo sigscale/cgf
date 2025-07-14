@@ -871,9 +871,9 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 
 	CalleePartyInformation ::= SEQUENCE
 	{
-	called-Party-Address              [0] InvolvedParty OPTIONAL,
-	requested-Party-Address           [1] InvolvedParty OPTIONAL,
-	list-Of-Called-Asserted-Identity  [2] SEQUENCE OF InvolvedParty OPTIONAL
+		called-Party-Address              [0] InvolvedParty OPTIONAL,
+		requested-Party-Address           [1] InvolvedParty OPTIONAL,
+		list-Of-Called-Asserted-Identity  [2] SEQUENCE OF InvolvedParty OPTIONAL
 	}
 
 	CAMELAccessPointNameNI ::= AccessPointNameNI
@@ -936,11 +936,9 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		indirectChangeCondition        (17),  -- NBIFOM "Indirect Change Condition"
 		userPlaneToUEChange            (18),  -- bearer modification. "Change of user plane to UE"    
 		servingPLMNRateControlChange   (19),     
-	-- bearer modification ÒServing PLMN Rate Control Change"
+	-- bearer modification "Serving PLMN Rate Control Change"
 		threeGPPPSDataOffStatusChange  (20),  -- "Change of 3GPP PS DataO ff Status"
 		aPNRateControlChange           (21)   -- bearer modification. "APN Rate ControlChange"
-
-
 	}
 
 	ChangeOfCharCondition ::= SEQUENCE
@@ -977,8 +975,6 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		threeGPPPSDataOffStatus                 [21] ThreeGPPPSDataOffStatus OPTIONAL,
 		listOfPresenceReportingAreaInformation  [22] SEQUENCE OF PresenceReportingAreaInfo OPTIONAL,
 		aPNRateControl                          [23] APNRateControl OPTIONAL
-
-
 	}
 
 	ChangeOfMBMSCondition ::= SEQUENCE
@@ -1039,7 +1035,6 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		tWANUserLocationInformation             [40] TWANUserLocationInfo OPTIONAL,
 		listOfPresenceReportingAreaInformation  [41] SEQUENCE OF PresenceReportingAreaInfo OPTIONAL,
 		voLTEInformation                        [42] VoLTEInformation OPTIONAL
-
 	}
 
 	ChangeLocation ::= SEQUENCE
@@ -1266,7 +1261,6 @@ DEFINITIONS IMPLICIT TAGS ::= BEGIN
 		outsideArea  (1),
 		inactive     (2),
 		unknown      (3)
-
 	}
 
 	PSFurnishChargingInformation ::= SEQUENCE
