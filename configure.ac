@@ -63,6 +63,7 @@ asndir=$ERLANG_INSTALL_LIB_DIR/$PACKAGE_NAME-$PACKAGE_VERSION/asn_src
 eincludedir=$ERLANG_INSTALL_LIB_DIR/$PACKAGE_NAME-$PACKAGE_VERSION/include
 privdir=$ERLANG_INSTALL_LIB_DIR/$PACKAGE_NAME-$PACKAGE_VERSION/priv
 schemadir=$ERLANG_INSTALL_LIB_DIR/$PACKAGE_NAME-$PACKAGE_VERSION/priv/schema
+wwwdir=$ERLANG_INSTALL_LIB_DIR/$PACKAGE_NAME-$PACKAGE_VERSION/priv/www
 scriptdir=$ERLANG_INSTALL_LIB_DIR/$PACKAGE_NAME-$PACKAGE_VERSION/priv/bin
 reldir=$ERLANG_INSTALL_LIB_DIR/../releases
 envdir=/etc/default
@@ -74,6 +75,7 @@ AC_SUBST(asndir)
 AC_SUBST(eincludedir)
 AC_SUBST(privdir)
 AC_SUBST(schemadir)
+AC_SUBST(wwwdir)
 AC_SUBST(reldir)
 AC_SUBST(scriptdir)
 AC_SUBST(envdir)
@@ -131,6 +133,6 @@ AC_ERLANG_CHECK_LIB([zj], [], [AC_MSG_ERROR([zj was not found!])])
 ##
 AC_OUTPUT([Makefile include/Makefile ebin/Makefile doc/Makefile
 		src/Makefile asn_src/Makefile priv/Makefile priv/schema/Makefile
-		test/Makefile sys.config $PACKAGE_NAME.rel ebin/cgf.appup
-		scripts/cgf scripts/cgf.service])
+		priv/www/Makefile test/Makefile sys.config $PACKAGE_NAME.rel
+		ebin/cgf.appup scripts/cgf scripts/cgf.service])
 
