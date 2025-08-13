@@ -133,6 +133,6 @@ AC_ERLANG_CHECK_LIB([zj], [], [AC_MSG_ERROR([zj was not found!])])
 ##
 AC_OUTPUT([Makefile include/Makefile ebin/Makefile doc/Makefile
 		src/Makefile asn_src/Makefile priv/Makefile priv/schema/Makefile
-		priv/www/Makefile test/Makefile sys.config $PACKAGE_NAME.rel
+		test/Makefile sys.config $PACKAGE_NAME.rel
 		ebin/cgf.appup scripts/cgf scripts/cgf.service])
 
