@@ -1,3 +1,10 @@
+2025-08-13   Vance Shipley <vances@sigscale.org>
+
+	* refactor including api-catalog in release
+	* correct httpd directives for /schema, /doc directories
+	* move api-catalog to /schemas with no auth required
+	* enable discovery with well known (rfc8615) api catalog (rfc9727)
+
 2025-07-11   Vance Shipley <vances@sigscale.org>
 
 	* handle an empty queue in event server

@@ -1,3 +1,8 @@
+August 13, 2025
+---------------
+	- Discovery with well known (rfc8615) API catalog (rfc9727)
+	- No authentication required for discovery, schemas and documentation
+
 July 8, 2025
 ------------
 	- Notify on import FSM termination to trigger next queued import immediately
