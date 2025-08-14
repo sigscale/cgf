@@ -42,7 +42,7 @@
             {alias, {"/schema", "lib/@PACKAGE@-@VERSION@/priv/schema"}},
             {alias, {"/.well-known/api-catalog",
                   "lib/@PACKAGE@-@VERSION@/priv/schema/api-catalog.linkset.jsonld"}},
-            {document_root, "lib/@PACKAGE@-@VERSION@/www"}]}]}]},
+            {document_root, "lib/@PACKAGE@-@VERSION@/doc"}]}]}]},
 {mnesia,
       [{dir, "db"}]},
 {cgf,
